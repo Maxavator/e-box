@@ -12,7 +12,7 @@ const Auth = () => {
   const { toast } = useToast();
 
   const validateSAID = (id: string) => {
-    const regex = /^([456])0\d{9}(\d{3})$/;
+    const regex = /^([456])0\d{11}$/;
     return regex.test(id);
   };
 
@@ -51,9 +51,9 @@ const Auth = () => {
             Demo Credentials
           </CardDescription>
           <div className="mt-4 space-y-2 text-sm text-gray-500 bg-gray-50 p-4 rounded-lg">
-            <p><span className="font-medium">Regular User:</span> 60102030405</p>
-            <p><span className="font-medium">Organization Admin:</span> 50102030405</p>
-            <p><span className="font-medium">Global Admin:</span> 40102030405</p>
+            <p><span className="font-medium">Regular User:</span> 6010203040512</p>
+            <p><span className="font-medium">Organization Admin:</span> 5010203040512</p>
+            <p><span className="font-medium">Global Admin:</span> 4010203040512</p>
           </div>
         </CardHeader>
         <CardContent>
