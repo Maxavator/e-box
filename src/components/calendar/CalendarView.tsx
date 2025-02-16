@@ -36,7 +36,7 @@ export function CalendarView() {
 
       if (error) throw error;
 
-      setEvents(data as CalendarEvent[]);
+      setEvents(data || []);
     } catch (error) {
       toast({
         title: "Error",
@@ -84,14 +84,14 @@ export function CalendarView() {
                   >
                     <h3 className="font-semibold">{event.title}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {format(new Date(event.startTime), 'h:mm a')} - {format(new Date(event.endTime), 'h:mm a')}
+                      {format(new Date(event.start_time), 'h:mm a')} - {format(new Date(event.end_time), 'h:mm a')}
                     </p>
                     {event.location && (
                       <p className="text-sm mt-1">📍 {event.location}</p>
                     )}
-                    {event.isOnline && event.meetingLink && (
+                    {event.is_online && event.meeting_link && (
                       <p className="text-sm mt-1">
-                        🔗 <a href={event.meetingLink} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Join Meeting</a>
+                        🔗 <a href={event.meeting_link} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Join Meeting</a>
                       </p>
                     )}
                   </div>

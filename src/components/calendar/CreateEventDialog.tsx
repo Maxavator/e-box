@@ -16,7 +16,7 @@ export function CreateEventDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState<Date>();
+  const [date, setDate] = useState<Date | undefined>(new Date());
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [location, setLocation] = useState("");
@@ -38,7 +38,15 @@ export function CreateEventDialog() {
     const endDateTime = new Date(`${format(date, 'yyyy-MM-dd')}T${endTime}`);
 
     try {
+      // Get the current user's ID from supabase auth
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
       const { error } = await supabase.from('calendar_events').insert({
+        creator_id: user.id,
         title,
         description,
         start_time: startDateTime.toISOString(),
@@ -68,7 +76,7 @@ export function CreateEventDialog() {
   const resetForm = () => {
     setTitle("");
     setDescription("");
-    setDate(undefined);
+    setDate(new Date());
     setStartTime("");
     setEndTime("");
     setLocation("");
