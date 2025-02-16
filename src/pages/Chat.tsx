@@ -6,64 +6,106 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import MessageItem from "@/components/chat/MessageItem";
-import { User as ChatUser, Message, Conversation } from "@/types/chat";
+import { CalendarView } from "@/components/calendar/CalendarView";
+import type { User as ChatUser, Message, Conversation } from "@/types/chat";
 
 const demoUsers: ChatUser[] = [
-  { id: '1', name: 'Sarah Chen', status: 'online' },
-  { id: '2', name: 'Mike Johnson', status: 'offline', lastSeen: '2 hours ago' },
-  { id: '3', name: 'Emma Wilson', status: 'online' },
-  { id: '4', name: 'Alex Rodriguez', status: 'offline', lastSeen: '1 day ago' },
-  { id: '5', name: 'David Kim', status: 'online' },
+  {
+    id: "1",
+    name: "John Doe",
+    title: "Software Engineer",
+    avatar: "/avatars/1.png",
+  },
+  {
+    id: "2",
+    name: "Jane Smith",
+    title: "Product Manager",
+    avatar: "/avatars/2.png",
+  },
+  {
+    id: "3",
+    name: "Mike Johnson",
+    title: "UX Designer",
+    avatar: "/avatars/3.png",
+  },
+  {
+    id: "4",
+    name: "Emily Brown",
+    title: "Data Scientist",
+    avatar: "/avatars/4.png",
+  },
 ];
 
 const demoConversations: Conversation[] = [
   {
-    id: '1',
-    userId: '1',
-    unreadCount: 2,
+    id: "101",
+    user: demoUsers[0],
+    lastMessage: "Hey, how's the project going?",
     messages: [
-      { id: '1', senderId: '1', text: 'Hi, could you review the latest design updates?', timestamp: '10:30 AM', status: 'sent' },
-      { id: '2', senderId: 'me', text: 'Sure, I\'ll take a look right now', timestamp: '10:32 AM', status: 'sent' },
-      { id: '3', senderId: '1', text: 'Thanks! Let me know what you think', timestamp: '10:33 AM', status: 'sent' },
-    ]
+      {
+        senderId: "1",
+        text: "Hey, how's the project going?",
+        timestamp: "2024-03-17T10:30:00",
+      },
+      {
+        senderId: "currentUser",
+        text: "It's coming along nicely! Just finished the UI.",
+        timestamp: "2024-03-17T10:32:00",
+      },
+    ],
   },
   {
-    id: '2',
-    userId: '2',
-    unreadCount: 0,
+    id: "102",
+    user: demoUsers[1],
+    lastMessage: "Can we schedule a meeting for next week?",
     messages: [
-      { id: '1', senderId: '2', text: 'Team meeting at 3 PM today', timestamp: '9:00 AM', status: 'sent' },
-      { id: '2', senderId: 'me', text: 'I\'ll be there', timestamp: '9:05 AM', status: 'sent' },
-    ]
+      {
+        senderId: "2",
+        text: "Can we schedule a meeting for next week?",
+        timestamp: "2024-03-16T15:45:00",
+      },
+      {
+        senderId: "currentUser",
+        text: "Sure, let me check my calendar.",
+        timestamp: "2024-03-16T15:47:00",
+      },
+    ],
   },
   {
-    id: '3',
-    userId: '3',
-    unreadCount: 1,
+    id: "103",
+    user: demoUsers[2],
+    lastMessage: "I have some feedback on the latest designs.",
     messages: [
-      { id: '1', senderId: '3', text: 'Did you see the new project requirements?', timestamp: '11:20 AM', status: 'sent' },
-    ]
+      {
+        senderId: "3",
+        text: "I have some feedback on the latest designs.",
+        timestamp: "2024-03-15T09:10:00",
+      },
+      {
+        senderId: "currentUser",
+        text: "Great, I'm all ears!",
+        timestamp: "2024-03-15T09:12:00",
+      },
+    ],
   },
   {
-    id: '4',
-    userId: '4',
-    unreadCount: 0,
+    id: "104",
+    user: demoUsers[3],
+    lastMessage: "The data analysis is complete.",
     messages: [
-      { id: '1', senderId: '4', text: 'Great presentation yesterday!', timestamp: 'Yesterday', status: 'sent' },
-      { id: '2', senderId: 'me', text: 'Thanks! Glad it went well', timestamp: 'Yesterday', status: 'sent' },
-    ]
-  },
-  {
-    id: '5',
-    userId: '5',
-    unreadCount: 3,
-    messages: [
-      { id: '1', senderId: '5', text: 'Can we discuss the new feature?', timestamp: '12:45 PM', status: 'sent' },
-      { id: '2', senderId: '5', text: 'I have some ideas to share', timestamp: '12:46 PM', status: 'sent' },
-      { id: '3', senderId: '5', text: 'Let me know when you\'re free', timestamp: '12:47 PM', status: 'sent' },
-    ]
+      {
+        senderId: "4",
+        text: "The data analysis is complete.",
+        timestamp: "2024-03-14T14:20:00",
+      },
+      {
+        senderId: "currentUser",
+        text: "Awesome, can you send me the report?",
+        timestamp: "2024-03-14T14:22:00",
+      },
+    ],
   },
 ];
 
@@ -74,162 +116,38 @@ const Chat = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("chats");
 
-  const totalUnreadMessages = demoConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
-
   const handleLogout = () => {
     navigate("/");
   };
 
-  const getUserById = (id: string) => demoUsers.find(user => user.id === id);
+  const handleLogoClick = () => {
+    navigate("/organization");
+  };
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedConversation) return;
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newMessage.trim() === "") return;
 
-    const message: Message = {
-      id: `${Date.now()}`,
-      senderId: 'me',
-      text: newMessage.trim(),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      status: 'sending'
-    };
-
-    setSelectedConversation(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        messages: [...prev.messages, message]
+    if (selectedConversation) {
+      const newMessageItem: Message = {
+        senderId: "currentUser",
+        text: newMessage,
+        timestamp: new Date().toISOString(),
       };
-    });
+
+      setSelectedConversation({
+        ...selectedConversation,
+        messages: [...selectedConversation.messages, newMessageItem],
+        lastMessage: newMessage,
+      });
+    }
 
     setNewMessage("");
-
-    // Simulate message sending
-    setTimeout(() => {
-      setSelectedConversation(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          messages: prev.messages.map(m => 
-            m.id === message.id ? { ...m, status: 'sent' } : m
-          )
-        };
-      });
-    }, 1000);
   };
 
-  const handleEditMessage = (messageId: string, newText: string) => {
-    setSelectedConversation(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        messages: prev.messages.map(m => 
-          m.id === messageId ? 
-          { 
-            ...m, 
-            text: newText, 
-            edited: true, 
-            editedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          } : m
-        )
-      };
-    });
-  };
-
-  const handleDeleteMessage = (messageId: string) => {
-    setSelectedConversation(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        messages: prev.messages.filter(m => m.id !== messageId)
-      };
-    });
-  };
-
-  const handleReaction = (messageId: string, emoji: string) => {
-    setSelectedConversation(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        messages: prev.messages.map(m => {
-          if (m.id !== messageId) return m;
-          
-          const existingReaction = m.reactions?.find(r => r.emoji === emoji);
-          const reactions = m.reactions || [];
-          
-          if (existingReaction) {
-            if (existingReaction.users.includes('me')) {
-              // Remove reaction
-              return {
-                ...m,
-                reactions: reactions
-                  .map(r => r.emoji === emoji ? 
-                    { ...r, users: r.users.filter(u => u !== 'me') } : r)
-                  .filter(r => r.users.length > 0)
-              };
-            } else {
-              // Add user to existing reaction
-              return {
-                ...m,
-                reactions: reactions.map(r => 
-                  r.emoji === emoji ? 
-                  { ...r, users: [...r.users, 'me'] } : r
-                )
-              };
-            }
-          } else {
-            // Add new reaction
-            return {
-              ...m,
-              reactions: [...reactions, { emoji, users: ['me'] }]
-            };
-          }
-        })
-      };
-    });
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
-    }
-  };
-
-  const filteredConversations = demoConversations.filter(conversation => {
-    const user = getUserById(conversation.userId);
-    const searchLower = searchQuery.toLowerCase();
-    
-    // Search in user name
-    const nameMatch = user?.name.toLowerCase().includes(searchLower);
-    
-    // Search in message content
-    const messageMatch = conversation.messages.some(message => 
-      message.text.toLowerCase().includes(searchLower)
-    );
-    
-    // Search in timestamp
-    const timestampMatch = conversation.messages.some(message =>
-      message.timestamp.toLowerCase().includes(searchLower)
-    );
-
-    // Return true if any of the search criteria match
-    return nameMatch || messageMatch || timestampMatch;
-  });
-
-  // Highlight matching text in the conversation list
-  const highlightText = (text: string) => {
-    if (!searchQuery) return text;
-    
-    const parts = text.split(new RegExp(`(${searchQuery})`, 'gi'));
-    return parts.map((part, index) => 
-      part.toLowerCase() === searchQuery.toLowerCase() ? 
-        <span key={index} className="bg-yellow-200">{part}</span> : part
-    );
-  };
-
-  const handleLogoClick = () => {
-    setActiveTab("chats");
-    setSelectedConversation(null);
-  };
+  const filteredConversations = demoConversations.filter((conversation) =>
+    conversation.user.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="flex-1 flex flex-col">
@@ -253,275 +171,119 @@ const Chat = () => {
           Logout
         </Button>
       </header>
+
       <div className="flex-1 flex">
-        <aside className="w-80 border-r bg-white">
+        <aside className="w-64 border-r bg-gray-50 flex flex-col">
           <div className="p-4">
-            <Tabs defaultValue="chats" value={activeTab} className="w-full" onValueChange={setActiveTab}>
-              <TabsList className="w-full grid grid-cols-3 mb-4">
-                <TabsTrigger value="profile" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">Profile</span>
-                </TabsTrigger>
-                <TabsTrigger value="chats" className="flex items-center gap-2 relative">
-                  <MessageCircle className="h-4 w-4" />
-                  <span className="hidden sm:inline">Chats</span>
-                  {totalUnreadMessages > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-medium text-white">
-                      {totalUnreadMessages}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="desk" className="flex items-center gap-2">
-                  <LayoutDashboard className="h-4 w-4" />
-                  <span className="hidden sm:inline">Desk</span>
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="profile" className="mt-0">
-                <div className="flex flex-col items-center py-8 space-y-4">
-                  <Avatar className="h-20 w-20">
-                    <AvatarFallback className="text-xl">ME</AvatarFallback>
-                  </Avatar>
-                  <div className="text-center">
-                    <h3 className="font-medium">My Profile</h3>
-                    <p className="text-sm text-gray-500">Manage your account</p>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="chats" className="mt-0 space-y-4">
-                <h2 className="font-semibold">Conversations</h2>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    type="text"
-                    placeholder="Search messages, names..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9"
-                  />
-                  {searchQuery && (
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
-                      {filteredConversations.length} results
-                    </div>
-                  )}
-                </div>
-                <ScrollArea className="h-[calc(100vh-16rem)]">
-                  {filteredConversations.map((conversation) => {
-                    const user = getUserById(conversation.userId);
-                    const lastMessage = conversation.messages[conversation.messages.length - 1];
-                    
-                    // Find the first matching message for preview
-                    const matchingMessage = searchQuery ? 
-                      conversation.messages.find(msg => 
-                        msg.text.toLowerCase().includes(searchQuery.toLowerCase())
-                      ) : lastMessage;
-                    
-                    const previewMessage = matchingMessage || lastMessage;
-                    
-                    return (
-                      <div
-                        key={conversation.id}
-                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-100 ${
-                          selectedConversation?.id === conversation.id ? 'bg-gray-100' : ''
-                        }`}
-                        onClick={() => setSelectedConversation(conversation)}
-                      >
-                        <Avatar>
-                          <AvatarFallback>{user?.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="font-medium truncate">
-                              {highlightText(user?.name || '')}
-                            </p>
-                            <span className="text-xs text-gray-500">
-                              {highlightText(previewMessage.timestamp)}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm text-gray-500 truncate">
-                              {highlightText(previewMessage.text)}
-                            </p>
-                            {conversation.unreadCount > 0 && (
-                              <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-blue-600 rounded-full">
-                                {conversation.unreadCount}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {searchQuery && filteredConversations.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      No conversations found matching "{searchQuery}"
-                    </div>
-                  )}
-                </ScrollArea>
-              </TabsContent>
-
-              <TabsContent value="desk" className="mt-0">
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <h3 className="font-medium text-lg">My Desk</h3>
-                    <p className="text-sm text-gray-500">Quick access to your workspace tools</p>
-                  </div>
-                  
-                  <div className="grid gap-4">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start h-auto p-4"
-                      onClick={() => {/* TODO: Add calendar functionality */}}
-                    >
-                      <div className="flex items-start gap-4">
-                        <Calendar className="h-6 w-6 text-blue-600 flex-shrink-0" />
-                        <div className="text-left">
-                          <h4 className="font-medium">Calendar</h4>
-                          <p className="text-sm text-gray-500">Schedule and manage appointments</p>
-                        </div>
-                      </div>
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start h-auto p-4"
-                      onClick={() => {/* TODO: Add HR services functionality */}}
-                    >
-                      <div className="flex items-start gap-4">
-                        <Users className="h-6 w-6 text-green-600 flex-shrink-0" />
-                        <div className="text-left">
-                          <h4 className="font-medium">HR Services</h4>
-                          <p className="text-sm text-gray-500">Access HR resources and support</p>
-                        </div>
-                      </div>
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start h-auto p-4"
-                      onClick={() => {/* TODO: Add tech support functionality */}}
-                    >
-                      <div className="flex items-start gap-4">
-                        <Wrench className="h-6 w-6 text-purple-600 flex-shrink-0" />
-                        <div className="text-left">
-                          <h4 className="font-medium">Tech Support</h4>
-                          <p className="text-sm text-gray-500">Get help with technical issues</p>
-                        </div>
-                      </div>
-                    </Button>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
+            <Input
+              type="search"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full"
+            />
           </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+            <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
+              <TabsTrigger
+                value="chats"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Chats
+              </TabsTrigger>
+              <TabsTrigger
+                value="calendar"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Calendar
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="chats" className="flex-1 p-0">
+              <ScrollArea className="h-[calc(100vh-8.5rem)]">
+                {filteredConversations.map((conversation) => (
+                  <div
+                    key={conversation.id}
+                    onClick={() => setSelectedConversation(conversation)}
+                    className={`p-4 cursor-pointer hover:bg-gray-100 ${
+                      selectedConversation?.id === conversation.id
+                        ? "bg-gray-100"
+                        : ""
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarFallback>
+                          {conversation.user.name[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium">{conversation.user.name}</p>
+                        <p className="text-sm text-gray-500 truncate">
+                          {conversation.lastMessage}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </ScrollArea>
+            </TabsContent>
+            <TabsContent value="calendar" className="flex-1 p-0">
+              <CalendarView />
+            </TabsContent>
+          </Tabs>
         </aside>
-        <main className="flex-1 flex flex-col bg-gray-50">
+
+        <main className="flex-1 flex flex-col">
           {selectedConversation ? (
-            <div className="flex-1 flex flex-col">
-              <div className="border-b bg-white p-4">
+            <>
+              <div className="p-4 border-b">
                 <div className="flex items-center gap-3">
                   <Avatar>
                     <AvatarFallback>
-                      {getUserById(selectedConversation.userId)?.name.split(' ').map(n => n[0]).join('')}
+                      {selectedConversation.user.name[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="font-medium">{getUserById(selectedConversation.userId)?.name}</h3>
+                    <p className="font-medium">
+                      {selectedConversation.user.name}
+                    </p>
                     <p className="text-sm text-gray-500">
-                      {getUserById(selectedConversation.userId)?.status === 'online' 
-                        ? 'Online' 
-                        : `Last seen ${getUserById(selectedConversation.userId)?.lastSeen}`}
+                      {selectedConversation.user.title}
                     </p>
                   </div>
                 </div>
               </div>
+
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-4">
-                  {selectedConversation.messages.map((message) => (
-                    <MessageItem
-                      key={message.id}
-                      message={message}
-                      isMine={message.senderId === 'me'}
-                      onEdit={handleEditMessage}
-                      onDelete={handleDeleteMessage}
-                      onReaction={handleReaction}
-                    />
+                  {selectedConversation.messages.map((message, index) => (
+                    <MessageItem key={index} message={message} />
                   ))}
                 </div>
               </ScrollArea>
-              <div className="border-t bg-white p-4">
-                <div className="flex gap-2">
+
+              <div className="p-4 border-t">
+                <form onSubmit={handleSendMessage} className="flex gap-2">
                   <Input
-                    placeholder="Type a message..."
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    placeholder="Type a message..."
                     className="flex-1"
                   />
-                  <Button 
-                    onClick={handleSendMessage}
-                    disabled={!newMessage.trim()}
-                    size="icon"
-                  >
-                    <Send className="h-4 w-4" />
+                  <Button type="submit">
+                    <Send className="w-4 h-4 mr-2" />
+                    Send
                   </Button>
-                </div>
+                </form>
               </div>
+            </>
+          ) : activeTab === "chats" ? (
+            <div className="flex-1 flex items-center justify-center text-gray-500">
+              Select a conversation to start chatting
             </div>
-          ) : (
-            <div className="flex-1 p-8 bg-gray-50">
-              <header className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900">Welcome to Your Dashboard</h2>
-                <p className="text-gray-500">Overview of your communication and activities</p>
-              </header>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <MessageSquare className="w-5 h-5 text-blue-600" />
-                      <span>Active Chats</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold mb-2">{demoConversations.length}</div>
-                    <p className="text-gray-500">Total conversations</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <MessageCircle className="w-5 h-5 text-green-600" />
-                      <span>Unread Messages</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold mb-2">
-                      {demoConversations.reduce((sum, conv) => sum + conv.unreadCount, 0)}
-                    </div>
-                    <p className="text-gray-500">Messages awaiting response</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <User className="w-5 h-5 text-purple-600" />
-                      <span>Online Contacts</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold mb-2">
-                      {demoUsers.filter(user => user.status === 'online').length}
-                    </div>
-                    <p className="text-gray-500">Team members available</p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          )}
+          ) : null}
         </main>
       </div>
     </div>
