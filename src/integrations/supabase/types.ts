@@ -101,6 +101,51 @@ export type Database = {
           },
         ]
       }
+      leave_balances: {
+        Row: {
+          annual_days_total: number
+          annual_days_used: number
+          created_at: string
+          id: string
+          maternity_days_total: number
+          maternity_days_used: number
+          paternity_days_total: number
+          paternity_days_used: number
+          sick_days_total: number
+          sick_days_used: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          annual_days_total?: number
+          annual_days_used?: number
+          created_at?: string
+          id?: string
+          maternity_days_total?: number
+          maternity_days_used?: number
+          paternity_days_total?: number
+          paternity_days_used?: number
+          sick_days_total?: number
+          sick_days_used?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          annual_days_total?: number
+          annual_days_used?: number
+          created_at?: string
+          id?: string
+          maternity_days_total?: number
+          maternity_days_used?: number
+          paternity_days_total?: number
+          paternity_days_used?: number
+          sick_days_total?: number
+          sick_days_used?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       leave_requests: {
         Row: {
           approved_at: string | null
