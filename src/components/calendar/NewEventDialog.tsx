@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { useAuth } from "@supabase/auth-helpers-react";
+import { useUser } from "@supabase/auth-helpers-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -35,7 +35,7 @@ export function NewEventDialog() {
     startTime: "09:00",
     endTime: "10:00",
   });
-  const user = useAuth();
+  const user = useUser();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
