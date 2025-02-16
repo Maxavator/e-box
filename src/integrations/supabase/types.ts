@@ -9,98 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      calendar_events: {
-        Row: {
-          created_at: string
-          creator_id: string
-          description: string | null
-          end_time: string
-          id: string
-          is_online: boolean | null
-          location: string | null
-          meeting_link: string | null
-          start_time: string
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          creator_id: string
-          description?: string | null
-          end_time: string
-          id?: string
-          is_online?: boolean | null
-          location?: string | null
-          meeting_link?: string | null
-          start_time: string
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          creator_id?: string
-          description?: string | null
-          end_time?: string
-          id?: string
-          is_online?: boolean | null
-          location?: string | null
-          meeting_link?: string | null
-          start_time?: string
-          title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "calendar_events_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      calendar_invites: {
-        Row: {
-          created_at: string
-          event_id: string
-          id: string
-          invitee_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          event_id: string
-          id?: string
-          invitee_id: string
-          status: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          event_id?: string
-          id?: string
-          invitee_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "calendar_invites_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "calendar_events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "calendar_invites_invitee_id_fkey"
-            columns: ["invitee_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       organizations: {
         Row: {
           created_at: string
@@ -132,7 +40,6 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
-          default_notification_time: Database["public"]["Enums"]["calendar_notification_time"]
           first_name: string | null
           id: string
           last_name: string | null
@@ -142,7 +49,6 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
-          default_notification_time?: Database["public"]["Enums"]["calendar_notification_time"]
           first_name?: string | null
           id: string
           last_name?: string | null
@@ -152,7 +58,6 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
-          default_notification_time?: Database["public"]["Enums"]["calendar_notification_time"]
           first_name?: string | null
           id?: string
           last_name?: string | null
@@ -210,13 +115,6 @@ export type Database = {
       }
     }
     Enums: {
-      calendar_notification_time:
-        | "5_min"
-        | "10_min"
-        | "15_min"
-        | "30_min"
-        | "1_hour"
-        | "1_day"
       user_role: "global_admin" | "org_admin" | "staff"
     }
     CompositeTypes: {
