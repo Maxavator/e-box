@@ -2,6 +2,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { Conversation } from "@/types/chat";
+import { getUserById } from "@/data/chat";
 
 interface ConversationListProps {
   conversations: Conversation[];
