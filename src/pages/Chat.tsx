@@ -229,7 +229,14 @@ const Chat = () => {
   return (
     <div className="flex-1 flex flex-col">
       <header className="h-16 border-b flex items-center justify-between px-6 bg-white">
-        <h1 className="text-xl font-semibold">Enterprise Chat</h1>
+        <div className="flex items-center gap-2">
+          <img 
+            src="/lovable-uploads/cea5cf65-708e-42c4-9a6c-6073f42a3471.png" 
+            alt="e-Box Logo" 
+            className="h-8"
+          />
+          <h1 className="text-xl font-semibold">Enterprise Chat</h1>
+        </div>
         <Button 
           variant="ghost" 
           size="sm" 
