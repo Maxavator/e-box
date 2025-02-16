@@ -1,11 +1,28 @@
 
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const Chat = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate("/");
+  };
+
   return (
     <div className="flex-1 flex flex-col">
-      <header className="h-16 border-b flex items-center px-6 bg-white">
+      <header className="h-16 border-b flex items-center justify-between px-6 bg-white">
         <h1 className="text-xl font-semibold">Enterprise Chat</h1>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleLogout}
+          className="text-gray-500 hover:text-gray-700"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Logout
+        </Button>
       </header>
       <div className="flex-1 flex">
         <aside className="w-80 border-r bg-white">
