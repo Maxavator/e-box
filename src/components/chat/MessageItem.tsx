@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Message } from '@/types/chat';
 import { cn } from '@/lib/utils';
-import { Check, Clock, AlertCircle, MoreVertical, Edit2, Trash, Heart, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Check, Clock, AlertCircle, Edit2, Trash, Heart, ThumbsUp, ThumbsDown } from 'lucide-react';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -12,18 +12,18 @@ import {
 
 interface MessageItemProps {
   message: Message;
-  isMine: boolean;
   onEdit: (messageId: string, newText: string) => void;
   onDelete: (messageId: string) => void;
-  onReaction: (messageId: string, emoji: string) => void;
+  onReact: (messageId: string, emoji: string) => void;
 }
 
 const EDIT_TIME_LIMIT = 60000; // 60 seconds in milliseconds
 
-const MessageItem = ({ message, isMine, onEdit, onDelete, onReaction }: MessageItemProps) => {
+export default function MessageItem({ message, onEdit, onDelete, onReact }: MessageItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(message.text);
   const [canEdit, setCanEdit] = useState(false);
+  const isMine = message.senderId === 'me';
 
   useEffect(() => {
     if (isMine && message.status === 'sent') {
@@ -58,7 +58,7 @@ const MessageItem = ({ message, isMine, onEdit, onDelete, onReaction }: MessageI
     { emoji: "❤️", icon: Heart },
     { emoji: "👍", icon: ThumbsUp },
     { emoji: "👎", icon: ThumbsDown },
-    { emoji: "🙏", icon: Heart, label: "Thank you" }, // Changed to praying hands emoji
+    { emoji: "🙏", icon: Heart, label: "Thank you" },
   ];
 
   return (
@@ -70,7 +70,7 @@ const MessageItem = ({ message, isMine, onEdit, onDelete, onReaction }: MessageI
         )}>
           <div className={cn(
             "max-w-[70%] rounded-lg p-3",
-            isMine ? "bg-burnt-orange-500 text-white" : "bg-white text-gray-900",
+            isMine ? "bg-primary text-primary-foreground" : "bg-muted",
             "hover:shadow-md transition-shadow"
           )}>
             {isEditing ? (
@@ -91,7 +91,7 @@ const MessageItem = ({ message, isMine, onEdit, onDelete, onReaction }: MessageI
                 <div className="flex items-center gap-1 mt-1">
                   <span className={cn(
                     "text-xs",
-                    isMine ? "text-burnt-orange-100" : "text-gray-500"
+                    isMine ? "text-primary-foreground/80" : "text-muted-foreground"
                   )}>
                     {message.timestamp}
                     {message.edited && " (edited)"}
@@ -138,7 +138,7 @@ const MessageItem = ({ message, isMine, onEdit, onDelete, onReaction }: MessageI
             {reactions.map((reaction) => (
               <button
                 key={reaction.emoji + (reaction.label || '')}
-                onClick={() => onReaction(message.id, reaction.emoji)}
+                onClick={() => onReact(message.id, reaction.emoji)}
                 className="hover:bg-gray-100 p-1 rounded"
                 title={reaction.label}
               >
@@ -150,6 +150,4 @@ const MessageItem = ({ message, isMine, onEdit, onDelete, onReaction }: MessageI
       </ContextMenuContent>
     </ContextMenu>
   );
-};
-
-export default MessageItem;
+}
