@@ -4,6 +4,7 @@ import { ChatInput } from "./ChatInput";
 import { CalendarView } from "@/components/calendar/CalendarView";
 import type { Conversation, Message } from "@/types/chat";
 import { getUserById } from "@/data/chat";
+import OrganizationDashboard from "@/pages/OrganizationDashboard";
 
 interface ChatContentProps {
   activeTab: string;
@@ -31,11 +32,7 @@ export function ChatContent({
   }
 
   if (!selectedConversation) {
-    return (
-      <div className="flex-1 flex items-center justify-center text-gray-500">
-        Select a conversation to start chatting
-      </div>
-    );
+    return <OrganizationDashboard />;
   }
 
   return (
