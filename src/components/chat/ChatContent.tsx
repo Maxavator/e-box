@@ -3,6 +3,7 @@ import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { CalendarView } from "@/components/calendar/CalendarView";
 import { CalendarInbox } from "@/components/calendar/CalendarInbox";
+import { CalendarDashboard } from "@/components/calendar/CalendarDashboard";
 import type { Conversation } from "@/types/chat";
 import { getUserById } from "@/data/chat";
 import OrganizationDashboard from "@/pages/OrganizationDashboard";
@@ -31,7 +32,9 @@ export function ChatContent({
   calendarView = 'calendar',
 }: ChatContentProps) {
   if (activeTab === "calendar") {
-    return calendarView === 'inbox' ? <CalendarInbox /> : <CalendarView />;
+    if (calendarView === 'inbox') return <CalendarInbox />;
+    if (calendarView === 'calendar') return <CalendarView />;
+    return <CalendarDashboard />;
   }
 
   if (!selectedConversation) {
