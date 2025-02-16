@@ -11,6 +11,9 @@ import { useUser } from "@supabase/auth-helpers-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useQuery } from "@tanstack/react-query";
+import { Check, X, UserPlus } from "lucide-react";
 
 interface NewEventFormData {
   title: string;
@@ -21,6 +24,14 @@ interface NewEventFormData {
   date: Date;
   startTime: string;
   endTime: string;
+  invitees: string[];
+}
+
+interface Profile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  organization_id: string | null;
 }
 
 export function NewEventDialog() {
@@ -34,8 +45,31 @@ export function NewEventDialog() {
     date: new Date(),
     startTime: "09:00",
     endTime: "10:00",
+    invitees: [],
   });
   const user = useUser();
+
+  const { data: organizationMembers } = useQuery({
+    queryKey: ['organization-members'],
+    queryFn: async () => {
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user?.id)
+        .single();
+
+      if (!userProfile?.organization_id) return [];
+
+      const { data: members } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .eq('organization_id', userProfile.organization_id)
+        .neq('id', user?.id);
+
+      return members || [];
+    },
+    enabled: !!user?.id,
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +87,8 @@ export function NewEventDialog() {
     const [endHours, endMinutes] = formData.endTime.split(':');
     endDateTime.setHours(parseInt(endHours), parseInt(endMinutes));
 
-    const { error } = await supabase
+    // Create the event
+    const { data: eventData, error: eventError } = await supabase
       .from('calendar_events')
       .insert({
         title: formData.title,
@@ -64,12 +99,32 @@ export function NewEventDialog() {
         start_time: startDateTime.toISOString(),
         end_time: endDateTime.toISOString(),
         creator_id: user.id,
-      });
+      })
+      .select()
+      .single();
 
-    if (error) {
+    if (eventError) {
       toast.error("Failed to create event");
-      console.error("Error creating event:", error);
+      console.error("Error creating event:", eventError);
       return;
+    }
+
+    // Create invites for selected users
+    if (formData.invitees.length > 0) {
+      const { error: inviteError } = await supabase
+        .from('calendar_invites')
+        .insert(
+          formData.invitees.map(inviteeId => ({
+            event_id: eventData.id,
+            invitee_id: inviteeId,
+            status: 'pending'
+          }))
+        );
+
+      if (inviteError) {
+        toast.error("Failed to send some invites");
+        console.error("Error sending invites:", inviteError);
+      }
     }
 
     toast.success("Event created successfully");
@@ -83,7 +138,17 @@ export function NewEventDialog() {
       date: new Date(),
       startTime: "09:00",
       endTime: "10:00",
+      invitees: [],
     });
+  };
+
+  const toggleInvitee = (userId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      invitees: prev.invitees.includes(userId)
+        ? prev.invitees.filter(id => id !== userId)
+        : [...prev.invitees, userId]
+    }));
   };
 
   return (
@@ -176,6 +241,36 @@ export function NewEventDialog() {
               />
             </div>
           )}
+
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <UserPlus className="h-4 w-4" />
+              Invite Members
+            </Label>
+            <ScrollArea className="h-[200px] border rounded-md p-2">
+              {organizationMembers?.map((member) => (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between p-2 hover:bg-gray-100 rounded-md cursor-pointer"
+                  onClick={() => toggleInvitee(member.id)}
+                >
+                  <span>
+                    {member.first_name} {member.last_name}
+                  </span>
+                  {formData.invitees.includes(member.id) ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <UserPlus className="h-4 w-4 text-gray-400" />
+                  )}
+                </div>
+              ))}
+              {!organizationMembers?.length && (
+                <p className="text-gray-500 text-center p-4">
+                  No other members in your organization
+                </p>
+              )}
+            </ScrollArea>
+          </div>
 
           <Button type="submit" className="w-full">Create Event</Button>
         </form>
