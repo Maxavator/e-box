@@ -58,6 +58,7 @@ const MessageItem = ({ message, isMine, onEdit, onDelete, onReaction }: MessageI
     { emoji: "❤️", icon: Heart },
     { emoji: "👍", icon: ThumbsUp },
     { emoji: "👎", icon: ThumbsDown },
+    { emoji: "❤️", icon: Heart, label: "Thank you" }, // Added thank you reaction
   ];
 
   return (
@@ -136,9 +137,10 @@ const MessageItem = ({ message, isMine, onEdit, onDelete, onReaction }: MessageI
           <div className="flex gap-2">
             {reactions.map((reaction) => (
               <button
-                key={reaction.emoji}
+                key={reaction.emoji + (reaction.label || '')}
                 onClick={() => onReaction(message.id, reaction.emoji)}
                 className="hover:bg-gray-100 p-1 rounded"
+                title={reaction.label}
               >
                 {reaction.emoji}
               </button>
