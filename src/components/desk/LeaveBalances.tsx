@@ -3,24 +3,23 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@supabase/auth-helpers-react";
 
 export function LeaveBalances() {
-  const user = useAuth();
-
   const { data: leaveBalances, isLoading } = useQuery({
-    queryKey: ['leaveBalances', user?.user?.id],
+    queryKey: ['leaveBalances'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
       const { data, error } = await supabase
         .from('leave_balances')
         .select('*')
-        .eq('user_id', user?.user?.id)
+        .eq('user_id', user.id)
         .single();
 
       if (error) throw error;
       return data;
     },
-    enabled: !!user?.user?.id,
   });
 
   if (isLoading) {
