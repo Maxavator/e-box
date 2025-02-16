@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -102,15 +103,19 @@ export function LeaveManager() {
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>New Leave Request</DialogTitle>
+              <DialogDescription>
+                Submit a new leave request by selecting the type, dates, and providing a reason.
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Leave Type</label>
+                <label className="text-sm font-medium" htmlFor="leave-type">Leave Type</label>
                 <Select
                   value={leaveType}
                   onValueChange={(value) => setLeaveType(value as LeaveType)}
+                  name="leave-type"
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="leave-type" className="w-full">
                     <SelectValue placeholder="Select leave type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -125,21 +130,25 @@ export function LeaveManager() {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Select Dates</label>
-                <Calendar
-                  mode="range"
-                  selected={dateRange}
-                  onSelect={setDateRange}
-                  numberOfMonths={2}
-                  className="rounded-md border"
-                />
+                <div className="border rounded-md p-4 bg-white">
+                  <Calendar
+                    mode="range"
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={2}
+                    className="rounded-md"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Reason</label>
+                <label className="text-sm font-medium" htmlFor="reason">Reason</label>
                 <Textarea
+                  id="reason"
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="Please provide a reason for your leave request"
+                  className="min-h-[100px]"
                 />
               </div>
 
