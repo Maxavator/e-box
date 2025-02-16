@@ -69,7 +69,8 @@ const MessageItem = ({ message, isMine, onEdit, onDelete, onReaction }: MessageI
         )}>
           <div className={cn(
             "max-w-[70%] rounded-lg p-3",
-            isMine ? "bg-blue-600 text-white" : "bg-white text-gray-900"
+            isMine ? "bg-burnt-orange-500 text-white" : "bg-white text-gray-900",
+            "hover:shadow-md transition-shadow"
           )}>
             {isEditing ? (
               <div className="flex flex-col gap-2">
@@ -89,7 +90,7 @@ const MessageItem = ({ message, isMine, onEdit, onDelete, onReaction }: MessageI
                 <div className="flex items-center gap-1 mt-1">
                   <span className={cn(
                     "text-xs",
-                    isMine ? "text-blue-100" : "text-gray-500"
+                    isMine ? "text-burnt-orange-100" : "text-gray-500"
                   )}>
                     {message.timestamp}
                     {message.edited && " (edited)"}
