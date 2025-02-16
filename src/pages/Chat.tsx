@@ -74,6 +74,8 @@ const Chat = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("chats");
 
+  const totalUnreadMessages = demoConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
+
   const handleLogout = () => {
     navigate("/");
   };
@@ -247,9 +249,14 @@ const Chat = () => {
                   <User className="h-4 w-4" />
                   <span className="hidden sm:inline">Profile</span>
                 </TabsTrigger>
-                <TabsTrigger value="chats" className="flex items-center gap-2">
+                <TabsTrigger value="chats" className="flex items-center gap-2 relative">
                   <MessageCircle className="h-4 w-4" />
                   <span className="hidden sm:inline">Chats</span>
+                  {totalUnreadMessages > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-medium text-white">
+                      {totalUnreadMessages}
+                    </span>
+                  )}
                 </TabsTrigger>
                 <TabsTrigger value="desk" className="flex items-center gap-2">
                   <LayoutDashboard className="h-4 w-4" />
