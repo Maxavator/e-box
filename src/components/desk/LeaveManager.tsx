@@ -26,10 +26,11 @@ import { useUser } from "@supabase/auth-helpers-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarIcon, Clock } from "lucide-react";
+import type { DateRange } from "react-day-picker";
 
 export function LeaveManager() {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedDates, setSelectedDates] = useState<Date[] | undefined>([]);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [leaveType, setLeaveType] = useState<LeaveType>("annual");
   const [reason, setReason] = useState("");
   const user = useUser();
@@ -50,20 +51,18 @@ export function LeaveManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedDates || selectedDates.length !== 2 || !user) {
+    if (!dateRange?.from || !dateRange?.to || !user) {
       toast.error("Please select start and end dates");
       return;
     }
 
-    const [startDate, endDate] = selectedDates;
-    
     try {
       const { error } = await supabase
         .from('leave_requests')
         .insert({
           leave_type: leaveType,
-          start_date: startDate.toISOString(),
-          end_date: endDate.toISOString(),
+          start_date: dateRange.from.toISOString(),
+          end_date: dateRange.to.toISOString(),
           reason,
           user_id: user.id,
         });
@@ -72,7 +71,7 @@ export function LeaveManager() {
 
       toast.success("Leave request submitted successfully");
       setIsOpen(false);
-      setSelectedDates([]);
+      setDateRange(undefined);
       setReason("");
       refetch();
     } catch (error) {
@@ -128,8 +127,8 @@ export function LeaveManager() {
                 <label className="text-sm font-medium">Select Dates</label>
                 <Calendar
                   mode="range"
-                  selected={selectedDates}
-                  onSelect={setSelectedDates}
+                  selected={dateRange}
+                  onSelect={setDateRange}
                   numberOfMonths={2}
                   className="rounded-md border"
                 />
