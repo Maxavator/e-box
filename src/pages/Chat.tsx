@@ -1,9 +1,10 @@
-import { MessageSquare, LogOut } from "lucide-react";
+import { MessageSquare, LogOut, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 
 // Demo data types
 interface User {
@@ -89,12 +90,40 @@ const demoConversations: Conversation[] = [
 const Chat = () => {
   const navigate = useNavigate();
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [newMessage, setNewMessage] = useState("");
 
   const handleLogout = () => {
     navigate("/");
   };
 
   const getUserById = (id: string) => demoUsers.find(user => user.id === id);
+
+  const handleSendMessage = () => {
+    if (!newMessage.trim() || !selectedConversation) return;
+
+    const message: Message = {
+      id: `${Date.now()}`,
+      senderId: 'me',
+      text: newMessage.trim(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setSelectedConversation(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        messages: [...prev.messages, message]
+      };
+    });
+
+    setNewMessage("");
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col">
@@ -195,6 +224,24 @@ const Chat = () => {
                   ))}
                 </div>
               </ScrollArea>
+              <div className="border-t bg-white p-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Type a message..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={handleSendMessage}
+                    disabled={!newMessage.trim()}
+                    size="icon"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center text-gray-400">
