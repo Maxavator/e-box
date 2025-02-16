@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, Calendar, Inbox, PlusCircle } from "lucide-react";
@@ -29,10 +30,6 @@ const CalendarActions = ({ onCalendarActionClick }: { onCalendarActionClick: (vi
         Calendar Inbox
       </Button>
       <NewEventDialog />
-      <Button variant="outline" className="w-full justify-start">
-        <PlusCircle className="mr-2 h-4 w-4" />
-        New Task
-      </Button>
     </div>
   );
 };
