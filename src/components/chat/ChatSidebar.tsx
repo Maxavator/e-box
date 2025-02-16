@@ -1,11 +1,11 @@
-
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar, Inbox, PlusCircle, Briefcase } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, Briefcase } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
+import { LeaveManager } from "@/components/desk/LeaveManager";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -36,14 +36,8 @@ const CalendarActions = ({ onCalendarActionClick }: { onCalendarActionClick: (vi
 
 const DeskContent = () => {
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-semibold mb-4">Desk Overview</h2>
-      <div className="space-y-2">
-        <Button variant="outline" className="w-full justify-start">
-          <Briefcase className="mr-2 h-4 w-4" />
-          My Tasks
-        </Button>
-      </div>
+    <div className="h-full">
+      <LeaveManager />
     </div>
   );
 };
