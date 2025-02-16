@@ -1,9 +1,10 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, PlusCircle } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
+import { Button } from "@/components/ui/button";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -14,6 +15,25 @@ interface ChatSidebarProps {
   selectedConversation: Conversation | null;
   onSelectConversation: (conversation: Conversation) => void;
 }
+
+const CalendarActions = () => {
+  return (
+    <div className="p-4 space-y-2">
+      <Button variant="outline" className="w-full justify-start">
+        <Inbox className="mr-2 h-4 w-4" />
+        Calendar Inbox
+      </Button>
+      <Button variant="outline" className="w-full justify-start">
+        <PlusCircle className="mr-2 h-4 w-4" />
+        New Event
+      </Button>
+      <Button variant="outline" className="w-full justify-start">
+        <PlusCircle className="mr-2 h-4 w-4" />
+        New Task
+      </Button>
+    </div>
+  );
+};
 
 export function ChatSidebar({
   searchQuery,
@@ -59,6 +79,10 @@ export function ChatSidebar({
             selectedConversation={selectedConversation}
             onSelectConversation={onSelectConversation}
           />
+        </TabsContent>
+
+        <TabsContent value="calendar" className="h-full">
+          <CalendarActions />
         </TabsContent>
       </Tabs>
     </div>
