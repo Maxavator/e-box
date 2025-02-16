@@ -1,4 +1,3 @@
-
 import { MessageSquare, LogOut, Send, Search, User, LayoutDashboard, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -7,6 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MessageItem from "@/components/chat/MessageItem";
 import { User as ChatUser, Message, Conversation } from "@/types/chat";
 
@@ -407,10 +407,55 @@ const Chat = () => {
               </div>
             </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-400">
-              <div className="text-center">
-                <MessageSquare className="w-12 h-12 mx-auto mb-4" />
-                <p>Select a conversation to start chatting</p>
+            <div className="flex-1 p-8 bg-gray-50">
+              <header className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900">Welcome to Your Dashboard</h2>
+                <p className="text-gray-500">Overview of your communication and activities</p>
+              </header>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <MessageSquare className="w-5 h-5 text-blue-600" />
+                      <span>Active Chats</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold mb-2">{demoConversations.length}</div>
+                    <p className="text-gray-500">Total conversations</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <MessageCircle className="w-5 h-5 text-green-600" />
+                      <span>Unread Messages</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold mb-2">
+                      {demoConversations.reduce((sum, conv) => sum + conv.unreadCount, 0)}
+                    </div>
+                    <p className="text-gray-500">Messages awaiting response</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <User className="w-5 h-5 text-purple-600" />
+                      <span>Online Contacts</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold mb-2">
+                      {demoUsers.filter(user => user.status === 'online').length}
+                    </div>
+                    <p className="text-gray-500">Team members available</p>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           )}
