@@ -1,16 +1,15 @@
-
-import { MessageSquare, LogOut, Send, Search } from "lucide-react";
+import { MessageSquare, LogOut, Send, Search, User, LayoutDashboard, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MessageItem from "@/components/chat/MessageItem";
-import { User, Message, Conversation } from "@/types/chat";
+import { User as ChatUser, Message, Conversation } from "@/types/chat";
 
-// Demo data
-const demoUsers: User[] = [
+const demoUsers: ChatUser[] = [
   { id: '1', name: 'Sarah Chen', status: 'online' },
   { id: '2', name: 'Mike Johnson', status: 'offline', lastSeen: '2 hours ago' },
   { id: '3', name: 'Emma Wilson', status: 'online' },
@@ -72,6 +71,7 @@ const Chat = () => {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("chats");
 
   const handleLogout = () => {
     navigate("/");
@@ -240,75 +240,116 @@ const Chat = () => {
       <div className="flex-1 flex">
         <aside className="w-80 border-r bg-white">
           <div className="p-4">
-            <h2 className="font-semibold mb-4">Conversations</h2>
-            <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Search messages, names..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
-              {searchQuery && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
-                  {filteredConversations.length} results
-                </div>
-              )}
-            </div>
-            <ScrollArea className="h-[calc(100vh-8rem)]">
-              {filteredConversations.map((conversation) => {
-                const user = getUserById(conversation.userId);
-                const lastMessage = conversation.messages[conversation.messages.length - 1];
-                
-                // Find the first matching message for preview
-                const matchingMessage = searchQuery ? 
-                  conversation.messages.find(msg => 
-                    msg.text.toLowerCase().includes(searchQuery.toLowerCase())
-                  ) : lastMessage;
-                
-                const previewMessage = matchingMessage || lastMessage;
-                
-                return (
-                  <div
-                    key={conversation.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-100 ${
-                      selectedConversation?.id === conversation.id ? 'bg-gray-100' : ''
-                    }`}
-                    onClick={() => setSelectedConversation(conversation)}
-                  >
-                    <Avatar>
-                      <AvatarFallback>{user?.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium truncate">
-                          {highlightText(user?.name || '')}
-                        </p>
-                        <span className="text-xs text-gray-500">
-                          {highlightText(previewMessage.timestamp)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-500 truncate">
-                          {highlightText(previewMessage.text)}
-                        </p>
-                        {conversation.unreadCount > 0 && (
-                          <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-blue-600 rounded-full">
-                            {conversation.unreadCount}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+            <Tabs defaultValue="chats" className="w-full" onValueChange={setActiveTab}>
+              <TabsList className="w-full grid grid-cols-3 mb-4">
+                <TabsTrigger value="profile" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">Profile</span>
+                </TabsTrigger>
+                <TabsTrigger value="chats" className="flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4" />
+                  <span className="hidden sm:inline">Chats</span>
+                </TabsTrigger>
+                <TabsTrigger value="desk" className="flex items-center gap-2">
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span className="hidden sm:inline">Desk</span>
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="profile" className="mt-0">
+                <div className="flex flex-col items-center py-8 space-y-4">
+                  <Avatar className="h-20 w-20">
+                    <AvatarFallback className="text-xl">ME</AvatarFallback>
+                  </Avatar>
+                  <div className="text-center">
+                    <h3 className="font-medium">My Profile</h3>
+                    <p className="text-sm text-gray-500">Manage your account</p>
                   </div>
-                );
-              })}
-              {searchQuery && filteredConversations.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  No conversations found matching "{searchQuery}"
                 </div>
-              )}
-            </ScrollArea>
+              </TabsContent>
+
+              <TabsContent value="chats" className="mt-0 space-y-4">
+                <h2 className="font-semibold">Conversations</h2>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    type="text"
+                    placeholder="Search messages, names..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                  {searchQuery && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
+                      {filteredConversations.length} results
+                    </div>
+                  )}
+                </div>
+                <ScrollArea className="h-[calc(100vh-16rem)]">
+                  {filteredConversations.map((conversation) => {
+                    const user = getUserById(conversation.userId);
+                    const lastMessage = conversation.messages[conversation.messages.length - 1];
+                    
+                    // Find the first matching message for preview
+                    const matchingMessage = searchQuery ? 
+                      conversation.messages.find(msg => 
+                        msg.text.toLowerCase().includes(searchQuery.toLowerCase())
+                      ) : lastMessage;
+                    
+                    const previewMessage = matchingMessage || lastMessage;
+                    
+                    return (
+                      <div
+                        key={conversation.id}
+                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-100 ${
+                          selectedConversation?.id === conversation.id ? 'bg-gray-100' : ''
+                        }`}
+                        onClick={() => setSelectedConversation(conversation)}
+                      >
+                        <Avatar>
+                          <AvatarFallback>{user?.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="font-medium truncate">
+                              {highlightText(user?.name || '')}
+                            </p>
+                            <span className="text-xs text-gray-500">
+                              {highlightText(previewMessage.timestamp)}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm text-gray-500 truncate">
+                              {highlightText(previewMessage.text)}
+                            </p>
+                            {conversation.unreadCount > 0 && (
+                              <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-blue-600 rounded-full">
+                                {conversation.unreadCount}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {searchQuery && filteredConversations.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      No conversations found matching "{searchQuery}"
+                    </div>
+                  )}
+                </ScrollArea>
+              </TabsContent>
+
+              <TabsContent value="desk" className="mt-0">
+                <div className="flex flex-col items-center py-8 space-y-4">
+                  <LayoutDashboard className="h-12 w-12 text-gray-400" />
+                  <div className="text-center">
+                    <h3 className="font-medium">My Desk</h3>
+                    <p className="text-sm text-gray-500">Your workspace</p>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </aside>
         <main className="flex-1 flex flex-col bg-gray-50">
