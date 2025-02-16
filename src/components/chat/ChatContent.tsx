@@ -2,7 +2,8 @@
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { CalendarView } from "@/components/calendar/CalendarView";
-import type { Conversation, Message } from "@/types/chat";
+import { CalendarInbox } from "@/components/calendar/CalendarInbox";
+import type { Conversation } from "@/types/chat";
 import { getUserById } from "@/data/chat";
 import OrganizationDashboard from "@/pages/OrganizationDashboard";
 
@@ -15,6 +16,7 @@ interface ChatContentProps {
   onEditMessage: (messageId: string, newText: string) => void;
   onDeleteMessage: (messageId: string) => void;
   onReactToMessage: (messageId: string, emoji: string) => void;
+  calendarView?: 'calendar' | 'inbox';
 }
 
 export function ChatContent({
@@ -26,9 +28,10 @@ export function ChatContent({
   onEditMessage,
   onDeleteMessage,
   onReactToMessage,
+  calendarView = 'calendar',
 }: ChatContentProps) {
-  if (activeTab !== "chats") {
-    return <CalendarView />;
+  if (activeTab === "calendar") {
+    return calendarView === 'inbox' ? <CalendarInbox /> : <CalendarView />;
   }
 
   if (!selectedConversation) {

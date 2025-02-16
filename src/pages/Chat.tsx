@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { ChatHeader } from "@/components/chat/ChatHeader";
@@ -14,6 +13,7 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("chats");
+  const [calendarView, setCalendarView] = useState<'calendar' | 'inbox'>('calendar');
 
   const handleLogout = () => {
     navigate("/");
@@ -22,6 +22,11 @@ const Chat = () => {
   const handleLogoClick = () => {
     setActiveTab("chats");
     setSelectedConversation(null);
+  };
+
+  const handleCalendarActionClick = (view: 'calendar' | 'inbox') => {
+    setActiveTab("calendar");
+    setCalendarView(view);
   };
 
   const handleSendMessage = () => {
@@ -155,6 +160,7 @@ const Chat = () => {
             conversations={filteredConversations}
             selectedConversation={selectedConversation}
             onSelectConversation={setSelectedConversation}
+            onCalendarActionClick={handleCalendarActionClick}
           />
         </ResizablePanel>
         
@@ -170,6 +176,7 @@ const Chat = () => {
             onEditMessage={handleEditMessage}
             onDeleteMessage={handleDeleteMessage}
             onReactToMessage={handleReaction}
+            calendarView={calendarView}
           />
         </ResizablePanel>
       </ResizablePanelGroup>

@@ -14,12 +14,17 @@ interface ChatSidebarProps {
   conversations: Conversation[];
   selectedConversation: Conversation | null;
   onSelectConversation: (conversation: Conversation) => void;
+  onCalendarActionClick: (view: 'calendar' | 'inbox') => void;
 }
 
-const CalendarActions = () => {
+const CalendarActions = ({ onCalendarActionClick }: { onCalendarActionClick: (view: 'calendar' | 'inbox') => void }) => {
   return (
     <div className="p-4 space-y-2">
-      <Button variant="outline" className="w-full justify-start">
+      <Button 
+        variant="outline" 
+        className="w-full justify-start"
+        onClick={() => onCalendarActionClick('inbox')}
+      >
         <Inbox className="mr-2 h-4 w-4" />
         Calendar Inbox
       </Button>
@@ -43,6 +48,7 @@ export function ChatSidebar({
   conversations,
   selectedConversation,
   onSelectConversation,
+  onCalendarActionClick,
 }: ChatSidebarProps) {
   return (
     <div className="h-full bg-gray-50">
@@ -82,7 +88,7 @@ export function ChatSidebar({
         </TabsContent>
 
         <TabsContent value="calendar" className="h-full">
-          <CalendarActions />
+          <CalendarActions onCalendarActionClick={onCalendarActionClick} />
         </TabsContent>
       </Tabs>
     </div>
