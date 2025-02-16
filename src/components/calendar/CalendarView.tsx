@@ -5,7 +5,9 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { CalendarEvent } from "@/types/chat";
+import type { Database } from "@/integrations/supabase/types";
+
+type CalendarEvent = Database['public']['Tables']['calendar_events']['Row'];
 
 export function CalendarView() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -18,7 +20,7 @@ export function CalendarView() {
         .from('calendar_events')
         .select('*');
       if (error) throw error;
-      return data as CalendarEvent[];
+      return data;
     },
   });
 
