@@ -1,4 +1,4 @@
-import { MessageSquare, LogOut, Send } from "lucide-react";
+import { MessageSquare, LogOut, Send, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -70,6 +70,7 @@ const Chat = () => {
   const navigate = useNavigate();
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleLogout = () => {
     navigate("/");
@@ -189,6 +190,11 @@ const Chat = () => {
     }
   };
 
+  const filteredConversations = demoConversations.filter(conversation => {
+    const user = getUserById(conversation.userId);
+    return user?.name.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
   return (
     <div className="flex-1 flex flex-col">
       <header className="h-16 border-b flex items-center justify-between px-6 bg-white">
@@ -207,8 +213,18 @@ const Chat = () => {
         <aside className="w-80 border-r bg-white">
           <div className="p-4">
             <h2 className="font-semibold mb-4">Conversations</h2>
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Search conversations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
             <ScrollArea className="h-[calc(100vh-8rem)]">
-              {demoConversations.map((conversation) => {
+              {filteredConversations.map((conversation) => {
                 const user = getUserById(conversation.userId);
                 const lastMessage = conversation.messages[conversation.messages.length - 1];
                 
