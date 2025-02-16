@@ -2,32 +2,11 @@ import { MessageSquare, LogOut, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-
-// Demo data types
-interface User {
-  id: string;
-  name: string;
-  avatar?: string;
-  status: 'online' | 'offline';
-  lastSeen?: string;
-}
-
-interface Message {
-  id: string;
-  senderId: string;
-  text: string;
-  timestamp: string;
-}
-
-interface Conversation {
-  id: string;
-  userId: string;
-  messages: Message[];
-  unreadCount: number;
-}
+import MessageItem from "@/components/chat/MessageItem";
+import { User, Message, Conversation } from "@/types/chat";
 
 // Demo data
 const demoUsers: User[] = [
@@ -105,7 +84,8 @@ const Chat = () => {
       id: `${Date.now()}`,
       senderId: 'me',
       text: newMessage.trim(),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      status: 'sending'
     };
 
     setSelectedConversation(prev => {
@@ -117,6 +97,90 @@ const Chat = () => {
     });
 
     setNewMessage("");
+
+    // Simulate message sending
+    setTimeout(() => {
+      setSelectedConversation(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          messages: prev.messages.map(m => 
+            m.id === message.id ? { ...m, status: 'sent' } : m
+          )
+        };
+      });
+    }, 1000);
+  };
+
+  const handleEditMessage = (messageId: string, newText: string) => {
+    setSelectedConversation(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        messages: prev.messages.map(m => 
+          m.id === messageId ? 
+          { 
+            ...m, 
+            text: newText, 
+            edited: true, 
+            editedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          } : m
+        )
+      };
+    });
+  };
+
+  const handleDeleteMessage = (messageId: string) => {
+    setSelectedConversation(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        messages: prev.messages.filter(m => m.id !== messageId)
+      };
+    });
+  };
+
+  const handleReaction = (messageId: string, emoji: string) => {
+    setSelectedConversation(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        messages: prev.messages.map(m => {
+          if (m.id !== messageId) return m;
+          
+          const existingReaction = m.reactions?.find(r => r.emoji === emoji);
+          const reactions = m.reactions || [];
+          
+          if (existingReaction) {
+            if (existingReaction.users.includes('me')) {
+              // Remove reaction
+              return {
+                ...m,
+                reactions: reactions
+                  .map(r => r.emoji === emoji ? 
+                    { ...r, users: r.users.filter(u => u !== 'me') } : r)
+                  .filter(r => r.users.length > 0)
+              };
+            } else {
+              // Add user to existing reaction
+              return {
+                ...m,
+                reactions: reactions.map(r => 
+                  r.emoji === emoji ? 
+                  { ...r, users: [...r.users, 'me'] } : r
+                )
+              };
+            }
+          } else {
+            // Add new reaction
+            return {
+              ...m,
+              reactions: [...reactions, { emoji, users: ['me'] }]
+            };
+          }
+        })
+      };
+    });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -202,25 +266,14 @@ const Chat = () => {
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-4">
                   {selectedConversation.messages.map((message) => (
-                    <div
+                    <MessageItem
                       key={message.id}
-                      className={`flex ${message.senderId === 'me' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[70%] rounded-lg p-3 ${
-                          message.senderId === 'me'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-white text-gray-900'
-                        }`}
-                      >
-                        <p>{message.text}</p>
-                        <span className={`text-xs ${
-                          message.senderId === 'me' ? 'text-blue-100' : 'text-gray-500'
-                        }`}>
-                          {message.timestamp}
-                        </span>
-                      </div>
-                    </div>
+                      message={message}
+                      isMine={message.senderId === 'me'}
+                      onEdit={handleEditMessage}
+                      onDelete={handleDeleteMessage}
+                      onReaction={handleReaction}
+                    />
                   ))}
                 </div>
               </ScrollArea>
