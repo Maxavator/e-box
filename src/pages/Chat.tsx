@@ -23,9 +23,9 @@ const demoConversations: Conversation[] = [
     userId: '1',
     unreadCount: 2,
     messages: [
-      { id: '1', senderId: '1', text: 'Hi, could you review the latest design updates?', timestamp: '10:30 AM' },
-      { id: '2', senderId: 'me', text: 'Sure, I\'ll take a look right now', timestamp: '10:32 AM' },
-      { id: '3', senderId: '1', text: 'Thanks! Let me know what you think', timestamp: '10:33 AM' },
+      { id: '1', senderId: '1', text: 'Hi, could you review the latest design updates?', timestamp: '10:30 AM', status: 'sent' },
+      { id: '2', senderId: 'me', text: 'Sure, I\'ll take a look right now', timestamp: '10:32 AM', status: 'sent' },
+      { id: '3', senderId: '1', text: 'Thanks! Let me know what you think', timestamp: '10:33 AM', status: 'sent' },
     ]
   },
   {
@@ -33,8 +33,8 @@ const demoConversations: Conversation[] = [
     userId: '2',
     unreadCount: 0,
     messages: [
-      { id: '1', senderId: '2', text: 'Team meeting at 3 PM today', timestamp: '9:00 AM' },
-      { id: '2', senderId: 'me', text: 'I\'ll be there', timestamp: '9:05 AM' },
+      { id: '1', senderId: '2', text: 'Team meeting at 3 PM today', timestamp: '9:00 AM', status: 'sent' },
+      { id: '2', senderId: 'me', text: 'I\'ll be there', timestamp: '9:05 AM', status: 'sent' },
     ]
   },
   {
@@ -42,7 +42,7 @@ const demoConversations: Conversation[] = [
     userId: '3',
     unreadCount: 1,
     messages: [
-      { id: '1', senderId: '3', text: 'Did you see the new project requirements?', timestamp: '11:20 AM' },
+      { id: '1', senderId: '3', text: 'Did you see the new project requirements?', timestamp: '11:20 AM', status: 'sent' },
     ]
   },
   {
@@ -50,8 +50,8 @@ const demoConversations: Conversation[] = [
     userId: '4',
     unreadCount: 0,
     messages: [
-      { id: '1', senderId: '4', text: 'Great presentation yesterday!', timestamp: 'Yesterday' },
-      { id: '2', senderId: 'me', text: 'Thanks! Glad it went well', timestamp: 'Yesterday' },
+      { id: '1', senderId: '4', text: 'Great presentation yesterday!', timestamp: 'Yesterday', status: 'sent' },
+      { id: '2', senderId: 'me', text: 'Thanks! Glad it went well', timestamp: 'Yesterday', status: 'sent' },
     ]
   },
   {
@@ -59,9 +59,9 @@ const demoConversations: Conversation[] = [
     userId: '5',
     unreadCount: 3,
     messages: [
-      { id: '1', senderId: '5', text: 'Can we discuss the new feature?', timestamp: '12:45 PM' },
-      { id: '2', senderId: '5', text: 'I have some ideas to share', timestamp: '12:46 PM' },
-      { id: '3', senderId: '5', text: 'Let me know when you\'re free', timestamp: '12:47 PM' },
+      { id: '1', senderId: '5', text: 'Can we discuss the new feature?', timestamp: '12:45 PM', status: 'sent' },
+      { id: '2', senderId: '5', text: 'I have some ideas to share', timestamp: '12:46 PM', status: 'sent' },
+      { id: '3', senderId: '5', text: 'Let me know when you\'re free', timestamp: '12:47 PM', status: 'sent' },
     ]
   },
 ];
