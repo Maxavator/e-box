@@ -1,3 +1,4 @@
+
 import { MessageSquare, LogOut, Send, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -192,8 +193,35 @@ const Chat = () => {
 
   const filteredConversations = demoConversations.filter(conversation => {
     const user = getUserById(conversation.userId);
-    return user?.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const searchLower = searchQuery.toLowerCase();
+    
+    // Search in user name
+    const nameMatch = user?.name.toLowerCase().includes(searchLower);
+    
+    // Search in message content
+    const messageMatch = conversation.messages.some(message => 
+      message.text.toLowerCase().includes(searchLower)
+    );
+    
+    // Search in timestamp
+    const timestampMatch = conversation.messages.some(message =>
+      message.timestamp.toLowerCase().includes(searchLower)
+    );
+
+    // Return true if any of the search criteria match
+    return nameMatch || messageMatch || timestampMatch;
   });
+
+  // Highlight matching text in the conversation list
+  const highlightText = (text: string) => {
+    if (!searchQuery) return text;
+    
+    const parts = text.split(new RegExp(`(${searchQuery})`, 'gi'));
+    return parts.map((part, index) => 
+      part.toLowerCase() === searchQuery.toLowerCase() ? 
+        <span key={index} className="bg-yellow-200">{part}</span> : part
+    );
+  };
 
   return (
     <div className="flex-1 flex flex-col">
@@ -217,16 +245,29 @@ const Chat = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 type="text"
-                placeholder="Search conversations..."
+                placeholder="Search messages, names..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
               />
+              {searchQuery && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
+                  {filteredConversations.length} results
+                </div>
+              )}
             </div>
             <ScrollArea className="h-[calc(100vh-8rem)]">
               {filteredConversations.map((conversation) => {
                 const user = getUserById(conversation.userId);
                 const lastMessage = conversation.messages[conversation.messages.length - 1];
+                
+                // Find the first matching message for preview
+                const matchingMessage = searchQuery ? 
+                  conversation.messages.find(msg => 
+                    msg.text.toLowerCase().includes(searchQuery.toLowerCase())
+                  ) : lastMessage;
+                
+                const previewMessage = matchingMessage || lastMessage;
                 
                 return (
                   <div
@@ -241,11 +282,17 @@ const Chat = () => {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <p className="font-medium truncate">{user?.name}</p>
-                        <span className="text-xs text-gray-500">{lastMessage.timestamp}</span>
+                        <p className="font-medium truncate">
+                          {highlightText(user?.name || '')}
+                        </p>
+                        <span className="text-xs text-gray-500">
+                          {highlightText(previewMessage.timestamp)}
+                        </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-500 truncate">{lastMessage.text}</p>
+                        <p className="text-sm text-gray-500 truncate">
+                          {highlightText(previewMessage.text)}
+                        </p>
                         {conversation.unreadCount > 0 && (
                           <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-blue-600 rounded-full">
                             {conversation.unreadCount}
@@ -256,6 +303,11 @@ const Chat = () => {
                   </div>
                 );
               })}
+              {searchQuery && filteredConversations.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  No conversations found matching "{searchQuery}"
+                </div>
+              )}
             </ScrollArea>
           </div>
         </aside>
