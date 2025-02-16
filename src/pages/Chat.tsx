@@ -1,4 +1,3 @@
-
 import { MessageSquare, LogOut, Send, Search, User, LayoutDashboard, MessageCircle, Calendar, Users, Wrench } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -227,6 +226,11 @@ const Chat = () => {
     );
   };
 
+  const handleLogoClick = () => {
+    setActiveTab("chats");
+    setSelectedConversation(null);
+  };
+
   return (
     <div className="flex-1 flex flex-col">
       <header className="h-16 border-b flex items-center justify-between px-6 bg-white">
@@ -234,7 +238,8 @@ const Chat = () => {
           <img 
             src="/lovable-uploads/cea5cf65-708e-42c4-9a6c-6073f42a3471.png" 
             alt="e-Box Logo" 
-            className="h-8"
+            className="h-8 cursor-pointer"
+            onClick={handleLogoClick}
           />
           <h1 className="text-xl font-semibold">Enterprise Chat</h1>
         </div>
