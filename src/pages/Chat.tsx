@@ -1,6 +1,6 @@
-
 import { MessageSquare, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -44,7 +44,7 @@ const demoConversations: Conversation[] = [
     unreadCount: 2,
     messages: [
       { id: '1', senderId: '1', text: 'Hi, could you review the latest design updates?', timestamp: '10:30 AM' },
-      { id: '2', senderId: 'me', text: 'Sure, I'll take a look right now', timestamp: '10:32 AM' },
+      { id: '2', senderId: 'me', text: 'Sure, I\'ll take a look right now', timestamp: '10:32 AM' },
       { id: '3', senderId: '1', text: 'Thanks! Let me know what you think', timestamp: '10:33 AM' },
     ]
   },
@@ -54,7 +54,7 @@ const demoConversations: Conversation[] = [
     unreadCount: 0,
     messages: [
       { id: '1', senderId: '2', text: 'Team meeting at 3 PM today', timestamp: '9:00 AM' },
-      { id: '2', senderId: 'me', text: 'I'll be there', timestamp: '9:05 AM' },
+      { id: '2', senderId: 'me', text: 'I\'ll be there', timestamp: '9:05 AM' },
     ]
   },
   {
@@ -81,7 +81,7 @@ const demoConversations: Conversation[] = [
     messages: [
       { id: '1', senderId: '5', text: 'Can we discuss the new feature?', timestamp: '12:45 PM' },
       { id: '2', senderId: '5', text: 'I have some ideas to share', timestamp: '12:46 PM' },
-      { id: '3', senderId: '5', text: 'Let me know when you're free', timestamp: '12:47 PM' },
+      { id: '3', senderId: '5', text: 'Let me know when you\'re free', timestamp: '12:47 PM' },
     ]
   },
 ];
