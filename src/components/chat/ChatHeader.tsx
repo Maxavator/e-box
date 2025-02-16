@@ -12,9 +12,13 @@ export function ChatHeader({ onLogout, onLogoClick }: ChatHeaderProps) {
     <header className="border-b bg-white p-4 flex items-center justify-between">
       <button 
         onClick={onLogoClick}
-        className="text-lg font-semibold hover:text-primary transition-colors"
+        className="flex items-center gap-2 hover:opacity-90 transition-opacity"
       >
-        Chat App
+        <img 
+          src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
+          alt="Afrovation" 
+          className="h-8"
+        />
       </button>
       <Button variant="ghost" size="icon" onClick={onLogout}>
         <LogOut className="h-5 w-5" />

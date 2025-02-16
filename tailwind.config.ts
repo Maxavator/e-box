@@ -26,11 +26,11 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
+          DEFAULT: "#E65A1F", // Afrovation orange
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
+          DEFAULT: "#612018", // Afrovation brown
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
@@ -52,18 +52,6 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
-        },
-        "burnt-orange": {
-          50: "#FFF5EB",
-          100: "#FFE6D5",
-          200: "#FFC8AB",
-          300: "#FFA980",
-          400: "#FF8B56",
-          500: "#F97316", /* Base burnt orange */
-          600: "#EA580C",
-          700: "#C2410C",
-          800: "#9A3412",
-          900: "#7C2D12",
         },
       },
       borderRadius: {
