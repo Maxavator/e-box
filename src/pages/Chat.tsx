@@ -1,16 +1,15 @@
 
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { MessageSquare, Calendar } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarView } from "@/components/calendar/CalendarView";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ConversationList } from "@/components/chat/ConversationList";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { MessageList } from "@/components/chat/MessageList";
 import type { Message, Conversation } from "@/types/chat";
-import { demoUsers, demoConversations } from "@/data/chat";
+import { demoUsers, demoConversations, getUserById } from "@/data/chat";
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -166,13 +165,6 @@ const Chat = () => {
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Chats
               </TabsTrigger>
-              <TabsTrigger
-                value="calendar"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Calendar
-              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="chats" className="flex-1 p-0">
@@ -181,10 +173,6 @@ const Chat = () => {
                 selectedConversation={selectedConversation}
                 onSelectConversation={setSelectedConversation}
               />
-            </TabsContent>
-            
-            <TabsContent value="calendar" className="flex-1 p-0">
-              <CalendarView />
             </TabsContent>
           </Tabs>
         </aside>

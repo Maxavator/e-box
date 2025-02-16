@@ -1,3 +1,4 @@
+
 import type { User, Conversation } from "@/types/chat";
 
 export const demoUsers: User[] = [
