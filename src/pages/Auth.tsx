@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
 const Auth = () => {
@@ -12,7 +12,7 @@ const Auth = () => {
   const { toast } = useToast();
 
   const validateSAID = (id: string) => {
-    const regex = /^([45])0\d{9}(\d{3})$/;
+    const regex = /^([456])0\d{9}(\d{3})$/;
     return regex.test(id);
   };
 
@@ -47,6 +47,14 @@ const Auth = () => {
           <CardTitle className="text-2xl font-bold text-center">
             Welcome to Enterprise Chat
           </CardTitle>
+          <CardDescription className="text-center text-gray-500">
+            Demo Credentials
+          </CardDescription>
+          <div className="mt-4 space-y-2 text-sm text-gray-500 bg-gray-50 p-4 rounded-lg">
+            <p><span className="font-medium">Regular User:</span> 60102030405</p>
+            <p><span className="font-medium">Organization Admin:</span> 50102030405</p>
+            <p><span className="font-medium">Global Admin:</span> 40102030405</p>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
