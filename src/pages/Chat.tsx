@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { MessageSquare, Calendar } from "lucide-react";
@@ -10,6 +11,7 @@ import { MessageList } from "@/components/chat/MessageList";
 import { CalendarView } from "@/components/calendar/CalendarView";
 import type { Message, Conversation } from "@/types/chat";
 import { demoUsers, demoConversations, getUserById } from "@/data/chat";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -148,85 +150,91 @@ const Chat = () => {
     <div className="flex-1 flex flex-col">
       <ChatHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
       
-      <div className="flex-1 flex">
-        <aside className="w-64 border-r bg-gray-50 flex flex-col">
-          <div className="p-4">
-            <Input
-              type="search"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-            <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
-              <TabsTrigger
-                value="chats"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Chats
-              </TabsTrigger>
-              <TabsTrigger
-                value="calendar"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Calendar
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="chats" className="flex-1 p-0">
-              <ConversationList
-                conversations={filteredConversations}
-                selectedConversation={selectedConversation}
-                onSelectConversation={setSelectedConversation}
+      <ResizablePanelGroup direction="horizontal" className="flex-1">
+        <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+          <div className="h-full bg-gray-50">
+            <div className="p-4">
+              <Input
+                type="search"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full"
               />
-            </TabsContent>
-          </Tabs>
-        </aside>
-
-        <main className="flex-1 flex flex-col">
-          {activeTab === "chats" ? (
-            selectedConversation ? (
-              <>
-                <div className="p-4 border-b">
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <p className="font-medium">
-                        {getUserById(selectedConversation.userId)?.name}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {getUserById(selectedConversation.userId)?.status}
-                      </p>
+            </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="h-[calc(100%-5rem)]">
+              <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
+                <TabsTrigger
+                  value="chats"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Chats
+                </TabsTrigger>
+                <TabsTrigger
+                  value="calendar"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
+                >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Calendar
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="chats" className="h-full p-0">
+                <ConversationList
+                  conversations={filteredConversations}
+                  selectedConversation={selectedConversation}
+                  onSelectConversation={setSelectedConversation}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </ResizablePanel>
+        
+        <ResizableHandle withHandle />
+        
+        <ResizablePanel defaultSize={75}>
+          <main className="h-full">
+            {activeTab === "chats" ? (
+              selectedConversation ? (
+                <div className="flex flex-col h-full">
+                  <div className="p-4 border-b">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <p className="font-medium">
+                          {getUserById(selectedConversation.userId)?.name}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {getUserById(selectedConversation.userId)?.status}
+                        </p>
+                      </div>
                     </div>
                   </div>
+
+                  <MessageList
+                    messages={selectedConversation.messages}
+                    onEditMessage={handleEditMessage}
+                    onDeleteMessage={handleDeleteMessage}
+                    onReactToMessage={handleReaction}
+                  />
+
+                  <ChatInput
+                    value={newMessage}
+                    onChange={setNewMessage}
+                    onSend={handleSendMessage}
+                  />
                 </div>
-
-                <MessageList
-                  messages={selectedConversation.messages}
-                  onEditMessage={handleEditMessage}
-                  onDeleteMessage={handleDeleteMessage}
-                  onReactToMessage={handleReaction}
-                />
-
-                <ChatInput
-                  value={newMessage}
-                  onChange={setNewMessage}
-                  onSend={handleSendMessage}
-                />
-              </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center text-gray-500">
+                  Select a conversation to start chatting
+                </div>
+              )
             ) : (
-              <div className="flex-1 flex items-center justify-center text-gray-500">
-                Select a conversation to start chatting
-              </div>
-            )
-          ) : (
-            <CalendarView />
-          )}
-        </main>
-      </div>
+              <CalendarView />
+            )}
+          </main>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 };
