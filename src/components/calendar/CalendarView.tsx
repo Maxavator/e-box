@@ -1,41 +1,54 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-const demoEvents = [
-  {
-    id: 1,
-    title: "Team Meeting",
-    description: "Weekly sync with the development team",
-    date: new Date(2024, 3, 15, 10, 0),
-    duration: "1 hour"
-  },
-  {
-    id: 2,
-    title: "Project Review",
-    description: "Review Q1 project milestones",
-    date: new Date(2024, 3, 17, 14, 30),
-    duration: "2 hours"
-  },
-  {
-    id: 3,
-    title: "Client Call",
-    description: "Discussion about new requirements",
-    date: new Date(2024, 3, 20, 11, 0),
-    duration: "45 minutes"
-  }
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import type { CalendarEvent } from "@/types/chat";
 
 export function CalendarView() {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const selectedDayEvents = demoEvents.filter(event => 
+  // Fetch all events
+  const { data: events, refetch } = useQuery({
+    queryKey: ['calendar-events'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('calendar_events')
+        .select('*');
+      if (error) throw error;
+      return data as CalendarEvent[];
+    },
+  });
+
+  // Set up real-time subscription for events
+  useEffect(() => {
+    const channel = supabase
+      .channel('calendar-events-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'calendar_events'
+        },
+        () => {
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
+
+  const selectedDayEvents = events?.filter(event => 
     date && 
-    event.date.getDate() === date.getDate() &&
-    event.date.getMonth() === date.getMonth() &&
-    event.date.getFullYear() === date.getFullYear()
+    new Date(event.start_time).getDate() === date.getDate() &&
+    new Date(event.start_time).getMonth() === date.getMonth() &&
+    new Date(event.start_time).getFullYear() === date.getFullYear()
   );
 
   return (
@@ -50,20 +63,37 @@ export function CalendarView() {
         <div className="mt-4">
           <h3 className="font-medium mb-2">Selected Date Events</h3>
           <ScrollArea className="h-[calc(100vh-26rem)]">
-            {selectedDayEvents.length > 0 ? (
+            {selectedDayEvents && selectedDayEvents.length > 0 ? (
               <div className="space-y-4">
                 {selectedDayEvents.map(event => (
                   <Card key={event.id} className="p-4">
                     <h4 className="font-medium">{event.title}</h4>
-                    <p className="text-sm text-gray-500">{event.description}</p>
+                    {event.description && (
+                      <p className="text-sm text-gray-500">{event.description}</p>
+                    )}
                     <div className="text-sm text-gray-500 mt-2">
-                      {event.date.toLocaleTimeString([], { 
+                      {new Date(event.start_time).toLocaleTimeString([], { 
                         hour: '2-digit', 
                         minute: '2-digit' 
                       })}
-                      {" • "}
-                      {event.duration}
+                      {" - "}
+                      {new Date(event.end_time).toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
                     </div>
+                    {event.location && (
+                      <div className="text-sm text-gray-500 mt-1">
+                        📍 {event.location}
+                      </div>
+                    )}
+                    {event.is_online && event.meeting_link && (
+                      <div className="text-sm text-blue-500 mt-1">
+                        <a href={event.meeting_link} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                          🔗 Join Meeting
+                        </a>
+                      </div>
+                    )}
                   </Card>
                 ))}
               </div>
@@ -78,23 +108,42 @@ export function CalendarView() {
           <h2 className="text-2xl font-bold mb-6">Calendar Overview</h2>
           <div className="space-y-6">
             <section>
-              <h3 className="text-lg font-medium mb-4">Upcoming Events</h3>
+              <h3 className="text-lg font-medium mb-4">All Events</h3>
               <div className="space-y-4">
-                {demoEvents
-                  .sort((a, b) => a.date.getTime() - b.date.getTime())
+                {events
+                  ?.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
                   .map(event => (
                     <Card key={event.id} className="p-4">
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="font-medium">{event.title}</h4>
-                          <p className="text-sm text-gray-500">{event.description}</p>
+                          {event.description && (
+                            <p className="text-sm text-gray-500">{event.description}</p>
+                          )}
+                          {event.location && (
+                            <p className="text-sm text-gray-500 mt-1">
+                              📍 {event.location}
+                            </p>
+                          )}
+                          {event.is_online && event.meeting_link && (
+                            <p className="text-sm text-blue-500 mt-1">
+                              <a href={event.meeting_link} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                🔗 Join Meeting
+                              </a>
+                            </p>
+                          )}
                         </div>
                         <div className="text-right">
                           <div className="text-sm font-medium">
-                            {event.date.toLocaleDateString()}
+                            {new Date(event.start_time).toLocaleDateString()}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {event.date.toLocaleTimeString([], { 
+                            {new Date(event.start_time).toLocaleTimeString([], { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                            {" - "}
+                            {new Date(event.end_time).toLocaleTimeString([], { 
                               hour: '2-digit', 
                               minute: '2-digit' 
                             })}
