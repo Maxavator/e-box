@@ -58,7 +58,7 @@ const MessageItem = ({ message, isMine, onEdit, onDelete, onReaction }: MessageI
     { emoji: "❤️", icon: Heart },
     { emoji: "👍", icon: ThumbsUp },
     { emoji: "👎", icon: ThumbsDown },
-    { emoji: "❤️", icon: Heart, label: "Thank you" }, // Added thank you reaction
+    { emoji: "🙏", icon: Heart, label: "Thank you" }, // Changed to praying hands emoji
   ];
 
   return (
