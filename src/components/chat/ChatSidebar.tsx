@@ -1,10 +1,10 @@
-
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, Calendar, Inbox, PlusCircle } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
+import { NewEventDialog } from "@/components/calendar/NewEventDialog";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -28,10 +28,7 @@ const CalendarActions = ({ onCalendarActionClick }: { onCalendarActionClick: (vi
         <Inbox className="mr-2 h-4 w-4" />
         Calendar Inbox
       </Button>
-      <Button variant="outline" className="w-full justify-start">
-        <PlusCircle className="mr-2 h-4 w-4" />
-        New Event
-      </Button>
+      <NewEventDialog />
       <Button variant="outline" className="w-full justify-start">
         <PlusCircle className="mr-2 h-4 w-4" />
         New Task
