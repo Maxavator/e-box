@@ -1,3 +1,4 @@
+
 import { MessageSquare, LogOut, Send, Search, User, LayoutDashboard, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -240,7 +241,7 @@ const Chat = () => {
       <div className="flex-1 flex">
         <aside className="w-80 border-r bg-white">
           <div className="p-4">
-            <Tabs defaultValue="chats" className="w-full" onValueChange={setActiveTab}>
+            <Tabs defaultValue="chats" value="chats" className="w-full" onValueChange={setActiveTab}>
               <TabsList className="w-full grid grid-cols-3 mb-4">
                 <TabsTrigger value="profile" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
