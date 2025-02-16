@@ -1,4 +1,5 @@
-import { MessageSquare, LogOut, Send, Search, User, LayoutDashboard, MessageCircle } from "lucide-react";
+
+import { MessageSquare, LogOut, Send, Search, User, LayoutDashboard, MessageCircle, Calendar, Users, Wrench } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -250,7 +251,7 @@ const Chat = () => {
       <div className="flex-1 flex">
         <aside className="w-80 border-r bg-white">
           <div className="p-4">
-            <Tabs defaultValue="chats" value="chats" className="w-full" onValueChange={setActiveTab}>
+            <Tabs defaultValue="chats" value={activeTab} className="w-full" onValueChange={setActiveTab}>
               <TabsList className="w-full grid grid-cols-3 mb-4">
                 <TabsTrigger value="profile" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
@@ -356,11 +357,54 @@ const Chat = () => {
               </TabsContent>
 
               <TabsContent value="desk" className="mt-0">
-                <div className="flex flex-col items-center py-8 space-y-4">
-                  <LayoutDashboard className="h-12 w-12 text-gray-400" />
-                  <div className="text-center">
-                    <h3 className="font-medium">My Desk</h3>
-                    <p className="text-sm text-gray-500">Your workspace</p>
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <h3 className="font-medium text-lg">My Desk</h3>
+                    <p className="text-sm text-gray-500">Quick access to your workspace tools</p>
+                  </div>
+                  
+                  <div className="grid gap-4">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start h-auto p-4"
+                      onClick={() => {/* TODO: Add calendar functionality */}}
+                    >
+                      <div className="flex items-start gap-4">
+                        <Calendar className="h-6 w-6 text-blue-600 flex-shrink-0" />
+                        <div className="text-left">
+                          <h4 className="font-medium">Calendar</h4>
+                          <p className="text-sm text-gray-500">Schedule and manage appointments</p>
+                        </div>
+                      </div>
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start h-auto p-4"
+                      onClick={() => {/* TODO: Add HR services functionality */}}
+                    >
+                      <div className="flex items-start gap-4">
+                        <Users className="h-6 w-6 text-green-600 flex-shrink-0" />
+                        <div className="text-left">
+                          <h4 className="font-medium">HR Services</h4>
+                          <p className="text-sm text-gray-500">Access HR resources and support</p>
+                        </div>
+                      </div>
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start h-auto p-4"
+                      onClick={() => {/* TODO: Add tech support functionality */}}
+                    >
+                      <div className="flex items-start gap-4">
+                        <Wrench className="h-6 w-6 text-purple-600 flex-shrink-0" />
+                        <div className="text-left">
+                          <h4 className="font-medium">Tech Support</h4>
+                          <p className="text-sm text-gray-500">Get help with technical issues</p>
+                        </div>
+                      </div>
+                    </Button>
                   </div>
                 </div>
               </TabsContent>
