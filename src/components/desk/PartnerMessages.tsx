@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,31 +38,38 @@ export function PartnerMessages() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      const { data, error } = await supabase
+      // First, get messages
+      const { data: messagesData, error: messagesError } = await supabase
         .from('partner_messages')
-        .select(`
-          id,
-          subject,
-          message,
-          created_at,
-          sender_id,
-          receiver_id,
-          is_read,
-          sender:profiles!partner_messages_sender_id_fkey (
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      
-      return (data || []).map(msg => ({
+      if (messagesError) throw messagesError;
+      if (!messagesData) return [];
+
+      // Then, get sender profiles
+      const senderIds = [...new Set(messagesData.map(msg => msg.sender_id))];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .in('id', senderIds);
+
+      if (profilesError) throw profilesError;
+
+      // Map profiles to a dictionary for easier lookup
+      const profilesMap = (profilesData || []).reduce((acc, profile) => {
+        acc[profile.id] = profile;
+        return acc;
+      }, {} as Record<string, SenderProfile>);
+
+      // Combine messages with sender profiles
+      return messagesData.map(msg => ({
         ...msg,
         is_read: msg.is_read ?? false,
+        sender: profilesMap[msg.sender_id] || null
       })) as PartnerMessage[];
-    },
+    }
   });
 
   const handleSendMessage = async () => {
