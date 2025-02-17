@@ -37,49 +37,50 @@ export function PartnerMessages() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 
-  const { data: messages, isLoading, refetch } = useQuery<PartnerMessage[]>({
+  const fetchMessages = async (): Promise<PartnerMessage[]> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('No user found');
+
+    // Fetch messages with a single filter
+    const { data: messagesData, error: messagesError } = await supabase
+      .from('partner_messages')
+      .select()
+      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+      .order('created_at', { ascending: false });
+
+    if (messagesError) throw messagesError;
+    const rawMessages = messagesData as RawMessage[];
+
+    if (rawMessages.length === 0) return [];
+
+    // Get unique sender IDs
+    const senderIds = [...new Set(rawMessages.map(msg => msg.sender_id))];
+
+    // Fetch sender profiles
+    const { data: profilesData, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id,first_name,last_name')
+      .in('id', senderIds);
+
+    if (profilesError) throw profilesError;
+    const profiles = profilesData as SenderProfile[];
+
+    // Create profiles lookup map
+    const profilesMap = Object.fromEntries(
+      profiles.map(profile => [profile.id, profile])
+    );
+
+    // Format messages
+    return rawMessages.map(msg => ({
+      ...msg,
+      is_read: Boolean(msg.is_read),
+      sender: profilesMap[msg.sender_id] || null
+    }));
+  };
+
+  const { data: messages, isLoading, refetch } = useQuery({
     queryKey: ['partnerMessages'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
-
-      // Fetch messages using filter() instead of or()
-      const { data: messagesData, error: messagesError } = await supabase
-        .from('partner_messages')
-        .select()
-        .filter('sender_id', 'eq', user.id)
-        .filter('receiver_id', 'eq', user.id)
-        .order('created_at', { ascending: false });
-
-      if (messagesError) throw messagesError;
-      const rawMessages = messagesData as RawMessage[];
-
-      if (rawMessages.length === 0) return [];
-
-      // Get unique sender IDs
-      const senderIds = [...new Set(rawMessages.map(msg => msg.sender_id))];
-
-      // Fetch sender profiles
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id,first_name,last_name')
-        .in('id', senderIds);
-
-      if (profilesError) throw profilesError;
-      const profiles = profilesData as SenderProfile[];
-
-      // Create profiles lookup map
-      const profilesMap = Object.fromEntries(
-        profiles.map(profile => [profile.id, profile])
-      );
-
-      // Format messages
-      return rawMessages.map(msg => ({
-        ...msg,
-        is_read: Boolean(msg.is_read),
-        sender: profilesMap[msg.sender_id] || null
-      }));
-    }
+    queryFn: fetchMessages
   });
 
   const handleSendMessage = async () => {
