@@ -1,13 +1,14 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar, Inbox, Briefcase, Mail } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, Briefcase, Mail, FileText, Clock } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
 import { LeaveManager } from "@/components/desk/LeaveManager";
 import { PostBox } from "@/components/desk/PostBox";
+import { useState } from "react";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -36,10 +37,28 @@ const CalendarActions = ({ onCalendarActionClick }: { onCalendarActionClick: (vi
   );
 };
 
-const DeskContent = () => {
+const DeskFeatures = ({ activeFeature, onFeatureSelect }: { 
+  activeFeature: string, 
+  onFeatureSelect: (feature: string) => void 
+}) => {
+  const features = [
+    { id: 'leave', label: 'Leave Balances', icon: Clock },
+    { id: 'policies', label: 'Policies', icon: FileText },
+  ];
+
   return (
-    <div className="h-full">
-      <LeaveManager />
+    <div className="p-4 space-y-2">
+      {features.map((feature) => (
+        <Button
+          key={feature.id}
+          variant={activeFeature === feature.id ? "secondary" : "ghost"}
+          className="w-full justify-start"
+          onClick={() => onFeatureSelect(feature.id)}
+        >
+          <feature.icon className="mr-2 h-4 w-4" />
+          {feature.label}
+        </Button>
+      ))}
     </div>
   );
 };
@@ -54,6 +73,8 @@ export function ChatSidebar({
   onSelectConversation,
   onCalendarActionClick,
 }: ChatSidebarProps) {
+  const [activeDeskFeature, setActiveDeskFeature] = useState('leave');
+
   return (
     <div className="h-full bg-gray-50">
       <div className="p-4">
@@ -110,7 +131,13 @@ export function ChatSidebar({
         </TabsContent>
 
         <TabsContent value="desk" className="h-full">
-          <DeskContent />
+          <DeskFeatures 
+            activeFeature={activeDeskFeature} 
+            onFeatureSelect={setActiveDeskFeature} 
+          />
+          <div className="border-t">
+            <LeaveManager defaultTab={activeDeskFeature} />
+          </div>
         </TabsContent>
 
         <TabsContent value="postbox" className="h-full">

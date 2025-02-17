@@ -3,19 +3,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LeaveBalances } from "./LeaveBalances";
 import { Policies } from "./Policies";
 
-export function LeaveManager() {
+interface LeaveManagerProps {
+  defaultTab?: string;
+}
+
+export function LeaveManager({ defaultTab = 'leave' }: LeaveManagerProps) {
   return (
-    <Tabs defaultValue="leave" className="w-full h-full">
-      <TabsList>
-        <TabsTrigger value="leave">Leave Balances</TabsTrigger>
-        <TabsTrigger value="policies">Policies</TabsTrigger>
-      </TabsList>
-      <TabsContent value="leave">
+    <div className="w-full h-full">
+      <TabsContent value="leave" forceMount hidden={defaultTab !== 'leave'}>
         <LeaveBalances />
       </TabsContent>
-      <TabsContent value="policies">
+      <TabsContent value="policies" forceMount hidden={defaultTab !== 'policies'}>
         <Policies />
       </TabsContent>
-    </Tabs>
+    </div>
   );
 }
