@@ -2,8 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, MessageSquare, BarChart } from "lucide-react";
-import { LeaveManager } from "@/components/desk/LeaveManager";
-import { LeaveBalances } from "@/components/desk/LeaveBalances";
 import { Policies } from "@/components/desk/Policies";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -18,12 +16,10 @@ const OrganizationDashboard = () => {
       <Tabs defaultValue="overview" className="px-8">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="leave">Leave Management</TabsTrigger>
           <TabsTrigger value="policies">Policies</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-6 space-y-6">
-          <LeaveBalances />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
@@ -70,10 +66,6 @@ const OrganizationDashboard = () => {
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-
-        <TabsContent value="leave">
-          <LeaveManager />
         </TabsContent>
 
         <TabsContent value="policies">
