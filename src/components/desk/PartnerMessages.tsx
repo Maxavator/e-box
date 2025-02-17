@@ -40,43 +40,40 @@ export function PartnerMessages() {
   const { data: messages, isLoading, refetch } = useQuery({
     queryKey: ['partnerMessages'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const userResponse = await supabase.auth.getUser();
+      const user = userResponse.data.user;
       if (!user) throw new Error('No user found');
 
-      // Get messages with explicit typing
-      const { data: messagesData, error: messagesError } = await supabase
+      const messagesResponse = await supabase
         .from('partner_messages')
         .select('*')
         .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
-      if (messagesError) throw messagesError;
-      if (!messagesData) return [];
+      if (messagesResponse.error) throw messagesResponse.error;
+      const messagesData = (messagesResponse.data || []) as RawMessage[];
 
-      const rawMessages = messagesData as RawMessage[];
-
-      // Get profiles with explicit typing
-      const senderIds = Array.from(new Set(rawMessages.map(msg => msg.sender_id)));
-      const { data: profiles, error: profilesError } = await supabase
+      const senderIds = [...new Set(messagesData.map(msg => msg.sender_id))];
+      const profilesResponse = await supabase
         .from('profiles')
         .select('id, first_name, last_name')
         .in('id', senderIds);
 
-      if (profilesError) throw profilesError;
+      if (profilesResponse.error) throw profilesResponse.error;
+      const profiles = (profilesResponse.data || []) as SenderProfile[];
 
-      const senderProfiles = (profiles || []) as SenderProfile[];
-      const profilesMap = new Map<string, SenderProfile>();
-      
-      for (const profile of senderProfiles) {
-        profilesMap.set(profile.id, profile);
-      }
+      const profilesMap: Record<string, SenderProfile> = {};
+      profiles.forEach(profile => {
+        profilesMap[profile.id] = profile;
+      });
 
-      // Transform messages with explicit typing
-      return rawMessages.map(msg => ({
+      const formattedMessages: PartnerMessage[] = messagesData.map(msg => ({
         ...msg,
         is_read: Boolean(msg.is_read),
-        sender: profilesMap.get(msg.sender_id) || null
+        sender: profilesMap[msg.sender_id] || null
       }));
+
+      return formattedMessages;
     }
   });
 
