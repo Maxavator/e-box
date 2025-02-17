@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,19 +9,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Define the database response type
-interface PartnerMessageRow {
-  id: string;
-  subject: string;
-  message: string;
-  created_at: string;
-  sender_id: string;
-  receiver_id: string;
-  is_read: boolean | null;
-  sender: {
-    first_name: string | null;
-    last_name: string | null;
-  } | null;
+type SenderProfile = {
+  first_name: string | null;
+  last_name: string | null;
 }
 
 interface PartnerMessage {
@@ -31,11 +20,9 @@ interface PartnerMessage {
   message: string;
   created_at: string;
   sender_id: string;
+  receiver_id: string;
   is_read: boolean;
-  sender: {
-    first_name: string;
-    last_name: string;
-  } | null;
+  sender: SenderProfile | null;
 }
 
 export function PartnerMessages() {
@@ -53,8 +40,14 @@ export function PartnerMessages() {
       const { data, error } = await supabase
         .from('partner_messages')
         .select(`
-          *,
-          sender:profiles!partner_messages_sender_id_fkey(
+          id,
+          subject,
+          message,
+          created_at,
+          sender_id,
+          receiver_id,
+          is_read,
+          sender:profiles!partner_messages_sender_id_fkey (
             first_name,
             last_name
           )
@@ -64,8 +57,7 @@ export function PartnerMessages() {
 
       if (error) throw error;
       
-      // Transform the data to match our interface
-      return (data as PartnerMessageRow[]).map(msg => ({
+      return (data || []).map(msg => ({
         ...msg,
         is_read: msg.is_read ?? false,
       })) as PartnerMessage[];
@@ -77,7 +69,6 @@ export function PartnerMessages() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      // First get the receiver's ID from their email
       const { data: receiverData, error: receiverError } = await supabase
         .from('profiles')
         .select('id')
