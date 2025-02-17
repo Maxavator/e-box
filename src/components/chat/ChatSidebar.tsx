@@ -7,7 +7,6 @@ import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
 import { LeaveManager } from "@/components/desk/LeaveManager";
-import { PostBox } from "@/components/desk/PostBox";
 import { useState } from "react";
 
 interface ChatSidebarProps {
@@ -109,13 +108,6 @@ export function ChatSidebar({
             <Briefcase className="w-4 h-4 mr-2" />
             Desk
           </TabsTrigger>
-          <TabsTrigger
-            value="postbox"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
-          >
-            <Mail className="w-4 h-4 mr-2" />
-            Post Box
-          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="chats" className="h-full p-0">
@@ -138,10 +130,6 @@ export function ChatSidebar({
           <div className="border-t">
             <LeaveManager defaultTab={activeDeskFeature} />
           </div>
-        </TabsContent>
-
-        <TabsContent value="postbox" className="h-full">
-          <PostBox />
         </TabsContent>
       </Tabs>
     </div>
