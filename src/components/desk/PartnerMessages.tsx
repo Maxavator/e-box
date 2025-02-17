@@ -10,6 +10,21 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+// Define the database response type
+interface PartnerMessageRow {
+  id: string;
+  subject: string;
+  message: string;
+  created_at: string;
+  sender_id: string;
+  receiver_id: string;
+  is_read: boolean | null;
+  sender: {
+    first_name: string | null;
+    last_name: string | null;
+  } | null;
+}
+
 interface PartnerMessage {
   id: string;
   subject: string;
@@ -48,7 +63,12 @@ export function PartnerMessages() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as PartnerMessage[];
+      
+      // Transform the data to match our interface
+      return (data as PartnerMessageRow[]).map(msg => ({
+        ...msg,
+        is_read: msg.is_read ?? false,
+      })) as PartnerMessage[];
     },
   });
 
