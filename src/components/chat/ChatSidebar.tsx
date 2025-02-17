@@ -1,7 +1,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar, Inbox, Briefcase, Mail, FileText } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, Briefcase, Mail, FileText, Clock } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,7 @@ const DeskFeatures = ({ activeFeature, onFeatureSelect }: {
   onFeatureSelect: (feature: string) => void 
 }) => {
   const features = [
+    { id: 'leave', label: 'Leave Balances', icon: Clock },
     { id: 'policies', label: 'Policies', icon: FileText },
   ];
 
@@ -72,7 +73,7 @@ export function ChatSidebar({
   onSelectConversation,
   onCalendarActionClick,
 }: ChatSidebarProps) {
-  const [activeDeskFeature, setActiveDeskFeature] = useState('policies');
+  const [activeDeskFeature, setActiveDeskFeature] = useState('leave');
 
   return (
     <div className="h-full bg-gray-50">
