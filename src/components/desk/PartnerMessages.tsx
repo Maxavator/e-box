@@ -16,17 +16,13 @@ type SenderProfile = {
   last_name: string | null;
 }
 
-interface RawMessage {
+interface Message {
   id: string;
   subject: string;
   message: string;
   created_at: string;
   sender_id: string;
   receiver_id: string;
-  is_read: boolean | null;
-}
-
-interface PartnerMessage extends Omit<RawMessage, 'is_read'> {
   is_read: boolean;
   sender: SenderProfile | null;
 }
@@ -43,7 +39,7 @@ export function PartnerMessages() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      const query = supabase
+      const { data, error } = await supabase
         .from('partner_messages')
         .select(`
           *,
@@ -55,22 +51,15 @@ export function PartnerMessages() {
         `)
         .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
-
-      const { data, error } = await query;
       
       if (error) throw error;
       if (!data) return [];
 
       return data.map(msg => ({
-        id: msg.id,
-        subject: msg.subject,
-        message: msg.message,
-        created_at: msg.created_at,
-        sender_id: msg.sender_id,
-        receiver_id: msg.receiver_id,
+        ...msg,
         is_read: Boolean(msg.is_read),
         sender: msg.sender as SenderProfile
-      }));
+      })) as Message[];
     }
   });
 
