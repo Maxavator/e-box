@@ -103,11 +103,6 @@ export function PostBox() {
       {/* Main Content */}
       <ResizablePanel defaultSize={80}>
         <div className="p-4 space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Post Box</h2>
-            <p className="text-sm text-muted-foreground">Official South African Post Office Communications</p>
-          </div>
-
           <div className="space-y-4">
             {messages?.map((msg) => (
               <Card key={msg.id} className={msg.is_read ? 'bg-gray-50' : 'bg-white'}>
