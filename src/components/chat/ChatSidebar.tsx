@@ -1,13 +1,12 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar, Inbox, Briefcase, Mail, FileText, Clock } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, Briefcase, FileText } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
-import { LeaveManager } from "@/components/desk/LeaveManager";
-import { useState } from "react";
+import { Policies } from "@/components/desk/Policies";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -36,28 +35,16 @@ const CalendarActions = ({ onCalendarActionClick }: { onCalendarActionClick: (vi
   );
 };
 
-const DeskFeatures = ({ activeFeature, onFeatureSelect }: { 
-  activeFeature: string, 
-  onFeatureSelect: (feature: string) => void 
-}) => {
-  const features = [
-    { id: 'leave', label: 'Leave Balances', icon: Clock },
-    { id: 'policies', label: 'Policies', icon: FileText },
-  ];
-
+const DeskFeatures = () => {
   return (
     <div className="p-4 space-y-2">
-      {features.map((feature) => (
-        <Button
-          key={feature.id}
-          variant={activeFeature === feature.id ? "secondary" : "ghost"}
-          className="w-full justify-start"
-          onClick={() => onFeatureSelect(feature.id)}
-        >
-          <feature.icon className="mr-2 h-4 w-4" />
-          {feature.label}
-        </Button>
-      ))}
+      <Button
+        variant="ghost"
+        className="w-full justify-start"
+      >
+        <FileText className="mr-2 h-4 w-4" />
+        Policies
+      </Button>
     </div>
   );
 };
@@ -72,8 +59,6 @@ export function ChatSidebar({
   onSelectConversation,
   onCalendarActionClick,
 }: ChatSidebarProps) {
-  const [activeDeskFeature, setActiveDeskFeature] = useState('leave');
-
   return (
     <div className="h-full bg-gray-50">
       <div className="p-4">
@@ -123,12 +108,9 @@ export function ChatSidebar({
         </TabsContent>
 
         <TabsContent value="desk" className="h-full">
-          <DeskFeatures 
-            activeFeature={activeDeskFeature} 
-            onFeatureSelect={setActiveDeskFeature} 
-          />
+          <DeskFeatures />
           <div className="border-t">
-            <LeaveManager defaultTab={activeDeskFeature} />
+            <Policies />
           </div>
         </TabsContent>
       </Tabs>
