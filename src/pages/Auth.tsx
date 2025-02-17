@@ -67,7 +67,7 @@ const Auth = () => {
                 className="w-full"
               />
             </div>
-            <Button type="submit" className="w-full bg-brand-600 hover:bg-brand-700">
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
               Login
             </Button>
           </form>
