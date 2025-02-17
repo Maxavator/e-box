@@ -15,7 +15,7 @@ interface PostBoxMessage {
   sender: {
     first_name: string;
     last_name: string;
-  };
+  } | null;
 }
 
 export function PostBox() {
