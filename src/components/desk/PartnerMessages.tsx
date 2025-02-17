@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,19 +43,21 @@ export function PartnerMessages() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      // Fetch messages using parameters instead of string concatenation
+      // Fetch messages using filter() instead of or()
       const { data: messagesData, error: messagesError } = await supabase
         .from('partner_messages')
         .select()
-        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .filter('sender_id', 'eq', user.id)
+        .filter('receiver_id', 'eq', user.id)
         .order('created_at', { ascending: false });
 
       if (messagesError) throw messagesError;
+      const rawMessages = messagesData as RawMessage[];
+
+      if (rawMessages.length === 0) return [];
 
       // Get unique sender IDs
-      const senderIds = Array.from(new Set(
-        (messagesData as RawMessage[]).map(msg => msg.sender_id)
-      ));
+      const senderIds = [...new Set(rawMessages.map(msg => msg.sender_id))];
 
       // Fetch sender profiles
       const { data: profilesData, error: profilesError } = await supabase
@@ -63,15 +66,15 @@ export function PartnerMessages() {
         .in('id', senderIds);
 
       if (profilesError) throw profilesError;
+      const profiles = profilesData as SenderProfile[];
 
-      // Create profiles lookup object
-      const profilesMap: Record<string, SenderProfile> = {};
-      for (const profile of profilesData as SenderProfile[]) {
-        profilesMap[profile.id] = profile;
-      }
+      // Create profiles lookup map
+      const profilesMap = Object.fromEntries(
+        profiles.map(profile => [profile.id, profile])
+      );
 
       // Format messages
-      return (messagesData as RawMessage[]).map((msg) => ({
+      return rawMessages.map(msg => ({
         ...msg,
         is_read: Boolean(msg.is_read),
         sender: profilesMap[msg.sender_id] || null
