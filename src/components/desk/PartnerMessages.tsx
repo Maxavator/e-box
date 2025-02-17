@@ -11,17 +11,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 type SenderProfile = {
+  id: string;
   first_name: string | null;
   last_name: string | null;
 }
 
-interface PartnerMessage {
+interface RawMessage {
   id: string;
   subject: string;
   message: string;
   created_at: string;
   sender_id: string;
   receiver_id: string;
+  is_read: boolean | null;
+}
+
+interface PartnerMessage extends Omit<RawMessage, 'is_read'> {
   is_read: boolean;
   sender: SenderProfile | null;
 }
@@ -38,7 +43,7 @@ export function PartnerMessages() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      // First, get messages
+      // Get messages with explicit typing
       const { data: messagesData, error: messagesError } = await supabase
         .from('partner_messages')
         .select('*')
@@ -48,27 +53,30 @@ export function PartnerMessages() {
       if (messagesError) throw messagesError;
       if (!messagesData) return [];
 
-      // Then, get sender profiles
-      const senderIds = [...new Set(messagesData.map(msg => msg.sender_id))];
-      const { data: profilesData, error: profilesError } = await supabase
+      const rawMessages = messagesData as RawMessage[];
+
+      // Get profiles with explicit typing
+      const senderIds = Array.from(new Set(rawMessages.map(msg => msg.sender_id)));
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name')
         .in('id', senderIds);
 
       if (profilesError) throw profilesError;
 
-      // Map profiles to a dictionary for easier lookup
-      const profilesMap = (profilesData || []).reduce((acc, profile) => {
-        acc[profile.id] = profile;
-        return acc;
-      }, {} as Record<string, SenderProfile>);
+      const senderProfiles = (profiles || []) as SenderProfile[];
+      const profilesMap = new Map<string, SenderProfile>();
+      
+      for (const profile of senderProfiles) {
+        profilesMap.set(profile.id, profile);
+      }
 
-      // Combine messages with sender profiles
-      return messagesData.map(msg => ({
+      // Transform messages with explicit typing
+      return rawMessages.map(msg => ({
         ...msg,
-        is_read: msg.is_read ?? false,
-        sender: profilesMap[msg.sender_id] || null
-      })) as PartnerMessage[];
+        is_read: Boolean(msg.is_read),
+        sender: profilesMap.get(msg.sender_id) || null
+      }));
     }
   });
 
