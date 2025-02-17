@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,42 +42,40 @@ export function PartnerMessages() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      // Fetch messages
+      // Fetch messages using parameters instead of string concatenation
       const { data: messagesData, error: messagesError } = await supabase
         .from('partner_messages')
-        .select('*')
+        .select()
         .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
       if (messagesError) throw messagesError;
-      const rawMessages = messagesData as RawMessage[];
 
       // Get unique sender IDs
-      const senderIds = [...new Set(rawMessages.map(msg => msg.sender_id))];
+      const senderIds = Array.from(new Set(
+        (messagesData as RawMessage[]).map(msg => msg.sender_id)
+      ));
 
       // Fetch sender profiles
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name')
+        .select('id,first_name,last_name')
         .in('id', senderIds);
 
       if (profilesError) throw profilesError;
-      const profiles = profilesData as SenderProfile[];
 
       // Create profiles lookup object
-      const profilesMap = profiles.reduce<Record<string, SenderProfile>>((acc, profile) => {
-        acc[profile.id] = profile;
-        return acc;
-      }, {});
+      const profilesMap: Record<string, SenderProfile> = {};
+      for (const profile of profilesData as SenderProfile[]) {
+        profilesMap[profile.id] = profile;
+      }
 
       // Format messages
-      const formattedMessages = rawMessages.map(msg => ({
+      return (messagesData as RawMessage[]).map((msg) => ({
         ...msg,
         is_read: Boolean(msg.is_read),
         sender: profilesMap[msg.sender_id] || null
       }));
-
-      return formattedMessages;
     }
   });
 
