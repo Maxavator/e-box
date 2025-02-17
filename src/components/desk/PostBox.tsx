@@ -20,13 +20,16 @@ interface PostBoxMessage {
   } | null;
 }
 
-type ServiceCategory = 
-  | "All Messages"
-  | "Banking Services"
-  | "Municipality"
-  | "Credit Providers"
-  | "Mobile Networks"
-  | "Government Service";
+const categories = [
+  "All Messages",
+  "Banking Services",
+  "Municipality",
+  "Credit Providers",
+  "Mobile Networks",
+  "Government Service"
+] as const;
+
+type ServiceCategory = typeof categories[number];
 
 export function PostBox() {
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>("All Messages");
@@ -63,15 +66,6 @@ export function PostBox() {
     },
   });
 
-  const categories: ServiceCategory[] = [
-    "All Messages",
-    "Banking Services",
-    "Municipality",
-    "Credit Providers",
-    "Mobile Networks",
-    "Government Service"
-  ];
-
   if (isLoading) {
     return <div className="p-4">Loading messages...</div>;
   }
@@ -82,13 +76,13 @@ export function PostBox() {
       <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
         <div className="h-full border-r bg-gray-50/40 p-4">
           <h3 className="font-semibold mb-4">Categories</h3>
-          <div className="flex flex-col space-y-2">
+          <div className="space-y-2">
             {categories.map((category) => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "secondary" : "ghost"}
                 className={cn(
-                  "w-full justify-start whitespace-normal h-auto text-left py-2",
+                  "w-full justify-start whitespace-normal h-auto py-2",
                   selectedCategory === category && "bg-gray-100"
                 )}
                 onClick={() => setSelectedCategory(category)}
