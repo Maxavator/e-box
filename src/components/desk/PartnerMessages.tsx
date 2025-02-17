@@ -37,50 +37,41 @@ export function PartnerMessages() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 
-  const fetchMessages = async (): Promise<PartnerMessage[]> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('No user found');
-
-    // Fetch messages with a single filter
-    const { data: messagesData, error: messagesError } = await supabase
-      .from('partner_messages')
-      .select()
-      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-      .order('created_at', { ascending: false });
-
-    if (messagesError) throw messagesError;
-    const rawMessages = messagesData as RawMessage[];
-
-    if (rawMessages.length === 0) return [];
-
-    // Get unique sender IDs
-    const senderIds = [...new Set(rawMessages.map(msg => msg.sender_id))];
-
-    // Fetch sender profiles
-    const { data: profilesData, error: profilesError } = await supabase
-      .from('profiles')
-      .select('id,first_name,last_name')
-      .in('id', senderIds);
-
-    if (profilesError) throw profilesError;
-    const profiles = profilesData as SenderProfile[];
-
-    // Create profiles lookup map
-    const profilesMap = Object.fromEntries(
-      profiles.map(profile => [profile.id, profile])
-    );
-
-    // Format messages
-    return rawMessages.map(msg => ({
-      ...msg,
-      is_read: Boolean(msg.is_read),
-      sender: profilesMap[msg.sender_id] || null
-    }));
-  };
-
   const { data: messages, isLoading, refetch } = useQuery({
     queryKey: ['partnerMessages'],
-    queryFn: fetchMessages
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      const query = supabase
+        .from('partner_messages')
+        .select(`
+          *,
+          sender:profiles!partner_messages_sender_id_fkey(
+            id,
+            first_name,
+            last_name
+          )
+        `)
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .order('created_at', { ascending: false });
+
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      if (!data) return [];
+
+      return data.map(msg => ({
+        id: msg.id,
+        subject: msg.subject,
+        message: msg.message,
+        created_at: msg.created_at,
+        sender_id: msg.sender_id,
+        receiver_id: msg.receiver_id,
+        is_read: Boolean(msg.is_read),
+        sender: msg.sender as SenderProfile
+      }));
+    }
   });
 
   const handleSendMessage = async () => {
