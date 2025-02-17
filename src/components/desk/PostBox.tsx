@@ -80,21 +80,23 @@ export function PostBox() {
     <ResizablePanelGroup direction="horizontal" className="h-full">
       {/* Sidebar */}
       <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
-        <div className="h-full border-r bg-gray-50/40 p-4 space-y-2">
+        <div className="h-full border-r bg-gray-50/40 p-4">
           <h3 className="font-semibold mb-4">Categories</h3>
-          {categories.map((category) => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "secondary" : "ghost"}
-              className={cn(
-                "w-full justify-start",
-                selectedCategory === category && "bg-gray-100"
-              )}
-              onClick={() => setSelectedCategory(category)}
-            >
-              {category}
-            </Button>
-          ))}
+          <div className="flex flex-col space-y-2">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "secondary" : "ghost"}
+                className={cn(
+                  "w-full justify-start whitespace-normal h-auto text-left py-2",
+                  selectedCategory === category && "bg-gray-100"
+                )}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
         </div>
       </ResizablePanel>
 
