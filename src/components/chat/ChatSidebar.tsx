@@ -1,11 +1,13 @@
+
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar, Inbox, Briefcase } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, Briefcase, Mail } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
 import { LeaveManager } from "@/components/desk/LeaveManager";
+import { PostBox } from "@/components/desk/PostBox";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -86,6 +88,13 @@ export function ChatSidebar({
             <Briefcase className="w-4 h-4 mr-2" />
             Desk
           </TabsTrigger>
+          <TabsTrigger
+            value="postbox"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            Post Box
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="chats" className="h-full p-0">
@@ -102,6 +111,10 @@ export function ChatSidebar({
 
         <TabsContent value="desk" className="h-full">
           <DeskContent />
+        </TabsContent>
+
+        <TabsContent value="postbox" className="h-full">
+          <PostBox />
         </TabsContent>
       </Tabs>
     </div>
