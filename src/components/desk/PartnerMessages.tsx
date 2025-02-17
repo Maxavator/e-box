@@ -31,6 +31,27 @@ interface PartnerMessage extends Omit<RawMessage, 'is_read'> {
   sender: SenderProfile | null;
 }
 
+async function fetchMessages(userId: string) {
+  const { data, error } = await supabase
+    .from('partner_messages')
+    .select('*')
+    .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data || []) as RawMessage[];
+}
+
+async function fetchProfiles(senderIds: string[]) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, first_name, last_name')
+    .in('id', senderIds);
+
+  if (error) throw error;
+  return (data || []) as SenderProfile[];
+}
+
 export function PartnerMessages() {
   const [isNewMessageOpen, setIsNewMessageOpen] = useState(false);
   const [receiverEmail, setReceiverEmail] = useState("");
@@ -40,40 +61,30 @@ export function PartnerMessages() {
   const { data: messages, isLoading, refetch } = useQuery({
     queryKey: ['partnerMessages'],
     queryFn: async () => {
-      const userResponse = await supabase.auth.getUser();
-      const user = userResponse.data.user;
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      const messagesResponse = await supabase
-        .from('partner_messages')
-        .select('*')
-        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-        .order('created_at', { ascending: false });
-
-      if (messagesResponse.error) throw messagesResponse.error;
-      const messagesData = (messagesResponse.data || []) as RawMessage[];
-
-      const senderIds = [...new Set(messagesData.map(msg => msg.sender_id))];
-      const profilesResponse = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name')
-        .in('id', senderIds);
-
-      if (profilesResponse.error) throw profilesResponse.error;
-      const profiles = (profilesResponse.data || []) as SenderProfile[];
-
+      // Fetch messages
+      const rawMessages = await fetchMessages(user.id);
+      
+      // Get unique sender IDs
+      const senderIds = Array.from(new Set(rawMessages.map(msg => msg.sender_id)));
+      
+      // Fetch sender profiles
+      const profiles = await fetchProfiles(senderIds);
+      
+      // Create profiles lookup object
       const profilesMap: Record<string, SenderProfile> = {};
-      profiles.forEach(profile => {
+      for (const profile of profiles) {
         profilesMap[profile.id] = profile;
-      });
+      }
 
-      const formattedMessages: PartnerMessage[] = messagesData.map(msg => ({
+      // Format messages with sender information
+      return rawMessages.map((msg): PartnerMessage => ({
         ...msg,
         is_read: Boolean(msg.is_read),
         sender: profilesMap[msg.sender_id] || null
       }));
-
-      return formattedMessages;
     }
   });
 
