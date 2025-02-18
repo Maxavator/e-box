@@ -62,6 +62,17 @@ export const TicketList = () => {
       return;
     }
 
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      toast({
+        title: "Error",
+        description: "Failed to get user information",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { data, error } = await supabase
       .from('helpdesk_tickets')
       .insert({
@@ -69,6 +80,7 @@ export const TicketList = () => {
         description: newTicket.description,
         status: 'open',
         priority: 'medium',
+        created_by: user.id
       })
       .select()
       .single();

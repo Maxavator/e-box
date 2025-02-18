@@ -52,7 +52,7 @@ export const ChatContent = ({
       <ChatInput
         value={newMessage}
         onChange={onNewMessageChange}
-        onSendMessage={onSendMessage}
+        onSend={onSendMessage}
       />
     </div>
   );
