@@ -5,4 +5,9 @@ export interface Document {
   size: string;
   isVerified?: boolean;
   downloadUrl?: string;
+  description?: string;
+  previewContent?: string;
+  category?: string;
+  version?: string;
+  lastModifiedBy?: string;
 }
