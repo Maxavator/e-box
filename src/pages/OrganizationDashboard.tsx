@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { UserManagement } from "@/components/admin/UserManagement";
+import { OrganizationManagement } from "@/components/admin/OrganizationManagement";
 
 const OrganizationDashboard = () => {
   const navigate = useNavigate();
@@ -73,14 +74,16 @@ const OrganizationDashboard = () => {
             </div>
             <div className="flex justify-between items-center">
               <p className="text-muted-foreground">Manage your organization's information and policies</p>
-              <Button 
-                variant="outline"
-                onClick={() => navigate("/organization/manage")}
-                className="flex items-center gap-2"
-              >
-                <Building2 className="h-4 w-4" />
-                Manage Organization
-              </Button>
+              {userInfo.isAdmin && (
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate("/organization/manage")}
+                  className="flex items-center gap-2"
+                >
+                  <Building2 className="h-4 w-4" />
+                  Manage Organization
+                </Button>
+              )}
             </div>
           </header>
 
@@ -167,6 +170,7 @@ const OrganizationDashboard = () => {
               <TabsContent value="admin">
                 <div className="space-y-6">
                   <UserManagement />
+                  <OrganizationManagement />
                 </div>
               </TabsContent>
             )}
