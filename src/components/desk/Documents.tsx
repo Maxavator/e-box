@@ -1,52 +1,89 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { DocumentList } from "./components/DocumentList";
 import { EmptyState } from "./components/EmptyState";
 import { OTPVerification } from "./components/OTPVerification";
-import { payslips, contracts, otherDocuments } from "./data/documents";
 import { Document } from "./types/documents";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Documents = () => {
   const [showOTPDialog, setShowOTPDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleDocumentClick = (doc: Document) => {
-    if (doc.name.toLowerCase().includes('payslip') || doc.name.toLowerCase().includes('contract') || 
-        doc.name.toLowerCase().includes('agreement')) {
-      setSelectedDocument(doc);
-      setShowOTPDialog(true);
-    } else if (doc.downloadUrl) {
-      const link = document.createElement('a');
-      link.href = doc.downloadUrl;
-      link.target = '_blank';
-      link.download = doc.downloadUrl.split('/').pop() || doc.name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast.success(`Downloading ${doc.name}`);
-    } else {
-      toast.error("Download URL not found");
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  const fetchDocuments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setDocuments(data || []);
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+      toast.error("Failed to load documents");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleOTPVerify = (otp: string) => {
-    if (otp === "123456" && selectedDocument?.downloadUrl) {
+  const handleDocumentClick = async (doc: Document) => {
+    if (doc.requires_otp) {
+      setSelectedDocument(doc);
+      setShowOTPDialog(true);
+    } else {
+      await downloadDocument(doc);
+    }
+  };
+
+  const downloadDocument = async (doc: Document) => {
+    try {
+      if (!doc.file_path) throw new Error("File path not found");
+
+      const { data, error } = await supabase.storage
+        .from('documents')
+        .download(doc.file_path);
+
+      if (error) throw error;
+
+      // Create a download link
+      const url = URL.createObjectURL(data);
       const link = document.createElement('a');
-      link.href = selectedDocument.downloadUrl;
-      link.target = '_blank';
-      link.download = selectedDocument.downloadUrl.split('/').pop() || selectedDocument.name;
+      link.href = url;
+      link.download = doc.name;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      toast.success(`Verified successfully. Downloading ${selectedDocument.name}`);
+      URL.revokeObjectURL(url);
+
+      toast.success(`Downloading ${doc.name}`);
+    } catch (error) {
+      console.error('Error downloading document:', error);
+      toast.error("Failed to download document");
+    }
+  };
+
+  const handleOTPVerify = async (otp: string) => {
+    if (otp === "123456" && selectedDocument) {
+      await downloadDocument(selectedDocument);
       setShowOTPDialog(false);
       setSelectedDocument(null);
     } else {
       toast.error("Invalid OTP");
     }
+  };
+
+  const filterDocuments = (category: string) => {
+    return documents.filter(doc => doc.category?.toLowerCase() === category.toLowerCase());
   };
 
   return (
@@ -64,9 +101,11 @@ export const Documents = () => {
             </TabsList>
             
             <TabsContent value="payslips">
-              {payslips.length > 0 ? (
+              {loading ? (
+                <div>Loading...</div>
+              ) : filterDocuments('Financial').length > 0 ? (
                 <DocumentList 
-                  documents={payslips} 
+                  documents={filterDocuments('Financial')}
                   requiresOTP={true}
                   onDocumentClick={handleDocumentClick}
                 />
@@ -76,9 +115,11 @@ export const Documents = () => {
             </TabsContent>
             
             <TabsContent value="contracts">
-              {contracts.length > 0 ? (
+              {loading ? (
+                <div>Loading...</div>
+              ) : filterDocuments('Legal').length > 0 ? (
                 <DocumentList 
-                  documents={contracts}
+                  documents={filterDocuments('Legal')}
                   requiresOTP={true}
                   onDocumentClick={handleDocumentClick}
                 />
@@ -88,9 +129,13 @@ export const Documents = () => {
             </TabsContent>
             
             <TabsContent value="other">
-              {otherDocuments.length > 0 ? (
+              {loading ? (
+                <div>Loading...</div>
+              ) : documents.filter(doc => 
+                !['Financial', 'Legal'].includes(doc.category || '')).length > 0 ? (
                 <DocumentList 
-                  documents={otherDocuments}
+                  documents={documents.filter(doc => 
+                    !['Financial', 'Legal'].includes(doc.category || ''))}
                   onDocumentClick={handleDocumentClick}
                 />
               ) : (

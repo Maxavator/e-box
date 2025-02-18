@@ -1,7 +1,8 @@
 
 export interface Document {
+  id?: string;
   name: string;
-  date: string;
+  date?: string;
   size: string;
   isVerified?: boolean;
   downloadUrl?: string;
@@ -10,4 +11,7 @@ export interface Document {
   category?: string;
   version?: string;
   lastModifiedBy?: string;
+  file_path?: string;
+  content_type?: string;
+  requires_otp?: boolean;
 }
