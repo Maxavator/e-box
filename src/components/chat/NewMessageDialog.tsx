@@ -5,23 +5,87 @@ import { Button } from "@/components/ui/button";
 import { Pen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { getUserById, demoUsers } from "@/data/chat";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { User } from "@/types/chat";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 export function NewMessageDialog() {
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const { toast } = useToast();
 
-  // For demo purposes, filter users as if they're in the same organization
-  const contacts = demoUsers.filter(user => {
-    const searchLower = searchQuery.toLowerCase();
-    return user.name.toLowerCase().includes(searchLower);
+  const { data: contacts = [], isLoading } = useQuery({
+    queryKey: ['organization-contacts'],
+    queryFn: async () => {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .single();
+
+      if (!profile?.organization_id) {
+        throw new Error('User not in organization');
+      }
+
+      const { data: orgContacts, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, avatar_url')
+        .eq('organization_id', profile.organization_id)
+        .neq('id', (await supabase.auth.getUser()).data.user?.id);
+
+      if (error) throw error;
+      return orgContacts || [];
+    }
   });
 
-  const handleSelectContact = (user: User) => {
-    // Add logic to start a new conversation with the selected user
-    setOpen(false);
+  const filteredContacts = contacts.filter(contact => {
+    const searchLower = searchQuery.toLowerCase();
+    const fullName = `${contact.first_name} ${contact.last_name}`.toLowerCase();
+    return fullName.includes(searchLower);
+  });
+
+  const handleSelectContact = async (contact: any) => {
+    try {
+      // Check if conversation already exists
+      const { data: existingConvs } = await supabase
+        .from('conversations')
+        .select('*')
+        .or(`user1_id.eq.${contact.id},user2_id.eq.${contact.id}`)
+        .single();
+
+      if (existingConvs) {
+        toast({
+          title: "Conversation exists",
+          description: "You already have a conversation with this contact"
+        });
+        return;
+      }
+
+      // Create new conversation
+      const { error } = await supabase
+        .from('conversations')
+        .insert({
+          user1_id: (await supabase.auth.getUser()).data.user?.id,
+          user2_id: contact.id
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Conversation started",
+        description: `Started a new conversation with ${contact.first_name} ${contact.last_name}`
+      });
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start conversation",
+        variant: "destructive"
+      });
+    } finally {
+      setOpen(false);
+    }
   };
 
   return (
@@ -45,28 +109,41 @@ export function NewMessageDialog() {
           />
           <ScrollArea className="h-[300px] pr-4">
             <div className="space-y-2">
-              {contacts.map((contact) => (
-                <Button
-                  key={contact.id}
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={() => handleSelectContact(contact)}
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback>
-                        {contact.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">{contact.name}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {contact.status === 'online' ? 'Online' : contact.lastSeen}
-                      </span>
+              {isLoading ? (
+                <div className="text-center text-muted-foreground py-4">
+                  Loading contacts...
+                </div>
+              ) : filteredContacts.length === 0 ? (
+                <div className="text-center text-muted-foreground py-4">
+                  No contacts found
+                </div>
+              ) : (
+                filteredContacts.map((contact) => (
+                  <Button
+                    key={contact.id}
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => handleSelectContact(contact)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        {contact.avatar_url ? (
+                          <AvatarImage src={contact.avatar_url} alt={`${contact.first_name} ${contact.last_name}`} />
+                        ) : (
+                          <AvatarFallback>
+                            {`${contact.first_name?.[0] || ''}${contact.last_name?.[0] || ''}`}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div className="flex flex-col items-start">
+                        <span className="font-medium">
+                          {`${contact.first_name} ${contact.last_name}`}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </Button>
-              ))}
+                  </Button>
+                ))
+              )}
             </div>
           </ScrollArea>
         </div>
