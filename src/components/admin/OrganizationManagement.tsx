@@ -5,23 +5,132 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Building2 } from "lucide-react";
+import { Building2, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+
+type Organization = {
+  id: string;
+  name: string;
+  domain: string | null;
+  logo_url: string | null;
+  created_at: string;
+};
+
+type OrganizationFormData = {
+  name: string;
+  domain: string;
+};
 
 export const OrganizationManagement = () => {
   const [isAddOrgOpen, setIsAddOrgOpen] = useState(false);
+  const [isEditOrgOpen, setIsEditOrgOpen] = useState(false);
+  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
+  const [formData, setFormData] = useState<OrganizationFormData>({
+    name: "",
+    domain: "",
+  });
+
+  const queryClient = useQueryClient();
 
   const { data: organizations, isLoading } = useQuery({
     queryKey: ['organizations'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('organizations')
-        .select('*');
+        .select('*')
+        .order('name');
+      if (error) throw error;
+      return data as Organization[];
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (newOrg: OrganizationFormData) => {
+      const { data, error } = await supabase
+        .from('organizations')
+        .insert([{ name: newOrg.name, domain: newOrg.domain || null }])
+        .select()
+        .single();
       if (error) throw error;
       return data;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      setIsAddOrgOpen(false);
+      setFormData({ name: "", domain: "" });
+      toast.success("Organization created successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to create organization: " + error.message);
+    },
   });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: OrganizationFormData }) => {
+      const { error } = await supabase
+        .from('organizations')
+        .update({ name: data.name, domain: data.domain || null })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      setIsEditOrgOpen(false);
+      setSelectedOrg(null);
+      toast.success("Organization updated successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to update organization: " + error.message);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('organizations')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      toast.success("Organization deleted successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to delete organization: " + error.message);
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedOrg) {
+      updateMutation.mutate({ id: selectedOrg.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (org: Organization) => {
+    setSelectedOrg(org);
+    setFormData({
+      name: org.name,
+      domain: org.domain || "",
+    });
+    setIsEditOrgOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this organization?")) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="space-y-4">
@@ -38,17 +147,66 @@ export const OrganizationManagement = () => {
             <DialogHeader>
               <DialogTitle>Add New Organization</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Organization Name</Label>
-                <Input id="name" placeholder="Acme Inc." />
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Acme Inc."
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="domain">Domain</Label>
-                <Input id="domain" placeholder="acme.com" />
+                <Input
+                  id="domain"
+                  name="domain"
+                  value={formData.domain}
+                  onChange={handleInputChange}
+                  placeholder="acme.com"
+                />
               </div>
-              <Button className="w-full">Add Organization</Button>
-            </div>
+              <Button type="submit" className="w-full">
+                Add Organization
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isEditOrgOpen} onOpenChange={setIsEditOrgOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Organization</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-name">Organization Name</Label>
+                <Input
+                  id="edit-name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Acme Inc."
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-domain">Domain</Label>
+                <Input
+                  id="edit-domain"
+                  name="domain"
+                  value={formData.domain}
+                  onChange={handleInputChange}
+                  placeholder="acme.com"
+                />
+              </div>
+              <Button type="submit" className="w-full">
+                Update Organization
+              </Button>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
@@ -60,7 +218,7 @@ export const OrganizationManagement = () => {
               <TableHead>Name</TableHead>
               <TableHead>Domain</TableHead>
               <TableHead>Created At</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -73,8 +231,13 @@ export const OrganizationManagement = () => {
                 <TableCell>{org.name}</TableCell>
                 <TableCell>{org.domain || 'N/A'}</TableCell>
                 <TableCell>{new Date(org.created_at).toLocaleDateString()}</TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="sm">Edit</Button>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="icon" onClick={() => handleEdit(org)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(org.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
