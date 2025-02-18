@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from "react";
-import { MessageItem } from "./MessageItem";
+import MessageItem from "./MessageItem";
 import { ChatInput } from "./ChatInput";
 import { Documents } from "@/components/desk/Documents";
 import { CalendarDashboard } from "@/components/calendar/CalendarDashboard";
