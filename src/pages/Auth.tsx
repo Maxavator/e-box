@@ -46,16 +46,16 @@ const Auth = () => {
       {/* Hero Section */}
       <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center space-y-8">
         <div className="space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-primary">
+          <h1 className="text-4xl md:text-5xl font-bold text-primary animate-fadeIn">
             e-Box by Afrovation
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-gray-600 animate-fadeIn delay-100">
             Secure, scalable, and efficient communication for your organization
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="flex items-start space-x-4">
+          <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-primary/5 transition-colors animate-fadeIn delay-200">
             <div className="bg-primary/10 p-2 rounded-lg">
               <Shield className="w-6 h-6 text-primary" />
             </div>
@@ -67,7 +67,7 @@ const Auth = () => {
             </div>
           </div>
 
-          <div className="flex items-start space-x-4">
+          <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-primary/5 transition-colors animate-fadeIn delay-300">
             <div className="bg-primary/10 p-2 rounded-lg">
               <Users className="w-6 h-6 text-primary" />
             </div>
@@ -79,7 +79,7 @@ const Auth = () => {
             </div>
           </div>
 
-          <div className="flex items-start space-x-4">
+          <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-primary/5 transition-colors animate-fadeIn delay-400">
             <div className="bg-primary/10 p-2 rounded-lg">
               <Building2 className="w-6 h-6 text-primary" />
             </div>
@@ -91,7 +91,7 @@ const Auth = () => {
             </div>
           </div>
 
-          <div className="flex items-start space-x-4">
+          <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-primary/5 transition-colors animate-fadeIn delay-500">
             <div className="bg-primary/10 p-2 rounded-lg">
               <Globe className="w-6 h-6 text-primary" />
             </div>
@@ -104,29 +104,29 @@ const Auth = () => {
           </div>
         </div>
 
-        <div className="pt-4">
+        <div className="pt-4 animate-fadeIn delay-600">
           <img 
             src="/lovable-uploads/cea5cf65-708e-42c4-9a6c-6073f42a3471.png" 
             alt="e-Box Preview" 
-            className="rounded-lg shadow-xl max-w-md mx-auto"
+            className="rounded-lg shadow-xl max-w-md mx-auto hover:shadow-2xl transition-shadow duration-300"
           />
         </div>
       </div>
 
       {/* Auth Section */}
-      <div className="w-full md:w-1/2 p-8 md:p-16 flex items-center justify-center bg-white/50 backdrop-blur-sm">
-        <Card className="w-full max-w-md animate-fadeIn">
+      <div className="w-full md:w-1/2 p-8 md:p-16 flex items-center justify-center bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-sm">
+        <Card className="w-full max-w-md animate-fadeIn shadow-xl hover:shadow-2xl transition-shadow duration-300 border-primary/10">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">
+            <CardTitle className="text-2xl font-bold text-center text-primary">
               Welcome to e-Box
             </CardTitle>
             <CardDescription className="text-center text-gray-500">
               Demo Credentials
             </CardDescription>
-            <div className="mt-4 space-y-2 text-sm text-gray-500 bg-gray-50 p-4 rounded-lg">
-              <p><span className="font-medium">Regular User:</span> 6010203040512</p>
-              <p><span className="font-medium">Organization Admin:</span> 5010203040512</p>
-              <p><span className="font-medium">Global Admin:</span> 4010203040512</p>
+            <div className="mt-4 space-y-2 text-sm text-gray-500 bg-primary/5 p-4 rounded-lg border border-primary/10">
+              <p className="hover:text-primary transition-colors"><span className="font-medium">Regular User:</span> 6010203040512</p>
+              <p className="hover:text-primary transition-colors"><span className="font-medium">Organization Admin:</span> 5010203040512</p>
+              <p className="hover:text-primary transition-colors"><span className="font-medium">Global Admin:</span> 4010203040512</p>
             </div>
           </CardHeader>
           <CardContent>
@@ -137,10 +137,13 @@ const Auth = () => {
                   placeholder="South African ID Number"
                   value={idNumber}
                   onChange={(e) => setIdNumber(e.target.value)}
-                  className="w-full"
+                  className="w-full focus:ring-primary"
                 />
               </div>
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
+              <Button 
+                type="submit" 
+                className="w-full bg-primary hover:bg-primary/90 transition-colors duration-300"
+              >
                 Login
               </Button>
             </form>
