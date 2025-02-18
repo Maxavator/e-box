@@ -1,13 +1,15 @@
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Calendar as CalendarIcon, Clock, User, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "./components/LanguageSelector";
-import { LeaveBalanceCard } from "./components/LeaveBalanceCard";
-import { RecentLeaveRequests } from "./components/RecentLeaveRequests";
-import { LeaveRequestForm } from "./components/LeaveRequestForm";
-import { LegalReference } from "./components/LegalReference";
-import { LeaveRequest } from "./types/leave";
 import "../i18n/config";
 
 export const LeaveManager = () => {
@@ -25,7 +27,7 @@ export const LeaveManager = () => {
     study: { total: 10, used: 0, pending: 0 }
   };
 
-  const recentLeaveRequests: LeaveRequest[] = [
+  const recentLeaveRequests = [
     { 
       id: 1, 
       type: 'Annual Leave', 
@@ -90,25 +92,199 @@ export const LeaveManager = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6">
-          <LeaveBalanceCard leaveBalance={leaveBalance} />
-          <RecentLeaveRequests 
-            requests={recentLeaveRequests}
-            getStatusColor={getStatusColor}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                {t('leave.title')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Annual Leave</p>
+                  <p className="text-2xl font-bold">
+                    {leaveBalance.annual.total - leaveBalance.annual.used} days
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {leaveBalance.annual.pending} pending requests
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Sick Leave</p>
+                  <p className="text-2xl font-bold">
+                    {leaveBalance.sick.total - leaveBalance.sick.used} days
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {leaveBalance.sick.pending} pending requests
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Family Responsibility</p>
+                  <p className="text-2xl font-bold">
+                    {leaveBalance.family.total - leaveBalance.family.used} days
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {leaveBalance.family.pending} pending requests
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Maternity Leave</p>
+                  <p className="text-2xl font-bold">
+                    {leaveBalance.maternity.total - leaveBalance.maternity.used} days
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {leaveBalance.maternity.pending} pending requests
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Study Leave</p>
+                  <p className="text-2xl font-bold">
+                    {leaveBalance.study.total - leaveBalance.study.used} days
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {leaveBalance.study.pending} pending requests
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Unpaid Leave</p>
+                  <p className="text-2xl font-bold">Available</p>
+                  <p className="text-sm text-muted-foreground">
+                    Subject to approval
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                {t('leave.recentRequests')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentLeaveRequests.map((request) => (
+                  <div key={request.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium">{request.type}</p>
+                      <p className="text-sm text-gray-600">
+                        {request.startDate} - {request.endDate} ({request.days} days)
+                      </p>
+                    </div>
+                    <span className={`font-medium ${getStatusColor(request.status)}`}>
+                      {request.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <LeaveRequestForm
-          selectedDates={selectedDates}
-          leaveType={leaveType}
-          reason={reason}
-          onDatesChange={setSelectedDates}
-          onLeaveTypeChange={setLeaveType}
-          onReasonChange={setReason}
-          onSubmit={handleSubmit}
-        />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CalendarIcon className="h-5 w-5" />
+              {t('leave.request')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>{t('leave.form.typeLabel')}</Label>
+              <Select value={leaveType} onValueChange={setLeaveType}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('leave.form.selectType')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="annual">{t('leave.types.annual')} (21 days per year)</SelectItem>
+                  <SelectItem value="sick">{t('leave.types.sick')} (30 days per 36 months)</SelectItem>
+                  <SelectItem value="family">{t('leave.types.family')} (3 days per year)</SelectItem>
+                  <SelectItem value="maternity">{t('leave.types.maternity')} (4 months)</SelectItem>
+                  <SelectItem value="study">{t('leave.types.study')} (10 days per year)</SelectItem>
+                  <SelectItem value="unpaid">{t('leave.types.unpaid')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>{t('leave.form.datesLabel')}</Label>
+              <Calendar
+                mode="multiple"
+                selected={selectedDates}
+                onSelect={setSelectedDates as any}
+                className="rounded-md border"
+                numberOfMonths={2}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('leave.form.reasonLabel')}</Label>
+              <Textarea
+                placeholder={t('leave.form.reasonPlaceholder')}
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                {t('leave.form.selectedDays')}: {selectedDates.length} days
+              </p>
+              <Button className="w-full" onClick={handleSubmit}>
+                {t('leave.form.submit')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <LegalReference />
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            {t('leave.legal.title')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="prose prose-sm max-w-none">
+            <div className="text-muted-foreground">
+              <p className="font-medium mb-2">{t('leave.legal.disclaimer')}</p>
+              
+              <h4 className="text-sm font-semibold mt-4 mb-2">{t('leave.legal.laws')}</h4>
+              <ul className="space-y-2 text-sm">
+                <li><span className="font-medium">{t('leave.legal.bcea')}:</span>
+                  <ul className="ml-4 mt-1 space-y-1">
+                    <li>• {t('leave.types.annual')}: 21 days per year</li>
+                    <li>• {t('leave.types.sick')}: 30 days per 36 months</li>
+                    <li>• {t('leave.types.family')}: 3 days per year</li>
+                    <li>• {t('leave.types.maternity')}: 4 months</li>
+                  </ul>
+                </li>
+                <li className="mt-2"><span className="font-medium">{t('leave.legal.lra')}:</span>
+                  <ul className="ml-4 mt-1 space-y-1">
+                    <li>• Protection against unfair dismissal relating to pregnancy and leave</li>
+                    <li>• Rights during leave periods</li>
+                  </ul>
+                </li>
+                <li className="mt-2"><span className="font-medium">{t('leave.legal.companyBenefits')}:</span>
+                  <ul className="ml-4 mt-1 space-y-1">
+                    <li>• {t('leave.types.study')}: 10 days per year</li>
+                    <li>• {t('leave.types.unpaid')}: Subject to approval</li>
+                  </ul>
+                </li>
+              </ul>
+
+              <p className="mt-4 text-sm font-medium text-yellow-600">
+                {t('leave.legal.important')}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
