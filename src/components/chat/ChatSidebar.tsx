@@ -55,6 +55,10 @@ const DeskFeatures = ({ onTabChange, onCalendarActionClick }: {
             <LayoutDashboard className="mr-2 h-4 w-4" />
             Dashboard
           </Button>
+          <Button variant="ghost" className="w-full justify-start" onClick={() => onCalendarActionClick('calendar')}>
+            <Calendar className="mr-2 h-4 w-4" />
+            Calendar
+          </Button>
           <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'documents' }))}>
             <FileText className="mr-2 h-4 w-4" />
             My Documents
