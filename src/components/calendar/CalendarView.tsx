@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { NewEventDialog } from "./NewEventDialog";
 
 type CalendarEvent = Database['public']['Tables']['calendar_events']['Row'];
 
@@ -18,8 +19,19 @@ export function CalendarView() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('calendar_events')
-        .select('*');
-      if (error) throw error;
+        .select(`
+          *,
+          calendar_invites (
+            id,
+            status,
+            invitee_id
+          )
+        `);
+      
+      if (error) {
+        console.error('Error fetching events:', error);
+        throw error;
+      }
       return data;
     },
   });
@@ -56,6 +68,9 @@ export function CalendarView() {
   return (
     <div className="flex h-full">
       <div className="w-96 border-r p-4 bg-white">
+        <div className="mb-4">
+          <NewEventDialog />
+        </div>
         <Calendar
           mode="single"
           selected={date}
