@@ -17,10 +17,10 @@ const HeroSection = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <h1 className="text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
-              Empower Your Enterprise Communication
+              Transform your Stakeholder Engagement with e-Box
             </h1>
             <p className="text-xl lg:text-2xl opacity-90 leading-relaxed">
-              Transform your workplace with e-Box - South Africa's premier enterprise communication platform. Built for African businesses, designed for growth, Executives to Deskless Staff, All Staff.
+              South Africa's premier enterprise communication platform. Built for businesses, designed for growth... Executives to Desk-less Staff, All Staff.
             </p>
           </div>
         </div>
