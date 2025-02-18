@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { Building2, Shield, Users, Globe, Mail } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
@@ -17,6 +17,11 @@ const Auth = () => {
   const [demoName, setDemoName] = useState("");
   const [demoEmail, setDemoEmail] = useState("");
   const [demoMessage, setDemoMessage] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [staffSize, setStaffSize] = useState("");
+  const [officialEmail, setOfficialEmail] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [mobile, setMobile] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -32,8 +37,6 @@ const Auth = () => {
       return;
     }
 
-    // For demo purposes, we'll use the same role-based routing logic
-    // In a real app, this would be handled by proper authentication
     const isGlobalAdmin = username.startsWith("admin");
     const isOrgAdmin = username.startsWith("org");
     
@@ -46,22 +49,63 @@ const Auth = () => {
     }
   };
 
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const validatePhone = (phone: string) => {
+    return /^\+[1-9]\d{1,14}$/.test(phone);
+  };
+
   const handleDemoRequest = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!demoName || !demoEmail) {
+    if (!demoName || !companyName || !staffSize || !officialEmail) {
       toast({
         title: "Missing Information",
-        description: "Please provide your name and email",
+        description: "Please fill in all required fields",
         variant: "destructive",
       });
       return;
     }
 
-    // In a real app, this would send the data to a server
-    // For now, we'll just open the email client
+    if (!validateEmail(officialEmail)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (telephone && !validatePhone(telephone)) {
+      toast({
+        title: "Invalid Telephone Number",
+        description: "Please enter a valid international telephone number (e.g., +27123456789)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (mobile && !validatePhone(mobile)) {
+      toast({
+        title: "Invalid Mobile Number",
+        description: "Please enter a valid international mobile number (e.g., +27123456789)",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const subject = encodeURIComponent("e-Box Demo Request");
-    const body = encodeURIComponent(`Name: ${demoName}\nEmail: ${demoEmail}\nMessage: ${demoMessage}`);
+    const body = encodeURIComponent(
+      `Name: ${demoName}\n` +
+      `Company: ${companyName}\n` +
+      `Staff Size: ${staffSize}\n` +
+      `Official Email: ${officialEmail}\n` +
+      `Telephone: ${telephone}\n` +
+      `Mobile: ${mobile}\n` +
+      `Message: ${demoMessage}`
+    );
     window.location.href = `mailto:support@afrovation.com?subject=${subject}&body=${body}`;
     
     setIsDemoDialogOpen(false);
@@ -70,15 +114,17 @@ const Auth = () => {
       description: "We'll be in touch with you shortly",
     });
 
-    // Reset form
     setDemoName("");
-    setDemoEmail("");
+    setCompanyName("");
+    setStaffSize("");
+    setOfficialEmail("");
+    setTelephone("");
+    setMobile("");
     setDemoMessage("");
   };
 
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row items-stretch bg-gradient-to-b from-brand-50 to-background">
-      {/* Hero Section */}
       <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center space-y-8">
         <div className="space-y-4">
           <h1 className="text-4xl md:text-5xl font-bold text-primary animate-fadeIn">
@@ -148,7 +194,6 @@ const Auth = () => {
         </div>
       </div>
 
-      {/* Auth Section */}
       <div className="w-full md:w-1/2 p-8 md:p-16 flex items-center justify-center bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-sm">
         <Card className="w-full max-w-md animate-fadeIn shadow-xl hover:shadow-2xl transition-shadow duration-300 border-primary/10">
           <CardHeader className="space-y-1">
@@ -204,7 +249,6 @@ const Auth = () => {
         </Card>
       </div>
 
-      {/* Demo Request Dialog */}
       <Dialog open={isDemoDialogOpen} onOpenChange={setIsDemoDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -215,26 +259,76 @@ const Auth = () => {
           </DialogHeader>
           <form onSubmit={handleDemoRequest} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="demoName">Name</Label>
+              <Label htmlFor="demoName">Name *</Label>
               <Input
                 id="demoName"
                 placeholder="Your name"
                 value={demoName}
                 onChange={(e) => setDemoName(e.target.value)}
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="demoEmail">Email</Label>
+              <Label htmlFor="companyName">Company or Organisation Name *</Label>
               <Input
-                id="demoEmail"
-                type="email"
-                placeholder="your@email.com"
-                value={demoEmail}
-                onChange={(e) => setDemoEmail(e.target.value)}
+                id="companyName"
+                placeholder="Your company name"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="demoMessage">Message (Optional)</Label>
+              <Label htmlFor="staffSize">Number of Staff *</Label>
+              <Select value={staffSize} onValueChange={setStaffSize} required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select staff size range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0-49">0-49</SelectItem>
+                  <SelectItem value="50-499">50-499</SelectItem>
+                  <SelectItem value="500-999">500-999</SelectItem>
+                  <SelectItem value="1000-4999">1,000-4,999</SelectItem>
+                  <SelectItem value="5000-9999">5,000-9,999</SelectItem>
+                  <SelectItem value="10000-19999">10,000-19,999</SelectItem>
+                  <SelectItem value="20000-49999">20,000-49,999</SelectItem>
+                  <SelectItem value="50000+">More than 50,000</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="officialEmail">Official Email Address *</Label>
+              <Input
+                id="officialEmail"
+                type="email"
+                placeholder="your.name@company.com"
+                value={officialEmail}
+                onChange={(e) => setOfficialEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="telephone">Telephone Number</Label>
+              <Input
+                id="telephone"
+                type="tel"
+                placeholder="+27123456789"
+                value={telephone}
+                onChange={(e) => setTelephone(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mobile">Mobile Number</Label>
+              <Input
+                id="mobile"
+                type="tel"
+                placeholder="+27123456789"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="demoMessage">Additional Information</Label>
               <Textarea
                 id="demoMessage"
                 placeholder="Tell us about your requirements..."
