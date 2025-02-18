@@ -44,7 +44,7 @@ export const ChatContent = ({
   return (
     <div className="flex-1 flex flex-col h-full">
       <MessageList
-        conversation={selectedConversation}
+        messages={selectedConversation?.messages || []}
         onEditMessage={onEditMessage}
         onDeleteMessage={onDeleteMessage}
         onReactToMessage={onReactToMessage}
