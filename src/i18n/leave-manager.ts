@@ -1,4 +1,3 @@
-
 export const translations = {
   en: {
     leave: {
@@ -71,8 +70,98 @@ export const translations = {
       title: "Ibhalansi Yekhefu",
       request: "Cela Ikhefu",
       recentRequests: "Izicelo Zakamuva",
-      // ... Add other languages similarly
+      legal: {
+        title: "Umthetho Wekhefu & Indlela Yokubhekisela",
+        disclaimer: "Sicela Uqaphele: Zonke izicelo zekhefu zithobela izimfuneko zomthetho kanye nenqubomgomo yenkampani. Hlala ubheka incwadi yenqubomgomo yenkampani ukuze uthole imihlahlandlela eqondile.",
+        laws: "Imithetho Yezabasebenzi yaseNingizimu Afrika Esebenzayo",
+        bcea: "Umthetho Wezimo Eziyisisekelo Zokuqashwa (BCEA)",
+        lra: "Umthetho Wobudlelwano Kwezabasebenzi (LRA)",
+        companyBenefits: "Imihlomulo Eqondene Nenkampani",
+        important: "Okubalulekile: Lokhu okungenhla kuyisifinyezo kuphela. Sicela uxhumane ne-HR noma ubheke incwadi yenqubomgomo yenkampani enoningiliziwe ukuze uthole ulwazi oluphelele kanye nezimfuneko ezithile zezicelo zekhefu."
+      },
+      types: {
+        annual: "Ikhefu Lonyaka",
+        sick: "Ikhefu Lokugula",
+        family: "Ikhefu Lomndeni",
+        maternity: "Ikhefu Lokubeletha",
+        study: "Ikhefu Lokufunda",
+        unpaid: "Ikhefu Elingaholo"
+      },
+      form: {
+        typeLabel: "Uhlobo Lwekhefu",
+        selectType: "Khetha uhlobo lwekhefu",
+        datesLabel: "Khetha Izinsuku",
+        reasonLabel: "Isizathu Sekhefu",
+        reasonPlaceholder: "Sicela usho isizathu sesicelo sakho sekhefu...",
+        selectedDays: "Okukhethiwe",
+        submit: "Thumela Isicelo Sekhefu"
+      }
+    }
+  },
+  xh: {
+    leave: {
+      title: "Intsalela Yekhefu",
+      request: "Cela Ikhefu",
+      recentRequests: "Izicelo Zakutsha",
+      legal: {
+        title: "Umthetho Wekhefu & Umgaqo-nkqubo Wokukhomba",
+        disclaimer: "Nceda Qaphela: Zonke izicelo zekhefu zixhomekeke kuzo zombini iimfuno zomthetho kunye nomgaqo-nkqubo wenkampani. Soloko ubhekisa kwincwadi yomgaqo-nkqubo wenkampani ukufumana izikhokelo ezithile.",
+        laws: "Imithetho Yabasebenzi yaseMzantsi Afrika Esebenzayo",
+        bcea: "UMthetho weMiqathango eSiseko yeNgqesho (BCEA)",
+        lra: "UMthetho wobuDlelwane kweZabasebenzi (LRA)",
+        companyBenefits: "IiNzuzo eziThile zeNkampani",
+        important: "Okubalulekileyo: Oku kungentla sisishwankathelo kuphela. Nceda uqhagamshelane ne-HR okanye ubhekise kwincwadi yomgaqo-nkqubo wenkampani ochazwe ngokupheleleyo ukufumana ulwazi olupheleleyo kunye neemfuno ezithile zezicelo zekhefu."
+      },
+      types: {
+        annual: "Ikhefu loNyaka",
+        sick: "Ikhefu lokuGula",
+        family: "Ikhefu loSapho",
+        maternity: "Ikhefu lokuBeleka",
+        study: "Ikhefu lokuFunda",
+        unpaid: "Ikhefu elingaHlawulwayo"
+      },
+      form: {
+        typeLabel: "Uhlobo lweKhefu",
+        selectType: "Khetha uhlobo lwekhefu",
+        datesLabel: "Khetha iintsuku",
+        reasonLabel: "Isizathu seKhefu",
+        reasonPlaceholder: "Nceda unike isizathu sesicelo sakho sekhefu...",
+        selectedDays: "Ezikhethiweyo",
+        submit: "Ngenisa iSicelo seKhefu"
+      }
+    }
+  },
+  st: {
+    leave: {
+      title: "Tekanyo ya Matsatsi a Phomolo",
+      request: "Kopa Matsatsi a Phomolo",
+      recentRequests: "Dikopo tsa Moraorao",
+      legal: {
+        title: "Molao wa Phomolo & Leano la Tshupiso",
+        disclaimer: "Ka kopo Ela hloko: Dikopo tsohle tsa matsatsi a phomolo di laolwa ke ditlhoko tsa molao le leano la khampani. Dula o sheba bukana ya leano la khampani bakeng sa ditataiso tse itseng.",
+        laws: "Melao ya Basebetsi ya Afrika Borwa e Sebetsang",
+        bcea: "Molao wa Maemo a Motheo a Khiro (BCEA)",
+        lra: "Molao wa Dikamano tsa Basebetsi (LRA)",
+        companyBenefits: "Melemo e Ikgethang ya Khampani",
+        important: "Ho bohlokwa: Tse ka hodimo ke kakaretso feela. Ka kopo ikopanye le HR kapa o shebe bukana ya leano la khampani e nang le dintlha tse felletseng bakeng sa tlhahisoleseding e felletseng le ditlhoko tse itseng tsa dikopo tsa matsatsi a phomolo."
+      },
+      types: {
+        annual: "Matsatsi a Phomolo a Selemo",
+        sick: "Matsatsi a ho Kula",
+        family: "Matsatsi a Boikarabelo ba Lelapa",
+        maternity: "Matsatsi a Pelehi",
+        study: "Matsatsi a ho Ithuta",
+        unpaid: "Matsatsi a sa Lefellweng"
+      },
+      form: {
+        typeLabel: "Mofuta wa Phomolo",
+        selectType: "Kgetha mofuta wa phomolo",
+        datesLabel: "Kgetha Matsatsi",
+        reasonLabel: "Lebaka la Phomolo",
+        reasonPlaceholder: "Ka kopo fana ka lebaka la kopo ya hao ya matsatsi a phomolo...",
+        selectedDays: "E kgethilweng",
+        submit: "Romela Kopo ya Matsatsi a Phomolo"
+      }
     }
   }
-  // ... Add other languages similarly
 };
