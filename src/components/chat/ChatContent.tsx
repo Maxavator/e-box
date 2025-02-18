@@ -1,12 +1,11 @@
 
-import { MessageList } from "./MessageList";
+import { useEffect, useRef } from "react";
+import { MessageItem } from "./MessageItem";
 import { ChatInput } from "./ChatInput";
-import { CalendarView } from "@/components/calendar/CalendarView";
-import { CalendarInbox } from "@/components/calendar/CalendarInbox";
+import { Documents } from "@/components/desk/Documents";
 import { CalendarDashboard } from "@/components/calendar/CalendarDashboard";
+import { CalendarInbox } from "@/components/calendar/CalendarInbox";
 import type { Conversation } from "@/types/chat";
-import { getUserById } from "@/data/chat";
-import OrganizationDashboard from "@/pages/OrganizationDashboard";
 
 interface ChatContentProps {
   activeTab: string;
@@ -17,10 +16,10 @@ interface ChatContentProps {
   onEditMessage: (messageId: string, newText: string) => void;
   onDeleteMessage: (messageId: string) => void;
   onReactToMessage: (messageId: string, emoji: string) => void;
-  calendarView?: 'calendar' | 'inbox';
+  calendarView: 'calendar' | 'inbox';
 }
 
-export function ChatContent({
+export const ChatContent = ({
   activeTab,
   selectedConversation,
   newMessage,
@@ -29,40 +28,51 @@ export function ChatContent({
   onEditMessage,
   onDeleteMessage,
   onReactToMessage,
-  calendarView = 'calendar',
-}: ChatContentProps) {
-  if (activeTab === "calendar") {
-    if (calendarView === 'inbox') return <CalendarInbox />;
-    if (calendarView === 'calendar') return <CalendarView />;
-    return <CalendarDashboard />;
+  calendarView,
+}: ChatContentProps) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [selectedConversation?.messages]);
+
+  if (activeTab === 'desk') {
+    return <Documents />;
+  }
+
+  if (activeTab === 'calendar') {
+    return calendarView === 'calendar' ? (
+      <CalendarDashboard />
+    ) : (
+      <CalendarInbox />
+    );
   }
 
   if (!selectedConversation) {
-    return <OrganizationDashboard />;
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center">
+          <h3 className="text-lg font-medium">No conversation selected</h3>
+          <p className="text-sm text-gray-500">Choose a conversation to start chatting</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b">
-        <div className="flex items-center gap-3">
-          <div>
-            <p className="font-medium">
-              {getUserById(selectedConversation.userId)?.name}
-            </p>
-            <p className="text-sm text-gray-500">
-              {getUserById(selectedConversation.userId)?.status}
-            </p>
-          </div>
-        </div>
+      <div className="flex-1 overflow-y-auto p-4">
+        {selectedConversation.messages.map((message) => (
+          <MessageItem
+            key={message.id}
+            message={message}
+            onEdit={(newText) => onEditMessage(message.id, newText)}
+            onDelete={() => onDeleteMessage(message.id)}
+            onReact={(emoji) => onReactToMessage(message.id, emoji)}
+          />
+        ))}
+        <div ref={messagesEndRef} />
       </div>
-
-      <MessageList
-        messages={selectedConversation.messages}
-        onEditMessage={onEditMessage}
-        onDeleteMessage={onDeleteMessage}
-        onReactToMessage={onReactToMessage}
-      />
-
       <ChatInput
         value={newMessage}
         onChange={onNewMessageChange}
@@ -70,4 +80,4 @@ export function ChatContent({
       />
     </div>
   );
-}
+};
