@@ -1,20 +1,18 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, MessageSquare, BarChart, Building2, Shield } from "lucide-react";
 import { Policies } from "@/components/desk/Policies";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChatHeader } from "@/components/chat/ChatHeader";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { OrganizationManagement } from "@/components/admin/OrganizationManagement";
+import { UserProfile } from "@/components/user/UserProfile";
 
 const OrganizationDashboard = () => {
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState<{ userName: string; orgName: string; isAdmin: boolean }>({ 
-    userName: '', 
+  const [userInfo, setUserInfo] = useState<{ orgName: string; isAdmin: boolean }>({ 
     orgName: '', 
     isAdmin: false 
   });
@@ -26,7 +24,7 @@ const OrganizationDashboard = () => {
       if (user) {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('first_name, last_name, organizations(name)')
+          .select('organizations(name)')
           .eq('id', user.id)
           .single();
 
@@ -37,10 +35,9 @@ const OrganizationDashboard = () => {
           .single();
 
         if (profileData) {
-          const userName = `${profileData.first_name} ${profileData.last_name}`;
           const orgName = profileData.organizations?.name || '';
           const isAdmin = roleData?.role === 'org_admin' || roleData?.role === 'global_admin';
-          setUserInfo({ userName, orgName, isAdmin });
+          setUserInfo({ orgName, isAdmin });
         }
       }
     };
@@ -59,15 +56,28 @@ const OrganizationDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <ChatHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
+      <header className="border-b bg-white p-4 flex items-center justify-between">
+        <button 
+          onClick={handleLogoClick}
+          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+        >
+          <img 
+            src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
+            alt="Afrovation" 
+            className="h-8"
+          />
+        </button>
+        <UserProfile onLogout={handleLogout} />
+      </header>
+
       <main className="w-full px-4 py-6 space-y-6">
         <div className="max-w-[2000px] mx-auto">
           <header className="space-y-4">
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-bold tracking-tight">Organization Dashboard</h1>
-              {userInfo.userName && (
+              {userInfo.orgName && (
                 <p className="text-muted-foreground">
-                  {userInfo.userName} ({userInfo.orgName})
+                  {userInfo.orgName}
                   {userInfo.isAdmin && <span className="ml-2 text-primary">(Admin)</span>}
                 </p>
               )}

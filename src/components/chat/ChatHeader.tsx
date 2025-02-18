@@ -1,8 +1,6 @@
 
-import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { UserProfile } from "@/components/user/UserProfile";
 
 interface ChatHeaderProps {
   onLogout: () => void;
@@ -10,28 +8,6 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({ onLogout, onLogoClick }: ChatHeaderProps) {
-  const [userName, setUserName] = useState<string>('');
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', user.id)
-          .single();
-
-        if (profileData) {
-          setUserName(`${profileData.first_name} ${profileData.last_name}`);
-        }
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
-
   return (
     <header className="border-b bg-white p-4 flex items-center justify-between">
       <button 
@@ -44,16 +20,7 @@ export function ChatHeader({ onLogout, onLogoClick }: ChatHeaderProps) {
           className="h-8"
         />
       </button>
-      <div className="flex items-center gap-4">
-        {userName && (
-          <span className="text-sm text-muted-foreground">
-            {userName}
-          </span>
-        )}
-        <Button variant="ghost" size="icon" onClick={onLogout}>
-          <LogOut className="h-5 w-5" />
-        </Button>
-      </div>
+      <UserProfile onLogout={onLogout} />
     </header>
   );
 }
