@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Mail, Info, AlertCircle } from "lucide-react";
+import { Mail, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Tooltip,
@@ -154,12 +154,6 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
               <Mail className="w-4 h-4" />
               Request a Demo
             </button>
-          </div>
-          <div className="text-center text-sm text-muted-foreground">
-            <p className="flex items-center gap-2 justify-center">
-              <AlertCircle className="w-4 h-4" />
-              Need help? Contact support
-            </p>
           </div>
         </CardFooter>
       </Card>
