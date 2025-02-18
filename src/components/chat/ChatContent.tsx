@@ -7,8 +7,7 @@ import { Dashboard } from "@/components/desk/Dashboard";
 import { Policies } from "@/components/desk/Policies";
 import { Settings } from "@/components/settings/Settings";
 import { LeaveManager } from "@/components/desk/LeaveManager";
-import { CalendarDashboard } from "@/components/calendar/CalendarDashboard";
-import { CalendarInbox } from "@/components/calendar/CalendarInbox";
+import { Calendar } from "@/components/desk/Calendar";
 import type { Conversation } from "@/types/chat";
 
 interface ChatContentProps {
@@ -32,7 +31,6 @@ export const ChatContent = ({
   onEditMessage,
   onDeleteMessage,
   onReactToMessage,
-  calendarView,
 }: ChatContentProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [selectedDeskFeature, setSelectedDeskFeature] = useState<string | null>(null);
@@ -65,17 +63,11 @@ export const ChatContent = ({
         return <Policies />;
       case 'settings':
         return <Settings />;
+      case 'calendar':
+        return <Calendar />;
       default:
         return <Dashboard />;
     }
-  }
-
-  if (activeTab === 'calendar') {
-    return calendarView === 'calendar' ? (
-      <CalendarDashboard />
-    ) : (
-      <CalendarInbox />
-    );
   }
 
   if (!selectedConversation) {
