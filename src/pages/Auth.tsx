@@ -3,7 +3,6 @@ import { useState } from "react";
 import HeroSection from "@/components/auth/HeroSection";
 import LoginForm from "@/components/auth/LoginForm";
 import DemoRequestDialog from "@/components/auth/DemoRequestDialog";
-import { Image } from "lucide-react";
 
 const Auth = () => {
   const [isDemoDialogOpen, setIsDemoDialogOpen] = useState(false);
@@ -13,9 +12,12 @@ const Auth = () => {
       <HeroSection />
       <div className="w-full md:w-1/2 flex flex-col items-center">
         <div className="w-full p-8 flex justify-center">
-          <div className="flex items-center gap-2 text-primary">
-            <Image className="w-10 h-10" />
-            <span className="text-2xl font-bold">e-Box</span>
+          <div className="flex items-center gap-2">
+            <img 
+              src="/lovable-uploads/4415dded-8eed-482f-ab46-9019698e147f.png" 
+              alt="e-Box Logo" 
+              className="h-12 w-auto"
+            />
           </div>
         </div>
         <LoginForm onRequestDemo={() => setIsDemoDialogOpen(true)} />
