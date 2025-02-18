@@ -1,3 +1,4 @@
+
 import type { Database } from "@/integrations/supabase/types";
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -15,12 +16,4 @@ export interface UserFormData {
   lastName: string;
   role: string;
   organizationId: string;
-}
-
-export interface Organization {
-  id: string;
-  name: string;
-  domain: string | null;
-  logo_url: string | null;
-  created_at: string;
 }

@@ -2,32 +2,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Building2, Pencil, Trash2 } from "lucide-react";
+import { Building2 } from "lucide-react";
 import { toast } from "sonner";
-
-type Organization = {
-  id: string;
-  name: string;
-  domain: string | null;
-  logo_url: string | null;
-  created_at: string;
-};
-
-type OrganizationFormData = {
-  name: string;
-  domain: string;
-};
+import { OrganizationForm } from "./organization/OrganizationForm";
+import { OrganizationTable } from "./organization/OrganizationTable";
+import type { Organization } from "./types";
 
 export const OrganizationManagement = () => {
   const [isAddOrgOpen, setIsAddOrgOpen] = useState(false);
   const [isEditOrgOpen, setIsEditOrgOpen] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
-  const [formData, setFormData] = useState<OrganizationFormData>({
+  const [formData, setFormData] = useState<{ name: string; domain: string; }>({
     name: "",
     domain: "",
   });
@@ -47,7 +34,7 @@ export const OrganizationManagement = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (newOrg: OrganizationFormData) => {
+    mutationFn: async (newOrg: typeof formData) => {
       const { data, error } = await supabase
         .from('organizations')
         .insert([{ name: newOrg.name, domain: newOrg.domain || null }])
@@ -68,7 +55,7 @@ export const OrganizationManagement = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: OrganizationFormData }) => {
+    mutationFn: async ({ id, data }: { id: string; data: typeof formData }) => {
       const { error } = await supabase
         .from('organizations')
         .update({ name: data.name, domain: data.domain || null })
@@ -147,32 +134,12 @@ export const OrganizationManagement = () => {
             <DialogHeader>
               <DialogTitle>Add New Organization</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Organization Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Acme Inc."
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="domain">Domain</Label>
-                <Input
-                  id="domain"
-                  name="domain"
-                  value={formData.domain}
-                  onChange={handleInputChange}
-                  placeholder="acme.com"
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Add Organization
-              </Button>
-            </form>
+            <OrganizationForm
+              formData={formData}
+              handleInputChange={handleInputChange}
+              handleSubmit={handleSubmit}
+              mode="add"
+            />
           </DialogContent>
         </Dialog>
 
@@ -181,68 +148,23 @@ export const OrganizationManagement = () => {
             <DialogHeader>
               <DialogTitle>Edit Organization</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-name">Organization Name</Label>
-                <Input
-                  id="edit-name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Acme Inc."
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-domain">Domain</Label>
-                <Input
-                  id="edit-domain"
-                  name="domain"
-                  value={formData.domain}
-                  onChange={handleInputChange}
-                  placeholder="acme.com"
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Update Organization
-              </Button>
-            </form>
+            <OrganizationForm
+              formData={formData}
+              handleInputChange={handleInputChange}
+              handleSubmit={handleSubmit}
+              mode="edit"
+            />
           </DialogContent>
         </Dialog>
       </div>
 
       <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Domain</TableHead>
-              <TableHead>Created At</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center">Loading organizations...</TableCell>
-              </TableRow>
-            ) : organizations?.map((org) => (
-              <TableRow key={org.id}>
-                <TableCell>{org.name}</TableCell>
-                <TableCell>{org.domain || 'N/A'}</TableCell>
-                <TableCell>{new Date(org.created_at).toLocaleDateString()}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" onClick={() => handleEdit(org)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleDelete(org.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <OrganizationTable
+          organizations={organizations}
+          isLoading={isLoading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
       </div>
     </div>
   );
