@@ -35,7 +35,7 @@ const HeroSection = () => {
                 <div className="space-y-1">
                   <h4 className="font-medium text-lg">Enterprise Security</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Bank-grade encryption with SA POPI Act compliance
+                    Secure encryption with SA POPI Act compliance
                   </p>
                 </div>
               </li>
@@ -57,18 +57,7 @@ const HeroSection = () => {
                 <div className="space-y-1">
                   <h4 className="font-medium text-lg">Team Communication</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Real-time messaging with multi-language support
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start gap-4 group">
-                <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                  <ChartBar className="w-6 h-6" />
-                </div>
-                <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Performance Analytics</h4>
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    Track KPIs and business metrics in real-time
+                    Real-time messaging for all staff through the organization
                   </p>
                 </div>
               </li>
@@ -83,27 +72,13 @@ const HeroSection = () => {
                   </p>
                 </div>
               </li>
-              <li className="flex items-start gap-4 group">
-                <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                  <Clock className="w-6 h-6" />
-                </div>
-                <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Time Management</h4>
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    Advanced leave tracking and attendance monitoring
-                  </p>
-                </div>
-              </li>
             </ul>
           </div>
 
           <div className="pt-6 border-t border-white/20">
-            <blockquote className="text-sm leading-relaxed opacity-80 italic">
-              "e-Box has revolutionized how we manage our team communication and HR processes. It's perfectly adapted to South African business needs for all inclusive communication."
-              <footer className="mt-2 font-medium not-italic">
-                - Leading South African Enterprise
-              </footer>
-            </blockquote>
+            <p className="text-sm leading-relaxed opacity-80">
+              Copyright Afrovation 2025. Another Innovation by Afrovation.com
+            </p>
           </div>
         </div>
       </div>
