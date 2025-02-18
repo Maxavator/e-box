@@ -7,6 +7,7 @@ import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
 import { NewMessageDialog } from "./NewMessageDialog";
+import { Documents } from "@/components/desk/Documents";
 
 interface ChatSidebarProps {
   searchQuery: string;
