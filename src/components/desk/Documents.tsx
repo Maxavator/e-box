@@ -2,244 +2,18 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FileText, Lock, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-
-const DocumentList = ({ 
-  documents, 
-  requiresOTP = false,
-  onDocumentClick 
-}: { 
-  documents: { 
-    name: string; 
-    date: string; 
-    size: string;
-    isVerified?: boolean;
-    downloadUrl?: string;
-  }[];
-  requiresOTP?: boolean;
-  onDocumentClick: (doc: { 
-    name: string; 
-    date: string; 
-    size: string;
-    isVerified?: boolean;
-    downloadUrl?: string;
-  }) => void;
-}) => (
-  <ScrollArea className="h-[400px]">
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead>Size</TableHead>
-          <TableHead className="text-right">Action</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {documents.map((doc) => (
-          <TableRow key={doc.name}>
-            <TableCell className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              {doc.name}
-              {requiresOTP && <Lock className="h-3 w-3 text-gray-400" />}
-              {doc.isVerified && (
-                <CheckCircle2 
-                  className="h-3 w-3 text-green-500" 
-                  aria-label="E-box Verified"
-                />
-              )}
-            </TableCell>
-            <TableCell>{doc.date}</TableCell>
-            <TableCell>{doc.size}</TableCell>
-            <TableCell className="text-right">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => onDocumentClick(doc)}
-              >
-                Download
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </ScrollArea>
-);
-
-const EmptyState = () => (
-  <div className="flex flex-col items-center justify-center p-8 text-center">
-    <FileText className="h-12 w-12 text-gray-400 mb-4" />
-    <h3 className="text-lg font-medium">No documents found</h3>
-    <p className="text-sm text-gray-500">Documents will appear here once they are added to your account.</p>
-  </div>
-);
-
-const OTPVerification = ({ 
-  isOpen, 
-  onClose,
-  onVerify 
-}: { 
-  isOpen: boolean; 
-  onClose: () => void;
-  onVerify: (otp: string) => void;
-}) => {
-  const [otp, setOtp] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onVerify(otp);
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Security Verification</DialogTitle>
-          <DialogDescription>
-            Enter the OTP sent to your email to access the document
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex justify-center py-4">
-            <InputOTP
-              maxLength={6}
-              value={otp}
-              onChange={(value) => setOtp(value)}
-            >
-              <InputOTPGroup>
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <InputOTPSlot key={index} index={index} />
-                ))}
-              </InputOTPGroup>
-            </InputOTP>
-          </div>
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" type="button" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">
-              Verify
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-};
+import { DocumentList } from "./components/DocumentList";
+import { EmptyState } from "./components/EmptyState";
+import { OTPVerification } from "./components/OTPVerification";
+import { payslips, contracts, otherDocuments } from "./data/documents";
+import { Document } from "./types/documents";
 
 export const Documents = () => {
   const [showOTPDialog, setShowOTPDialog] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<{
-    name: string;
-    date: string;
-    size: string;
-    isVerified?: boolean;
-    downloadUrl?: string;
-  } | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
-  const payslips = [
-    { 
-      name: "Payslip March 2024", 
-      date: "2024-03-01", 
-      size: "156 KB",
-      isVerified: true,
-      downloadUrl: "/lovable-uploads/payslips/payslip_march_2024_e-box_by_afrovation.pdf"
-    },
-    { 
-      name: "Payslip February 2024", 
-      date: "2024-02-01", 
-      size: "155 KB",
-      isVerified: true,
-      downloadUrl: "/lovable-uploads/payslips/payslip_february_2024_e-box_by_afrovation.pdf"
-    },
-    { 
-      name: "Payslip January 2024", 
-      date: "2024-01-01", 
-      size: "154 KB",
-      isVerified: true,
-      downloadUrl: "/lovable-uploads/payslips/payslip_january_2024_e-box_by_afrovation.pdf"
-    },
-    { 
-      name: "Payslip December 2023", 
-      date: "2023-12-01", 
-      size: "153 KB",
-      isVerified: true,
-      downloadUrl: "/lovable-uploads/payslips/payslip_december_2023_e-box_by_afrovation.pdf"
-    }
-  ];
-
-  const contracts = [
-    { 
-      name: "Employment Contract", 
-      date: "2023-01-15", 
-      size: "2.1 MB",
-      isVerified: true,
-      downloadUrl: "/lovable-uploads/contracts/employment_contract_2023_e-box_by_afrovation.pdf"
-    },
-    { 
-      name: "NDA Agreement", 
-      date: "2023-01-15", 
-      size: "890 KB",
-      isVerified: true,
-      downloadUrl: "/lovable-uploads/contracts/non_disclosure_agreement_2023_e-box_by_afrovation.pdf"
-    },
-    { 
-      name: "IP Rights Agreement", 
-      date: "2023-01-15", 
-      size: "756 KB",
-      isVerified: true,
-      downloadUrl: "/lovable-uploads/contracts/intellectual_property_rights_agreement_2023_e-box_by_afrovation.pdf"
-    },
-    { 
-      name: "Remote Work Agreement", 
-      date: "2023-06-01", 
-      size: "945 KB",
-      isVerified: true,
-      downloadUrl: "/lovable-uploads/contracts/remote_work_agreement_2023_e-box_by_afrovation.pdf"
-    }
-  ];
-
-  const otherDocuments = [
-    { 
-      name: "Employee Handbook 2024", 
-      date: "2024-01-01", 
-      size: "3.2 MB",
-      downloadUrl: "/lovable-uploads/documents/employee_handbook_2024_e-box_by_afrovation.pdf"
-    },
-    { 
-      name: "Travel Policy", 
-      date: "2023-11-15", 
-      size: "645 KB",
-      downloadUrl: "/lovable-uploads/documents/travel_policy_2023_e-box_by_afrovation.pdf"
-    },
-    { 
-      name: "Benefits Guide 2024", 
-      date: "2024-01-01", 
-      size: "1.8 MB",
-      downloadUrl: "/lovable-uploads/documents/benefits_guide_2024_e-box_by_afrovation.pdf"
-    },
-    { 
-      name: "IT Security Guidelines", 
-      date: "2023-12-15", 
-      size: "987 KB",
-      downloadUrl: "/lovable-uploads/documents/it_security_guidelines_2023_e-box_by_afrovation.pdf"
-    }
-  ];
-
-  const handleDocumentClick = (doc: { 
-    name: string; 
-    date: string; 
-    size: string;
-    isVerified?: boolean;
-    downloadUrl?: string;
-  }) => {
+  const handleDocumentClick = (doc: Document) => {
     if (doc.name.toLowerCase().includes('payslip') || doc.name.toLowerCase().includes('contract') || 
         doc.name.toLowerCase().includes('agreement')) {
       setSelectedDocument(doc);
@@ -263,7 +37,7 @@ export const Documents = () => {
       const link = document.createElement('a');
       link.href = selectedDocument.downloadUrl;
       link.target = '_blank';
-      link.download = selectedDocument.name;
+      link.download = selectedDocument.downloadUrl.split('/').pop() || selectedDocument.name;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
