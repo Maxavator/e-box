@@ -7,6 +7,7 @@ import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
 import { NewMessageDialog } from "./NewMessageDialog";
+import { useState } from "react";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -35,29 +36,47 @@ const CalendarActions = ({ onCalendarActionClick }: { onCalendarActionClick: (vi
   );
 };
 
-const DeskFeatures = () => {
+const DeskFeatures = ({ onTabChange, onCalendarActionClick }: { 
+  onTabChange: (value: string) => void;
+  onCalendarActionClick: (view: 'calendar' | 'inbox') => void;
+}) => {
+  const [activeDeskTab, setActiveDeskTab] = useState("dashboard");
+
   return (
-    <div className="p-4 space-y-2">
-      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'dashboard' }))}>
-        <LayoutDashboard className="mr-2 h-4 w-4" />
-        Dashboard
-      </Button>
-      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'documents' }))}>
-        <FileText className="mr-2 h-4 w-4" />
-        My Documents
-      </Button>
-      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'leave-manager' }))}>
-        <Clock className="mr-2 h-4 w-4" />
-        Leave Manager
-      </Button>
-      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'policies' }))}>
-        <FileText className="mr-2 h-4 w-4" />
-        Policies
-      </Button>
-      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'settings' }))}>
-        <Settings className="mr-2 h-4 w-4" />
-        Settings
-      </Button>
+    <div className="h-full">
+      <Tabs value={activeDeskTab} onValueChange={setActiveDeskTab} className="h-full">
+        <TabsList className="w-full justify-start px-4 pt-4">
+          <TabsTrigger value="dashboard" className="flex-1">Dashboard</TabsTrigger>
+          <TabsTrigger value="calendar" className="flex-1">Calendar</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="dashboard" className="p-4 space-y-2">
+          <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'dashboard' }))}>
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            Dashboard
+          </Button>
+          <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'documents' }))}>
+            <FileText className="mr-2 h-4 w-4" />
+            My Documents
+          </Button>
+          <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'leave-manager' }))}>
+            <Clock className="mr-2 h-4 w-4" />
+            Leave Manager
+          </Button>
+          <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'policies' }))}>
+            <FileText className="mr-2 h-4 w-4" />
+            Policies
+          </Button>
+          <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'settings' }))}>
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
+          </Button>
+        </TabsContent>
+
+        <TabsContent value="calendar" className="h-full">
+          <CalendarActions onCalendarActionClick={onCalendarActionClick} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
@@ -100,13 +119,6 @@ export function ChatSidebar({
             )}
           </TabsTrigger>
           <TabsTrigger
-            value="calendar"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
-          >
-            <Calendar className="w-4 h-4 mr-2" />
-            Calendar
-          </TabsTrigger>
-          <TabsTrigger
             value="desk"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
           >
@@ -126,12 +138,8 @@ export function ChatSidebar({
           />
         </TabsContent>
 
-        <TabsContent value="calendar" className="h-full">
-          <CalendarActions onCalendarActionClick={onCalendarActionClick} />
-        </TabsContent>
-
         <TabsContent value="desk" className="h-full">
-          <DeskFeatures />
+          <DeskFeatures onTabChange={onTabChange} onCalendarActionClick={onCalendarActionClick} />
         </TabsContent>
       </Tabs>
     </div>
