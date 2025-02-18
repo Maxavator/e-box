@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import MessageItem from "./MessageItem";
 import { ChatInput } from "./ChatInput";
 import { Documents } from "@/components/desk/Documents";
@@ -32,13 +32,39 @@ export const ChatContent = ({
   calendarView,
 }: ChatContentProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [selectedDeskFeature, setSelectedDeskFeature] = useState<string | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [selectedConversation?.messages]);
 
+  useEffect(() => {
+    const handleDeskFeatureSelected = (event: CustomEvent<string>) => {
+      setSelectedDeskFeature(event.detail);
+    };
+
+    window.addEventListener('desk-feature-selected', handleDeskFeatureSelected as EventListener);
+
+    return () => {
+      window.removeEventListener('desk-feature-selected', handleDeskFeatureSelected as EventListener);
+    };
+  }, []);
+
   if (activeTab === 'desk') {
-    return <Dashboard />;
+    switch (selectedDeskFeature) {
+      case 'documents':
+        return <Documents />;
+      case 'dashboard':
+        return <Dashboard />;
+      case 'policies':
+        return <div className="p-6"><h2 className="text-2xl font-semibold">Policies</h2></div>;
+      case 'helpdesk':
+        return <div className="p-6"><h2 className="text-2xl font-semibold">Helpdesk</h2></div>;
+      case 'settings':
+        return <div className="p-6"><h2 className="text-2xl font-semibold">Settings</h2></div>;
+      default:
+        return <Dashboard />;
+    }
   }
 
   if (activeTab === 'calendar') {

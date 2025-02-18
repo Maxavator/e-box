@@ -7,7 +7,6 @@ import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
 import { NewMessageDialog } from "./NewMessageDialog";
-import { Documents } from "@/components/desk/Documents";
 import { useState } from "react";
 
 interface ChatSidebarProps {
@@ -38,35 +37,25 @@ const CalendarActions = ({ onCalendarActionClick }: { onCalendarActionClick: (vi
 };
 
 const DeskFeatures = () => {
-  const [showDocuments, setShowDocuments] = useState(false);
-
-  if (showDocuments) {
-    return <Documents />;
-  }
-
   return (
     <div className="p-4 space-y-2">
-      <Button variant="ghost" className="w-full justify-start">
+      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'dashboard' }))}>
         <LayoutDashboard className="mr-2 h-4 w-4" />
         Dashboard
       </Button>
-      <Button 
-        variant="ghost" 
-        className="w-full justify-start"
-        onClick={() => setShowDocuments(true)}
-      >
+      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'documents' }))}>
         <FileText className="mr-2 h-4 w-4" />
         My Documents
       </Button>
-      <Button variant="ghost" className="w-full justify-start">
+      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'policies' }))}>
         <FileText className="mr-2 h-4 w-4" />
         Policies
       </Button>
-      <Button variant="ghost" className="w-full justify-start">
+      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'helpdesk' }))}>
         <Headset className="mr-2 h-4 w-4" />
         Helpdesk
       </Button>
-      <Button variant="ghost" className="w-full justify-start">
+      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'settings' }))}>
         <Settings className="mr-2 h-4 w-4" />
         Settings
       </Button>
