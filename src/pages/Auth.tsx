@@ -6,31 +6,30 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Building2, Shield, Users, Globe } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 const Auth = () => {
-  const [idNumber, setIdNumber] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const validateSAID = (id: string) => {
-    const regex = /^([456])0\d{11}$/;
-    return regex.test(id);
-  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateSAID(idNumber)) {
+    if (!username || !password) {
       toast({
-        title: "Invalid ID Number",
-        description: "Please enter a valid South African ID number",
+        title: "Invalid Credentials",
+        description: "Please enter both username and password",
         variant: "destructive",
       });
       return;
     }
 
-    const isGlobalAdmin = idNumber.startsWith("4");
-    const isOrgAdmin = idNumber.startsWith("5");
+    // For demo purposes, we'll use the same role-based routing logic
+    // In a real app, this would be handled by proper authentication
+    const isGlobalAdmin = username.startsWith("admin");
+    const isOrgAdmin = username.startsWith("org");
     
     if (isGlobalAdmin) {
       navigate("/admin");
@@ -124,19 +123,32 @@ const Auth = () => {
               Demo Credentials
             </CardDescription>
             <div className="mt-4 space-y-2 text-sm text-gray-500 bg-primary/5 p-4 rounded-lg border border-primary/10">
-              <p className="hover:text-primary transition-colors"><span className="font-medium">Regular User:</span> 6010203040512</p>
-              <p className="hover:text-primary transition-colors"><span className="font-medium">Organization Admin:</span> 5010203040512</p>
-              <p className="hover:text-primary transition-colors"><span className="font-medium">Global Admin:</span> 4010203040512</p>
+              <p className="hover:text-primary transition-colors"><span className="font-medium">Regular User:</span> username: user / password: password</p>
+              <p className="hover:text-primary transition-colors"><span className="font-medium">Organization Admin:</span> username: org_admin / password: password</p>
+              <p className="hover:text-primary transition-colors"><span className="font-medium">Global Admin:</span> username: admin / password: password</p>
             </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
                 <Input
+                  id="username"
                   type="text"
-                  placeholder="South African ID Number"
-                  value={idNumber}
-                  onChange={(e) => setIdNumber(e.target.value)}
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full focus:ring-primary"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full focus:ring-primary"
                 />
               </div>
