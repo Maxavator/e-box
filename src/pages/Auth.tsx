@@ -47,7 +47,7 @@ const Auth = () => {
       <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center space-y-8">
         <div className="space-y-4">
           <h1 className="text-4xl md:text-5xl font-bold text-primary">
-            Enterprise Chat Platform
+            e-Box by Afrovation
           </h1>
           <p className="text-xl text-gray-600">
             Secure, scalable, and efficient communication for your organization
@@ -107,7 +107,7 @@ const Auth = () => {
         <div className="pt-4">
           <img 
             src="/lovable-uploads/cea5cf65-708e-42c4-9a6c-6073f42a3471.png" 
-            alt="Platform Preview" 
+            alt="e-Box Preview" 
             className="rounded-lg shadow-xl max-w-md mx-auto"
           />
         </div>
@@ -118,7 +118,7 @@ const Auth = () => {
         <Card className="w-full max-w-md animate-fadeIn">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">
-              Welcome to Enterprise Chat
+              Welcome to e-Box
             </CardTitle>
             <CardDescription className="text-center text-gray-500">
               Demo Credentials
