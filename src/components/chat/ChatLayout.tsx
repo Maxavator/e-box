@@ -2,7 +2,7 @@
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { ChatSidebar } from "./ChatSidebar";
 import { ChatContent } from "./ChatContent";
-import { ChatHeader } from "./ChatHeader";
+import { AppHeader } from "@/components/shared/AppHeader";
 import type { Conversation } from "@/types/chat";
 
 interface ChatLayoutProps {
@@ -46,7 +46,7 @@ export const ChatLayout = ({
 }: ChatLayoutProps) => {
   return (
     <div className="flex-1 flex flex-col">
-      <ChatHeader onLogout={onLogout} onLogoClick={onLogoClick} />
+      <AppHeader onLogout={onLogout} onLogoClick={onLogoClick} />
       
       <ResizablePanelGroup direction="horizontal" className="flex-1">
         <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>

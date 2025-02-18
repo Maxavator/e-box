@@ -3,13 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Users, Building2, Settings, UserPlus, 
-  MessagesSquare, ArrowUpRight, LogOut 
+  MessagesSquare, ArrowUpRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { OrganizationManagement } from "@/components/admin/OrganizationManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
+import { AppHeader } from "@/components/shared/AppHeader";
 
 const AdminPortal = () => {
   const navigate = useNavigate();
@@ -17,6 +18,10 @@ const AdminPortal = () => {
 
   const handleLogout = () => {
     navigate("/");
+  };
+
+  const handleLogoClick = () => {
+    navigate("/organization");
   };
 
   const renderView = () => {
@@ -34,21 +39,7 @@ const AdminPortal = () => {
 
   return (
     <div className="flex-1 min-h-screen bg-gray-50">
-      <header className="h-16 bg-white border-b px-8 flex items-center justify-between sticky top-0 z-10">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Admin Portal</h1>
-          <p className="text-sm text-gray-500">Manage your enterprise system</p>
-        </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleLogout}
-          className="text-gray-500 hover:text-gray-700"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Logout
-        </Button>
-      </header>
+      <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
 
       <div className="p-8">
         {activeView === 'dashboard' ? (

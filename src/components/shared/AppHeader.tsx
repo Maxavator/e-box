@@ -2,12 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/components/user/UserProfile";
 
-interface ChatHeaderProps {
+interface AppHeaderProps {
   onLogout: () => void;
   onLogoClick: () => void;
 }
 
-export function ChatHeader({ onLogout, onLogoClick }: ChatHeaderProps) {
+export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
   return (
     <header className="border-b bg-white p-4 flex items-center justify-between">
       <button 

@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { OrganizationManagement } from "@/components/admin/OrganizationManagement";
-import { UserProfile } from "@/components/user/UserProfile";
+import { AppHeader } from "@/components/shared/AppHeader";
 
 const OrganizationDashboard = () => {
   const navigate = useNavigate();
@@ -56,19 +56,7 @@ const OrganizationDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-white p-4 flex items-center justify-between">
-        <button 
-          onClick={handleLogoClick}
-          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
-        >
-          <img 
-            src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
-            alt="Afrovation" 
-            className="h-8"
-          />
-        </button>
-        <UserProfile onLogout={handleLogout} />
-      </header>
+      <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
 
       <main className="w-full px-4 py-6 space-y-6">
         <div className="max-w-[2000px] mx-auto">
