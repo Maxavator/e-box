@@ -21,7 +21,6 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
     lastName: string;
     avatarUrl: string | null;
   } | null>(null);
-  const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -57,6 +56,15 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
         <CircleDot className="w-3 h-3 text-green-500" />
         <span className="text-sm text-muted-foreground">Online</span>
       </div>
+
+      <Button 
+        variant="outline" 
+        onClick={onLogout}
+        className="flex items-center gap-2"
+      >
+        <LogOut className="w-4 h-4" />
+        Logout
+      </Button>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
