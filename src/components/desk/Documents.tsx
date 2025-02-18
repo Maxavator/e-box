@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +6,6 @@ import { FileText, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
@@ -92,17 +90,16 @@ const OTPVerification = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex justify-center py-4">
             <InputOTP
+              maxLength={6}
               value={otp}
               onChange={(value) => setOtp(value)}
-              maxLength={6}
-              render={({ slots }) => (
-                <InputOTPGroup>
-                  {slots.map((slot, index) => (
-                    <InputOTPSlot key={index} {...slot} index={index} />
-                  ))}
-                </InputOTPGroup>
-              )}
-            />
+            >
+              <InputOTPGroup>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <InputOTPSlot key={index} index={index} />
+                ))}
+              </InputOTPGroup>
+            </InputOTP>
           </div>
           <div className="flex justify-end space-x-2">
             <Button variant="outline" type="button" onClick={onClose}>
@@ -122,7 +119,6 @@ export const Documents = () => {
   const [showOTPDialog, setShowOTPDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<{ name: string; date: string; size: string } | null>(null);
 
-  // Sample data - replace with actual data from your backend
   const payslips = [
     { name: "Payslip March 2024", date: "2024-03-01", size: "156 KB" },
     { name: "Payslip February 2024", date: "2024-02-01", size: "155 KB" },
@@ -145,14 +141,12 @@ export const Documents = () => {
       setSelectedDocument(doc);
       setShowOTPDialog(true);
     } else {
-      // Handle regular document download
       toast.success(`Downloading ${doc.name}`);
     }
   };
 
   const handleOTPVerify = (otp: string) => {
-    // In a real application, you would verify the OTP with your backend
-    if (otp === "123456") { // Example verification
+    if (otp === "123456") {
       toast.success(`Verified successfully. Downloading ${selectedDocument?.name}`);
       setShowOTPDialog(false);
       setSelectedDocument(null);
