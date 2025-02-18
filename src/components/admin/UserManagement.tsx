@@ -43,10 +43,24 @@ export const UserManagement = () => {
     },
   });
 
-  if (error?.message?.includes('permission denied')) {
+  if (error) {
+    const errorMessage = error.message?.toLowerCase() || '';
+    if (errorMessage.includes('permission denied')) {
+      return (
+        <div className="p-4 text-center">
+          <p className="text-red-500">You don't have permission to view user management. Please contact an administrator.</p>
+        </div>
+      );
+    } else if (errorMessage.includes('jwt')) {
+      return (
+        <div className="p-4 text-center">
+          <p className="text-red-500">Please log in to access user management.</p>
+        </div>
+      );
+    }
     return (
       <div className="p-4 text-center">
-        <p className="text-red-500">You don't have permission to view user management. Please contact an administrator.</p>
+        <p className="text-red-500">An error occurred while loading users. Please try again later.</p>
       </div>
     );
   }
