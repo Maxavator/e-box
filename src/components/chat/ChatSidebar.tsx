@@ -1,12 +1,12 @@
+
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar, Inbox, Briefcase, LayoutDashboard, FileText, Headset, Settings, Plus } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, Briefcase, LayoutDashboard, FileText, Settings } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
 import { NewMessageDialog } from "./NewMessageDialog";
-import { useState } from "react";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -49,10 +49,6 @@ const DeskFeatures = () => {
       <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'policies' }))}>
         <FileText className="mr-2 h-4 w-4" />
         Policies
-      </Button>
-      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'helpdesk' }))}>
-        <Headset className="mr-2 h-4 w-4" />
-        Helpdesk
       </Button>
       <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'settings' }))}>
         <Settings className="mr-2 h-4 w-4" />
@@ -113,13 +109,6 @@ export function ChatSidebar({
             <Briefcase className="w-4 h-4 mr-2" />
             Desk
           </TabsTrigger>
-          <TabsTrigger
-            value="helpdesk"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
-          >
-            <Headset className="w-4 h-4 mr-2" />
-            Help
-          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="chats" className="h-full p-0">
@@ -139,19 +128,6 @@ export function ChatSidebar({
 
         <TabsContent value="desk" className="h-full">
           <DeskFeatures />
-        </TabsContent>
-
-        <TabsContent value="helpdesk" className="h-full">
-          <div className="p-4">
-            <Button
-              className="w-full justify-start"
-              variant="default"
-              onClick={() => onTabChange("helpdesk")}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              New Support Ticket
-            </Button>
-          </div>
         </TabsContent>
       </Tabs>
     </div>
