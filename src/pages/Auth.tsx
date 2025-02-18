@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -152,6 +153,14 @@ const Auth = () => {
               >
                 Login
               </Button>
+              <div className="text-center mt-4">
+                <a 
+                  href="mailto:info@afrovation.co.za?subject=e-Box Demo Request" 
+                  className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+                >
+                  Request a Demo →
+                </a>
+              </div>
             </form>
           </CardContent>
         </Card>
