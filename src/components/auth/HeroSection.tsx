@@ -1,74 +1,78 @@
 
-import { Building2, Shield, Users, Globe } from "lucide-react";
-
 const HeroSection = () => {
   return (
-    <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center space-y-8">
-      <div className="space-y-4">
-        <h1 className="text-4xl md:text-5xl font-bold text-primary animate-fadeIn">
-          e-Box by Afrovation
-        </h1>
-        <p className="text-xl text-gray-600 animate-fadeIn delay-100">
-          Secure, scalable, and efficient communication platform enabling seamless collaboration from executives to remote staff, including deskless employees - ensuring no one is left behind
-        </p>
-      </div>
+    <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-primary/90 to-primary p-8 text-white items-center justify-center">
+      <div className="max-w-xl space-y-8">
+        <div className="space-y-4">
+          <h1 className="text-4xl lg:text-5xl font-bold">
+            Welcome to e-Box
+          </h1>
+          <p className="text-xl lg:text-2xl opacity-90">
+            Your comprehensive solution for secure communication and document management
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-primary/5 transition-colors animate-fadeIn delay-200">
-          <div className="bg-primary/10 p-2 rounded-lg">
-            <Shield className="w-6 h-6 text-primary" />
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold">Key Features</h3>
+            <ul className="space-y-3">
+              <li className="flex items-start">
+                <svg className="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Secure messaging and file sharing</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Integrated calendar for event management</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Document storage and organization</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Policy management and compliance</span>
+              </li>
+            </ul>
           </div>
-          <div>
-            <h3 className="font-semibold mb-1">Enterprise Security</h3>
-            <p className="text-sm text-gray-600">
-              Advanced encryption and compliance features to protect your data
-            </p>
+
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold">Why Choose e-Box?</h3>
+            <ul className="space-y-3">
+              <li className="flex items-start">
+                <svg className="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span>Enterprise-grade security</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>Real-time collaboration</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <span>Scalable solution for teams of all sizes</span>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-primary/5 transition-colors animate-fadeIn delay-300">
-          <div className="bg-primary/10 p-2 rounded-lg">
-            <Users className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <h3 className="font-semibold mb-1">Team Collaboration</h3>
-            <p className="text-sm text-gray-600">
-              Seamless communication across departments and organizations
-            </p>
-          </div>
+        <div className="pt-4 border-t border-white/20">
+          <p className="text-sm opacity-80">
+            © 2024 e-Box. All rights reserved. Our platform helps organizations streamline their communication, document management, and compliance processes.
+          </p>
         </div>
-
-        <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-primary/5 transition-colors animate-fadeIn delay-400">
-          <div className="bg-primary/10 p-2 rounded-lg">
-            <Building2 className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <h3 className="font-semibold mb-1">Multi-Org Support</h3>
-            <p className="text-sm text-gray-600">
-              Manage multiple organizations with advanced admin controls
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-primary/5 transition-colors animate-fadeIn delay-500">
-          <div className="bg-primary/10 p-2 rounded-lg">
-            <Globe className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <h3 className="font-semibold mb-1">Global Accessibility</h3>
-            <p className="text-sm text-gray-600">
-              Access your workspace from anywhere, on any device
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="pt-4 animate-fadeIn delay-600">
-        <img 
-          src="/lovable-uploads/cea5cf65-708e-42c4-9a6c-6073f42a3471.png" 
-          alt="e-Box Preview" 
-          className="rounded-lg shadow-xl max-w-md mx-auto hover:shadow-2xl transition-shadow duration-300"
-        />
       </div>
     </div>
   );

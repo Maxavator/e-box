@@ -3,10 +3,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Mail } from "lucide-react";
+import { Mail, Info, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface LoginFormProps {
   onRequestDemo: () => void;
@@ -81,7 +87,22 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="username">Username</Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>For testing, use:</p>
+                      <p>Regular user: 6010203040512</p>
+                      <p>Org admin: 5010203040512</p>
+                      <p>Global admin: 4010203040512</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <Input
                 id="username"
                 type="text"
@@ -92,7 +113,20 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Password format: Test + username</p>
+                      <p>Example: Test6010203040512</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -108,18 +142,26 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
             >
               Login
             </Button>
-            <div className="text-center mt-4">
-              <button
-                type="button"
-                onClick={onRequestDemo}
-                className="text-primary hover:text-primary/80 text-sm font-medium transition-colors inline-flex items-center gap-2"
-              >
-                <Mail className="w-4 h-4" />
-                Request a Demo
-              </button>
-            </div>
           </form>
         </CardContent>
+        <CardFooter className="flex flex-col space-y-4 pt-4">
+          <div className="text-center w-full">
+            <button
+              type="button"
+              onClick={onRequestDemo}
+              className="text-primary hover:text-primary/80 text-sm font-medium transition-colors inline-flex items-center gap-2"
+            >
+              <Mail className="w-4 h-4" />
+              Request a Demo
+            </button>
+          </div>
+          <div className="text-center text-sm text-muted-foreground">
+            <p className="flex items-center gap-2 justify-center">
+              <AlertCircle className="w-4 h-4" />
+              Need help? Contact support
+            </p>
+          </div>
+        </CardFooter>
       </Card>
     </div>
   );
