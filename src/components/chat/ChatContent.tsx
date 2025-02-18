@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import MessageItem from "./MessageItem";
 import { ChatInput } from "./ChatInput";
 import { Documents } from "@/components/desk/Documents";
+import { Dashboard } from "@/components/desk/Dashboard";
 import { CalendarDashboard } from "@/components/calendar/CalendarDashboard";
 import { CalendarInbox } from "@/components/calendar/CalendarInbox";
 import type { Conversation } from "@/types/chat";
@@ -37,7 +38,7 @@ export const ChatContent = ({
   }, [selectedConversation?.messages]);
 
   if (activeTab === 'desk') {
-    return <Documents />;
+    return <Dashboard />;
   }
 
   if (activeTab === 'calendar') {
