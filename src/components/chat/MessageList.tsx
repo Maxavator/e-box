@@ -1,25 +1,35 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MessageItem from "@/components/chat/MessageItem";
-import type { Message } from "@/types/chat";
+import type { Conversation } from "@/types/chat";
 
 interface MessageListProps {
-  messages: Message[];
+  conversation: Conversation | null;
   onEditMessage: (messageId: string, newText: string) => void;
   onDeleteMessage: (messageId: string) => void;
   onReactToMessage: (messageId: string, emoji: string) => void;
 }
 
 export function MessageList({ 
-  messages,
+  conversation,
   onEditMessage,
   onDeleteMessage,
   onReactToMessage
 }: MessageListProps) {
+  if (!conversation) {
+    return (
+      <ScrollArea className="flex-1">
+        <div className="p-4 text-center text-muted-foreground">
+          Select a conversation to start chatting
+        </div>
+      </ScrollArea>
+    );
+  }
+
   return (
     <ScrollArea className="flex-1">
       <div className="p-4 space-y-4">
-        {messages.map((message) => (
+        {conversation.messages.map((message) => (
           <MessageItem
             key={message.id}
             message={message}
