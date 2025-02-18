@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, Calendar, Inbox, Briefcase, LayoutDashboard, FileText, Headset, Settings } from "lucide-react";
@@ -7,7 +6,6 @@ import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
 import { NewMessageDialog } from "./NewMessageDialog";
-import { useState } from "react";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -45,11 +43,7 @@ const DeskFeatures = () => {
       </Button>
       <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'documents' }))}>
         <FileText className="mr-2 h-4 w-4" />
-        My Documents
-      </Button>
-      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'policies' }))}>
-        <FileText className="mr-2 h-4 w-4" />
-        Policies
+        Documents
       </Button>
       <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'helpdesk' }))}>
         <Headset className="mr-2 h-4 w-4" />
