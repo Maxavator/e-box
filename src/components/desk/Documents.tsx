@@ -148,7 +148,8 @@ export const Documents = () => {
   ];
 
   const handleDocumentClick = (doc: { name: string; date: string; size: string }) => {
-    if (doc.name.toLowerCase().includes('payslip')) {
+    if (doc.name.toLowerCase().includes('payslip') || doc.name.toLowerCase().includes('contract') || 
+        doc.name.toLowerCase().includes('agreement')) {
       setSelectedDocument(doc);
       setShowOTPDialog(true);
     } else {
@@ -196,6 +197,7 @@ export const Documents = () => {
               {contracts.length > 0 ? (
                 <DocumentList 
                   documents={contracts}
+                  requiresOTP={true}
                   onDocumentClick={handleDocumentClick}
                 />
               ) : (
