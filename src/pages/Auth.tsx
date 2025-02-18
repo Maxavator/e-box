@@ -5,12 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Shield, Users, Globe } from "lucide-react";
+import { Building2, Shield, Users, Globe, Mail } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isDemoDialogOpen, setIsDemoDialogOpen] = useState(false);
+  const [demoName, setDemoName] = useState("");
+  const [demoEmail, setDemoEmail] = useState("");
+  const [demoMessage, setDemoMessage] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -38,6 +44,36 @@ const Auth = () => {
     } else {
       navigate("/chat");
     }
+  };
+
+  const handleDemoRequest = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!demoName || !demoEmail) {
+      toast({
+        title: "Missing Information",
+        description: "Please provide your name and email",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // In a real app, this would send the data to a server
+    // For now, we'll just open the email client
+    const subject = encodeURIComponent("e-Box Demo Request");
+    const body = encodeURIComponent(`Name: ${demoName}\nEmail: ${demoEmail}\nMessage: ${demoMessage}`);
+    window.location.href = `mailto:support@afrovation.com?subject=${subject}&body=${body}`;
+    
+    setIsDemoDialogOpen(false);
+    toast({
+      title: "Demo Request Sent",
+      description: "We'll be in touch with you shortly",
+    });
+
+    // Reset form
+    setDemoName("");
+    setDemoEmail("");
+    setDemoMessage("");
   };
 
   return (
@@ -154,17 +190,66 @@ const Auth = () => {
                 Login
               </Button>
               <div className="text-center mt-4">
-                <a 
-                  href="mailto:info@afrovation.co.za?subject=e-Box Demo Request" 
-                  className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+                <button
+                  type="button"
+                  onClick={() => setIsDemoDialogOpen(true)}
+                  className="text-primary hover:text-primary/80 text-sm font-medium transition-colors inline-flex items-center gap-2"
                 >
-                  Request a Demo →
-                </a>
+                  <Mail className="w-4 h-4" />
+                  Request a Demo
+                </button>
               </div>
             </form>
           </CardContent>
         </Card>
       </div>
+
+      {/* Demo Request Dialog */}
+      <Dialog open={isDemoDialogOpen} onOpenChange={setIsDemoDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Request a Demo</DialogTitle>
+            <DialogDescription>
+              Fill out the form below and we'll get back to you shortly.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleDemoRequest} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="demoName">Name</Label>
+              <Input
+                id="demoName"
+                placeholder="Your name"
+                value={demoName}
+                onChange={(e) => setDemoName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="demoEmail">Email</Label>
+              <Input
+                id="demoEmail"
+                type="email"
+                placeholder="your@email.com"
+                value={demoEmail}
+                onChange={(e) => setDemoEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="demoMessage">Message (Optional)</Label>
+              <Textarea
+                id="demoMessage"
+                placeholder="Tell us about your requirements..."
+                value={demoMessage}
+                onChange={(e) => setDemoMessage(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button type="submit">
+                Send Request
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
