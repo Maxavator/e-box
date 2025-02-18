@@ -49,7 +49,10 @@ const DocumentList = ({
               {doc.name}
               {requiresOTP && <Lock className="h-3 w-3 text-gray-400" />}
               {doc.isVerified && (
-                <CheckCircle2 className="h-3 w-3 text-green-500" title="E-box Verified" />
+                <CheckCircle2 
+                  className="h-3 w-3 text-green-500" 
+                  aria-label="E-box Verified"
+                />
               )}
             </TableCell>
             <TableCell>{doc.date}</TableCell>
@@ -147,28 +150,28 @@ export const Documents = () => {
       date: "2024-03-01", 
       size: "156 KB",
       isVerified: true,
-      downloadUrl: "/lovable-uploads/payslips/march-2024-payslip.pdf"
+      downloadUrl: "/lovable-uploads/payslips/payslip_march_2024_e-box_by_afrovation.pdf"
     },
     { 
       name: "Payslip February 2024", 
       date: "2024-02-01", 
       size: "155 KB",
       isVerified: true,
-      downloadUrl: "/lovable-uploads/payslips/february-2024-payslip.pdf"
+      downloadUrl: "/lovable-uploads/payslips/payslip_february_2024_e-box_by_afrovation.pdf"
     },
     { 
       name: "Payslip January 2024", 
       date: "2024-01-01", 
       size: "154 KB",
       isVerified: true,
-      downloadUrl: "/lovable-uploads/payslips/january-2024-payslip.pdf"
+      downloadUrl: "/lovable-uploads/payslips/payslip_january_2024_e-box_by_afrovation.pdf"
     },
     { 
       name: "Payslip December 2023", 
       date: "2023-12-01", 
       size: "153 KB",
       isVerified: true,
-      downloadUrl: "/lovable-uploads/payslips/december-2023-payslip.pdf"
+      downloadUrl: "/lovable-uploads/payslips/payslip_december_2023_e-box_by_afrovation.pdf"
     }
   ];
 
@@ -178,28 +181,28 @@ export const Documents = () => {
       date: "2023-01-15", 
       size: "2.1 MB",
       isVerified: true,
-      downloadUrl: "/lovable-uploads/contracts/employment-contract.pdf"
+      downloadUrl: "/lovable-uploads/contracts/employment_contract_2023_e-box_by_afrovation.pdf"
     },
     { 
       name: "NDA Agreement", 
       date: "2023-01-15", 
       size: "890 KB",
       isVerified: true,
-      downloadUrl: "/lovable-uploads/contracts/nda-agreement.pdf"
+      downloadUrl: "/lovable-uploads/contracts/non_disclosure_agreement_2023_e-box_by_afrovation.pdf"
     },
     { 
       name: "IP Rights Agreement", 
       date: "2023-01-15", 
       size: "756 KB",
       isVerified: true,
-      downloadUrl: "/lovable-uploads/contracts/ip-rights-agreement.pdf"
+      downloadUrl: "/lovable-uploads/contracts/intellectual_property_rights_agreement_2023_e-box_by_afrovation.pdf"
     },
     { 
       name: "Remote Work Agreement", 
       date: "2023-06-01", 
       size: "945 KB",
       isVerified: true,
-      downloadUrl: "/lovable-uploads/contracts/remote-work-agreement.pdf"
+      downloadUrl: "/lovable-uploads/contracts/remote_work_agreement_2023_e-box_by_afrovation.pdf"
     }
   ];
 
@@ -208,25 +211,25 @@ export const Documents = () => {
       name: "Employee Handbook 2024", 
       date: "2024-01-01", 
       size: "3.2 MB",
-      downloadUrl: "/lovable-uploads/documents/employee-handbook-2024.pdf"
+      downloadUrl: "/lovable-uploads/documents/employee_handbook_2024_e-box_by_afrovation.pdf"
     },
     { 
       name: "Travel Policy", 
       date: "2023-11-15", 
       size: "645 KB",
-      downloadUrl: "/lovable-uploads/documents/travel-policy.pdf"
+      downloadUrl: "/lovable-uploads/documents/travel_policy_2023_e-box_by_afrovation.pdf"
     },
     { 
       name: "Benefits Guide 2024", 
       date: "2024-01-01", 
       size: "1.8 MB",
-      downloadUrl: "/lovable-uploads/documents/benefits-guide-2024.pdf"
+      downloadUrl: "/lovable-uploads/documents/benefits_guide_2024_e-box_by_afrovation.pdf"
     },
     { 
       name: "IT Security Guidelines", 
       date: "2023-12-15", 
       size: "987 KB",
-      downloadUrl: "/lovable-uploads/documents/it-security-guidelines.pdf"
+      downloadUrl: "/lovable-uploads/documents/it_security_guidelines_2023_e-box_by_afrovation.pdf"
     }
   ];
 
@@ -242,11 +245,10 @@ export const Documents = () => {
       setSelectedDocument(doc);
       setShowOTPDialog(true);
     } else if (doc.downloadUrl) {
-      // Create a temporary anchor element to trigger the download
       const link = document.createElement('a');
       link.href = doc.downloadUrl;
       link.target = '_blank';
-      link.download = doc.name;
+      link.download = doc.downloadUrl.split('/').pop() || doc.name;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
