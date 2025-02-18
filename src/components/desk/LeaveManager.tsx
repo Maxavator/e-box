@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -7,8 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Calendar as CalendarIcon, Clock, User, FileText } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { LanguageSelector } from "./components/LanguageSelector";
+import "../i18n/config";
 
 export const LeaveManager = () => {
+  const { t } = useTranslation();
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [leaveType, setLeaveType] = useState<string>("");
   const [reason, setReason] = useState<string>("");
@@ -81,13 +86,17 @@ export const LeaveManager = () => {
 
   return (
     <div className="p-6 space-y-6">
+      <div className="flex justify-end mb-4">
+        <LanguageSelector />
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Leave Balance
+                {t('leave.title')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -152,7 +161,7 @@ export const LeaveManager = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5" />
-                Recent Requests
+                {t('leave.recentRequests')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -179,29 +188,29 @@ export const LeaveManager = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CalendarIcon className="h-5 w-5" />
-              Request Leave
+              {t('leave.request')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Leave Type</Label>
+              <Label>{t('leave.form.typeLabel')}</Label>
               <Select value={leaveType} onValueChange={setLeaveType}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select leave type" />
+                  <SelectValue placeholder={t('leave.form.selectType')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="annual">Annual Leave (21 days per year)</SelectItem>
-                  <SelectItem value="sick">Sick Leave (30 days per 36 months)</SelectItem>
-                  <SelectItem value="family">Family Responsibility (3 days per year)</SelectItem>
-                  <SelectItem value="maternity">Maternity Leave (4 months)</SelectItem>
-                  <SelectItem value="study">Study Leave (10 days per year)</SelectItem>
-                  <SelectItem value="unpaid">Unpaid Leave</SelectItem>
+                  <SelectItem value="annual">{t('leave.types.annual')} (21 days per year)</SelectItem>
+                  <SelectItem value="sick">{t('leave.types.sick')} (30 days per 36 months)</SelectItem>
+                  <SelectItem value="family">{t('leave.types.family')} (3 days per year)</SelectItem>
+                  <SelectItem value="maternity">{t('leave.types.maternity')} (4 months)</SelectItem>
+                  <SelectItem value="study">{t('leave.types.study')} (10 days per year)</SelectItem>
+                  <SelectItem value="unpaid">{t('leave.types.unpaid')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             <div className="space-y-2">
-              <Label>Select Dates</Label>
+              <Label>{t('leave.form.datesLabel')}</Label>
               <Calendar
                 mode="multiple"
                 selected={selectedDates}
@@ -212,9 +221,9 @@ export const LeaveManager = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Reason for Leave</Label>
+              <Label>{t('leave.form.reasonLabel')}</Label>
               <Textarea
-                placeholder="Please provide a reason for your leave request..."
+                placeholder={t('leave.form.reasonPlaceholder')}
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 className="min-h-[100px]"
@@ -223,10 +232,10 @@ export const LeaveManager = () => {
 
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">
-                Selected: {selectedDates.length} days
+                {t('leave.form.selectedDays')}: {selectedDates.length} days
               </p>
               <Button className="w-full" onClick={handleSubmit}>
-                Submit Leave Request
+                {t('leave.form.submit')}
               </Button>
             </div>
           </CardContent>
@@ -237,40 +246,40 @@ export const LeaveManager = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Leave Legislation & Policy Reference
+            {t('leave.legal.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="prose prose-sm max-w-none">
             <div className="text-muted-foreground">
-              <p className="font-medium mb-2">Please Note: All leave requests are subject to both statutory requirements and company policy. Always refer to the company policy manual for specific guidelines.</p>
+              <p className="font-medium mb-2">{t('leave.legal.disclaimer')}</p>
               
-              <h4 className="text-sm font-semibold mt-4 mb-2">Applicable South African Labor Laws:</h4>
+              <h4 className="text-sm font-semibold mt-4 mb-2">{t('leave.legal.laws')}</h4>
               <ul className="space-y-2 text-sm">
-                <li><span className="font-medium">Basic Conditions of Employment Act (BCEA):</span>
+                <li><span className="font-medium">{t('leave.legal.bcea')}:</span>
                   <ul className="ml-4 mt-1 space-y-1">
-                    <li>• Annual Leave: 21 consecutive days per annual leave cycle (15 working days)</li>
-                    <li>• Sick Leave: 30 days per 36-month cycle</li>
-                    <li>• Family Responsibility Leave: 3 days per year</li>
-                    <li>• Maternity Leave: 4 consecutive months</li>
+                    <li>• {t('leave.types.annual')}: 21 days per year</li>
+                    <li>• {t('leave.types.sick')}: 30 days per 36 months</li>
+                    <li>• {t('leave.types.family')}: 3 days per year</li>
+                    <li>• {t('leave.types.maternity')}: 4 months</li>
                   </ul>
                 </li>
-                <li className="mt-2"><span className="font-medium">Labour Relations Act (LRA):</span>
+                <li className="mt-2"><span className="font-medium">{t('leave.legal.lra')}:</span>
                   <ul className="ml-4 mt-1 space-y-1">
                     <li>• Protection against unfair dismissal relating to pregnancy and leave</li>
                     <li>• Rights during leave periods</li>
                   </ul>
                 </li>
-                <li className="mt-2"><span className="font-medium">Company-Specific Benefits:</span>
+                <li className="mt-2"><span className="font-medium">{t('leave.legal.companyBenefits')}:</span>
                   <ul className="ml-4 mt-1 space-y-1">
-                    <li>• Study Leave: 10 days per calendar year (subject to company policy)</li>
-                    <li>• Unpaid Leave: Available subject to approval</li>
+                    <li>• {t('leave.types.study')}: 10 days per year</li>
+                    <li>• {t('leave.types.unpaid')}: Subject to approval</li>
                   </ul>
                 </li>
               </ul>
 
               <p className="mt-4 text-sm font-medium text-yellow-600">
-                Important: The above is a summary only. Please consult HR or refer to the detailed company policy manual for complete information and specific requirements for leave applications.
+                {t('leave.legal.important')}
               </p>
             </div>
           </div>
