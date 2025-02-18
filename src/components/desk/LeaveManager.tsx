@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Calendar as CalendarIcon, Clock, User, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "./components/LanguageSelector";
-import "../i18n/config";
+import "../../i18n/config";
 
 export const LeaveManager = () => {
   const { t } = useTranslation();

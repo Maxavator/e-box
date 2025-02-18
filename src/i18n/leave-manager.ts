@@ -65,14 +65,5 @@ export const translations = {
         submit: "Dien Verlofaansoek in"
       }
     }
-  },
-  zu: {
-    leave: {
-      title: "Ibhalansi Yekhefu",
-      request: "Cela Ikhefu",
-      recentRequests: "Izicelo Zakamuva",
-      // ... Add other languages similarly
-    }
   }
-  // ... Add other languages similarly
 };
