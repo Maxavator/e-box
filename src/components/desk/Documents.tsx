@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,32 +37,6 @@ export const Documents = () => {
         },
         {
           id: '2',
-          name: 'Employment_Contract_2024.pdf',
-          size: '890 KB',
-          category: 'Legal',
-          description: 'Updated employment contract for 2024',
-          version: '2.1',
-          lastModifiedBy: 'Legal Department',
-          isVerified: true,
-          requires_otp: true,
-          date: '2024-01-15',
-          previewContent: 'Employment contract including updated terms and conditions for 2024.'
-        },
-        {
-          id: '3',
-          name: 'Company_Handbook_2024.pdf',
-          size: '1.2 MB',
-          category: 'Other',
-          description: 'Employee handbook and guidelines',
-          version: '3.0',
-          lastModifiedBy: 'HR Department',
-          isVerified: true,
-          requires_otp: false,
-          date: '2024-01-01',
-          previewContent: 'Company policies, procedures, and guidelines for all employees.'
-        },
-        {
-          id: '4',
           name: 'February_2024_Payslip.pdf',
           size: '242 KB',
           category: 'Financial',
@@ -76,7 +49,72 @@ export const Documents = () => {
           previewContent: 'This is a secure payslip document for February 2024. Please verify your identity to view the full content.'
         },
         {
+          id: '3',
+          name: 'March_2024_Payslip.pdf',
+          size: '248 KB',
+          category: 'Financial',
+          description: 'Monthly payslip for March 2024',
+          version: '1.0',
+          lastModifiedBy: 'HR System',
+          isVerified: true,
+          requires_otp: true,
+          date: '2024-03-31',
+          previewContent: 'This is a secure payslip document for March 2024. Please verify your identity to view the full content.'
+        },
+        {
+          id: '4',
+          name: 'Employment_Contract_2024.pdf',
+          size: '890 KB',
+          category: 'Legal',
+          description: 'Updated employment contract for 2024',
+          version: '2.1',
+          lastModifiedBy: 'Legal Department',
+          isVerified: true,
+          requires_otp: true,
+          date: '2024-01-15',
+          previewContent: 'Employment contract including updated terms and conditions for 2024.'
+        },
+        {
           id: '5',
+          name: 'Non_Disclosure_Agreement.pdf',
+          size: '425 KB',
+          category: 'Legal',
+          description: 'Confidentiality agreement',
+          version: '1.0',
+          lastModifiedBy: 'Legal Department',
+          isVerified: true,
+          requires_otp: true,
+          date: '2024-01-20',
+          previewContent: 'Non-disclosure agreement outlining confidentiality terms and conditions.'
+        },
+        {
+          id: '6',
+          name: 'Code_of_Conduct_2024.pdf',
+          size: '678 KB',
+          category: 'Legal',
+          description: 'Company code of conduct and ethics',
+          version: '3.2',
+          lastModifiedBy: 'Legal Department',
+          isVerified: true,
+          requires_otp: true,
+          date: '2024-01-10',
+          previewContent: 'Updated code of conduct including ethical guidelines and compliance requirements.'
+        },
+        {
+          id: '7',
+          name: 'Company_Handbook_2024.pdf',
+          size: '1.2 MB',
+          category: 'Other',
+          description: 'Employee handbook and guidelines',
+          version: '3.0',
+          lastModifiedBy: 'HR Department',
+          isVerified: true,
+          requires_otp: false,
+          date: '2024-01-01',
+          previewContent: 'Company policies, procedures, and guidelines for all employees.'
+        },
+        {
+          id: '8',
           name: 'Performance_Review_Q1_2024.pdf',
           size: '350 KB',
           category: 'Other',
@@ -87,6 +125,32 @@ export const Documents = () => {
           requires_otp: false,
           date: '2024-03-15',
           previewContent: 'Quarterly performance review document including goals and achievements.'
+        },
+        {
+          id: '9',
+          name: 'IT_Security_Guidelines.pdf',
+          size: '520 KB',
+          category: 'Other',
+          description: 'IT security policies and procedures',
+          version: '2.1',
+          lastModifiedBy: 'IT Department',
+          isVerified: true,
+          requires_otp: false,
+          date: '2024-02-01',
+          previewContent: 'Information security guidelines and best practices for all employees.'
+        },
+        {
+          id: '10',
+          name: 'Employee_Benefits_2024.pdf',
+          size: '680 KB',
+          category: 'Other',
+          description: 'Overview of employee benefits package',
+          version: '1.2',
+          lastModifiedBy: 'HR Department',
+          isVerified: true,
+          requires_otp: false,
+          date: '2024-01-05',
+          previewContent: 'Comprehensive guide to employee benefits, including medical aid, pension, and other perks.'
         }
       ];
 
