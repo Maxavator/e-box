@@ -1,17 +1,22 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, MessageSquare, BarChart, Building2 } from "lucide-react";
+import { Users, MessageSquare, BarChart, Building2, Shield } from "lucide-react";
 import { Policies } from "@/components/desk/Policies";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { UserManagement } from "@/components/admin/UserManagement";
 
 const OrganizationDashboard = () => {
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState<{ userName: string; orgName: string }>({ userName: '', orgName: '' });
+  const [userInfo, setUserInfo] = useState<{ userName: string; orgName: string; isAdmin: boolean }>({ 
+    userName: '', 
+    orgName: '', 
+    isAdmin: false 
+  });
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -24,10 +29,17 @@ const OrganizationDashboard = () => {
           .eq('id', user.id)
           .single();
 
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single();
+
         if (profileData) {
           const userName = `${profileData.first_name} ${profileData.last_name}`;
           const orgName = profileData.organizations?.name || '';
-          setUserInfo({ userName, orgName });
+          const isAdmin = roleData?.role === 'org_admin' || roleData?.role === 'global_admin';
+          setUserInfo({ userName, orgName, isAdmin });
         }
       }
     };
@@ -55,6 +67,7 @@ const OrganizationDashboard = () => {
               {userInfo.userName && (
                 <p className="text-muted-foreground">
                   {userInfo.userName} ({userInfo.orgName})
+                  {userInfo.isAdmin && <span className="ml-2 text-primary">(Admin)</span>}
                 </p>
               )}
             </div>
@@ -75,6 +88,9 @@ const OrganizationDashboard = () => {
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="policies">Policies</TabsTrigger>
+              {userInfo.isAdmin && (
+                <TabsTrigger value="admin">Administration</TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="overview" className="mt-6">
@@ -123,12 +139,37 @@ const OrganizationDashboard = () => {
                     </Button>
                   </CardContent>
                 </Card>
+
+                {userInfo.isAdmin && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Shield className="h-5 w-5 text-primary" />
+                        <span>Role Management</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground mb-4">Manage user roles and permissions</p>
+                      <Button variant="outline" className="w-full">
+                        Manage Roles
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </TabsContent>
 
             <TabsContent value="policies">
               <Policies />
             </TabsContent>
+
+            {userInfo.isAdmin && (
+              <TabsContent value="admin">
+                <div className="space-y-6">
+                  <UserManagement />
+                </div>
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </main>
