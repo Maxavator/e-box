@@ -17,30 +17,46 @@ import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
 import { CalendarDays, Clock } from "lucide-react";
+import { addDays } from "date-fns";
+import type { Database } from "@/integrations/supabase/types";
+
+type LeaveType = Database["public"]["Enums"]["leave_type"];
+type LeaveStatus = Database["public"]["Enums"]["leave_status"];
 
 interface LeaveBalance {
-  annual_leave: number;
-  sick_leave: number;
-  family_responsibility: number;
-  study_leave: number;
+  id: string;
+  user_id: string;
+  annual_days_total: number;
+  annual_days_used: number;
+  sick_days_total: number;
+  sick_days_used: number;
+  maternity_days_total: number;
+  maternity_days_used: number;
+  paternity_days_total: number;
+  paternity_days_used: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface LeaveRequest {
   id: string;
   user_id: string;
-  leave_type: string;
+  leave_type: LeaveType;
   start_date: string;
   end_date: string;
-  status: 'pending' | 'approved' | 'rejected';
-  reason: string;
+  status: LeaveStatus;
+  reason: string | null;
   created_at: string;
+  approved_at: string | null;
+  approved_by: string | null;
+  updated_at: string;
 }
 
 export function LeaveManager() {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [selectedDates, setSelectedDates] = useState<Date[] | undefined>([]);
-  const [leaveType, setLeaveType] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<LeaveType | ''>('');
+  const [dateRange, setDateRange] = useState<{ from: Date; to?: Date }>({ from: new Date() });
   const [reason, setReason] = useState("");
 
   const { data: leaveBalance } = useQuery({
@@ -60,7 +76,7 @@ export function LeaveManager() {
     }
   });
 
-  const { data: recentRequests } = useQuery({
+  const { data: recentRequests, refetch: refetchRequests } = useQuery({
     queryKey: ['leave-requests'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -79,7 +95,7 @@ export function LeaveManager() {
   });
 
   const handleSubmit = async () => {
-    if (!selectedDates || selectedDates.length !== 2 || !leaveType || !reason) {
+    if (!selectedType || !dateRange.from || !dateRange.to || !reason) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
@@ -101,15 +117,16 @@ export function LeaveManager() {
     const { error } = await supabase
       .from('leave_requests')
       .insert({
-        user_id: user.id,
-        leave_type: leaveType,
-        start_date: selectedDates[0].toISOString(),
-        end_date: selectedDates[1].toISOString(),
+        leave_type: selectedType,
+        start_date: dateRange.from.toISOString(),
+        end_date: dateRange.to.toISOString(),
         reason,
+        user_id: user.id,
         status: 'pending'
       });
 
     if (error) {
+      console.error('Error submitting leave request:', error);
       toast({
         title: "Error",
         description: "Failed to submit leave request",
@@ -123,10 +140,27 @@ export function LeaveManager() {
       description: "Leave request submitted successfully"
     });
 
-    // Reset form
-    setSelectedDates([]);
-    setLeaveType("");
+    // Reset form and refresh data
+    setSelectedType('');
+    setDateRange({ from: new Date() });
     setReason("");
+    refetchRequests();
+  };
+
+  const getLeaveBalance = (type: string) => {
+    if (!leaveBalance) return 0;
+    switch (type) {
+      case 'annual':
+        return leaveBalance.annual_days_total - leaveBalance.annual_days_used;
+      case 'sick':
+        return leaveBalance.sick_days_total - leaveBalance.sick_days_used;
+      case 'maternity':
+        return leaveBalance.maternity_days_total - leaveBalance.maternity_days_used;
+      case 'paternity':
+        return leaveBalance.paternity_days_total - leaveBalance.paternity_days_used;
+      default:
+        return 0;
+    }
   };
 
   return (
@@ -139,25 +173,25 @@ export function LeaveManager() {
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-4">
               <Clock className="h-5 w-5 text-primary" />
-              <h2 className="font-semibold">{t('leave.title')}</h2>
+              <h2 className="font-semibold">{t('leave.balance')}</h2>
             </div>
             {leaveBalance ? (
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>{t('leave.types.annual')}</span>
-                  <span className="font-medium">{leaveBalance.annual_leave} days</span>
+                  <span className="font-medium">{getLeaveBalance('annual')} days</span>
                 </div>
                 <div className="flex justify-between">
                   <span>{t('leave.types.sick')}</span>
-                  <span className="font-medium">{leaveBalance.sick_leave} days</span>
+                  <span className="font-medium">{getLeaveBalance('sick')} days</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>{t('leave.types.family')}</span>
-                  <span className="font-medium">{leaveBalance.family_responsibility} days</span>
+                  <span>{t('leave.types.maternity')}</span>
+                  <span className="font-medium">{getLeaveBalance('maternity')} days</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>{t('leave.types.study')}</span>
-                  <span className="font-medium">{leaveBalance.study_leave} days</span>
+                  <span>{t('leave.types.paternity')}</span>
+                  <span className="font-medium">{getLeaveBalance('paternity')} days</span>
                 </div>
               </div>
             ) : (
@@ -203,15 +237,15 @@ export function LeaveManager() {
               <label className="block text-sm font-medium mb-2">
                 {t('leave.form.typeLabel')}
               </label>
-              <Select value={leaveType} onValueChange={setLeaveType}>
+              <Select value={selectedType} onValueChange={(value) => setSelectedType(value as LeaveType)}>
                 <SelectTrigger>
                   <SelectValue placeholder={t('leave.form.selectType')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="annual">{t('leave.types.annual')}</SelectItem>
                   <SelectItem value="sick">{t('leave.types.sick')}</SelectItem>
-                  <SelectItem value="family">{t('leave.types.family')}</SelectItem>
-                  <SelectItem value="study">{t('leave.types.study')}</SelectItem>
+                  <SelectItem value="maternity">{t('leave.types.maternity')}</SelectItem>
+                  <SelectItem value="paternity">{t('leave.types.paternity')}</SelectItem>
                   <SelectItem value="unpaid">{t('leave.types.unpaid')}</SelectItem>
                 </SelectContent>
               </Select>
@@ -223,10 +257,11 @@ export function LeaveManager() {
               </label>
               <Calendar
                 mode="range"
-                selected={selectedDates}
-                onSelect={setSelectedDates as any}
+                selected={dateRange}
+                onSelect={setDateRange}
                 numberOfMonths={2}
                 className="rounded-md border"
+                disabled={(date) => date < addDays(new Date(), -1)}
               />
             </div>
 
