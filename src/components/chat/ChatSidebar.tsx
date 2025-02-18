@@ -1,7 +1,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar, Inbox, Briefcase, LayoutDashboard, Car, FileText, Headset, Settings } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, Briefcase, LayoutDashboard, Car, FileText, Headset, Settings, Pen } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
@@ -79,7 +79,7 @@ export function ChatSidebar({
 
   return (
     <div className="h-full bg-gray-50">
-      <div className="p-4">
+      <div className="p-4 space-y-4">
         <Input
           type="search"
           placeholder="Search..."
@@ -119,6 +119,12 @@ export function ChatSidebar({
         </TabsList>
         
         <TabsContent value="chats" className="h-full p-0">
+          <div className="p-4">
+            <Button variant="outline" className="w-full justify-start">
+              <Pen className="mr-2 h-4 w-4" />
+              New Message
+            </Button>
+          </div>
           <ConversationList
             conversations={conversations}
             selectedConversation={selectedConversation}
