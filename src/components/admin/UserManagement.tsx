@@ -8,11 +8,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { UserPlus } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
+
+type Profile = Database['public']['Tables']['profiles']['Row'] & {
+  user_roles: Array<{
+    role: Database['public']['Enums']['user_role']
+  }>
+};
 
 export const UserManagement = () => {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading } = useQuery<Profile[]>({
     queryKey: ['users'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -24,7 +31,7 @@ export const UserManagement = () => {
           )
         `);
       if (error) throw error;
-      return data;
+      return data as Profile[];
     },
   });
 
