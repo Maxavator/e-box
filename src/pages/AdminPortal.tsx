@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Users, Building2, Settings, UserPlus, 
-  MessagesSquare, ArrowUpRight
+  MessagesSquare, ArrowUpRight, LogOut
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -42,6 +42,17 @@ const AdminPortal = () => {
       <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
 
       <div className="p-8">
+        <div className="flex justify-end mb-6">
+          <Button 
+            variant="outline" 
+            onClick={handleLogout}
+            className="flex items-center gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </Button>
+        </div>
+
         {activeView === 'dashboard' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <Card>
