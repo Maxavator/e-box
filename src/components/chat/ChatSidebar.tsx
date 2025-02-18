@@ -6,6 +6,7 @@ import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewMessageDialog } from "./NewMessageDialog";
+import { Badge } from "@/components/ui/badge";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -75,15 +76,20 @@ export function ChatSidebar({
         <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
           <TabsTrigger
             value="chats"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
+            className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
           >
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Chats
-            {totalUnreadCount > 0 && (
-              <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
-                {totalUnreadCount}
-              </span>
-            )}
+            <div className="flex items-center">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              <span>Chats</span>
+              {totalUnreadCount > 0 && (
+                <Badge 
+                  variant="default" 
+                  className="ml-2 bg-primary hover:bg-primary"
+                >
+                  {totalUnreadCount}
+                </Badge>
+              )}
+            </div>
           </TabsTrigger>
           <TabsTrigger
             value="desk"
