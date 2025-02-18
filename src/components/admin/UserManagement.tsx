@@ -27,7 +27,7 @@ export const UserManagement = () => {
         .from('profiles')
         .select(`
           *,
-          user_roles!inner (
+          user_roles (
             role
           )
         `);
