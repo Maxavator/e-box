@@ -114,6 +114,13 @@ export function ChatSidebar({
             <Briefcase className="w-4 h-4 mr-2" />
             Desk
           </TabsTrigger>
+          <TabsTrigger
+            value="helpdesk"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
+          >
+            <Headset className="w-4 h-4 mr-2" />
+            Help
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="chats" className="h-full p-0">
@@ -133,6 +140,19 @@ export function ChatSidebar({
 
         <TabsContent value="desk" className="h-full">
           <DeskFeatures />
+        </TabsContent>
+
+        <TabsContent value="helpdesk" className="h-full">
+          <div className="p-4">
+            <Button
+              className="w-full justify-start"
+              variant="default"
+              onClick={() => onTabChange("helpdesk")}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              New Support Ticket
+            </Button>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

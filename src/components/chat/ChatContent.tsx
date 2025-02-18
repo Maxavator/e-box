@@ -7,6 +7,7 @@ import { Dashboard } from "@/components/desk/Dashboard";
 import { Policies } from "@/components/desk/Policies";
 import { CalendarDashboard } from "@/components/calendar/CalendarDashboard";
 import { CalendarInbox } from "@/components/calendar/CalendarInbox";
+import { TicketList } from "@/components/helpdesk/TicketList";
 import type { Conversation } from "@/types/chat";
 
 interface ChatContentProps {
@@ -51,6 +52,10 @@ export const ChatContent = ({
     };
   }, []);
 
+  if (activeTab === "helpdesk") {
+    return <TicketList />;
+  }
+
   if (activeTab === 'desk') {
     switch (selectedDeskFeature) {
       case 'documents':
@@ -60,7 +65,7 @@ export const ChatContent = ({
       case 'policies':
         return <Policies />;
       case 'helpdesk':
-        return <div className="p-6"><h2 className="text-2xl font-semibold">Helpdesk</h2></div>;
+        return <TicketList />;
       case 'settings':
         return <div className="p-6"><h2 className="text-2xl font-semibold">Settings</h2></div>;
       default:
