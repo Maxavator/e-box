@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { MessageSquare, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,16 +35,6 @@ export const TicketList = () => {
   }, []);
 
   const fetchTickets = async () => {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError || !userData.user) {
-      toast({
-        title: "Error",
-        description: "Failed to get user information",
-        variant: "destructive",
-      });
-      return;
-    }
-
     const { data, error } = await supabase
       .from('helpdesk_tickets')
       .select('*')
@@ -72,16 +62,6 @@ export const TicketList = () => {
       return;
     }
 
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError || !userData.user) {
-      toast({
-        title: "Error",
-        description: "Failed to get user information",
-        variant: "destructive",
-      });
-      return;
-    }
-
     const { data, error } = await supabase
       .from('helpdesk_tickets')
       .insert({
@@ -89,7 +69,6 @@ export const TicketList = () => {
         description: newTicket.description,
         status: 'open',
         priority: 'medium',
-        created_by: userData.user.id,
       })
       .select()
       .single();

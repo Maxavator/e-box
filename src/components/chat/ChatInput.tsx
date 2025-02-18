@@ -6,14 +6,14 @@ import { Send } from "lucide-react";
 interface ChatInputProps {
   value: string;
   onChange: (value: string) => void;
-  onSendMessage: () => void;
+  onSend: () => void;
 }
 
-export function ChatInput({ value, onChange, onSendMessage }: ChatInputProps) {
+export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      onSendMessage();
+      onSend();
     }
   };
 
@@ -27,7 +27,7 @@ export function ChatInput({ value, onChange, onSendMessage }: ChatInputProps) {
           placeholder="Type a message..."
           className="min-h-[44px] max-h-[120px]"
         />
-        <Button onClick={onSendMessage} className="shrink-0">
+        <Button onClick={onSend} className="shrink-0">
           <Send className="h-4 w-4" />
         </Button>
       </div>
