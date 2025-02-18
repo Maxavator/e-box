@@ -19,9 +19,13 @@ export function NewMessageDialog() {
   const { data: contacts = [], isLoading } = useQuery({
     queryKey: ['organization-contacts'],
     queryFn: async () => {
+      const currentUser = (await supabase.auth.getUser()).data.user;
+      if (!currentUser) throw new Error('Not authenticated');
+
       const { data: profile } = await supabase
         .from('profiles')
         .select('organization_id')
+        .eq('id', currentUser.id)
         .single();
 
       if (!profile?.organization_id) {
@@ -32,7 +36,7 @@ export function NewMessageDialog() {
         .from('profiles')
         .select('id, first_name, last_name, avatar_url')
         .eq('organization_id', profile.organization_id)
-        .neq('id', (await supabase.auth.getUser()).data.user?.id);
+        .neq('id', currentUser.id);
 
       if (error) throw error;
       return orgContacts || [];
@@ -47,12 +51,18 @@ export function NewMessageDialog() {
 
   const handleSelectContact = async (contact: any) => {
     try {
+      const currentUser = (await supabase.auth.getUser()).data.user;
+      if (!currentUser) throw new Error('Not authenticated');
+
       // Check if conversation already exists
-      const { data: existingConvs } = await supabase
+      const { data: existingConvs, error: searchError } = await supabase
         .from('conversations')
         .select('*')
         .or(`user1_id.eq.${contact.id},user2_id.eq.${contact.id}`)
-        .single();
+        .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
+        .maybeSingle();
+
+      if (searchError) throw searchError;
 
       if (existingConvs) {
         toast({
@@ -63,14 +73,14 @@ export function NewMessageDialog() {
       }
 
       // Create new conversation
-      const { error } = await supabase
+      const { error: insertError } = await supabase
         .from('conversations')
         .insert({
-          user1_id: (await supabase.auth.getUser()).data.user?.id,
+          user1_id: currentUser.id,
           user2_id: contact.id
         });
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
       toast({
         title: "Conversation started",
