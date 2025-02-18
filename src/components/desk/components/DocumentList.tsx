@@ -21,6 +21,12 @@ interface DocumentListProps {
 }
 
 export const DocumentList = ({ documents, requiresOTP = false, onDocumentClick }: DocumentListProps) => {
+  const getDownloadFileName = (originalName: string) => {
+    const extension = originalName.split('.').pop();
+    const nameWithoutExtension = originalName.replace(`.${extension}`, '');
+    return `${nameWithoutExtension}_by_e-Box.${extension}`;
+  };
+
   const DocumentPreview = ({ document }: { document: Document }) => (
     <div className="space-y-6">
       <div>
@@ -55,7 +61,10 @@ export const DocumentList = ({ documents, requiresOTP = false, onDocumentClick }
 
       <Button 
         className="w-full"
-        onClick={() => onDocumentClick(document)}
+        onClick={() => {
+          const newDoc = { ...document, name: getDownloadFileName(document.name) };
+          onDocumentClick(newDoc);
+        }}
       >
         Download Document
       </Button>
@@ -125,7 +134,10 @@ export const DocumentList = ({ documents, requiresOTP = false, onDocumentClick }
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  onClick={() => onDocumentClick(doc)}
+                  onClick={() => {
+                    const newDoc = { ...document, name: getDownloadFileName(doc.name) };
+                    onDocumentClick(newDoc);
+                  }}
                 >
                   Download
                 </Button>
