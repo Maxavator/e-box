@@ -1,11 +1,13 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar, Inbox, Briefcase, LayoutDashboard, Car, FileText, Headset } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, Briefcase, LayoutDashboard, Car, FileText, Headset, Settings } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -17,6 +19,35 @@ interface ChatSidebarProps {
   onSelectConversation: (conversation: Conversation) => void;
   onCalendarActionClick: (view: 'calendar' | 'inbox') => void;
 }
+
+const UserStatus = () => {
+  return (
+    <div className="p-4 border-b flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <Avatar>
+          <AvatarImage src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" alt="Afrovation" />
+          <AvatarFallback>AF</AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">Afrovation</span>
+          <div className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-green-500" />
+            <span className="text-xs text-muted-foreground">Online</span>
+          </div>
+        </div>
+      </div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Settings className="h-4 w-4" />
+            <span className="sr-only">Settings</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Profile Settings</TooltipContent>
+      </Tooltip>
+    </div>
+  );
+};
 
 const CalendarActions = ({ onCalendarActionClick }: { onCalendarActionClick: (view: 'calendar' | 'inbox') => void }) => {
   return (
@@ -79,6 +110,7 @@ export function ChatSidebar({
 
   return (
     <div className="h-full bg-gray-50">
+      <UserStatus />
       <div className="p-4">
         <Input
           type="search"
@@ -88,7 +120,7 @@ export function ChatSidebar({
           className="w-full"
         />
       </div>
-      <Tabs value={activeTab} onValueChange={onTabChange} className="h-[calc(100%-5rem)]">
+      <Tabs value={activeTab} onValueChange={onTabChange} className="h-[calc(100%-9rem)]">
         <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
           <TabsTrigger
             value="chats"
