@@ -7,7 +7,7 @@ import { ChatContent } from "@/components/chat/ChatContent";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { useToast } from "@/components/ui/use-toast";
 import { demoConversations, getUserById } from "@/data/chat";
-import type { Message, Conversation, Reaction } from "@/types/chat";
+import type { Message, Conversation } from "@/types/chat";
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -30,8 +30,10 @@ const Chat = () => {
             if (conv.userId === randomUser.userId) {
               const newMessage: Message = {
                 id: Math.random().toString(),
-                content: `Random message from ${user.name}`,
+                senderId: user.id,
+                text: `Random message from ${user.name}`,
                 timestamp: new Date().toISOString(),
+                status: 'sent',
                 sender: 'them',
                 reactions: []
               };
@@ -39,7 +41,7 @@ const Chat = () => {
               return {
                 ...conv,
                 messages: [...conv.messages, newMessage],
-                lastMessage: newMessage.content,
+                lastMessage: newMessage.text,
                 unreadCount: selectedConversation?.id === conv.id ? 0 : (conv.unreadCount + 1)
               };
             }
@@ -77,8 +79,10 @@ const Chat = () => {
 
     const message: Message = {
       id: Math.random().toString(),
-      content: newMessage,
+      senderId: 'me',
+      text: newMessage,
       timestamp: new Date().toISOString(),
+      status: 'sent',
       sender: 'me',
       reactions: []
     };
@@ -88,7 +92,7 @@ const Chat = () => {
       return {
         ...prev,
         messages: [...prev.messages, message],
-        lastMessage: message.content
+        lastMessage: message.text
       };
     });
 
@@ -102,8 +106,10 @@ const Chat = () => {
 
         const reply: Message = {
           id: Math.random().toString(),
-          content: `Reply from ${user.name}`,
+          senderId: user.id,
+          text: `Reply from ${user.name}`,
           timestamp: new Date().toISOString(),
+          status: 'sent',
           sender: 'them',
           reactions: []
         };
@@ -111,7 +117,7 @@ const Chat = () => {
         return {
           ...prev,
           messages: [...prev.messages, reply],
-          lastMessage: reply.content
+          lastMessage: reply.text
         };
       });
     }, 1000);
@@ -124,7 +130,7 @@ const Chat = () => {
         ...prev,
         messages: prev.messages.map(m =>
           m.id === messageId
-            ? { ...m, content: newContent, edited: true }
+            ? { ...m, text: newContent, edited: true }
             : m
         ),
       };
@@ -138,7 +144,7 @@ const Chat = () => {
       return {
         ...prev,
         messages: updatedMessages,
-        lastMessage: updatedMessages[updatedMessages.length - 1]?.content ?? ''
+        lastMessage: updatedMessages[updatedMessages.length - 1]?.text ?? ''
       };
     });
   };

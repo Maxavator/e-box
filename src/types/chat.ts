@@ -6,6 +6,11 @@ export interface User {
   lastSeen?: string;
 }
 
+export interface Reaction {
+  emoji: string;
+  users: string[];
+}
+
 export interface Message {
   id: string;
   senderId: string;
@@ -14,10 +19,8 @@ export interface Message {
   status: 'sending' | 'sent' | 'error';
   edited?: boolean;
   editedAt?: string;
-  reactions?: Array<{
-    emoji: string;
-    users: string[];
-  }>;
+  reactions: Reaction[];
+  sender?: 'me' | 'them';  // Added to support existing code
 }
 
 export interface Conversation {
@@ -25,4 +28,5 @@ export interface Conversation {
   userId: string;
   unreadCount: number;
   messages: Message[];
+  lastMessage: string;  // Added to support message preview
 }
