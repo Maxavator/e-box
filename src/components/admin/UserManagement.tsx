@@ -23,7 +23,7 @@ export const UserManagement = () => {
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select(`
           id,
@@ -34,20 +34,19 @@ export const UserManagement = () => {
           )
         `);
       
-      if (error) {
-        console.error('Error fetching users:', error);
-        throw error;
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
       }
       
-      return data as UserWithRole[];
+      return profiles as UserWithRole[];
     },
   });
 
-  // Check if we have permission to access the data
   if (error?.message?.includes('permission denied')) {
     return (
       <div className="p-4 text-center">
-        <p className="text-red-500">You don't have permission to view user management.</p>
+        <p className="text-red-500">You don't have permission to view user management. Please contact an administrator.</p>
       </div>
     );
   }
