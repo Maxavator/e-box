@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -22,7 +21,6 @@ interface LeaveRequestFormProps {
 }
 
 export function LeaveRequestForm({ onSubmitSuccess }: LeaveRequestFormProps) {
-  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedType, setSelectedType] = useState<LeaveType | ''>('');
   const [dateRange, setDateRange] = useState<{ from: Date; to?: Date }>({ from: new Date() });
@@ -31,7 +29,7 @@ export function LeaveRequestForm({ onSubmitSuccess }: LeaveRequestFormProps) {
   const handleSubmit = async () => {
     if (!selectedType || !dateRange.from || !dateRange.to || !reason) {
       toast({
-        title: "Validation Error",
+        title: "Missing Information",
         description: "Please fill in all required fields",
         variant: "destructive"
       });
@@ -41,8 +39,8 @@ export function LeaveRequestForm({ onSubmitSuccess }: LeaveRequestFormProps) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast({
-        title: "Authentication Error",
-        description: "Please login to submit leave requests",
+        title: "Authentication Required",
+        description: "Please sign in to submit leave requests",
         variant: "destructive"
       });
       return;
@@ -62,19 +60,18 @@ export function LeaveRequestForm({ onSubmitSuccess }: LeaveRequestFormProps) {
     if (error) {
       console.error('Error submitting leave request:', error);
       toast({
-        title: "Error",
-        description: "Failed to submit leave request",
+        title: "Submission Failed",
+        description: "Unable to submit your leave request. Please try again.",
         variant: "destructive"
       });
       return;
     }
 
     toast({
-      title: "Success",
-      description: "Leave request submitted successfully"
+      title: "Request Submitted",
+      description: "Your leave request has been submitted successfully"
     });
 
-    // Reset form and refresh data
     setSelectedType('');
     setDateRange({ from: new Date() });
     setReason("");
@@ -82,54 +79,55 @@ export function LeaveRequestForm({ onSubmitSuccess }: LeaveRequestFormProps) {
   };
 
   return (
-    <Card className="p-4">
-      <h2 className="font-semibold mb-4">{t('leave.request')}</h2>
-      <div className="space-y-4">
+    <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
+      <h2 className="text-xl font-semibold text-gray-900 mb-6">New Leave Request</h2>
+      <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium mb-2">
-            {t('leave.form.typeLabel')}
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Leave Type
           </label>
           <Select value={selectedType} onValueChange={(value) => setSelectedType(value as LeaveType)}>
-            <SelectTrigger>
-              <SelectValue placeholder={t('leave.form.selectType')} />
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select leave type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="annual">{t('leave.types.annual')}</SelectItem>
-              <SelectItem value="sick">{t('leave.types.sick')}</SelectItem>
-              <SelectItem value="maternity">{t('leave.types.maternity')}</SelectItem>
-              <SelectItem value="paternity">{t('leave.types.paternity')}</SelectItem>
-              <SelectItem value="unpaid">{t('leave.types.unpaid')}</SelectItem>
+              <SelectItem value="annual">Annual Leave</SelectItem>
+              <SelectItem value="sick">Sick Leave</SelectItem>
+              <SelectItem value="maternity">Maternity Leave</SelectItem>
+              <SelectItem value="paternity">Paternity Leave</SelectItem>
+              <SelectItem value="unpaid">Unpaid Leave</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">
-            {t('leave.form.datesLabel')}
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Date Range
           </label>
           <Calendar
             mode="range"
             selected={dateRange}
             onSelect={setDateRange}
             numberOfMonths={2}
-            className="rounded-md border"
+            className="rounded-lg border shadow-sm"
             disabled={(date) => date < addDays(new Date(), -1)}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">
-            {t('leave.form.reasonLabel')}
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Reason for Leave
           </label>
           <Textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder={t('leave.form.reasonPlaceholder')}
+            placeholder="Please provide details about your leave request"
+            className="h-32"
           />
         </div>
 
         <Button onClick={handleSubmit} className="w-full">
-          {t('leave.form.submit')}
+          Submit Request
         </Button>
       </div>
     </Card>
