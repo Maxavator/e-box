@@ -43,10 +43,6 @@ const DeskFeatures = () => {
       </Button>
       <Button variant="ghost" className="w-full justify-start">
         <Calendar className="mr-2 h-4 w-4" />
-        Calendar
-      </Button>
-      <Button variant="ghost" className="w-full justify-start">
-        <Calendar className="mr-2 h-4 w-4" />
         Leave Manager
       </Button>
       <Button variant="ghost" className="w-full justify-start">
