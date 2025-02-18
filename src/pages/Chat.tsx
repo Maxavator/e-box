@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { demoConversations, getUserById } from "@/data/chat";
 import type { Message, Conversation } from "@/types/chat";
 import Dashboard from "./Dashboard";
+import Settings from "./Settings";
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Chat = () => {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [conversations, setConversations] = useState(demoConversations);
+  const [selectedFeature, setSelectedFeature] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -213,6 +215,10 @@ const Chat = () => {
   const renderContent = () => {
     if (activeTab === "dashboard") {
       return <Dashboard />;
+    }
+
+    if (activeTab === "desk" && selectedFeature === "settings") {
+      return <Settings />;
     }
 
     return (
