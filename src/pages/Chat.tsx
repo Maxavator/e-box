@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ChatHeader } from "@/components/chat/ChatHeader";
@@ -8,6 +7,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/componen
 import { useToast } from "@/components/ui/use-toast";
 import { demoConversations, getUserById } from "@/data/chat";
 import type { Message, Conversation } from "@/types/chat";
+import Dashboard from "./Dashboard";
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -210,6 +210,26 @@ const Chat = () => {
     );
   });
 
+  const renderContent = () => {
+    if (activeTab === "dashboard") {
+      return <Dashboard />;
+    }
+
+    return (
+      <ChatContent
+        activeTab={activeTab}
+        selectedConversation={selectedConversation}
+        newMessage={newMessage}
+        onNewMessageChange={setNewMessage}
+        onSendMessage={handleSendMessage}
+        onEditMessage={handleEditMessage}
+        onDeleteMessage={handleDeleteMessage}
+        onReactToMessage={handleReaction}
+        calendarView={calendarView}
+      />
+    );
+  };
+
   return (
     <div className="flex-1 flex flex-col">
       <ChatHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
@@ -221,7 +241,7 @@ const Chat = () => {
             onSearchChange={setSearchQuery}
             activeTab={activeTab}
             onTabChange={setActiveTab}
-            conversations={filteredConversations}
+            conversations={conversations}
             selectedConversation={selectedConversation}
             onSelectConversation={handleSelectConversation}
             onCalendarActionClick={handleCalendarActionClick}
@@ -231,17 +251,7 @@ const Chat = () => {
         <ResizableHandle withHandle />
         
         <ResizablePanel defaultSize={75}>
-          <ChatContent
-            activeTab={activeTab}
-            selectedConversation={selectedConversation}
-            newMessage={newMessage}
-            onNewMessageChange={setNewMessage}
-            onSendMessage={handleSendMessage}
-            onEditMessage={handleEditMessage}
-            onDeleteMessage={handleDeleteMessage}
-            onReactToMessage={handleReaction}
-            calendarView={calendarView}
-          />
+          {renderContent()}
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

@@ -1,60 +1,103 @@
-
-import type { User, Conversation } from "@/types/chat";
+import { Message, User } from "@/types/chat";
 
 export const demoUsers: User[] = [
-  { id: '1', name: 'Sarah Chen', status: 'online' },
-  { id: '2', name: 'Mike Johnson', status: 'offline', lastSeen: '2 hours ago' },
-  { id: '3', name: 'Emma Wilson', status: 'online' },
-  { id: '4', name: 'Alex Rodriguez', status: 'offline', lastSeen: '1 day ago' },
-  { id: '5', name: 'David Kim', status: 'online' },
+  {
+    id: 'user1',
+    name: 'Alice Johnson',
+    status: 'online',
+    lastSeen: 'Just now'
+  },
+  {
+    id: 'user2',
+    name: 'Bob Smith',
+    status: 'offline',
+    lastSeen: '5 minutes ago'
+  },
+  {
+    id: 'user3',
+    name: 'Charlie Brown',
+    status: 'online',
+    lastSeen: '10 minutes ago'
+  },
+  {
+    id: 'user4',
+    name: 'Diana Miller',
+    status: 'offline',
+    lastSeen: '30 minutes ago'
+  },
+  {
+    id: 'user5',
+    name: 'Ethan Davis',
+    status: 'online',
+    lastSeen: '1 hour ago'
+  }
 ];
 
-export const demoConversations: Conversation[] = [
+const createMessage = (id: string, senderId: string, text: string, timestamp: string): Message => ({
+  id,
+  senderId,
+  text,
+  timestamp,
+  status: 'sent',
+  reactions: [],
+});
+
+export const demoMessages: Message[] = [
+  createMessage('1', 'user1', 'Hello!', '2024-02-01T10:00:00Z'),
+  createMessage('2', 'user2', 'Hi there!', '2024-02-01T10:01:00Z'),
+  createMessage('3', 'user3', 'Good morning!', '2024-02-01T10:02:00Z'),
+];
+
+export const demoConversations = [
   {
     id: '1',
-    userId: '1',
-    unreadCount: 2,
+    userId: 'user1',
+    unreadCount: 0,
     messages: [
-      { id: '1', senderId: '1', text: 'Hi, could you review the latest design updates?', timestamp: '10:30 AM', status: 'sent' },
-      { id: '2', senderId: 'me', text: 'Sure, I\'ll take a look right now', timestamp: '10:32 AM', status: 'sent' },
-      { id: '3', senderId: '1', text: 'Thanks! Let me know what you think', timestamp: '10:33 AM', status: 'sent' },
-    ]
+      createMessage('1', 'user1', 'Hey, how are you?', '2024-02-01T10:00:00Z'),
+      createMessage('2', 'me', 'I\'m good, thanks!', '2024-02-01T10:01:00Z'),
+    ],
+    lastMessage: 'I\'m good, thanks!'
   },
   {
     id: '2',
-    userId: '2',
-    unreadCount: 0,
+    userId: 'user2',
+    unreadCount: 2,
     messages: [
-      { id: '1', senderId: '2', text: 'Team meeting at 3 PM today', timestamp: '9:00 AM', status: 'sent' },
-      { id: '2', senderId: 'me', text: 'I\'ll be there', timestamp: '9:05 AM', status: 'sent' },
-    ]
+      createMessage('3', 'user2', 'Did you see the new feature?', '2024-02-01T10:02:00Z'),
+      createMessage('4', 'me', 'Not yet, what is it?', '2024-02-01T10:03:00Z'),
+    ],
+    lastMessage: 'Not yet, what is it?'
   },
   {
     id: '3',
-    userId: '3',
+    userId: 'user3',
     unreadCount: 1,
     messages: [
-      { id: '1', senderId: '3', text: 'Did you see the new project requirements?', timestamp: '11:20 AM', status: 'sent' },
-    ]
+      createMessage('5', 'user3', 'What are you working on today?', '2024-02-01T10:04:00Z'),
+      createMessage('6', 'me', 'Just finishing up some reports.', '2024-02-01T10:05:00Z'),
+    ],
+    lastMessage: 'Just finishing up some reports.'
   },
   {
     id: '4',
-    userId: '4',
+    userId: 'user4',
     unreadCount: 0,
     messages: [
-      { id: '1', senderId: '4', text: 'Great presentation yesterday!', timestamp: 'Yesterday', status: 'sent' },
-      { id: '2', senderId: 'me', text: 'Thanks! Glad it went well', timestamp: 'Yesterday', status: 'sent' },
-    ]
+      createMessage('7', 'user4', 'Can we schedule a meeting?', '2024-02-01T10:06:00Z'),
+      createMessage('8', 'me', 'Sure, when are you free?', '2024-02-01T10:07:00Z'),
+    ],
+    lastMessage: 'Sure, when are you free?'
   },
   {
     id: '5',
-    userId: '5',
-    unreadCount: 3,
+    userId: 'user5',
+    unreadCount: 0,
     messages: [
-      { id: '1', senderId: '5', text: 'Can we discuss the new feature?', timestamp: '12:45 PM', status: 'sent' },
-      { id: '2', senderId: '5', text: 'I have some ideas to share', timestamp: '12:46 PM', status: 'sent' },
-      { id: '3', senderId: '5', text: 'Let me know when you\'re free', timestamp: '12:47 PM', status: 'sent' },
-    ]
+      createMessage('9', 'user5', 'How is the project going?', '2024-02-01T10:08:00Z'),
+      createMessage('10', 'me', 'It\'s progressing well.', '2024-02-01T10:09:00Z'),
+    ],
+    lastMessage: 'It\'s progressing well.'
   },
 ];
 
