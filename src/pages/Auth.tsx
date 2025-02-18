@@ -8,7 +8,7 @@ const Auth = () => {
   const [isDemoDialogOpen, setIsDemoDialogOpen] = useState(false);
 
   return (
-    <div className="min-h-screen w-full flex flex-col md:flex-row items-stretch bg-gradient-to-br from-[#FFE29F] via-[#FFA99F] to-[#FF719A]">
+    <div className="min-h-screen w-full flex flex-col md:flex-row items-stretch bg-gradient-to-b from-brand-50 to-background">
       <HeroSection />
       <LoginForm onRequestDemo={() => setIsDemoDialogOpen(true)} />
       <DemoRequestDialog 
