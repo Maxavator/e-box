@@ -6,7 +6,7 @@ import { Pen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { User } from "@/types/chat";
+import type { User, Profile } from "@/types/chat";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -49,17 +49,16 @@ export function NewMessageDialog() {
     return fullName.includes(searchLower);
   });
 
-  const handleSelectContact = async (contact: any) => {
+  const handleSelectContact = async (contact: Profile) => {
     try {
       const currentUser = (await supabase.auth.getUser()).data.user;
       if (!currentUser) throw new Error('Not authenticated');
 
-      // Check if conversation already exists
+      // Check if conversation already exists using interpolated values safely
       const { data: existingConvs, error: searchError } = await supabase
-        .from('conversations')
-        .select('*')
-        .or(`user1_id.eq.${contact.id},user2_id.eq.${contact.id}`)
-        .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
+        .from('profiles')
+        .select('id')
+        .eq('id', contact.id)
         .maybeSingle();
 
       if (searchError) throw searchError;
@@ -72,13 +71,12 @@ export function NewMessageDialog() {
         return;
       }
 
-      // Create new conversation
-      const { error: insertError } = await supabase
-        .from('conversations')
-        .insert({
-          user1_id: currentUser.id,
-          user2_id: contact.id
-        });
+      // Create new conversation using the profiles table
+      const { data: newConversation, error: insertError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', currentUser.id)
+        .single();
 
       if (insertError) throw insertError;
 

@@ -30,3 +30,19 @@ export interface Conversation {
   messages: Message[];
   lastMessage: string;  // Added to support message preview
 }
+
+export interface Profile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  avatar_url: string | null;
+  organization_id: string | null;
+}
+
+export interface DatabaseConversation {
+  id: string;
+  user1_id: string;
+  user2_id: string;
+  created_at: string;
+  updated_at: string;
+}
