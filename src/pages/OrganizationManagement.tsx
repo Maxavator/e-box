@@ -1,6 +1,6 @@
 
 import { OrganizationManagement as OrganizationManagementComponent } from "@/components/admin/OrganizationManagement";
-import { ChatHeader } from "@/components/chat/ChatHeader";
+import { AppHeader } from "@/components/shared/AppHeader";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -18,7 +18,7 @@ const OrganizationManagement = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <ChatHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
+      <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
       <main className="container mx-auto p-4 space-y-6">
         <OrganizationManagementComponent />
       </main>
