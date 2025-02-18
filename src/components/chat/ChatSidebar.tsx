@@ -6,7 +6,6 @@ import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewEventDialog } from "@/components/calendar/NewEventDialog";
-import { Policies } from "@/components/desk/Policies";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -130,9 +129,6 @@ export function ChatSidebar({
 
         <TabsContent value="desk" className="h-full">
           <DeskFeatures />
-          <div className="border-t">
-            <Policies />
-          </div>
         </TabsContent>
       </Tabs>
     </div>
