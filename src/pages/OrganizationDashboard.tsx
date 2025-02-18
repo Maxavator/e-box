@@ -47,88 +47,90 @@ const OrganizationDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <ChatHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
-      <main className="container mx-auto p-4 space-y-6">
-        <header className="space-y-2">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold tracking-tight">Organization Dashboard</h1>
-            {userInfo.userName && (
-              <p className="text-muted-foreground">
-                {userInfo.userName} ({userInfo.orgName})
-              </p>
-            )}
-          </div>
-          <div className="flex justify-between items-center">
-            <p className="text-muted-foreground">Manage your organization's information and policies</p>
-            <Button 
-              variant="outline"
-              onClick={() => navigate("/organization/manage")}
-              className="flex items-center gap-2"
-            >
-              <Building2 className="h-4 w-4" />
-              Manage Organization
-            </Button>
-          </div>
-        </header>
-
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="policies">Policies</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-primary" />
-                    <span>Team Members</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4">Manage your organization's members</p>
-                  <Button variant="outline" className="w-full">
-                    Manage Team
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5 text-primary" />
-                    <span>Chat Activity</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4">Monitor chat activity and usage</p>
-                  <Button variant="outline" className="w-full">
-                    View Activity
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart className="h-5 w-5 text-primary" />
-                    <span>Analytics</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4">View organization analytics</p>
-                  <Button variant="outline" className="w-full">
-                    View Analytics
-                  </Button>
-                </CardContent>
-              </Card>
+      <main className="w-full px-4 py-6 space-y-6">
+        <div className="max-w-[2000px] mx-auto">
+          <header className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold tracking-tight">Organization Dashboard</h1>
+              {userInfo.userName && (
+                <p className="text-muted-foreground">
+                  {userInfo.userName} ({userInfo.orgName})
+                </p>
+              )}
             </div>
-          </TabsContent>
+            <div className="flex justify-between items-center">
+              <p className="text-muted-foreground">Manage your organization's information and policies</p>
+              <Button 
+                variant="outline"
+                onClick={() => navigate("/organization/manage")}
+                className="flex items-center gap-2"
+              >
+                <Building2 className="h-4 w-4" />
+                Manage Organization
+              </Button>
+            </div>
+          </header>
 
-          <TabsContent value="policies">
-            <Policies />
-          </TabsContent>
-        </Tabs>
+          <Tabs defaultValue="overview" className="mt-8">
+            <TabsList>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="policies">Policies</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-primary" />
+                      <span>Team Members</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">Manage your organization's members</p>
+                    <Button variant="outline" className="w-full">
+                      Manage Team
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5 text-primary" />
+                      <span>Chat Activity</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">Monitor chat activity and usage</p>
+                    <Button variant="outline" className="w-full">
+                      View Activity
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart className="h-5 w-5 text-primary" />
+                      <span>Analytics</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">View organization analytics</p>
+                    <Button variant="outline" className="w-full">
+                      View Analytics
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="policies">
+              <Policies />
+            </TabsContent>
+          </Tabs>
+        </div>
       </main>
     </div>
   );
