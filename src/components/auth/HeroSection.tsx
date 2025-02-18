@@ -9,7 +9,7 @@ const HeroSection = () => {
           e-Box by Afrovation
         </h1>
         <p className="text-xl text-gray-600 animate-fadeIn delay-100">
-          Secure, scalable, and efficient communication for your organization
+          Secure, scalable, and efficient communication platform enabling seamless collaboration from executives to remote staff and everyone in between
         </p>
       </div>
 
