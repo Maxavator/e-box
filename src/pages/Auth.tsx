@@ -10,8 +10,8 @@ const Auth = () => {
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row items-stretch bg-gradient-to-b from-brand-50 to-background">
       <HeroSection />
-      <div className="w-full md:w-1/2 flex flex-col items-center">
-        <div className="w-full p-8 flex justify-center">
+      <div className="w-full md:w-1/2 flex flex-col items-center justify-center">
+        <div className="w-full px-8 pb-8 flex justify-center">
           <div className="flex items-center gap-2">
             <img 
               src="/lovable-uploads/4415dded-8eed-482f-ab46-9019698e147f.png" 
