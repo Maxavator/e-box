@@ -8,18 +8,23 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { Database } from "@/integrations/supabase/types";
+
+type CalendarNotificationTime = Database['public']['Enums']['calendar_notification_time'];
+
+type ProfileType = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  avatarUrl: string | null;
+  defaultNotificationTime: CalendarNotificationTime;
+};
 
 export const Settings = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [profile, setProfile] = useState<{
-    firstName: string;
-    lastName: string;
-    email: string;
-    avatarUrl: string | null;
-    defaultNotificationTime: string;
-  } | null>(null);
+  const [profile, setProfile] = useState<ProfileType | null>(null);
 
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: false,
