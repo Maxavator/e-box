@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { TicketPriority } from "../../types/helpdesk";
 
 interface NewTicketDialogProps {
   isOpen: boolean;
@@ -20,7 +19,7 @@ export const NewTicketDialog = ({ isOpen, onClose, onTicketCreated }: NewTicketD
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [department, setDepartment] = useState("");
-  const [priority, setPriority] = useState<TicketPriority>("medium");
+  const [priority, setPriority] = useState<string>("medium");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,7 +38,6 @@ export const NewTicketDialog = ({ isOpen, onClose, onTicketCreated }: NewTicketD
           department,
           priority,
           created_by: user.id,
-          status: 'open'
         });
 
       if (error) throw error;
@@ -110,7 +108,7 @@ export const NewTicketDialog = ({ isOpen, onClose, onTicketCreated }: NewTicketD
 
           <div className="space-y-2">
             <Label htmlFor="priority">Priority</Label>
-            <Select value={priority} onValueChange={(value) => setPriority(value as TicketPriority)}>
+            <Select value={priority} onValueChange={setPriority}>
               <SelectTrigger>
                 <SelectValue placeholder="Select priority" />
               </SelectTrigger>

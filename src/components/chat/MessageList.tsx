@@ -16,16 +16,6 @@ export function MessageList({
   onDeleteMessage,
   onReactToMessage
 }: MessageListProps) {
-  if (!messages || messages.length === 0) {
-    return (
-      <ScrollArea className="flex-1">
-        <div className="p-4 text-center text-muted-foreground">
-          No messages yet
-        </div>
-      </ScrollArea>
-    );
-  }
-
   return (
     <ScrollArea className="flex-1">
       <div className="p-4 space-y-4">
