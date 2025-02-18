@@ -150,7 +150,7 @@ const AdminPortal = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Building2 className="w-5 h-5 text-brand-600" />
-                <span>Organizations</span>
+                <span>Organizations Management</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
