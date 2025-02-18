@@ -30,16 +30,41 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
       return;
     }
 
-    const isGlobalAdmin = username.startsWith("admin");
-    const isOrgAdmin = username.startsWith("org");
-    
-    if (isGlobalAdmin) {
-      navigate("/admin");
-    } else if (isOrgAdmin) {
-      navigate("/organization");
-    } else {
-      navigate("/chat");
+    // Test credentials validation
+    const validCredentials = [
+      { id: "6010203040512", password: "6010203040512", type: "regular" },
+      { id: "5010203040512", password: "5010203040512", type: "org_admin" },
+      { id: "4010203040512", password: "4010203040512", type: "global_admin" }
+    ];
+
+    const matchedCredential = validCredentials.find(
+      cred => cred.id === username && cred.password === password
+    );
+
+    if (!matchedCredential) {
+      toast({
+        title: "Invalid Credentials",
+        description: "Please check your username and password",
+        variant: "destructive",
+      });
+      return;
     }
+
+    switch (matchedCredential.type) {
+      case "global_admin":
+        navigate("/admin");
+        break;
+      case "org_admin":
+        navigate("/organization");
+        break;
+      default:
+        navigate("/chat");
+    }
+
+    toast({
+      title: "Login Successful",
+      description: `Welcome ${matchedCredential.type.replace('_', ' ')} user!`,
+    });
   };
 
   return (
