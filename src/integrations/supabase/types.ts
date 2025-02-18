@@ -390,6 +390,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_global_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       calendar_notification_time:
