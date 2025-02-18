@@ -150,6 +150,59 @@ export const SystemSettings = () => {
 
           <Card>
             <CardHeader>
+              <CardTitle>Manual Report Generation</CardTitle>
+              <CardDescription>Generate and download reports on demand</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Report Type</Label>
+                  <Select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select report type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="activity">Activity Report</SelectItem>
+                      <SelectItem value="communication">Communication Report</SelectItem>
+                      <SelectItem value="alerts">Alert Report</SelectItem>
+                      <SelectItem value="summary">System Summary</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Date Range</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input type="date" placeholder="Start date" />
+                    <Input type="date" placeholder="End date" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Export Format</Label>
+                  <Select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select format" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pdf">PDF</SelectItem>
+                      <SelectItem value="excel">Excel</SelectItem>
+                      <SelectItem value="csv">CSV</SelectItem>
+                      <SelectItem value="json">JSON</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button className="w-full">
+                  <Download className="mr-2 h-4 w-4" />
+                  Generate and Download Report
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Report Types</CardTitle>
               <CardDescription>Configure which reports to generate</CardDescription>
             </CardHeader>
