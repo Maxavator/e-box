@@ -1,10 +1,17 @@
 
 const HeroSection = () => {
   return (
-    <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-primary/90 to-primary p-12 text-white items-center justify-center relative overflow-hidden">
+    <div className="hidden md:flex md:w-1/2 items-center justify-center relative overflow-hidden">
+      {/* Base background image layer */}
+      <div className="absolute inset-0 bg-[url('/lovable-uploads/cea5cf65-708e-42c4-9a6c-6073f42a3471.png')] bg-cover bg-center"></div>
+      
+      {/* Orange gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/95 to-primary/90"></div>
+      
+      {/* Grid pattern overlay */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20"></div>
       
-      <div className="max-w-xl space-y-10 relative z-10">
+      <div className="max-w-xl space-y-10 relative z-10 p-12 text-white">
         <div className="space-y-6">
           <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
             Your Digital Mailbox
