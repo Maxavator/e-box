@@ -6,7 +6,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-[url('/lovable-uploads/2bf4f63d-6422-4f37-a6d6-c8d4ec489017.png')] bg-cover bg-center bg-no-repeat object-center"></div>
       
       {/* Orange gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/95 to-primary/90"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-primary/75"></div>
       
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20"></div>
