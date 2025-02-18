@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Ticket } from "lucide-react";
+import { Plus, TicketIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { NewTicketDialog } from "./components/helpdesk/NewTicketDialog";
@@ -87,7 +86,7 @@ export const Helpdesk = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Ticket className="h-5 w-5" />
+            <TicketIcon className="h-5 w-5" />
             Helpdesk
           </CardTitle>
           <Button onClick={() => setIsNewTicketOpen(true)}>
