@@ -14,4 +14,6 @@ export interface Document {
   file_path?: string;
   content_type?: string;
   requires_otp?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }

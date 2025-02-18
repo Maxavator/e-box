@@ -140,6 +140,54 @@ export type Database = {
           },
         ]
       }
+      documents: {
+        Row: {
+          category: string
+          content_type: string | null
+          created_at: string | null
+          description: string | null
+          file_path: string
+          id: string
+          is_verified: boolean | null
+          last_modified_by: string | null
+          name: string
+          requires_otp: boolean | null
+          size: string | null
+          updated_at: string | null
+          version: string | null
+        }
+        Insert: {
+          category: string
+          content_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          file_path: string
+          id?: string
+          is_verified?: boolean | null
+          last_modified_by?: string | null
+          name: string
+          requires_otp?: boolean | null
+          size?: string | null
+          updated_at?: string | null
+          version?: string | null
+        }
+        Update: {
+          category?: string
+          content_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          file_path?: string
+          id?: string
+          is_verified?: boolean | null
+          last_modified_by?: string | null
+          name?: string
+          requires_otp?: boolean | null
+          size?: string | null
+          updated_at?: string | null
+          version?: string | null
+        }
+        Relationships: []
+      }
       leave_balances: {
         Row: {
           annual_days_total: number

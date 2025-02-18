@@ -21,13 +21,30 @@ export const Documents = () => {
 
   const fetchDocuments = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: fetchedDocs, error } = await supabase
         .from('documents')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*');
 
       if (error) throw error;
-      setDocuments(data || []);
+
+      const formattedDocs: Document[] = (fetchedDocs || []).map(doc => ({
+        id: doc.id,
+        name: doc.name,
+        size: doc.size || '0 KB',
+        description: doc.description,
+        category: doc.category,
+        version: doc.version,
+        lastModifiedBy: doc.last_modified_by,
+        file_path: doc.file_path,
+        content_type: doc.content_type,
+        isVerified: doc.is_verified,
+        requires_otp: doc.requires_otp,
+        date: doc.created_at ? new Date(doc.created_at).toLocaleDateString() : undefined,
+        created_at: doc.created_at,
+        updated_at: doc.updated_at
+      }));
+
+      setDocuments(formattedDocs);
     } catch (error) {
       console.error('Error fetching documents:', error);
       toast.error("Failed to load documents");
