@@ -14,11 +14,14 @@ export const LeaveManager = () => {
   const [leaveType, setLeaveType] = useState<string>("");
   const [reason, setReason] = useState<string>("");
 
+  // Updated leave balances according to South African labor law
   const leaveBalance = {
-    annual: { total: 15, used: 5, pending: 2 },
-    sick: { total: 30, used: 2, pending: 0 },
-    maternity: { total: 120, used: 0, pending: 0 },
-    paternity: { total: 10, used: 0, pending: 0 }
+    annual: { total: 21, used: 5, pending: 2 }, // 21 consecutive days annual leave
+    sick: { total: 30, used: 2, pending: 0 }, // 30 days in a 36-month cycle
+    family: { total: 3, used: 0, pending: 0 }, // 3 days family responsibility leave
+    maternity: { total: 120, used: 0, pending: 0 }, // 4 months maternity leave
+    unpaid: { total: 0, used: 0, pending: 0 }, // Unpaid leave - no limit
+    study: { total: 10, used: 0, pending: 0 } // Study leave - company specific
   };
 
   const recentLeaveRequests = [
@@ -111,6 +114,15 @@ export const LeaveManager = () => {
                   </p>
                 </div>
                 <div className="space-y-2">
+                  <p className="text-sm font-medium">Family Responsibility</p>
+                  <p className="text-2xl font-bold">
+                    {leaveBalance.family.total - leaveBalance.family.used} days
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {leaveBalance.family.pending} pending requests
+                  </p>
+                </div>
+                <div className="space-y-2">
                   <p className="text-sm font-medium">Maternity Leave</p>
                   <p className="text-2xl font-bold">
                     {leaveBalance.maternity.total - leaveBalance.maternity.used} days
@@ -120,12 +132,19 @@ export const LeaveManager = () => {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Paternity Leave</p>
+                  <p className="text-sm font-medium">Study Leave</p>
                   <p className="text-2xl font-bold">
-                    {leaveBalance.paternity.total - leaveBalance.paternity.used} days
+                    {leaveBalance.study.total - leaveBalance.study.used} days
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {leaveBalance.paternity.pending} pending requests
+                    {leaveBalance.study.pending} pending requests
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Unpaid Leave</p>
+                  <p className="text-2xl font-bold">Available</p>
+                  <p className="text-sm text-muted-foreground">
+                    Subject to approval
                   </p>
                 </div>
               </div>
@@ -176,10 +195,12 @@ export const LeaveManager = () => {
                   <SelectValue placeholder="Select leave type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="annual">Annual Leave</SelectItem>
-                  <SelectItem value="sick">Sick Leave</SelectItem>
-                  <SelectItem value="maternity">Maternity Leave</SelectItem>
-                  <SelectItem value="paternity">Paternity Leave</SelectItem>
+                  <SelectItem value="annual">Annual Leave (21 days per year)</SelectItem>
+                  <SelectItem value="sick">Sick Leave (30 days per 36 months)</SelectItem>
+                  <SelectItem value="family">Family Responsibility (3 days per year)</SelectItem>
+                  <SelectItem value="maternity">Maternity Leave (4 months)</SelectItem>
+                  <SelectItem value="study">Study Leave (10 days per year)</SelectItem>
+                  <SelectItem value="unpaid">Unpaid Leave</SelectItem>
                 </SelectContent>
               </Select>
             </div>
