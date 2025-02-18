@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, MessageSquare, BarChart } from "lucide-react";
+import { Users, MessageSquare, BarChart, Building2 } from "lucide-react";
 import { Policies } from "@/components/desk/Policies";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChatHeader } from "@/components/chat/ChatHeader";
@@ -57,7 +57,17 @@ const OrganizationDashboard = () => {
               </p>
             )}
           </div>
-          <p className="text-muted-foreground">Manage your organization's information and policies</p>
+          <div className="flex justify-between items-center">
+            <p className="text-muted-foreground">Manage your organization's information and policies</p>
+            <Button 
+              variant="outline"
+              onClick={() => navigate("/organization/manage")}
+              className="flex items-center gap-2"
+            >
+              <Building2 className="h-4 w-4" />
+              Manage Organization
+            </Button>
+          </div>
         </header>
 
         <Tabs defaultValue="overview" className="space-y-4">
