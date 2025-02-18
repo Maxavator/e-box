@@ -123,17 +123,28 @@ export const Documents = () => {
     { name: "Payslip March 2024", date: "2024-03-01", size: "156 KB" },
     { name: "Payslip February 2024", date: "2024-02-01", size: "155 KB" },
     { name: "Payslip January 2024", date: "2024-01-01", size: "154 KB" },
+    { name: "Payslip December 2023", date: "2023-12-01", size: "153 KB" },
+    { name: "Payslip November 2023", date: "2023-11-01", size: "152 KB" },
+    { name: "Payslip October 2023", date: "2023-10-01", size: "151 KB" }
   ];
 
   const contracts = [
     { name: "Employment Contract", date: "2023-01-15", size: "2.1 MB" },
     { name: "NDA Agreement", date: "2023-01-15", size: "890 KB" },
+    { name: "IP Rights Agreement", date: "2023-01-15", size: "756 KB" },
+    { name: "Remote Work Agreement", date: "2023-06-01", size: "945 KB" },
+    { name: "Benefits Agreement", date: "2023-01-15", size: "1.2 MB" }
   ];
 
   const otherDocuments = [
-    { name: "Company Handbook", date: "2023-12-01", size: "3.2 MB" },
+    { name: "Employee Handbook 2024", date: "2024-01-01", size: "3.2 MB" },
     { name: "Travel Policy", date: "2023-11-15", size: "645 KB" },
-    { name: "Benefits Guide", date: "2023-10-01", size: "1.8 MB" },
+    { name: "Benefits Guide 2024", date: "2024-01-01", size: "1.8 MB" },
+    { name: "IT Security Guidelines", date: "2023-12-15", size: "987 KB" },
+    { name: "Expense Claim Procedure", date: "2023-10-01", size: "754 KB" },
+    { name: "Health and Safety Guidelines", date: "2023-09-15", size: "1.5 MB" },
+    { name: "Code of Conduct", date: "2023-08-01", size: "2.3 MB" },
+    { name: "Career Development Program", date: "2024-02-15", size: "1.1 MB" }
   ];
 
   const handleDocumentClick = (doc: { name: string; date: string; size: string }) => {
