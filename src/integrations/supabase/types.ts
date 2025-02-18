@@ -380,6 +380,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_role: {
+        Args: {
+          role_to_check: Database["public"]["Enums"]["user_role"]
+        }
+        Returns: boolean
+      }
       generate_sa_id: {
         Args: Record<PropertyKey, never>
         Returns: string
