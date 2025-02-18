@@ -1,5 +1,5 @@
 
-import { Shield, Users, MessageSquare, ChartBar, Scale, Clock } from "lucide-react";
+import { Shield, Users, MessageSquare, Scale } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -17,7 +17,7 @@ const HeroSection = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <h1 className="text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
-              Transform your Stakeholder Engagement with e-Box
+              Transform Your Stakeholder Engagement
             </h1>
             <p className="text-xl lg:text-2xl opacity-90 leading-relaxed">
               South Africa's premier enterprise communication platform. Built for businesses, designed for growth... Executives to Desk-less Staff, All Staff.
