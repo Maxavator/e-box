@@ -70,7 +70,7 @@ const HeroSection = () => {
 
         <div className="pt-4 border-t border-white/20">
           <p className="text-sm opacity-80">
-            © 2024 e-Box. All rights reserved. Our platform helps organizations streamline their communication, document management, and compliance processes.
+            © 2025 Afrovation. All rights reserved. Our platform helps organizations streamline their communication, document management, and compliance processes.
           </p>
         </div>
       </div>
