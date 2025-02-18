@@ -10,28 +10,34 @@ import { supabase } from "@/integrations/supabase/client";
 import { UserPlus } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
-type Profile = Database['public']['Tables']['profiles']['Row'] & {
-  user_roles: Array<{
-    role: Database['public']['Enums']['user_role']
-  }>
-};
+type Profile = Database['public']['Tables']['profiles']['Row'];
+type UserRole = Database['public']['Tables']['user_roles']['Row'];
+
+interface UserWithRole extends Profile {
+  user_roles: Pick<UserRole, 'role'>[];
+}
 
 export const UserManagement = () => {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
-  const { data: users, isLoading } = useQuery<Profile[]>({
+  const { data: users, isLoading } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
         .select(`
           *,
-          user_roles (
+          user_roles!inner (
             role
           )
         `);
-      if (error) throw error;
-      return data as Profile[];
+      
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+      }
+      
+      return data as UserWithRole[];
     },
   });
 
@@ -96,6 +102,13 @@ export const UserManagement = () => {
                 </TableCell>
               </TableRow>
             ))}
+            {!isLoading && (!users || users.length === 0) && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-4">
+                  No users found
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
