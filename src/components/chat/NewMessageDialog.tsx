@@ -34,7 +34,7 @@ export function NewMessageDialog() {
 
       const { data: orgContacts, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, avatar_url')
+        .select('id, first_name, last_name, avatar_url, organization_id')
         .eq('organization_id', profile.organization_id)
         .neq('id', currentUser.id);
 
@@ -56,9 +56,9 @@ export function NewMessageDialog() {
 
       // Check if conversation already exists using interpolated values safely
       const { data: existingConvs, error: searchError } = await supabase
-        .from('profiles')
+        .from('conversations')
         .select('id')
-        .eq('id', contact.id)
+        .or(`user1_id.eq.${contact.id},user2_id.eq.${contact.id}`)
         .maybeSingle();
 
       if (searchError) throw searchError;
@@ -71,12 +71,13 @@ export function NewMessageDialog() {
         return;
       }
 
-      // Create new conversation using the profiles table
-      const { data: newConversation, error: insertError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', currentUser.id)
-        .single();
+      // Create new conversation
+      const { error: insertError } = await supabase
+        .from('conversations')
+        .insert({
+          user1_id: currentUser.id,
+          user2_id: contact.id
+        });
 
       if (insertError) throw insertError;
 
