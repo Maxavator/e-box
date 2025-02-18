@@ -20,6 +20,15 @@ interface UserWithRole extends Profile {
 export const UserManagement = () => {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
+  const { data: isAdmin } = useQuery({
+    queryKey: ['isGlobalAdmin'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('is_global_admin');
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
@@ -41,17 +50,20 @@ export const UserManagement = () => {
       
       return profiles as UserWithRole[];
     },
+    enabled: isAdmin, // Only fetch users if the current user is an admin
   });
+
+  if (!isAdmin) {
+    return (
+      <div className="p-4 text-center">
+        <p className="text-red-500">You don't have permission to view user management. Please contact an administrator.</p>
+      </div>
+    );
+  }
 
   if (error) {
     const errorMessage = error.message?.toLowerCase() || '';
-    if (errorMessage.includes('permission denied')) {
-      return (
-        <div className="p-4 text-center">
-          <p className="text-red-500">You don't have permission to view user management. Please contact an administrator.</p>
-        </div>
-      );
-    } else if (errorMessage.includes('jwt')) {
+    if (errorMessage.includes('jwt')) {
       return (
         <div className="p-4 text-center">
           <p className="text-red-500">Please log in to access user management.</p>
