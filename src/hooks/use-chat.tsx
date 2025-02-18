@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { demoConversations, getUserById } from "@/data/chat";
+import { supabase } from "@/integrations/supabase/client";
 import type { Message, Conversation } from "@/types/chat";
 
 export const useChat = () => {
@@ -15,94 +15,171 @@ export const useChat = () => {
   const [selectedFeature, setSelectedFeature] = useState("");
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const randomUser = demoConversations[Math.floor(Math.random() * demoConversations.length)];
-      const user = getUserById(randomUser.userId);
-      
-      if (user) {
-        setConversations(prevConversations => 
-          prevConversations.map(conv => {
-            if (conv.userId === randomUser.userId) {
-              const newMessage: Message = {
-                id: Math.random().toString(),
-                senderId: user.id,
-                text: `Random message from ${user.name}`,
-                timestamp: new Date().toISOString(),
-                status: 'sent',
-                sender: 'them',
-                reactions: []
-              };
+    const fetchConversations = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-              return {
-                ...conv,
-                messages: [...conv.messages, newMessage],
-                lastMessage: newMessage.text,
-                unreadCount: selectedConversation?.id === conv.id ? 0 : (conv.unreadCount + 1)
-              };
-            }
-            return conv;
-          })
-        );
+      const { data: convos, error } = await supabase
+        .from('conversations')
+        .select(`
+          id,
+          user1_id,
+          user2_id,
+          created_at,
+          updated_at
+        `)
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
 
-        if (selectedConversation?.userId !== randomUser.userId) {
-          toast({
-            title: "New Message",
-            description: `New message from ${user.name}`
-          });
-        }
+      if (error) {
+        console.error('Error fetching conversations:', error);
+        return;
       }
-    }, Math.random() * 15000 + 15000);
 
-    return () => clearInterval(interval);
-  }, [selectedConversation, toast]);
+      const transformedConvos = await Promise.all(convos.map(async (conv) => {
+        const otherUserId = conv.user1_id === user.id ? conv.user2_id : conv.user1_id;
+        
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', otherUserId)
+          .single();
 
-  const handleSendMessage = () => {
-    if (!selectedConversation || !newMessage.trim()) return;
+        const { data: messages } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('conversation_id', conv.id)
+          .order('created_at', { ascending: true });
 
-    const message: Message = {
-      id: Math.random().toString(),
-      senderId: 'me',
-      text: newMessage,
-      timestamp: new Date().toISOString(),
-      status: 'sent',
-      sender: 'me',
-      reactions: []
+        const lastMessage = messages && messages.length > 0 ? messages[messages.length - 1].content : '';
+        
+        return {
+          id: conv.id,
+          userId: otherUserId,
+          unreadCount: 0,
+          messages: messages?.map(msg => ({
+            id: msg.id,
+            senderId: msg.sender_id,
+            text: msg.content,
+            timestamp: msg.created_at,
+            status: 'sent',
+            reactions: [],
+            sender: msg.sender_id === user.id ? 'me' : 'them'
+          })) || [],
+          lastMessage
+        };
+      }));
+
+      setConversations(transformedConvos);
     };
 
-    setSelectedConversation(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        messages: [...prev.messages, message],
-        lastMessage: message.text
-      };
-    });
+    fetchConversations();
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('chat_messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages'
+        },
+        async (payload) => {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+
+          const newMessage = payload.new;
+          
+          if (selectedConversation?.id === newMessage.conversation_id) {
+            setSelectedConversation(prev => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                messages: [...prev.messages, {
+                  id: newMessage.id,
+                  senderId: newMessage.sender_id,
+                  text: newMessage.content,
+                  timestamp: newMessage.created_at,
+                  status: 'sent',
+                  reactions: [],
+                  sender: newMessage.sender_id === user.id ? 'me' : 'them'
+                }],
+                lastMessage: newMessage.content
+              };
+            });
+
+            if (newMessage.sender_id !== user.id) {
+              const { data: senderProfile } = await supabase
+                .from('profiles')
+                .select('first_name, last_name')
+                .eq('id', newMessage.sender_id)
+                .single();
+
+              if (senderProfile) {
+                toast({
+                  title: "New Message",
+                  description: `From ${senderProfile.first_name} ${senderProfile.last_name}`
+                });
+              }
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedConversation?.id, toast]);
+
+  const handleSendMessage = async () => {
+    if (!selectedConversation || !newMessage.trim()) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: messageData, error } = await supabase
+      .from('messages')
+      .insert({
+        conversation_id: selectedConversation.id,
+        sender_id: user.id,
+        content: newMessage,
+        created_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setNewMessage("");
 
-    setTimeout(() => {
-      setSelectedConversation(prev => {
-        if (!prev) return prev;
-        const user = getUserById(prev.userId);
-        if (!user) return prev;
+    setSelectedConversation(prev => {
+      if (!prev) return prev;
+      const newMessageObj: Message = {
+        id: messageData.id,
+        senderId: user.id,
+        text: newMessage,
+        timestamp: messageData.created_at,
+        status: 'sent',
+        reactions: [],
+        sender: 'me'
+      };
 
-        const reply: Message = {
-          id: Math.random().toString(),
-          senderId: user.id,
-          text: `Reply from ${user.name}`,
-          timestamp: new Date().toISOString(),
-          status: 'sent',
-          sender: 'them',
-          reactions: []
-        };
-
-        return {
-          ...prev,
-          messages: [...prev.messages, reply],
-          lastMessage: reply.text
-        };
-      });
-    }, 1000);
+      return {
+        ...prev,
+        messages: [...prev.messages, newMessageObj],
+        lastMessage: newMessage
+      };
+    });
   };
 
   const handleEditMessage = (messageId: string, newContent: string) => {
@@ -169,7 +246,7 @@ export const useChat = () => {
     });
   };
 
-  const handleSelectConversation = (conversation: Conversation) => {
+  const handleSelectConversation = async (conversation: Conversation) => {
     const updatedConversation = { ...conversation, unreadCount: 0 };
     setSelectedConversation(updatedConversation);
     
