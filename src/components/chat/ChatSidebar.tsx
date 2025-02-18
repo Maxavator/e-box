@@ -1,7 +1,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar, Inbox, Briefcase, FileText } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, Briefcase } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
@@ -31,20 +31,6 @@ const CalendarActions = ({ onCalendarActionClick }: { onCalendarActionClick: (vi
         Calendar Inbox
       </Button>
       <NewEventDialog />
-    </div>
-  );
-};
-
-const DeskFeatures = () => {
-  return (
-    <div className="p-4 space-y-2">
-      <Button
-        variant="ghost"
-        className="w-full justify-start"
-      >
-        <FileText className="mr-2 h-4 w-4" />
-        Policies
-      </Button>
     </div>
   );
 };
@@ -108,7 +94,6 @@ export function ChatSidebar({
         </TabsContent>
 
         <TabsContent value="desk" className="h-full">
-          <DeskFeatures />
           <div className="border-t">
             <Policies />
           </div>
