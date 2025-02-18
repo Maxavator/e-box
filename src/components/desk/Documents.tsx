@@ -21,25 +21,98 @@ export const Documents = () => {
 
   const fetchDocuments = async () => {
     try {
+      // Sample documents data
+      const sampleDocuments = [
+        {
+          id: '1',
+          name: 'January_2024_Payslip.pdf',
+          size: '245 KB',
+          category: 'Financial',
+          description: 'Monthly payslip for January 2024',
+          version: '1.0',
+          lastModifiedBy: 'HR System',
+          isVerified: true,
+          requires_otp: true,
+          date: '2024-01-31',
+          previewContent: 'This is a secure payslip document for January 2024. Please verify your identity to view the full content.'
+        },
+        {
+          id: '2',
+          name: 'Employment_Contract_2024.pdf',
+          size: '890 KB',
+          category: 'Legal',
+          description: 'Updated employment contract for 2024',
+          version: '2.1',
+          lastModifiedBy: 'Legal Department',
+          isVerified: true,
+          requires_otp: true,
+          date: '2024-01-15',
+          previewContent: 'Employment contract including updated terms and conditions for 2024.'
+        },
+        {
+          id: '3',
+          name: 'Company_Handbook_2024.pdf',
+          size: '1.2 MB',
+          category: 'Other',
+          description: 'Employee handbook and guidelines',
+          version: '3.0',
+          lastModifiedBy: 'HR Department',
+          isVerified: true,
+          requires_otp: false,
+          date: '2024-01-01',
+          previewContent: 'Company policies, procedures, and guidelines for all employees.'
+        },
+        {
+          id: '4',
+          name: 'February_2024_Payslip.pdf',
+          size: '242 KB',
+          category: 'Financial',
+          description: 'Monthly payslip for February 2024',
+          version: '1.0',
+          lastModifiedBy: 'HR System',
+          isVerified: true,
+          requires_otp: true,
+          date: '2024-02-29',
+          previewContent: 'This is a secure payslip document for February 2024. Please verify your identity to view the full content.'
+        },
+        {
+          id: '5',
+          name: 'Performance_Review_Q1_2024.pdf',
+          size: '350 KB',
+          category: 'Other',
+          description: 'First quarter performance evaluation',
+          version: '1.0',
+          lastModifiedBy: 'Line Manager',
+          isVerified: true,
+          requires_otp: false,
+          date: '2024-03-15',
+          previewContent: 'Quarterly performance review document including goals and achievements.'
+        }
+      ];
+
       const { data: fetchedDocs, error } = await supabase
         .from('documents')
         .select('*');
 
       if (error) throw error;
 
-      const formattedDocs: Document[] = (fetchedDocs || []).map(doc => ({
+      // Use fetched documents if available, otherwise use sample documents
+      const docsToUse = fetchedDocs && fetchedDocs.length > 0 ? fetchedDocs : sampleDocuments;
+
+      const formattedDocs: Document[] = docsToUse.map(doc => ({
         id: doc.id,
         name: doc.name,
         size: doc.size || '0 KB',
         description: doc.description,
         category: doc.category,
         version: doc.version,
-        lastModifiedBy: doc.last_modified_by,
+        lastModifiedBy: doc.lastModifiedBy || doc.last_modified_by,
         file_path: doc.file_path,
         content_type: doc.content_type,
-        isVerified: doc.is_verified,
+        isVerified: doc.isVerified || doc.is_verified,
         requires_otp: doc.requires_otp,
-        date: doc.created_at ? new Date(doc.created_at).toLocaleDateString() : undefined,
+        date: doc.date || (doc.created_at ? new Date(doc.created_at).toLocaleDateString() : undefined),
+        previewContent: doc.previewContent,
         created_at: doc.created_at,
         updated_at: doc.updated_at
       }));
