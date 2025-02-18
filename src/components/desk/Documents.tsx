@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FileText, Lock } from "lucide-react";
+import { FileText, Lock, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -14,9 +15,21 @@ const DocumentList = ({
   requiresOTP = false,
   onDocumentClick 
 }: { 
-  documents: { name: string; date: string; size: string }[];
+  documents: { 
+    name: string; 
+    date: string; 
+    size: string;
+    isVerified?: boolean;
+    downloadUrl?: string;
+  }[];
   requiresOTP?: boolean;
-  onDocumentClick: (doc: { name: string; date: string; size: string }) => void;
+  onDocumentClick: (doc: { 
+    name: string; 
+    date: string; 
+    size: string;
+    isVerified?: boolean;
+    downloadUrl?: string;
+  }) => void;
 }) => (
   <ScrollArea className="h-[400px]">
     <Table>
@@ -35,6 +48,9 @@ const DocumentList = ({
               <FileText className="h-4 w-4" />
               {doc.name}
               {requiresOTP && <Lock className="h-3 w-3 text-gray-400" />}
+              {doc.isVerified && (
+                <CheckCircle2 className="h-3 w-3 text-green-500" title="E-box Verified" />
+              )}
             </TableCell>
             <TableCell>{doc.date}</TableCell>
             <TableCell>{doc.size}</TableCell>
@@ -84,7 +100,7 @@ const OTPVerification = ({
         <DialogHeader>
           <DialogTitle>Security Verification</DialogTitle>
           <DialogDescription>
-            Enter the OTP sent to your email to access the payslip
+            Enter the OTP sent to your email to access the document
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -117,49 +133,139 @@ const OTPVerification = ({
 
 export const Documents = () => {
   const [showOTPDialog, setShowOTPDialog] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<{ name: string; date: string; size: string } | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<{
+    name: string;
+    date: string;
+    size: string;
+    isVerified?: boolean;
+    downloadUrl?: string;
+  } | null>(null);
 
   const payslips = [
-    { name: "Payslip March 2024", date: "2024-03-01", size: "156 KB" },
-    { name: "Payslip February 2024", date: "2024-02-01", size: "155 KB" },
-    { name: "Payslip January 2024", date: "2024-01-01", size: "154 KB" },
-    { name: "Payslip December 2023", date: "2023-12-01", size: "153 KB" },
-    { name: "Payslip November 2023", date: "2023-11-01", size: "152 KB" },
-    { name: "Payslip October 2023", date: "2023-10-01", size: "151 KB" }
+    { 
+      name: "Payslip March 2024", 
+      date: "2024-03-01", 
+      size: "156 KB",
+      isVerified: true,
+      downloadUrl: "/lovable-uploads/payslips/march-2024-payslip.pdf"
+    },
+    { 
+      name: "Payslip February 2024", 
+      date: "2024-02-01", 
+      size: "155 KB",
+      isVerified: true,
+      downloadUrl: "/lovable-uploads/payslips/february-2024-payslip.pdf"
+    },
+    { 
+      name: "Payslip January 2024", 
+      date: "2024-01-01", 
+      size: "154 KB",
+      isVerified: true,
+      downloadUrl: "/lovable-uploads/payslips/january-2024-payslip.pdf"
+    },
+    { 
+      name: "Payslip December 2023", 
+      date: "2023-12-01", 
+      size: "153 KB",
+      isVerified: true,
+      downloadUrl: "/lovable-uploads/payslips/december-2023-payslip.pdf"
+    }
   ];
 
   const contracts = [
-    { name: "Employment Contract", date: "2023-01-15", size: "2.1 MB" },
-    { name: "NDA Agreement", date: "2023-01-15", size: "890 KB" },
-    { name: "IP Rights Agreement", date: "2023-01-15", size: "756 KB" },
-    { name: "Remote Work Agreement", date: "2023-06-01", size: "945 KB" },
-    { name: "Benefits Agreement", date: "2023-01-15", size: "1.2 MB" }
+    { 
+      name: "Employment Contract", 
+      date: "2023-01-15", 
+      size: "2.1 MB",
+      isVerified: true,
+      downloadUrl: "/lovable-uploads/contracts/employment-contract.pdf"
+    },
+    { 
+      name: "NDA Agreement", 
+      date: "2023-01-15", 
+      size: "890 KB",
+      isVerified: true,
+      downloadUrl: "/lovable-uploads/contracts/nda-agreement.pdf"
+    },
+    { 
+      name: "IP Rights Agreement", 
+      date: "2023-01-15", 
+      size: "756 KB",
+      isVerified: true,
+      downloadUrl: "/lovable-uploads/contracts/ip-rights-agreement.pdf"
+    },
+    { 
+      name: "Remote Work Agreement", 
+      date: "2023-06-01", 
+      size: "945 KB",
+      isVerified: true,
+      downloadUrl: "/lovable-uploads/contracts/remote-work-agreement.pdf"
+    }
   ];
 
   const otherDocuments = [
-    { name: "Employee Handbook 2024", date: "2024-01-01", size: "3.2 MB" },
-    { name: "Travel Policy", date: "2023-11-15", size: "645 KB" },
-    { name: "Benefits Guide 2024", date: "2024-01-01", size: "1.8 MB" },
-    { name: "IT Security Guidelines", date: "2023-12-15", size: "987 KB" },
-    { name: "Expense Claim Procedure", date: "2023-10-01", size: "754 KB" },
-    { name: "Health and Safety Guidelines", date: "2023-09-15", size: "1.5 MB" },
-    { name: "Code of Conduct", date: "2023-08-01", size: "2.3 MB" },
-    { name: "Career Development Program", date: "2024-02-15", size: "1.1 MB" }
+    { 
+      name: "Employee Handbook 2024", 
+      date: "2024-01-01", 
+      size: "3.2 MB",
+      downloadUrl: "/lovable-uploads/documents/employee-handbook-2024.pdf"
+    },
+    { 
+      name: "Travel Policy", 
+      date: "2023-11-15", 
+      size: "645 KB",
+      downloadUrl: "/lovable-uploads/documents/travel-policy.pdf"
+    },
+    { 
+      name: "Benefits Guide 2024", 
+      date: "2024-01-01", 
+      size: "1.8 MB",
+      downloadUrl: "/lovable-uploads/documents/benefits-guide-2024.pdf"
+    },
+    { 
+      name: "IT Security Guidelines", 
+      date: "2023-12-15", 
+      size: "987 KB",
+      downloadUrl: "/lovable-uploads/documents/it-security-guidelines.pdf"
+    }
   ];
 
-  const handleDocumentClick = (doc: { name: string; date: string; size: string }) => {
+  const handleDocumentClick = (doc: { 
+    name: string; 
+    date: string; 
+    size: string;
+    isVerified?: boolean;
+    downloadUrl?: string;
+  }) => {
     if (doc.name.toLowerCase().includes('payslip') || doc.name.toLowerCase().includes('contract') || 
         doc.name.toLowerCase().includes('agreement')) {
       setSelectedDocument(doc);
       setShowOTPDialog(true);
-    } else {
+    } else if (doc.downloadUrl) {
+      // Create a temporary anchor element to trigger the download
+      const link = document.createElement('a');
+      link.href = doc.downloadUrl;
+      link.target = '_blank';
+      link.download = doc.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       toast.success(`Downloading ${doc.name}`);
+    } else {
+      toast.error("Download URL not found");
     }
   };
 
   const handleOTPVerify = (otp: string) => {
-    if (otp === "123456") {
-      toast.success(`Verified successfully. Downloading ${selectedDocument?.name}`);
+    if (otp === "123456" && selectedDocument?.downloadUrl) {
+      const link = document.createElement('a');
+      link.href = selectedDocument.downloadUrl;
+      link.target = '_blank';
+      link.download = selectedDocument.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success(`Verified successfully. Downloading ${selectedDocument.name}`);
       setShowOTPDialog(false);
       setSelectedDocument(null);
     } else {
