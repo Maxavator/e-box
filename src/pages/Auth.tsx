@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -120,13 +119,8 @@ const Auth = () => {
               Welcome to e-Box
             </CardTitle>
             <CardDescription className="text-center text-gray-500">
-              Demo Credentials
+              Enter your credentials to continue
             </CardDescription>
-            <div className="mt-4 space-y-2 text-sm text-gray-500 bg-primary/5 p-4 rounded-lg border border-primary/10">
-              <p className="hover:text-primary transition-colors"><span className="font-medium">Regular User:</span> username: user / password: password</p>
-              <p className="hover:text-primary transition-colors"><span className="font-medium">Organization Admin:</span> username: org_admin / password: password</p>
-              <p className="hover:text-primary transition-colors"><span className="font-medium">Global Admin:</span> username: admin / password: password</p>
-            </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
