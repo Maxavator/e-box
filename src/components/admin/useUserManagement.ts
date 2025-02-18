@@ -29,6 +29,31 @@ export const useUserManagement = () => {
     },
   });
 
+  const { data: userRole } = useQuery({
+    queryKey: ['userRole'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .single();
+      if (error) throw error;
+      return data?.role;
+    },
+  });
+
+  const { data: userProfile } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: userRole === 'org_admin',
+  });
+
   const { data: organizations } = useQuery({
     queryKey: ['organizations'],
     queryFn: async () => {
@@ -39,28 +64,39 @@ export const useUserManagement = () => {
       if (error) throw error;
       return data;
     },
-    enabled: isAdmin,
+    enabled: isAdmin || userRole === 'org_admin',
   });
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const { data: profiles, error: profilesError } = await supabase
+      let query = supabase
         .from('profiles')
         .select(`
           *,
           user_roles (role),
           organizations (name)
         `);
+
+      if (userRole === 'org_admin' && userProfile?.organization_id) {
+        query = query.eq('organization_id', userProfile.organization_id);
+      }
+      
+      const { data: profiles, error: profilesError } = await query;
       
       if (profilesError) throw profilesError;
       return profiles as unknown as UserWithRole[];
     },
-    enabled: isAdmin,
+    enabled: isAdmin || (userRole === 'org_admin' && !!userProfile?.organization_id),
   });
 
   const updateUserMutation = useMutation({
     mutationFn: async ({ userId, data }: { userId: string, data: UserFormData }) => {
+      // Check if user has permission to update
+      if (userRole === 'org_admin' && userProfile?.organization_id !== data.organizationId) {
+        throw new Error("You don't have permission to update users from other organizations");
+      }
+
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
@@ -106,5 +142,7 @@ export const useUserManagement = () => {
     formData,
     setFormData,
     updateUserMutation,
+    userRole,
+    userProfile,
   };
 };
