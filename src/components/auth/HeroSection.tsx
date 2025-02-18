@@ -5,7 +5,7 @@ const HeroSection = () => {
       <div className="max-w-xl space-y-8">
         <div className="space-y-4">
           <h1 className="text-4xl lg:text-5xl font-bold">
-            Welcome to e-Box
+            Secure Enterprise Communication
           </h1>
           <p className="text-xl lg:text-2xl opacity-90">
             Your comprehensive solution for secure communication and document management
