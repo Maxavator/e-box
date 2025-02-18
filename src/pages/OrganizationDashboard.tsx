@@ -7,9 +7,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 const OrganizationDashboard = () => {
   const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState<{ userName: string; orgName: string }>({ userName: '', orgName: '' });
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('first_name, last_name, organizations(name)')
+          .eq('id', user.id)
+          .single();
+
+        if (profileData) {
+          const userName = `${profileData.first_name} ${profileData.last_name}`;
+          const orgName = profileData.organizations?.name || '';
+          setUserInfo({ userName, orgName });
+        }
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -25,7 +49,14 @@ const OrganizationDashboard = () => {
       <ChatHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
       <main className="container mx-auto p-4 space-y-6">
         <header className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Organization Dashboard</h1>
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold tracking-tight">Organization Dashboard</h1>
+            {userInfo.userName && (
+              <p className="text-muted-foreground">
+                {userInfo.userName} ({userInfo.orgName})
+              </p>
+            )}
+          </div>
           <p className="text-muted-foreground">Manage your organization's information and policies</p>
         </header>
 
