@@ -5,6 +5,7 @@ import { ChatInput } from "./ChatInput";
 import { Documents } from "@/components/desk/Documents";
 import { Dashboard } from "@/components/desk/Dashboard";
 import { Policies } from "@/components/desk/Policies";
+import { Settings } from "@/components/settings/Settings";
 import { CalendarDashboard } from "@/components/calendar/CalendarDashboard";
 import { CalendarInbox } from "@/components/calendar/CalendarInbox";
 import type { Conversation } from "@/types/chat";
@@ -60,7 +61,7 @@ export const ChatContent = ({
       case 'policies':
         return <Policies />;
       case 'settings':
-        return <div className="p-6"><h2 className="text-2xl font-semibold">Settings</h2></div>;
+        return <Settings />;
       default:
         return <Dashboard />;
     }
