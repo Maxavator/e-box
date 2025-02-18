@@ -20,13 +20,15 @@ interface UserWithRole extends Profile {
 export const UserManagement = () => {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
         .select(`
-          *,
+          id,
+          first_name,
+          last_name,
           user_roles (
             role
           )
@@ -40,6 +42,15 @@ export const UserManagement = () => {
       return data as UserWithRole[];
     },
   });
+
+  // Check if we have permission to access the data
+  if (error?.message?.includes('permission denied')) {
+    return (
+      <div className="p-4 text-center">
+        <p className="text-red-500">You don't have permission to view user management.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
