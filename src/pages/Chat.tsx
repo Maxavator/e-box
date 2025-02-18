@@ -1,20 +1,22 @@
+
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatContent } from "@/components/chat/ChatContent";
-import type { Message, Conversation } from "@/types/chat";
-import { demoConversations, getUserById } from "@/data/chat";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { toast } from "sonner";
+import { useToast } from "@/components/ui/use-toast";
+import { demoConversations, getUserById } from "@/data/chat";
+import type { Message, Conversation, Reaction } from "@/types/chat";
 
 const Chat = () => {
   const navigate = useNavigate();
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
-  const [newMessage, setNewMessage] = useState("");
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("chats");
-  const [calendarView, setCalendarView] = useState<'calendar' | 'inbox'>('calendar');
+  const [calendarView, setCalendarView] = useState<"calendar" | "inbox">("calendar");
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [newMessage, setNewMessage] = useState("");
   const [conversations, setConversations] = useState(demoConversations);
 
   useEffect(() => {
@@ -23,162 +25,122 @@ const Chat = () => {
       const user = getUserById(randomUser.userId);
       
       if (user) {
-        const newMessage: Message = {
-          id: `${Date.now()}`,
-          senderId: user.id,
-          text: `New update from ${user.name}`,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          status: 'sent'
-        };
-
         setConversations(prevConversations => 
-          prevConversations.map(conv => 
-            conv.userId === user.id 
-              ? {
-                  ...conv,
-                  messages: [...conv.messages, newMessage],
-                  unreadCount: selectedConversation?.userId !== user.id 
-                    ? conv.unreadCount + 1 
-                    : conv.unreadCount
-                }
-              : conv
-          )
+          prevConversations.map(conv => {
+            if (conv.userId === randomUser.userId) {
+              const newMessage: Message = {
+                id: Math.random().toString(),
+                content: `Random message from ${user.name}`,
+                timestamp: new Date().toISOString(),
+                sender: 'them',
+                reactions: []
+              };
+
+              return {
+                ...conv,
+                messages: [...conv.messages, newMessage],
+                lastMessage: newMessage.content,
+                unreadCount: selectedConversation?.id === conv.id ? 0 : (conv.unreadCount + 1)
+              };
+            }
+            return conv;
+          })
         );
 
-        if (selectedConversation?.userId !== user.id) {
-          toast(`New message from ${user.name}`);
+        if (selectedConversation?.userId !== randomUser.userId) {
+          toast({
+            title: "New Message",
+            description: `New message from ${user.name}`
+          });
         }
       }
     }, Math.random() * 15000 + 15000);
 
     return () => clearInterval(interval);
-  }, [selectedConversation]);
+  }, [selectedConversation, toast]);
 
   const handleLogout = () => {
     navigate("/");
   };
 
   const handleLogoClick = () => {
-    setActiveTab("chats");
-    setSelectedConversation(null);
+    navigate("/organization");
   };
 
   const handleCalendarActionClick = (view: 'calendar' | 'inbox') => {
-    setActiveTab("calendar");
     setCalendarView(view);
+    setActiveTab('calendar');
   };
 
   const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedConversation) return;
+    if (!selectedConversation || !newMessage.trim()) return;
 
     const message: Message = {
-      id: `${Date.now()}`,
-      senderId: 'me',
-      text: newMessage.trim(),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      status: 'sending'
+      id: Math.random().toString(),
+      content: newMessage,
+      timestamp: new Date().toISOString(),
+      sender: 'me',
+      reactions: []
     };
 
     setSelectedConversation(prev => {
       if (!prev) return prev;
       return {
         ...prev,
-        messages: [...prev.messages, message]
+        messages: [...prev.messages, message],
+        lastMessage: message.content
       };
     });
-
-    setConversations(prevConversations => 
-      prevConversations.map(conv => 
-        conv.id === selectedConversation.id 
-          ? { ...conv, messages: [...conv.messages, message] }
-          : conv
-      )
-    );
 
     setNewMessage("");
 
     setTimeout(() => {
       setSelectedConversation(prev => {
         if (!prev) return prev;
+        const user = getUserById(prev.userId);
+        if (!user) return prev;
+
+        const reply: Message = {
+          id: Math.random().toString(),
+          content: `Reply from ${user.name}`,
+          timestamp: new Date().toISOString(),
+          sender: 'them',
+          reactions: []
+        };
+
         return {
           ...prev,
-          messages: prev.messages.map(m => 
-            m.id === message.id ? { ...m, status: 'sent' } : m
-          )
+          messages: [...prev.messages, reply],
+          lastMessage: reply.content
         };
       });
-
-      setConversations(prevConversations => 
-        prevConversations.map(conv => 
-          conv.id === selectedConversation.id 
-            ? {
-                ...conv,
-                messages: conv.messages.map(m => 
-                  m.id === message.id ? { ...m, status: 'sent' } : m
-                )
-              }
-            : conv
-        )
-      );
     }, 1000);
   };
 
-  const handleEditMessage = (messageId: string, newText: string) => {
+  const handleEditMessage = (messageId: string, newContent: string) => {
     setSelectedConversation(prev => {
       if (!prev) return prev;
       return {
         ...prev,
-        messages: prev.messages.map(m => 
-          m.id === messageId ? 
-          { 
-            ...m, 
-            text: newText, 
-            edited: true, 
-            editedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          } : m
-        )
+        messages: prev.messages.map(m =>
+          m.id === messageId
+            ? { ...m, content: newContent, edited: true }
+            : m
+        ),
       };
     });
-
-    setConversations(prevConversations => 
-      prevConversations.map(conv => 
-        conv.id === selectedConversation?.id 
-          ? {
-              ...conv,
-              messages: conv.messages.map(m => 
-                m.id === messageId ? 
-                { 
-                  ...m, 
-                  text: newText, 
-                  edited: true, 
-                  editedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                } : m
-              )
-            }
-          : conv
-      )
-    );
   };
 
   const handleDeleteMessage = (messageId: string) => {
     setSelectedConversation(prev => {
       if (!prev) return prev;
+      const updatedMessages = prev.messages.filter(m => m.id !== messageId);
       return {
         ...prev,
-        messages: prev.messages.filter(m => m.id !== messageId)
+        messages: updatedMessages,
+        lastMessage: updatedMessages[updatedMessages.length - 1]?.content ?? ''
       };
     });
-
-    setConversations(prevConversations => 
-      prevConversations.map(conv => 
-        conv.id === selectedConversation?.id 
-          ? {
-              ...conv,
-              messages: conv.messages.filter(m => m.id !== messageId)
-            }
-          : conv
-      )
-    );
   };
 
   const handleReaction = (messageId: string, emoji: string) => {
@@ -188,25 +150,23 @@ const Chat = () => {
         ...prev,
         messages: prev.messages.map(m => {
           if (m.id !== messageId) return m;
-          
-          const existingReaction = m.reactions?.find(r => r.emoji === emoji);
-          const reactions = m.reactions || [];
+
+          const reactions = [...m.reactions];
+          const existingReaction = reactions.find(r => r.emoji === emoji);
           
           if (existingReaction) {
             if (existingReaction.users.includes('me')) {
               return {
                 ...m,
                 reactions: reactions
-                  .map(r => r.emoji === emoji ? 
-                    { ...r, users: r.users.filter(u => u !== 'me') } : r)
+                  .map(r => r.emoji === emoji ? { ...r, users: r.users.filter(u => u !== 'me') } : r)
                   .filter(r => r.users.length > 0)
               };
             } else {
               return {
                 ...m,
                 reactions: reactions.map(r => 
-                  r.emoji === emoji ? 
-                  { ...r, users: [...r.users, 'me'] } : r
+                  r.emoji === emoji ? { ...r, users: [...r.users, 'me'] } : r
                 )
               };
             }
@@ -219,44 +179,6 @@ const Chat = () => {
         })
       };
     });
-
-    setConversations(prevConversations => 
-      prevConversations.map(conv => 
-        conv.id === selectedConversation?.id 
-          ? { ...conv, messages: conv.messages.map(m => {
-              if (m.id !== messageId) return m;
-              
-              const existingReaction = m.reactions?.find(r => r.emoji === emoji);
-              const reactions = m.reactions || [];
-              
-              if (existingReaction) {
-                if (existingReaction.users.includes('me')) {
-                  return {
-                    ...m,
-                    reactions: reactions
-                      .map(r => r.emoji === emoji ? 
-                        { ...r, users: r.users.filter(u => u !== 'me') } : r)
-                      .filter(r => r.users.length > 0)
-                  };
-                } else {
-                  return {
-                    ...m,
-                    reactions: reactions.map(r => 
-                      r.emoji === emoji ? 
-                      { ...r, users: [...r.users, 'me'] } : r
-                    )
-                  };
-                }
-              } else {
-                return {
-                  ...m,
-                  reactions: [...reactions, { emoji, users: ['me'] }]
-                };
-              }
-            })}
-          : conv
-      )
-    );
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
@@ -275,12 +197,11 @@ const Chat = () => {
   const filteredConversations = conversations.filter(conversation => {
     const user = getUserById(conversation.userId);
     const searchLower = searchQuery.toLowerCase();
-    
-    return user?.name.toLowerCase().includes(searchLower) ||
-           conversation.messages.some(message => 
-             message.text.toLowerCase().includes(searchLower) ||
-             message.timestamp.toLowerCase().includes(searchLower)
-           );
+    return (
+      user &&
+      (user.name.toLowerCase().includes(searchLower) ||
+        conversation.lastMessage.toLowerCase().includes(searchLower))
+    );
   });
 
   return (
@@ -294,7 +215,7 @@ const Chat = () => {
             onSearchChange={setSearchQuery}
             activeTab={activeTab}
             onTabChange={setActiveTab}
-            conversations={conversations}
+            conversations={filteredConversations}
             selectedConversation={selectedConversation}
             onSelectConversation={handleSelectConversation}
             onCalendarActionClick={handleCalendarActionClick}
