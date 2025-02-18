@@ -18,14 +18,14 @@ interface ChatSidebarProps {
   onCalendarActionClick: (view: 'calendar' | 'inbox') => void;
 }
 
-const DeskFeatures = ({ onCalendarActionClick }: { onCalendarActionClick: (view: 'calendar' | 'inbox') => void }) => {
+const DeskFeatures = () => {
   return (
     <div className="p-4 space-y-2">
       <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'dashboard' }))}>
         <LayoutDashboard className="mr-2 h-4 w-4" />
         Dashboard
       </Button>
-      <Button variant="ghost" className="w-full justify-start" onClick={() => onCalendarActionClick('calendar')}>
+      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'calendar' }))}>
         <Calendar className="mr-2 h-4 w-4" />
         Calendar
       </Button>
@@ -57,7 +57,6 @@ export function ChatSidebar({
   conversations,
   selectedConversation,
   onSelectConversation,
-  onCalendarActionClick,
 }: ChatSidebarProps) {
   const totalUnreadCount = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
 
@@ -107,7 +106,7 @@ export function ChatSidebar({
         </TabsContent>
 
         <TabsContent value="desk" className="h-full">
-          <DeskFeatures onCalendarActionClick={onCalendarActionClick} />
+          <DeskFeatures />
         </TabsContent>
       </Tabs>
     </div>
