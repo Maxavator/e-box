@@ -16,7 +16,7 @@ const Auth = () => {
             <img 
               src="/lovable-uploads/4415dded-8eed-482f-ab46-9019698e147f.png" 
               alt="e-Box Logo" 
-              className="h-12 w-auto"
+              className="h-16 w-auto"
             />
           </div>
         </div>
