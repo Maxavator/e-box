@@ -1,244 +1,28 @@
-import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { useEffect } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
-import { DocumentList } from "./components/DocumentList";
-import { EmptyState } from "./components/EmptyState";
 import { OTPVerification } from "./components/OTPVerification";
-import { Document } from "./types/documents";
-import { supabase } from "@/integrations/supabase/client";
+import { DocumentTabs } from "./components/DocumentTabs";
+import { useDocuments } from "./hooks/useDocuments";
 
 export const Documents = () => {
-  const [showOTPDialog, setShowOTPDialog] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    documents,
+    loading,
+    showOTPDialog,
+    selectedDocument,
+    fetchDocuments,
+    handleDocumentClick,
+    handleOTPVerify,
+    filterDocuments,
+    setShowOTPDialog,
+    setSelectedDocument
+  } = useDocuments();
 
   useEffect(() => {
     fetchDocuments();
   }, []);
-
-  const fetchDocuments = async () => {
-    try {
-      // Sample documents data
-      const sampleDocuments = [
-        {
-          id: '1',
-          name: 'January_2024_Payslip.pdf',
-          size: '245 KB',
-          category: 'Financial',
-          description: 'Monthly payslip for January 2024',
-          version: '1.0',
-          lastModifiedBy: 'HR System',
-          isVerified: true,
-          requires_otp: true,
-          date: '2024-01-31',
-          previewContent: 'This is a secure payslip document for January 2024. Please verify your identity to view the full content.'
-        },
-        {
-          id: '2',
-          name: 'February_2024_Payslip.pdf',
-          size: '242 KB',
-          category: 'Financial',
-          description: 'Monthly payslip for February 2024',
-          version: '1.0',
-          lastModifiedBy: 'HR System',
-          isVerified: true,
-          requires_otp: true,
-          date: '2024-02-29',
-          previewContent: 'This is a secure payslip document for February 2024. Please verify your identity to view the full content.'
-        },
-        {
-          id: '3',
-          name: 'March_2024_Payslip.pdf',
-          size: '248 KB',
-          category: 'Financial',
-          description: 'Monthly payslip for March 2024',
-          version: '1.0',
-          lastModifiedBy: 'HR System',
-          isVerified: true,
-          requires_otp: true,
-          date: '2024-03-31',
-          previewContent: 'This is a secure payslip document for March 2024. Please verify your identity to view the full content.'
-        },
-        {
-          id: '4',
-          name: 'Employment_Contract_2024.pdf',
-          size: '890 KB',
-          category: 'Legal',
-          description: 'Updated employment contract for 2024',
-          version: '2.1',
-          lastModifiedBy: 'Legal Department',
-          isVerified: true,
-          requires_otp: true,
-          date: '2024-01-15',
-          previewContent: 'Employment contract including updated terms and conditions for 2024.'
-        },
-        {
-          id: '5',
-          name: 'Non_Disclosure_Agreement.pdf',
-          size: '425 KB',
-          category: 'Legal',
-          description: 'Confidentiality agreement',
-          version: '1.0',
-          lastModifiedBy: 'Legal Department',
-          isVerified: true,
-          requires_otp: true,
-          date: '2024-01-20',
-          previewContent: 'Non-disclosure agreement outlining confidentiality terms and conditions.'
-        },
-        {
-          id: '6',
-          name: 'Code_of_Conduct_2024.pdf',
-          size: '678 KB',
-          category: 'Legal',
-          description: 'Company code of conduct and ethics',
-          version: '3.2',
-          lastModifiedBy: 'Legal Department',
-          isVerified: true,
-          requires_otp: true,
-          date: '2024-01-10',
-          previewContent: 'Updated code of conduct including ethical guidelines and compliance requirements.'
-        },
-        {
-          id: '7',
-          name: 'Company_Handbook_2024.pdf',
-          size: '1.2 MB',
-          category: 'Other',
-          description: 'Employee handbook and guidelines',
-          version: '3.0',
-          lastModifiedBy: 'HR Department',
-          isVerified: true,
-          requires_otp: false,
-          date: '2024-01-01',
-          previewContent: 'Company policies, procedures, and guidelines for all employees.'
-        },
-        {
-          id: '8',
-          name: 'Performance_Review_Q1_2024.pdf',
-          size: '350 KB',
-          category: 'Other',
-          description: 'First quarter performance evaluation',
-          version: '1.0',
-          lastModifiedBy: 'Line Manager',
-          isVerified: true,
-          requires_otp: false,
-          date: '2024-03-15',
-          previewContent: 'Quarterly performance review document including goals and achievements.'
-        },
-        {
-          id: '9',
-          name: 'IT_Security_Guidelines.pdf',
-          size: '520 KB',
-          category: 'Other',
-          description: 'IT security policies and procedures',
-          version: '2.1',
-          lastModifiedBy: 'IT Department',
-          isVerified: true,
-          requires_otp: false,
-          date: '2024-02-01',
-          previewContent: 'Information security guidelines and best practices for all employees.'
-        },
-        {
-          id: '10',
-          name: 'Employee_Benefits_2024.pdf',
-          size: '680 KB',
-          category: 'Other',
-          description: 'Overview of employee benefits package',
-          version: '1.2',
-          lastModifiedBy: 'HR Department',
-          isVerified: true,
-          requires_otp: false,
-          date: '2024-01-05',
-          previewContent: 'Comprehensive guide to employee benefits, including medical aid, pension, and other perks.'
-        }
-      ];
-
-      const { data: fetchedDocs, error } = await supabase
-        .from('documents')
-        .select('*');
-
-      if (error) throw error;
-
-      // Use fetched documents if available, otherwise use sample documents
-      const docsToUse = fetchedDocs && fetchedDocs.length > 0 ? fetchedDocs : sampleDocuments;
-
-      const formattedDocs: Document[] = docsToUse.map(doc => ({
-        id: doc.id,
-        name: doc.name,
-        size: doc.size || '0 KB',
-        description: doc.description,
-        category: doc.category,
-        version: doc.version,
-        lastModifiedBy: doc.lastModifiedBy || doc.last_modified_by,
-        file_path: doc.file_path,
-        content_type: doc.content_type,
-        isVerified: doc.isVerified || doc.is_verified,
-        requires_otp: doc.requires_otp,
-        date: doc.date || (doc.created_at ? new Date(doc.created_at).toLocaleDateString() : undefined),
-        previewContent: doc.previewContent,
-        created_at: doc.created_at,
-        updated_at: doc.updated_at
-      }));
-
-      setDocuments(formattedDocs);
-    } catch (error) {
-      console.error('Error fetching documents:', error);
-      toast.error("Failed to load documents");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDocumentClick = async (doc: Document) => {
-    if (doc.requires_otp) {
-      setSelectedDocument(doc);
-      setShowOTPDialog(true);
-    } else {
-      await downloadDocument(doc);
-    }
-  };
-
-  const downloadDocument = async (doc: Document) => {
-    try {
-      if (!doc.file_path) throw new Error("File path not found");
-
-      const { data, error } = await supabase.storage
-        .from('documents')
-        .download(doc.file_path);
-
-      if (error) throw error;
-
-      // Create a download link
-      const url = URL.createObjectURL(data);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = doc.name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast.success(`Downloading ${doc.name}`);
-    } catch (error) {
-      console.error('Error downloading document:', error);
-      toast.error("Failed to download document");
-    }
-  };
-
-  const handleOTPVerify = async (otp: string) => {
-    if (otp === "123456" && selectedDocument) {
-      await downloadDocument(selectedDocument);
-      setShowOTPDialog(false);
-      setSelectedDocument(null);
-    } else {
-      toast.error("Invalid OTP");
-    }
-  };
-
-  const filterDocuments = (category: string) => {
-    return documents.filter(doc => doc.category?.toLowerCase() === category.toLowerCase());
-  };
 
   return (
     <div className="p-6">
@@ -254,48 +38,12 @@ export const Documents = () => {
               <TabsTrigger value="other">Other Documents</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="payslips">
-              {loading ? (
-                <div>Loading...</div>
-              ) : filterDocuments('Financial').length > 0 ? (
-                <DocumentList 
-                  documents={filterDocuments('Financial')}
-                  requiresOTP={true}
-                  onDocumentClick={handleDocumentClick}
-                />
-              ) : (
-                <EmptyState />
-              )}
-            </TabsContent>
-            
-            <TabsContent value="contracts">
-              {loading ? (
-                <div>Loading...</div>
-              ) : filterDocuments('Legal').length > 0 ? (
-                <DocumentList 
-                  documents={filterDocuments('Legal')}
-                  requiresOTP={true}
-                  onDocumentClick={handleDocumentClick}
-                />
-              ) : (
-                <EmptyState />
-              )}
-            </TabsContent>
-            
-            <TabsContent value="other">
-              {loading ? (
-                <div>Loading...</div>
-              ) : documents.filter(doc => 
-                !['Financial', 'Legal'].includes(doc.category || '')).length > 0 ? (
-                <DocumentList 
-                  documents={documents.filter(doc => 
-                    !['Financial', 'Legal'].includes(doc.category || ''))}
-                  onDocumentClick={handleDocumentClick}
-                />
-              ) : (
-                <EmptyState />
-              )}
-            </TabsContent>
+            <DocumentTabs
+              loading={loading}
+              documents={documents}
+              filterDocuments={filterDocuments}
+              onDocumentClick={handleDocumentClick}
+            />
           </Tabs>
         </CardContent>
       </Card>
