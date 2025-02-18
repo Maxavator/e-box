@@ -135,7 +135,7 @@ export const DocumentList = ({ documents, requiresOTP = false, onDocumentClick }
                   variant="ghost" 
                   size="sm"
                   onClick={() => {
-                    const newDoc = { ...document, name: getDownloadFileName(doc.name) };
+                    const newDoc = { ...doc, name: getDownloadFileName(doc.name) };
                     onDocumentClick(newDoc);
                   }}
                 >
