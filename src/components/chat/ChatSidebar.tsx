@@ -1,6 +1,7 @@
+
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar, Inbox, Briefcase, LayoutDashboard, Car, FileText, Headset, Settings } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, Briefcase, LayoutDashboard, FileText, Headset, Settings } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
@@ -40,10 +41,6 @@ const DeskFeatures = () => {
       <Button variant="ghost" className="w-full justify-start">
         <LayoutDashboard className="mr-2 h-4 w-4" />
         Dashboard
-      </Button>
-      <Button variant="ghost" className="w-full justify-start">
-        <Car className="mr-2 h-4 w-4" />
-        Fleet Manager
       </Button>
       <Button variant="ghost" className="w-full justify-start">
         <FileText className="mr-2 h-4 w-4" />
