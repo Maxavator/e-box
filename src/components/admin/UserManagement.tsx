@@ -9,6 +9,7 @@ import type { UserWithRole } from "./types";
 export const UserManagement = () => {
   const {
     isAdmin,
+    userRole,
     organizations,
     users,
     isLoading,
@@ -46,7 +47,7 @@ export const UserManagement = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  if (!isAdmin) {
+  if (!isAdmin && userRole !== 'org_admin') {
     return (
       <div className="p-4 text-center">
         <p className="text-red-500">You don't have permission to view user management.</p>
@@ -57,7 +58,15 @@ export const UserManagement = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">User Management</h2>
+        <div>
+          <h2 className="text-xl font-bold">User Management</h2>
+          {userRole === 'org_admin' && (
+            <p className="text-sm text-muted-foreground">Managing users for your organization</p>
+          )}
+          {isAdmin && (
+            <p className="text-sm text-muted-foreground">Managing all users across organizations</p>
+          )}
+        </div>
         <Button onClick={() => setIsAddUserOpen(true)}>
           <UserPlus className="w-4 h-4 mr-2" />
           Add User
