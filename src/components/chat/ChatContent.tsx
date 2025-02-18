@@ -6,6 +6,7 @@ import { Documents } from "@/components/desk/Documents";
 import { Dashboard } from "@/components/desk/Dashboard";
 import { Policies } from "@/components/desk/Policies";
 import { Settings } from "@/components/settings/Settings";
+import { LeaveManager } from "@/components/desk/LeaveManager";
 import { CalendarDashboard } from "@/components/calendar/CalendarDashboard";
 import { CalendarInbox } from "@/components/calendar/CalendarInbox";
 import type { Conversation } from "@/types/chat";
@@ -58,6 +59,8 @@ export const ChatContent = ({
         return <Documents />;
       case 'dashboard':
         return <Dashboard />;
+      case 'leave-manager':
+        return <LeaveManager />;
       case 'policies':
         return <Policies />;
       case 'settings':
