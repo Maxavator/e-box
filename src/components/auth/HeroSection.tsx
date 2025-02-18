@@ -1,5 +1,5 @@
 
-import { Shield, Zap, Clock } from "lucide-react";
+import { Shield, Users, MessageSquare, ChartBar, Scale, Clock } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -16,39 +16,70 @@ const HeroSection = () => {
       <div className="max-w-xl space-y-12 relative z-10 p-12 text-white">
         <div className="space-y-6">
           <div className="space-y-2">
-            <h2 className="text-lg font-medium text-white/80">Welcome to e-Box</h2>
             <h1 className="text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
-              Your Secure Digital Mailbox
+              Empower Your Enterprise Communication
             </h1>
+            <p className="text-xl lg:text-2xl opacity-90 leading-relaxed">
+              Transform your workplace with e-Box - South Africa's premier enterprise communication platform. Built for African businesses, designed for growth, Executives to Deskless Staff, All Staff.
+            </p>
           </div>
-          <p className="text-xl lg:text-2xl opacity-90 leading-relaxed">
-            Transform your official communications with a modern, secure, and efficient digital solution
-          </p>
         </div>
 
         <div className="space-y-8">
           <div className="space-y-6">
-            <h3 className="text-2xl font-semibold">Enterprise-Grade Features</h3>
-            <ul className="space-y-6">
+            <ul className="grid grid-cols-2 gap-6">
               <li className="flex items-start gap-4 group">
                 <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
                   <Shield className="w-6 h-6" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Bank-Level Security</h4>
-                  <p className="text-white/80 leading-relaxed">
-                    End-to-end encryption and advanced security protocols protect your sensitive communications
+                  <h4 className="font-medium text-lg">Enterprise Security</h4>
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    Bank-grade encryption with SA POPI Act compliance
                   </p>
                 </div>
               </li>
               <li className="flex items-start gap-4 group">
                 <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                  <Zap className="w-6 h-6" />
+                  <Users className="w-6 h-6" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Instant Delivery</h4>
-                  <p className="text-white/80 leading-relaxed">
-                    Real-time document delivery and notifications keep you informed and responsive
+                  <h4 className="font-medium text-lg">HR Management</h4>
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    Integrated SA ID verification and employee management
+                  </p>
+                </div>
+              </li>
+              <li className="flex items-start gap-4 group">
+                <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
+                  <MessageSquare className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-medium text-lg">Team Communication</h4>
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    Real-time messaging with multi-language support
+                  </p>
+                </div>
+              </li>
+              <li className="flex items-start gap-4 group">
+                <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
+                  <ChartBar className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-medium text-lg">Performance Analytics</h4>
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    Track KPIs and business metrics in real-time
+                  </p>
+                </div>
+              </li>
+              <li className="flex items-start gap-4 group">
+                <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
+                  <Scale className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-medium text-lg">Local Compliance</h4>
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    Built for South African business regulations
                   </p>
                 </div>
               </li>
@@ -57,9 +88,9 @@ const HeroSection = () => {
                   <Clock className="w-6 h-6" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Always Available</h4>
-                  <p className="text-white/80 leading-relaxed">
-                    Access your documents 24/7 from any device, anywhere in the world
+                  <h4 className="font-medium text-lg">Time Management</h4>
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    Advanced leave tracking and attendance monitoring
                   </p>
                 </div>
               </li>
@@ -67,9 +98,12 @@ const HeroSection = () => {
           </div>
 
           <div className="pt-6 border-t border-white/20">
-            <p className="text-sm leading-relaxed opacity-80">
-              Trusted by government institutions and leading organizations for secure, reliable, and efficient digital communication.
-            </p>
+            <blockquote className="text-sm leading-relaxed opacity-80 italic">
+              "e-Box has revolutionized how we manage our team communication and HR processes. It's perfectly adapted to South African business needs for all inclusive communication."
+              <footer className="mt-2 font-medium not-italic">
+                - Leading South African Enterprise
+              </footer>
+            </blockquote>
           </div>
         </div>
       </div>
