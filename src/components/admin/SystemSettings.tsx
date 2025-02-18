@@ -15,6 +15,7 @@ export const SystemSettings = () => {
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
         
         <TabsContent value="general" className="space-y-4">
@@ -96,6 +97,35 @@ export const SystemSettings = () => {
                   <Label>User Activity Notifications</Label>
                   <p className="text-sm text-muted-foreground">
                     Send notifications for important user actions
+                  </p>
+                </div>
+                <Switch />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="reports" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Report Settings</CardTitle>
+              <CardDescription>Configure system-wide reporting preferences</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Automated Reports</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Enable scheduled report generation
+                  </p>
+                </div>
+                <Switch />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Report Exports</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Allow exporting reports to various formats
                   </p>
                 </div>
                 <Switch />
