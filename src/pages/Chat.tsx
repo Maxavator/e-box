@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ChatHeader } from "@/components/chat/ChatHeader";
@@ -8,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { demoConversations, getUserById } from "@/data/chat";
 import type { Message, Conversation } from "@/types/chat";
 import Dashboard from "./Dashboard";
-import Settings from "./Settings";
+import { Settings } from "@/components/desk/Settings";
 
 const Chat = () => {
   const navigate = useNavigate();
