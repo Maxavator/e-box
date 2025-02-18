@@ -1,9 +1,11 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { FileSpreadsheet, Mail, Download, Bell } from "lucide-react";
 
 export const SystemSettings = () => {
   return (
@@ -108,27 +110,135 @@ export const SystemSettings = () => {
         <TabsContent value="reports" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Report Settings</CardTitle>
-              <CardDescription>Configure system-wide reporting preferences</CardDescription>
+              <CardTitle>Automated Reports</CardTitle>
+              <CardDescription>Configure scheduled report generation and delivery</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Enable Automated Reports</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Schedule regular report generation
+                    </p>
+                  </div>
+                  <Switch />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Report Frequency</Label>
+                  <Select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select frequency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="daily">Daily</SelectItem>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                      <SelectItem value="quarterly">Quarterly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email Recipients</Label>
+                  <Input placeholder="Enter email addresses (comma-separated)" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Report Types</CardTitle>
+              <CardDescription>Configure which reports to generate</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Automated Reports</Label>
+                  <Label className="flex items-center gap-2">
+                    <FileSpreadsheet className="h-4 w-4" />
+                    Activity Reports
+                  </Label>
                   <p className="text-sm text-muted-foreground">
-                    Enable scheduled report generation
+                    User activity and engagement metrics
                   </p>
                 </div>
                 <Switch />
               </div>
+
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Report Exports</Label>
+                  <Label className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Communication Reports
+                  </Label>
                   <p className="text-sm text-muted-foreground">
-                    Allow exporting reports to various formats
+                    Message and notification statistics
                   </p>
                 </div>
                 <Switch />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="flex items-center gap-2">
+                    <Bell className="h-4 w-4" />
+                    Alert Reports
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    System alerts and notifications summary
+                  </p>
+                </div>
+                <Switch />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Export Settings</CardTitle>
+              <CardDescription>Configure report export options</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Enable Export Options</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Allow reports to be exported in various formats
+                    </p>
+                  </div>
+                  <Switch />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Default Export Format</Label>
+                  <Select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select format" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pdf">PDF</SelectItem>
+                      <SelectItem value="excel">Excel</SelectItem>
+                      <SelectItem value="csv">CSV</SelectItem>
+                      <SelectItem value="json">JSON</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="flex items-center gap-2">
+                      <Download className="h-4 w-4" />
+                      Include Raw Data
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Attach raw data files with exports
+                    </p>
+                  </div>
+                  <Switch />
+                </div>
               </div>
             </CardContent>
           </Card>
