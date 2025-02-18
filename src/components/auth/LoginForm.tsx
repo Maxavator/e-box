@@ -32,9 +32,9 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
 
     // Test credentials validation
     const validCredentials = [
-      { id: "6010203040512", password: "6010203040512", type: "regular" },
-      { id: "5010203040512", password: "5010203040512", type: "org_admin" },
-      { id: "4010203040512", password: "4010203040512", type: "global_admin" }
+      { id: "6010203040512", password: "Test6010203040512", type: "regular" },
+      { id: "5010203040512", password: "Test5010203040512", type: "org_admin" },
+      { id: "4010203040512", password: "Test4010203040512", type: "global_admin" }
     ];
 
     const matchedCredential = validCredentials.find(
