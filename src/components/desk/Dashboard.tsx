@@ -1,8 +1,16 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, MessageSquare, ArrowUpRight, FileText, Calendar } from "lucide-react";
+import { Documents } from "@/components/desk/Documents";
+import { useState } from "react";
 
 export const Dashboard = () => {
+  const [showDocuments, setShowDocuments] = useState(false);
+
+  if (showDocuments) {
+    return <Documents />;
+  }
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-6">Welcome back, John</h2>
@@ -86,7 +94,10 @@ export const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
-              <button className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left">
+              <button 
+                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
+                onClick={() => setShowDocuments(true)}
+              >
                 <FileText className="w-5 h-5 mb-2 text-blue-600" />
                 <p className="font-medium">View Documents</p>
                 <p className="text-sm text-gray-500">Access your files</p>
