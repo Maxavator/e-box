@@ -44,9 +44,9 @@ const HeroSection = () => {
                   <Users className="w-6 h-6" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">HR Management</h4>
+                  <h4 className="font-medium text-lg">Leave Manager</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Integrated SA ID verification and employee management
+                    Comprehensive leave management with multi-language support
                   </p>
                 </div>
               </li>
