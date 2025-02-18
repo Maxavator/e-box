@@ -1,5 +1,5 @@
 
-import { Shield, Users, MessageSquare, Scale } from "lucide-react";
+import { Shield, Users, MessageSquare, Scale, FileText } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -69,6 +69,17 @@ const HeroSection = () => {
                   <h4 className="font-medium text-lg">Local Compliance</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
                     Built for South African business regulations
+                  </p>
+                </div>
+              </li>
+              <li className="flex items-start gap-4 group col-span-2">
+                <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-medium text-lg">Payslip Distribution</h4>
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    Secure electronic payslip delivery and management
                   </p>
                 </div>
               </li>
