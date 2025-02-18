@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ChatHeader } from "@/components/chat/ChatHeader";
@@ -19,7 +18,6 @@ const Chat = () => {
   const [conversations, setConversations] = useState(demoConversations);
 
   useEffect(() => {
-    // Simulate incoming messages every 15-30 seconds
     const interval = setInterval(() => {
       const randomUser = demoConversations[Math.floor(Math.random() * demoConversations.length)];
       const user = getUserById(randomUser.userId);
@@ -51,7 +49,7 @@ const Chat = () => {
           toast(`New message from ${user.name}`);
         }
       }
-    }, Math.random() * 15000 + 15000); // Random interval between 15-30 seconds
+    }, Math.random() * 15000 + 15000);
 
     return () => clearInterval(interval);
   }, [selectedConversation]);
@@ -99,7 +97,6 @@ const Chat = () => {
 
     setNewMessage("");
 
-    // Simulate message sending
     setTimeout(() => {
       setSelectedConversation(prev => {
         if (!prev) return prev;
@@ -197,7 +194,6 @@ const Chat = () => {
           
           if (existingReaction) {
             if (existingReaction.users.includes('me')) {
-              // Remove reaction
               return {
                 ...m,
                 reactions: reactions
@@ -206,7 +202,6 @@ const Chat = () => {
                   .filter(r => r.users.length > 0)
               };
             } else {
-              // Add user to existing reaction
               return {
                 ...m,
                 reactions: reactions.map(r => 
@@ -216,7 +211,6 @@ const Chat = () => {
               };
             }
           } else {
-            // Add new reaction
             return {
               ...m,
               reactions: [...reactions, { emoji, users: ['me'] }]
@@ -265,6 +259,19 @@ const Chat = () => {
     );
   };
 
+  const handleSelectConversation = (conversation: Conversation) => {
+    const updatedConversation = { ...conversation, unreadCount: 0 };
+    setSelectedConversation(updatedConversation);
+    
+    setConversations(prevConversations => 
+      prevConversations.map(conv => 
+        conv.id === conversation.id 
+          ? updatedConversation
+          : conv
+      )
+    );
+  };
+
   const filteredConversations = conversations.filter(conversation => {
     const user = getUserById(conversation.userId);
     const searchLower = searchQuery.toLowerCase();
@@ -287,9 +294,9 @@ const Chat = () => {
             onSearchChange={setSearchQuery}
             activeTab={activeTab}
             onTabChange={setActiveTab}
-            conversations={filteredConversations}
+            conversations={conversations}
             selectedConversation={selectedConversation}
-            onSelectConversation={setSelectedConversation}
+            onSelectConversation={handleSelectConversation}
             onCalendarActionClick={handleCalendarActionClick}
           />
         </ResizablePanel>

@@ -79,6 +79,8 @@ export function ChatSidebar({
   onSelectConversation,
   onCalendarActionClick,
 }: ChatSidebarProps) {
+  const totalUnreadCount = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
+
   return (
     <div className="h-full bg-gray-50">
       <div className="p-4">
@@ -98,6 +100,11 @@ export function ChatSidebar({
           >
             <MessageSquare className="w-4 h-4 mr-2" />
             Chats
+            {totalUnreadCount > 0 && (
+              <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+                {totalUnreadCount}
+              </span>
+            )}
           </TabsTrigger>
           <TabsTrigger
             value="calendar"
