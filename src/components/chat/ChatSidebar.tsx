@@ -1,7 +1,6 @@
-
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Calendar, Inbox, Briefcase, LayoutDashboard, FileText, Headset, Settings } from "lucide-react";
+import { MessageSquare, Calendar, Inbox, Briefcase, LayoutDashboard, FileText, Headset, Settings, Plus } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
