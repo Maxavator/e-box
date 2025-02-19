@@ -6,6 +6,13 @@ import { toast } from "sonner";
 
 export type LoginMethod = 'email' | 'saId';
 
+// Test accounts configuration
+const TEST_ACCOUNTS = {
+  REGULAR: "6010203040512",
+  ORG_ADMIN: "5010203040512",
+  GLOBAL_ADMIN: "4010203040512"
+};
+
 export const useAuth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,11 +21,18 @@ export const useAuth = () => {
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');
   const navigate = useNavigate();
 
+  const isTestAccount = (id: string) => {
+    return Object.values(TEST_ACCOUNTS).includes(id);
+  };
+
   const validateSaId = (id: string) => {
+    // Allow test accounts through even if they don't match the regular SA ID format
+    if (isTestAccount(id)) return true;
     return /^\d{13}$/.test(id);
   };
 
   const isSaId = (input: string) => {
+    if (isTestAccount(input)) return true;
     return /^\d+$/.test(input) && input.length === 13;
   };
 
@@ -50,7 +64,7 @@ export const useAuth = () => {
       let signInResult;
       
       if (loginMethod === 'email') {
-        // If email input looks like an SA ID, treat it as one
+        // Handle test accounts and regular SA ID format
         if (isSaId(email)) {
           signInResult = await supabase.auth.signInWithPassword({
             email: `${email}@said.auth`,
@@ -74,12 +88,20 @@ export const useAuth = () => {
         if (signInResult.error.message.includes('Invalid login credentials')) {
           if (loginMethod === 'email') {
             if (isSaId(email)) {
-              toast.error("Invalid SA ID number or password format incorrect");
+              const isTest = isTestAccount(email);
+              toast.error(isTest 
+                ? `For test account ${email}, use password: Test${email}`
+                : "Invalid SA ID number or password format incorrect"
+              );
             } else {
               toast.error("Invalid email or password");
             }
           } else {
-            toast.error("Invalid SA ID number or password format incorrect");
+            const isTest = isTestAccount(saId);
+            toast.error(isTest 
+              ? `For test account ${saId}, use password: Test${saId}`
+              : "Invalid SA ID number or password format incorrect"
+            );
           }
         } else {
           toast.error(signInResult.error.message);
