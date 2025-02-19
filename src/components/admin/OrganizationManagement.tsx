@@ -13,11 +13,38 @@ export const OrganizationManagement = () => {
     isEditOrgOpen,
     setIsEditOrgOpen,
     formData,
-    handleSubmit,
-    handleEdit,
-    handleDelete,
-    handleInputChange,
+    setFormData,
+    selectedOrg,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   } = useOrganizations();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedOrg) {
+      updateMutation.mutate({ id: selectedOrg.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (org: typeof organizations[0]) => {
+    setFormData({
+      name: org.name,
+      domain: org.domain || "",
+    });
+    setIsEditOrgOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteMutation.mutate(id);
+  };
 
   return (
     <div className="space-y-6">

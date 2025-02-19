@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,9 @@ interface Member {
   id: string;
   first_name: string | null;
   last_name: string | null;
-  user_roles: UserRole[];
+  user_roles: {
+    role: 'global_admin' | 'org_admin' | 'staff';
+  }[];
 }
 
 export const OrganizationMembers = ({ organizationId }: OrganizationMembersProps) => {
@@ -38,14 +39,17 @@ export const OrganizationMembers = ({ organizationId }: OrganizationMembersProps
           id,
           first_name,
           last_name,
-          user_roles!inner (
+          user_roles (
             role
           )
         `)
         .eq('organization_id', organizationId);
 
       if (error) throw error;
-      return data as Member[];
+      return (data as any[]).map(member => ({
+        ...member,
+        user_roles: member.user_roles || []
+      })) as Member[];
     },
   });
 

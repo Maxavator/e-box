@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -21,7 +20,7 @@ export const useContacts = () => {
           contact_id,
           is_favorite,
           created_at,
-          contact:profiles!contacts_contact_id_fkey (
+          contact:profiles (
             id,
             first_name,
             last_name,
@@ -31,7 +30,15 @@ export const useContacts = () => {
         .eq('user_id', userData.user.id);
 
       if (error) throw error;
-      return data as Contact[];
+      return (data as any[]).map(item => ({
+        ...item,
+        contact: item.contact || {
+          id: item.contact_id,
+          first_name: null,
+          last_name: null,
+          organization_id: null
+        }
+      })) as Contact[];
     }
   });
 
