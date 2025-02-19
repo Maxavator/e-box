@@ -7,12 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Label } from "@/components/ui/label";
 import { Mail, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 interface LoginFormProps {
   onRequestDemo: () => void;
@@ -22,13 +24,13 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!username || !password) {
-      toast({
+      uiToast({
         title: "Invalid Credentials",
         description: "Please enter both username and password",
         variant: "destructive",
@@ -48,7 +50,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
     );
 
     if (!matchedCredential) {
-      toast({
+      uiToast({
         title: "Invalid Credentials",
         description: "Please check your username and password",
         variant: "destructive",
@@ -56,21 +58,40 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
       return;
     }
 
-    switch (matchedCredential.type) {
-      case "global_admin":
-        navigate("/admin");
-        break;
-      case "org_admin":
-        navigate("/organization");
-        break;
-      default:
-        navigate("/chat");
-    }
+    try {
+      // Check if user is global admin
+      if (matchedCredential.type === "global_admin") {
+        const { data: isGlobalAdmin, error: adminCheckError } = await supabase.rpc('is_global_admin');
+        
+        if (adminCheckError) {
+          console.error('Error checking admin status:', adminCheckError);
+          toast.error("Failed to verify admin status");
+          return;
+        }
 
-    toast({
-      title: "Login Successful",
-      description: `Welcome ${matchedCredential.type.replace('_', ' ')} user!`,
-    });
+        if (!isGlobalAdmin) {
+          toast.error("Access denied: Admin privileges required");
+          return;
+        }
+      }
+
+      // Route based on user type
+      switch (matchedCredential.type) {
+        case "global_admin":
+          navigate("/admin");
+          break;
+        case "org_admin":
+          navigate("/organization");
+          break;
+        default:
+          navigate("/chat");
+      }
+
+      toast.success(`Welcome ${matchedCredential.type.replace('_', ' ')} user!`);
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error("An error occurred during login");
+    }
   };
 
   return (
