@@ -89,36 +89,52 @@ export const useUserManagement = () => {
         throw new Error("Not authorized to view users");
       }
 
-      let query = supabase
+      // First, get all profiles
+      let profilesQuery = supabase
         .from('profiles')
-        .select(`
-          *,
-          user_roles (
-            id,
-            role,
-            created_at,
-            updated_at,
-            user_id
-          ),
-          organizations!profiles_organization_id_fkey (
-            name
-          )
-        `);
+        .select('*');
 
       if (userRole === 'org_admin' && userProfile?.organization_id) {
-        query = query.eq('organization_id', userProfile.organization_id);
+        profilesQuery = profilesQuery.eq('organization_id', userProfile.organization_id);
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
+      const { data: profiles, error: profilesError } = await profilesQuery;
+      if (profilesError) throw profilesError;
 
-      const transformedData = data.map(profile => ({
-        ...profile,
-        user_roles: profile.user_roles || [],
-        organizations: profile.organizations ? [profile.organizations] : []
-      }));
+      // For each profile, get their roles and organization
+      const usersWithDetails = await Promise.all(
+        profiles.map(async (profile) => {
+          // Get user roles
+          const { data: userRoles, error: rolesError } = await supabase
+            .from('user_roles')
+            .select('*')
+            .eq('user_id', profile.id);
+          
+          if (rolesError) throw rolesError;
 
-      return transformedData as UserWithRole[];
+          // Get organization details if organization_id exists
+          let organizationData = [];
+          if (profile.organization_id) {
+            const { data: org, error: orgError } = await supabase
+              .from('organizations')
+              .select('name')
+              .eq('id', profile.organization_id)
+              .single();
+            
+            if (!orgError && org) {
+              organizationData = [{ name: org.name }];
+            }
+          }
+
+          return {
+            ...profile,
+            user_roles: userRoles || [],
+            organizations: organizationData
+          };
+        })
+      );
+
+      return usersWithDetails as UserWithRole[];
     },
     enabled: (isAdmin || userRole === 'org_admin') && (!userRole || userRole === 'org_admin' ? !!userProfile?.organization_id : true),
   });
