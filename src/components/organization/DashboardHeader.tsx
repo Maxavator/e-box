@@ -1,6 +1,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Building2, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardHeaderProps {
   orgName: string;
@@ -15,6 +17,27 @@ export const DashboardHeader = ({
   onLogout, 
   onManageOrg 
 }: DashboardHeaderProps) => {
+  const [userName, setUserName] = useState<string>("");
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', user.id)
+          .single();
+
+        if (profileData) {
+          setUserName(`${profileData.first_name} ${profileData.last_name}`);
+        }
+      }
+    };
+
+    fetchUserName();
+  }, []);
+
   return (
     <header className="space-y-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
@@ -26,14 +49,21 @@ export const DashboardHeader = ({
               {isAdmin && <span className="ml-2 text-primary">(Admin)</span>}
             </p>
           )}
-          <Button 
-            variant="destructive" 
-            onClick={onLogout}
-            className="flex items-center gap-2"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
+          <div className="flex items-center gap-4">
+            {userName && (
+              <span className="text-sm text-muted-foreground">
+                {userName}
+              </span>
+            )}
+            <Button 
+              variant="destructive" 
+              onClick={onLogout}
+              className="flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+          </div>
         </div>
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -54,3 +84,4 @@ export const DashboardHeader = ({
     </header>
   );
 };
+
