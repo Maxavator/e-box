@@ -24,7 +24,21 @@ const DeskFeatures = () => {
   const navigate = useNavigate();
 
   const handleFeatureClick = (feature: string) => {
-    window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: feature }));
+    switch (feature) {
+      case 'dashboard':
+        navigate('/organization');
+        break;
+      case 'calendar':
+      case 'contacts':
+      case 'documents':
+      case 'leave-manager':
+      case 'policies':
+      case 'settings':
+        window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: feature }));
+        break;
+      default:
+        console.log('Unknown feature:', feature);
+    }
   };
 
   return (

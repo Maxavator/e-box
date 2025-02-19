@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, MessageSquare, ArrowUpRight, FileText, Calendar, Megaphone } from "lucide-react";
 import { Documents } from "@/components/desk/Documents";
@@ -28,11 +27,9 @@ export const Dashboard = () => {
         navigate('/chat');
         break;
       case 'documents':
-        setShowDocuments(true);
+        window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'documents' }));
         break;
       case 'contacts':
-        setShowContacts(true);
-        break;
       case 'team':
         window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'contacts' }));
         break;
