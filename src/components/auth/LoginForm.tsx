@@ -10,10 +10,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthResponse } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 interface LoginFormProps {
   onRequestDemo: () => void;
 }
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
   const [email, setEmail] = useState("");
@@ -89,7 +92,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
         .from('profiles')
         .select('id')
         .eq('sa_id', saId)
-        .single();
+        .single<Profile>();
 
       if (userError || !userData) {
         toast({
