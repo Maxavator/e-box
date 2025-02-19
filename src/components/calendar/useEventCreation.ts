@@ -47,7 +47,7 @@ export function useEventCreation() {
         meeting_link: formData.meetingLink || null,
         start_time: startDateTime.toISOString(),
         end_time: endDateTime.toISOString(),
-        creator_id: user.id,
+        created_by: user.id,
       })
       .select()
       .single();

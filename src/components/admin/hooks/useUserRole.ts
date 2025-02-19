@@ -10,9 +10,18 @@ export const useUserRole = () => {
   const { data: isAdmin, isLoading: isAdminLoading, error: adminError } = useQuery({
     queryKey: ['isGlobalAdmin'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('is_global_admin');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+      
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'global_admin')
+        .maybeSingle();
+
       if (error) throw error;
-      return data;
+      return !!data;
     },
     meta: {
       onError: (error: Error) => {
@@ -32,7 +41,7 @@ export const useUserRole = () => {
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data?.role as UserRoleType;

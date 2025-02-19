@@ -55,7 +55,11 @@ export const ContactsList = () => {
       const { data, error } = await supabase
         .from('contacts')
         .select(`
+          id,
+          user_id,
+          contact_id,
           is_favorite,
+          created_at,
           contact:profiles!contacts_contact_id_fkey (
             id,
             first_name,

@@ -5,9 +5,14 @@ type DBTables = Database['public']['Tables']
 
 export interface Organization extends DBTables['organizations']['Row'] {}
 
-export interface Profile extends DBTables['profiles']['Row'] {}
+export interface Profile extends DBTables['profiles']['Row'] {
+  organization_id?: string;
+  calendar_notification_time?: number;
+}
 
-export interface UserRole extends DBTables['user_roles']['Row'] {}
+export interface UserRole extends DBTables['user_roles']['Row'] {
+  role: 'global_admin' | 'org_admin' | 'staff';
+}
 
 export type LeaveType = Database['public']['Enums']['leave_type'];
 export type LeaveStatus = Database['public']['Enums']['leave_status'];
