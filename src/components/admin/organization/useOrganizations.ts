@@ -23,41 +23,48 @@ export const useOrganizations = () => {
 
   const queryClient = useQueryClient();
 
-  // First, get the current authenticated user
-  const { data: { user } = { user: null } } = useQuery({
-    queryKey: ['currentUser'],
+  // Get current session and user
+  const { data: session } = useQuery({
+    queryKey: ['session'],
     queryFn: async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
+      const { data: { session }, error } = await supabase.auth.getSession();
       if (error) throw error;
-      if (!user) throw new Error("Not authenticated");
-      return { user };
+      return session;
     },
   });
 
-  // Then check if the user is an admin
+  // Check if user is a global admin
   const { data: isAdmin } = useQuery({
-    queryKey: ['isGlobalAdmin', user?.id],
+    queryKey: ['isGlobalAdmin', session?.user?.id],
     queryFn: async () => {
-      if (!user?.id) return false;
+      if (!session?.user?.id) return false;
 
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', user.id)
+        .eq('user_id', session.user.id)
         .eq('role', 'global_admin')
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error checking admin status:', error);
+        return false;
+      }
+
       return !!data;
     },
-    enabled: !!user?.id,
+    enabled: !!session?.user?.id,
   });
 
-  // Finally fetch organizations if user is admin
+  // Fetch organizations if user is admin
   const { data: organizations, isLoading } = useQuery({
-    queryKey: ['organizations', user?.id],
+    queryKey: ['organizations', session?.user?.id],
     queryFn: async () => {
-      if (!user?.id || !isAdmin) {
+      if (!session?.user?.id) {
+        throw new Error("Not authenticated");
+      }
+
+      if (!isAdmin) {
         throw new Error("Not authorized to view organizations");
       }
 
@@ -80,12 +87,16 @@ export const useOrganizations = () => {
         }
       })) as Organization[];
     },
-    enabled: !!user?.id && isAdmin === true,
+    enabled: !!session?.user?.id && isAdmin === true,
   });
 
   const createMutation = useMutation({
     mutationFn: async (newOrg: OrganizationFormData) => {
-      if (!user?.id || !isAdmin) {
+      if (!session?.user?.id) {
+        throw new Error("Not authenticated");
+      }
+
+      if (!isAdmin) {
         throw new Error("Not authorized to create organizations");
       }
 
@@ -98,7 +109,12 @@ export const useOrganizations = () => {
         }])
         .select()
         .single();
-      if (error) throw error;
+
+      if (error) {
+        console.error('Error creating organization:', error);
+        throw error;
+      }
+
       return data;
     },
     onSuccess: () => {
@@ -108,13 +124,18 @@ export const useOrganizations = () => {
       toast.success("Organization created successfully");
     },
     onError: (error) => {
+      console.error('Create organization error:', error);
       toast.error("Failed to create organization: " + error.message);
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: OrganizationFormData }) => {
-      if (!user?.id || !isAdmin) {
+      if (!session?.user?.id) {
+        throw new Error("Not authenticated");
+      }
+
+      if (!isAdmin) {
         throw new Error("Not authorized to update organizations");
       }
 
@@ -126,6 +147,7 @@ export const useOrganizations = () => {
           logo_url: data.logo_url || null
         })
         .eq('id', id);
+
       if (error) throw error;
     },
     onSuccess: () => {
@@ -135,13 +157,18 @@ export const useOrganizations = () => {
       toast.success("Organization updated successfully");
     },
     onError: (error) => {
+      console.error('Update organization error:', error);
       toast.error("Failed to update organization: " + error.message);
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      if (!user?.id || !isAdmin) {
+      if (!session?.user?.id) {
+        throw new Error("Not authenticated");
+      }
+
+      if (!isAdmin) {
         throw new Error("Not authorized to delete organizations");
       }
 
@@ -149,6 +176,7 @@ export const useOrganizations = () => {
         .from('organizations')
         .delete()
         .eq('id', id);
+
       if (error) throw error;
     },
     onSuccess: () => {
@@ -156,6 +184,7 @@ export const useOrganizations = () => {
       toast.success("Organization deleted successfully");
     },
     onError: (error) => {
+      console.error('Delete organization error:', error);
       toast.error("Failed to delete organization: " + error.message);
     },
   });
