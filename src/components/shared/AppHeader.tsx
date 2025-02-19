@@ -1,6 +1,8 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 
 interface AppHeaderProps {
   onLogout: () => void;
@@ -40,7 +42,7 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
           <img 
             src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
             alt="Afrovation" 
-            className="h-12" // Increased from h-8 to h-12
+            className="h-12"
           />
         </button>
         {displayName && (
@@ -49,7 +51,14 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
           </span>
         )}
       </div>
-      <UserProfile onLogout={onLogout} />
+      <Button 
+        variant="ghost" 
+        onClick={onLogout}
+        className="flex items-center gap-2"
+      >
+        <LogOut className="w-4 h-4" />
+        Logout
+      </Button>
     </header>
   );
 }

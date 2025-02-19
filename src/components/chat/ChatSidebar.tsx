@@ -1,7 +1,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Briefcase, LayoutDashboard, FileText, Settings, Clock, Calendar, Users } from "lucide-react";
+import { MessageSquare, Briefcase, LayoutDashboard, FileText, Settings, Clock, Calendar, Users, LogOut } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
@@ -72,6 +72,7 @@ export function ChatSidebar({
   selectedConversation,
   onSelectConversation,
 }: ChatSidebarProps) {
+  const navigate = useNavigate();
   const [displayName, setDisplayName] = useState<string>("");
   const totalUnreadCount = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
 
@@ -94,6 +95,11 @@ export function ChatSidebar({
 
     fetchUserInfo();
   }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+  };
 
   return (
     <div className="h-full bg-gray-50">
@@ -119,6 +125,14 @@ export function ChatSidebar({
               <p className="text-sm font-medium truncate">{displayName}</p>
               <p className="text-xs text-muted-foreground">Online</p>
             </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleLogout}
+              className="ml-auto"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
           </div>
         )}
       </div>
