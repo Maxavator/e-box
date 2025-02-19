@@ -158,7 +158,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
         </CardFooter>
       </Card>
       <div className="mt-4">
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-gray-500">
           Version 1.91
         </span>
       </div>
