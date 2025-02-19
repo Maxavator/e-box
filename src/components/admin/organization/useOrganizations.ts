@@ -8,6 +8,7 @@ import type { Organization } from "../types";
 export interface OrganizationFormData {
   name: string;
   domain: string;
+  logo_url?: string;
 }
 
 export const useOrganizations = () => {
@@ -17,6 +18,7 @@ export const useOrganizations = () => {
   const [formData, setFormData] = useState<OrganizationFormData>({
     name: "",
     domain: "",
+    logo_url: "",
   });
 
   const queryClient = useQueryClient();
@@ -89,7 +91,11 @@ export const useOrganizations = () => {
 
       const { data, error } = await supabase
         .from('organizations')
-        .insert([{ name: newOrg.name, domain: newOrg.domain || null }])
+        .insert([{ 
+          name: newOrg.name, 
+          domain: newOrg.domain || null,
+          logo_url: newOrg.logo_url || null
+        }])
         .select()
         .single();
       if (error) throw error;
@@ -98,7 +104,7 @@ export const useOrganizations = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
       setIsAddOrgOpen(false);
-      setFormData({ name: "", domain: "" });
+      setFormData({ name: "", domain: "", logo_url: "" });
       toast.success("Organization created successfully");
     },
     onError: (error) => {
@@ -114,7 +120,11 @@ export const useOrganizations = () => {
 
       const { error } = await supabase
         .from('organizations')
-        .update({ name: data.name, domain: data.domain || null })
+        .update({ 
+          name: data.name, 
+          domain: data.domain || null,
+          logo_url: data.logo_url || null
+        })
         .eq('id', id);
       if (error) throw error;
     },
