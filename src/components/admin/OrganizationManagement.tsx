@@ -2,6 +2,7 @@
 import { OrganizationTable } from "./organization/OrganizationTable";
 import { OrganizationDialogs } from "./organization/OrganizationDialogs";
 import { useOrganizations } from "./organization/useOrganizations";
+import { QuickStatsCard } from "../organization/cards/QuickStatsCard";
 
 export const OrganizationManagement = () => {
   const {
@@ -19,7 +20,7 @@ export const OrganizationManagement = () => {
   } = useOrganizations();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-xl font-bold">Organization Management</h2>
@@ -37,6 +38,8 @@ export const OrganizationManagement = () => {
           handleSubmit={handleSubmit}
         />
       </div>
+
+      <QuickStatsCard />
 
       <div className="border rounded-lg">
         <OrganizationTable
