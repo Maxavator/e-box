@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Users, Building2, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { UserManagement } from "@/components/admin/UserManagement";
@@ -31,7 +31,37 @@ const AdminPortal = () => {
       case 'settings':
         return <SystemSettings />;
       default:
-        return null;
+        return (
+          <div className="space-y-6">
+            <StatsCards />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Button
+                variant="outline"
+                className="h-32 flex flex-col items-center justify-center space-y-2 hover:bg-gray-100"
+                onClick={() => setActiveView('users')}
+              >
+                <Users className="h-8 w-8" />
+                <span>User Management</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-32 flex flex-col items-center justify-center space-y-2 hover:bg-gray-100"
+                onClick={() => setActiveView('organizations')}
+              >
+                <Building2 className="h-8 w-8" />
+                <span>Organization Management</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-32 flex flex-col items-center justify-center space-y-2 hover:bg-gray-100"
+                onClick={() => setActiveView('settings')}
+              >
+                <Settings className="h-8 w-8" />
+                <span>System Settings</span>
+              </Button>
+            </div>
+          </div>
+        );
     }
   };
 
@@ -39,8 +69,22 @@ const AdminPortal = () => {
     <div className="flex-1 min-h-screen bg-gray-50">
       <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
 
-      <div className="p-8">
-        <div className="flex justify-end mb-6">
+      <div className="container mx-auto p-8">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {activeView === 'dashboard' ? 'Admin Dashboard' : 
+               activeView === 'users' ? 'User Management' :
+               activeView === 'organizations' ? 'Organization Management' : 
+               'System Settings'}
+            </h1>
+            <p className="text-gray-500 mt-1">
+              {activeView === 'dashboard' ? 'Overview of your admin portal' :
+               activeView === 'users' ? 'Manage user accounts and permissions' :
+               activeView === 'organizations' ? 'Manage organizations and their settings' :
+               'Configure system-wide settings'}
+            </p>
+          </div>
           <Button 
             variant="outline" 
             onClick={handleLogout}
@@ -51,25 +95,17 @@ const AdminPortal = () => {
           </Button>
         </div>
 
-        {activeView === 'dashboard' && <StatsCards />}
-        
-        <NavigationCards 
-          activeView={activeView}
-          onViewChange={setActiveView}
-        />
-
         {activeView !== 'dashboard' && (
-          <div className="mt-8">
-            <Button 
-              variant="ghost" 
-              onClick={() => setActiveView('dashboard')}
-              className="mb-4"
-            >
-              ← Back to Dashboard
-            </Button>
-            {renderView()}
-          </div>
+          <Button 
+            variant="ghost" 
+            onClick={() => setActiveView('dashboard')}
+            className="mb-6"
+          >
+            ← Back to Dashboard
+          </Button>
         )}
+
+        {renderView()}
       </div>
     </div>
   );
