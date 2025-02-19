@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -39,7 +38,7 @@ const AdminPortal = () => {
 
   return (
     <div className="flex-1 min-h-screen bg-gray-50">
-      <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
+      <AppHeader onLogoClick={handleLogoClick} />
 
       <div className="p-8">
         <div className="flex justify-end mb-6">
