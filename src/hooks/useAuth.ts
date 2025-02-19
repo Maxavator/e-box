@@ -50,13 +50,18 @@ export const useAuth = () => {
       let signInResult;
       
       if (loginMethod === 'email') {
-        const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
-        const loginPassword = isSaId(email) ? formatSaIdPassword(email) : password;
-        
-        signInResult = await supabase.auth.signInWithPassword({
-          email: loginEmail,
-          password: loginPassword,
-        });
+        // If email input looks like an SA ID, treat it as one
+        if (isSaId(email)) {
+          signInResult = await supabase.auth.signInWithPassword({
+            email: `${email}@said.auth`,
+            password: formatSaIdPassword(email),
+          });
+        } else {
+          signInResult = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+        }
       } else {
         signInResult = await supabase.auth.signInWithPassword({
           email: `${saId}@said.auth`,
@@ -69,12 +74,12 @@ export const useAuth = () => {
         if (signInResult.error.message.includes('Invalid login credentials')) {
           if (loginMethod === 'email') {
             if (isSaId(email)) {
-              toast.error("Invalid SA ID or password. Remember: if using SA ID, the password format is 'Test' followed by your SA ID");
+              toast.error("Invalid SA ID number or password format incorrect");
             } else {
-              toast.error("Invalid email or password. Please try again.");
+              toast.error("Invalid email or password");
             }
           } else {
-            toast.error("Invalid SA ID. Please try again or sign up if you haven't already.");
+            toast.error("Invalid SA ID number or password format incorrect");
           }
         } else {
           toast.error(signInResult.error.message);
