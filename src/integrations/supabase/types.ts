@@ -9,6 +9,77 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      calendar_events: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          end_time: string
+          id: string
+          is_online: boolean | null
+          location: string | null
+          meeting_link: string | null
+          start_time: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_time: string
+          id?: string
+          is_online?: boolean | null
+          location?: string | null
+          meeting_link?: string | null
+          start_time: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_time?: string
+          id?: string
+          is_online?: boolean | null
+          location?: string | null
+          meeting_link?: string | null
+          start_time?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      calendar_invites: {
+        Row: {
+          created_at: string | null
+          event_id: string | null
+          id: string
+          invitee_id: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id?: string | null
+          id?: string
+          invitee_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string | null
+          id?: string
+          invitee_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_invites_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "calendar_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_participants: {
         Row: {
           chat_id: string
@@ -74,6 +145,108 @@ export type Database = {
           },
         ]
       }
+      contacts: {
+        Row: {
+          contact_id: string | null
+          created_at: string | null
+          id: string
+          is_favorite: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      leave_balances: {
+        Row: {
+          annual_days_total: number | null
+          annual_days_used: number | null
+          created_at: string | null
+          id: string
+          maternity_days_total: number | null
+          maternity_days_used: number | null
+          paternity_days_total: number | null
+          paternity_days_used: number | null
+          sick_days_total: number | null
+          sick_days_used: number | null
+          user_id: string | null
+        }
+        Insert: {
+          annual_days_total?: number | null
+          annual_days_used?: number | null
+          created_at?: string | null
+          id?: string
+          maternity_days_total?: number | null
+          maternity_days_used?: number | null
+          paternity_days_total?: number | null
+          paternity_days_used?: number | null
+          sick_days_total?: number | null
+          sick_days_used?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          annual_days_total?: number | null
+          annual_days_used?: number | null
+          created_at?: string | null
+          id?: string
+          maternity_days_total?: number | null
+          maternity_days_used?: number | null
+          paternity_days_total?: number | null
+          paternity_days_used?: number | null
+          sick_days_total?: number | null
+          sick_days_used?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      leave_requests: {
+        Row: {
+          approved_by: string | null
+          created_at: string | null
+          end_date: string
+          id: string
+          leave_type: string
+          reason: string | null
+          start_date: string
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          approved_by?: string | null
+          created_at?: string | null
+          end_date: string
+          id?: string
+          leave_type: string
+          reason?: string | null
+          start_date: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          approved_by?: string | null
+          created_at?: string | null
+          end_date?: string
+          id?: string
+          leave_type?: string
+          reason?: string | null
+          start_date?: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           chat_id: string | null
@@ -116,43 +289,55 @@ export type Database = {
       organizations: {
         Row: {
           created_at: string | null
+          domain: string | null
           id: string
+          logo_url: string | null
           name: string
+          updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          domain?: string | null
           id?: string
+          logo_url?: string | null
           name: string
+          updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          domain?: string | null
           id?: string
+          logo_url?: string | null
           name?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string | null
-          full_name: string
+          first_name: string | null
           id: string
-          id_number: string
+          last_name: string | null
           organization_id: string | null
           role: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string | null
-          full_name: string
+          first_name?: string | null
           id?: string
-          id_number: string
+          last_name?: string | null
           organization_id?: string | null
           role: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string | null
-          full_name?: string
+          first_name?: string | null
           id?: string
-          id_number?: string
+          last_name?: string | null
           organization_id?: string | null
           role?: string
         }
@@ -166,6 +351,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -174,7 +380,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "global_admin" | "org_admin" | "staff"
     }
     CompositeTypes: {
       [_ in never]: never
