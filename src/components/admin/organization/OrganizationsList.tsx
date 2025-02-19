@@ -68,6 +68,24 @@ export const OrganizationsList = () => {
     refetchOnWindowFocus: false
   });
 
+  // Add an isAdmin state based on user role
+  const { data: roleData } = useQuery({
+    queryKey: ['userRole'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return { isAdmin: false };
+
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) return { isAdmin: false };
+      return { isAdmin: data?.role === 'global_admin' || data?.role === 'org_admin' };
+    }
+  });
+
   const handleRetry = () => {
     refetch();
     toast.info('Retrying to fetch organizations...');
@@ -100,6 +118,7 @@ export const OrganizationsList = () => {
             isLoading={isLoading} 
             onEdit={() => {}} 
             onDelete={() => {}} 
+            isAdmin={roleData?.isAdmin ?? false}
           />
         )}
       </CardContent>
