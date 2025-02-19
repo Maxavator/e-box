@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, Briefcase, LayoutDashboard, FileText, Settings, Clock, Calendar, Users } from "lucide-react";
@@ -22,6 +21,7 @@ interface ChatSidebarProps {
 
 const DeskFeatures = () => {
   const navigate = useNavigate();
+  const updatesCount = 3; // This would typically come from a real data source
 
   const handleFeatureClick = (feature: string) => {
     switch (feature) {
@@ -46,6 +46,11 @@ const DeskFeatures = () => {
       <Button variant="ghost" className="w-full justify-start" onClick={() => handleFeatureClick('dashboard')}>
         <LayoutDashboard className="mr-2 h-4 w-4" />
         Dashboard
+        {updatesCount > 0 && (
+          <Badge variant="secondary" className="ml-auto">
+            {updatesCount} new
+          </Badge>
+        )}
       </Button>
       <Button variant="ghost" className="w-full justify-start" onClick={() => handleFeatureClick('calendar')}>
         <Calendar className="mr-2 h-4 w-4" />
@@ -85,6 +90,7 @@ export function ChatSidebar({
   onSelectConversation,
 }: ChatSidebarProps) {
   const totalUnreadCount = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
+  const deskUpdatesCount = 3; // This would typically come from a real data source
 
   return (
     <div className="h-full bg-gray-50">
@@ -120,8 +126,18 @@ export function ChatSidebar({
             value="desk"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
           >
-            <Briefcase className="w-4 h-4 mr-2" />
-            Desk
+            <div className="flex items-center">
+              <Briefcase className="w-4 h-4 mr-2" />
+              <span>Desk</span>
+              {deskUpdatesCount > 0 && (
+                <Badge 
+                  variant="secondary" 
+                  className="ml-2 px-1.5 py-0.5 h-5"
+                >
+                  {deskUpdatesCount}
+                </Badge>
+              )}
+            </div>
           </TabsTrigger>
         </TabsList>
         
