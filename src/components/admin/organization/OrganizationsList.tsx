@@ -4,19 +4,60 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Building2 } from "lucide-react";
 import { OrganizationTable } from "./OrganizationTable";
+import { useEffect, useState } from "react";
+import type { Organization } from "../types";
 
 export const OrganizationsList = () => {
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userOrgId, setUserOrgId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get user's role
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      // Get user's organization
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      setUserRole(roleData?.role || null);
+      setUserOrgId(profileData?.organization_id || null);
+    };
+
+    fetchUserInfo();
+  }, []);
+
   const { data: organizations, isLoading } = useQuery({
-    queryKey: ['organizations'],
+    queryKey: ['organizations', userRole, userOrgId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('organizations')
-        .select('*')
-        .order('name');
+        .select('*');
+
+      // Only fetch specific organization for org_admin
+      if (userRole === 'org_admin' && userOrgId) {
+        query = query.eq('id', userOrgId);
+      }
+
+      const { data, error } = await query.order('name');
       
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching organizations:', error);
+        throw error;
+      }
+      return data as Organization[];
     },
+    enabled: userRole !== null, // Only run query when we have the user role
   });
 
   return (
