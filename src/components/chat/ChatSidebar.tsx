@@ -145,6 +145,7 @@ export function ChatSidebar({
           <div className="p-4">
             <Button 
               variant="ghost" 
+              size="sm"
               className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
               onClick={onLogout}
             >

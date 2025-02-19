@@ -62,11 +62,6 @@ export function ChatLayout({
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
 
-  const handleNewMessage = () => {
-    onSendMessage("New message");
-    setShowNewMessageDialog(false);
-  };
-
   return (
     <div className="flex h-screen flex-col">
       <AppHeader onLogoClick={onLogoClick} />
@@ -101,7 +96,10 @@ export function ChatLayout({
           </DialogHeader>
           <div className="space-y-4 py-4">
             <Button
-              onClick={handleNewMessage}
+              onClick={() => {
+                onSendMessage("New message");
+                setShowNewMessageDialog(false);
+              }}
               className="w-full"
             >
               Start New Conversation
