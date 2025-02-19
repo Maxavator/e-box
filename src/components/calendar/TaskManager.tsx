@@ -7,16 +7,7 @@ import { Check, List, Plus, Trash, X } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-
-interface Task {
-  id: string;
-  title: string;
-  completed: boolean | null;
-  due_date: string | null;
-  created_at: string | null;
-  user_id: string;
-  updated_at: string | null;
-}
+import type { CalendarTask } from "@/types/database";
 
 export const TaskManager = () => {
   const [newTask, setNewTask] = useState("");
@@ -52,9 +43,18 @@ export const TaskManager = () => {
         return [];
       }
 
-      return data || [];
+      return data as CalendarTask[];
     },
-    retry: false
+    meta: {
+      onError: (error: Error) => {
+        console.error('Error fetching tasks:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load tasks",
+          variant: "destructive",
+        });
+      }
+    }
   });
 
   const addTaskMutation = useMutation({
@@ -81,7 +81,7 @@ export const TaskManager = () => {
         .select();
 
       if (error) throw error;
-      return data?.[0];
+      return data?.[0] as CalendarTask;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendar-tasks'] });
@@ -90,7 +90,7 @@ export const TaskManager = () => {
         description: "Your task has been added successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
         description: "Failed to add task: " + error.message,
@@ -108,12 +108,12 @@ export const TaskManager = () => {
         .select();
 
       if (error) throw error;
-      return data?.[0];
+      return data?.[0] as CalendarTask;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendar-tasks'] });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
         description: "Failed to update task: " + error.message,
@@ -138,7 +138,7 @@ export const TaskManager = () => {
         description: "Your task has been deleted successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
         description: "Failed to delete task: " + error.message,
