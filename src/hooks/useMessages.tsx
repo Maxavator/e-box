@@ -15,7 +15,14 @@ export const useMessages = (
     if (!selectedConversation || !newMessage.trim()) return;
 
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to send messages",
+        variant: "destructive"
+      });
+      return;
+    }
 
     const { data: messageData, error } = await supabase
       .from('messages')
@@ -59,8 +66,33 @@ export const useMessages = (
     setSelectedConversation(updatedConversation);
   };
 
-  const handleEditMessage = (messageId: string, newContent: string) => {
+  const handleEditMessage = async (messageId: string, newContent: string) => {
     if (!selectedConversation) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to edit messages",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const { error } = await supabase
+      .from('messages')
+      .update({ content: newContent })
+      .eq('id', messageId)
+      .eq('sender_id', user.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to edit message",
+        variant: "destructive"
+      });
+      return;
+    }
 
     const updatedConversation: Conversation = {
       ...selectedConversation,
@@ -74,8 +106,33 @@ export const useMessages = (
     setSelectedConversation(updatedConversation);
   };
 
-  const handleDeleteMessage = (messageId: string) => {
+  const handleDeleteMessage = async (messageId: string) => {
     if (!selectedConversation) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to delete messages",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const { error } = await supabase
+      .from('messages')
+      .delete()
+      .eq('id', messageId)
+      .eq('sender_id', user.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete message",
+        variant: "destructive"
+      });
+      return;
+    }
 
     const updatedMessages = selectedConversation.messages.filter(m => m.id !== messageId);
     const updatedConversation: Conversation = {
