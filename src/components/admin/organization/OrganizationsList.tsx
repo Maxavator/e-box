@@ -20,70 +20,79 @@ import type { Organization } from "../types";
 
 export const OrganizationsList = () => {
   const navigate = useNavigate();
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setShowAuthDialog(true);
-        return;
+    const checkAdminStatus = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setShowAuthDialog(true);
+          return;
+        }
+
+        const { data: isGlobalAdmin, error } = await supabase.rpc('is_global_admin');
+        
+        if (error) {
+          console.error('Error checking admin status:', error);
+          toast.error("Failed to verify admin status");
+          return;
+        }
+
+        setIsAdmin(isGlobalAdmin);
+      } catch (error) {
+        console.error('Error in checkAdminStatus:', error);
+        toast.error("Failed to verify authentication status");
       }
-
-      // Get user's role
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single();
-
-      if (roleError) {
-        console.error('Error fetching user role:', roleError);
-        toast.error("Failed to fetch user role");
-        return;
-      }
-
-      setUserRole(roleData?.role || null);
     };
 
-    fetchUserInfo();
+    checkAdminStatus();
   }, []);
 
   const { data: organizations, isLoading } = useQuery({
-    queryKey: ['organizations', userRole],
+    queryKey: ['organizations', isAdmin],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setShowAuthDialog(true);
-        throw new Error("Not authenticated");
-      }
+      try {
+        const { data, error } = await supabase
+          .from('organizations')
+          .select('*')
+          .order('name');
+        
+        if (error) {
+          console.error('Error fetching organizations:', error);
+          toast.error("Failed to fetch organizations");
+          throw error;
+        }
 
-      const { data, error } = await supabase
-        .from('organizations')
-        .select('*')
-        .order('name');
-      
-      if (error) {
-        console.error('Error fetching organizations:', error);
-        toast.error("Failed to fetch organizations");
+        return data as Organization[];
+      } catch (error) {
+        console.error('Error in queryFn:', error);
         throw error;
       }
-
-      return data as Organization[];
     },
-    enabled: userRole !== null,
+    enabled: isAdmin !== null,
   });
 
   const handleLogin = () => {
     navigate("/auth");
   };
 
-  if (!userRole) {
+  if (isAdmin === null) {
     return (
       <Card>
         <CardContent className="p-6">
-          <p className="text-center text-gray-500">Loading user role...</p>
+          <p className="text-center text-gray-500">Verifying access...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isAdmin === false) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-center text-gray-500">You don't have permission to view organizations.</p>
         </CardContent>
       </Card>
     );
