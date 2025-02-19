@@ -155,6 +155,11 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
               Request a Demo
             </button>
           </div>
+          <div className="text-center w-full">
+            <span className="text-xs text-muted-foreground">
+              Version 1.91
+            </span>
+          </div>
         </CardFooter>
       </Card>
     </div>
