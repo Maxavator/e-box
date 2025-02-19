@@ -83,8 +83,8 @@ export function ChatSidebar({
               <span>Chats</span>
               {totalUnreadCount > 0 && (
                 <Badge 
-                  variant="default" 
-                  className="ml-2 bg-primary hover:bg-primary"
+                  variant="destructive" 
+                  className="ml-2 px-1.5 py-0.5 h-5"
                 >
                   {totalUnreadCount}
                 </Badge>
