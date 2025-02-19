@@ -129,35 +129,6 @@ export const useOrganizations = () => {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (selectedOrg) {
-      updateMutation.mutate({ id: selectedOrg.id, data: formData });
-    } else {
-      createMutation.mutate(formData);
-    }
-  };
-
-  const handleEdit = (org: Organization) => {
-    setSelectedOrg(org);
-    setFormData({
-      name: org.name,
-      domain: org.domain || "",
-    });
-    setIsEditOrgOpen(true);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this organization?")) {
-      deleteMutation.mutate(id);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
   return {
     organizations,
     isLoading,
@@ -167,9 +138,11 @@ export const useOrganizations = () => {
     isEditOrgOpen,
     setIsEditOrgOpen,
     formData,
-    handleSubmit,
-    handleEdit,
-    handleDelete,
-    handleInputChange,
+    selectedOrg,
+    setSelectedOrg,
+    setFormData,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   };
 };

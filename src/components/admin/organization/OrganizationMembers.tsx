@@ -10,9 +10,17 @@ import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { UserPlus, Mail } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import type { UserRole } from "@/types/database";
 
 interface OrganizationMembersProps {
   organizationId: string;
+}
+
+interface Member {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  user_roles: UserRole[];
 }
 
 export const OrganizationMembers = ({ organizationId }: OrganizationMembersProps) => {
@@ -30,12 +38,14 @@ export const OrganizationMembers = ({ organizationId }: OrganizationMembersProps
           id,
           first_name,
           last_name,
-          user_roles (role)
+          user_roles!inner (
+            role
+          )
         `)
         .eq('organization_id', organizationId);
 
       if (error) throw error;
-      return data;
+      return data as Member[];
     },
   });
 
@@ -88,7 +98,7 @@ export const OrganizationMembers = ({ organizationId }: OrganizationMembersProps
                     {member.first_name} {member.last_name}
                   </TableCell>
                   <TableCell>
-                    {member.user_roles?.[0]?.role || 'Staff'}
+                    {member.user_roles[0]?.role || 'Staff'}
                   </TableCell>
                   <TableCell>
                     <Button variant="ghost" size="sm">
