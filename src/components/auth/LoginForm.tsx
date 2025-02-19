@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Mail, Info } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import {
   Tooltip,
   TooltipContent,
@@ -19,58 +20,74 @@ interface LoginFormProps {
 }
 
 const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!username || !password) {
+    if (!email || !password) {
       toast({
         title: "Invalid Credentials",
-        description: "Please enter both username and password",
+        description: "Please enter both email and password",
         variant: "destructive",
       });
       return;
     }
 
-    // Test credentials validation
-    const validCredentials = [
-      { id: "6010203040512", password: "Test6010203040512", type: "regular" },
-      { id: "5010203040512", password: "Test5010203040512", type: "org_admin" },
-      { id: "4010203040512", password: "Test4010203040512", type: "global_admin" }
-    ];
-
-    const matchedCredential = validCredentials.find(
-      cred => cred.id === username && cred.password === password
-    );
-
-    if (!matchedCredential) {
-      toast({
-        title: "Invalid Credentials",
-        description: "Please check your username and password",
-        variant: "destructive",
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      return;
-    }
 
-    switch (matchedCredential.type) {
-      case "global_admin":
+      if (error) {
+        throw error;
+      }
+
+      if (data.session) {
+        toast.success("Login successful!");
         navigate("/admin");
-        break;
-      case "org_admin":
-        navigate("/organization");
-        break;
-      default:
-        navigate("/chat");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to login");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignUp = async () => {
+    if (!email || !password) {
+      toast({
+        title: "Invalid Credentials",
+        description: "Please enter both email and password",
+        variant: "destructive",
+      });
+      return;
     }
 
-    toast({
-      title: "Login Successful",
-      description: `Welcome ${matchedCredential.type.replace('_', ' ')} user!`,
-    });
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        toast.success("Registration successful! Please check your email to confirm your account.");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to sign up");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -87,28 +104,13 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="username">Username</Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>For testing, use:</p>
-                      <p>Regular user: 6010203040512</p>
-                      <p>Org admin: 5010203040512</p>
-                      <p>Global admin: 4010203040512</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                placeholder="Enter your username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full focus:ring-primary"
               />
             </div>
@@ -121,8 +123,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
                       <Info className="h-4 w-4 text-muted-foreground" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Password format: Test + username</p>
-                      <p>Example: Test6010203040512</p>
+                      <p>Password must be at least 6 characters</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -136,12 +137,24 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
                 className="w-full focus:ring-primary"
               />
             </div>
-            <Button 
-              type="submit" 
-              className="w-full bg-primary hover:bg-primary/90 transition-colors duration-300"
-            >
-              Login
-            </Button>
+            <div className="space-y-4">
+              <Button 
+                type="submit" 
+                className="w-full bg-primary hover:bg-primary/90 transition-colors duration-300"
+                disabled={isLoading}
+              >
+                {isLoading ? "Loading..." : "Login"}
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline"
+                className="w-full"
+                onClick={handleSignUp}
+                disabled={isLoading}
+              >
+                Sign Up
+              </Button>
+            </div>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4 pt-4">
