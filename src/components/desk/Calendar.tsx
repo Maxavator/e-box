@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
@@ -6,22 +7,45 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, Users, Clock, MapPin } from "lucide-react";
 import { TaskManager } from "@/components/calendar/TaskManager";
+import { useToast } from "@/components/ui/use-toast";
 
 export function Calendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const { toast } = useToast();
 
-  const { data: events } = useQuery({
+  const { data: events, isError } = useQuery({
     queryKey: ['calendar-events'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to view your calendar events",
+          variant: "destructive",
+        });
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('calendar_events')
         .select('*')
         .gte('start_time', new Date().toISOString())
         .order('start_time', { ascending: true })
         .limit(5);
-      if (error) throw error;
-      return data;
-    }
+
+      if (error) {
+        console.error('Error fetching events:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load calendar events",
+          variant: "destructive",
+        });
+        return [];
+      }
+
+      return data || [];
+    },
+    retry: false
   });
 
   return (
@@ -79,7 +103,7 @@ export function Calendar() {
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-gray-500">
                 <Clock className="h-12 w-12 mb-2 text-gray-400" />
-                <p>No events scheduled for today</p>
+                <p>{isError ? "Failed to load events" : "No events scheduled for today"}</p>
               </div>
             )}
           </ScrollArea>
