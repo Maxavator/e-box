@@ -32,7 +32,7 @@ const DeskFeatures = () => {
       </Button>
       <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'contacts' }))}>
         <Users className="mr-2 h-4 w-4" />
-        Contacts
+        Contacts List
       </Button>
       <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'documents' }))}>
         <FileText className="mr-2 h-4 w-4" />
