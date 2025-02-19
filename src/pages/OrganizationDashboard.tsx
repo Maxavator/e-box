@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { UserManagement } from "@/components/admin/UserManagement";
-import { OrganizationManagement } from "@/components/admin/OrganizationManagement";
+import OrganizationManagement from "@/components/admin/OrganizationManagement";
 import { OrganizationsList } from "@/components/admin/organization/OrganizationsList";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { useToast } from "@/hooks/use-toast";

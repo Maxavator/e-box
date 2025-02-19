@@ -1,4 +1,3 @@
-
 import { OrganizationManagement as OrganizationManagementComponent } from "@/components/admin/OrganizationManagement";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { useNavigate } from "react-router-dom";

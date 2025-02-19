@@ -4,7 +4,7 @@ import { LogOut, Users, Building2, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { UserManagement } from "@/components/admin/UserManagement";
-import { OrganizationManagement } from "@/components/admin/OrganizationManagement";
+import OrganizationManagement from "@/components/admin/OrganizationManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { StatsCards } from "@/components/admin/dashboard/StatsCards";
