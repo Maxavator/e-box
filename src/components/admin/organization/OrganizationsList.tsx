@@ -5,9 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Building2 } from "lucide-react";
 import { OrganizationTable } from "./OrganizationTable";
 import { toast } from "sonner";
-import { useState } from "react";
-import { OrganizationForm } from "./OrganizationForm";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Organization {
   id: string;
@@ -22,12 +19,23 @@ interface Organization {
 }
 
 export const OrganizationsList = () => {
-  const [editingOrg, setEditingOrg] = useState<Organization | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   const { data: organizations, isLoading, error, refetch } = useQuery({
     queryKey: ['organizations'],
     queryFn: async () => {
+      // First, check if user has admin access
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+        .single();
+
+      if (roleError) {
+        console.error('Error checking user role:', roleError);
+        throw new Error('Failed to verify access permissions');
+      }
+
+      const isAdmin = roleData?.role === 'global_admin' || roleData?.role === 'org_admin';
+
       // Fetch organizations with member count
       const { data, error: orgsError } = await supabase
         .from('organizations')
@@ -48,6 +56,7 @@ export const OrganizationsList = () => {
         throw orgsError;
       }
 
+      // Transform the data to include member count
       return data.map(org => ({
         ...org,
         _count: {
@@ -59,107 +68,41 @@ export const OrganizationsList = () => {
     refetchOnWindowFocus: false
   });
 
-  const handleEdit = (org: Organization) => {
-    setEditingOrg(org);
-    setIsDialogOpen(true);
-  };
-
-  const handleDelete = async (id: string) => {
-    toast.error("Delete functionality not implemented");
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingOrg) return;
-
-    const formData = new FormData(e.target as HTMLFormElement);
-    const name = formData.get('name') as string;
-    const domain = formData.get('domain') as string;
-
-    try {
-      const { error } = await supabase
-        .from('organizations')
-        .update({ 
-          name,
-          domain: domain || null,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', editingOrg.id);
-
-      if (error) throw error;
-
-      toast.success('Organization updated successfully');
-      setIsDialogOpen(false);
-      refetch();
-    } catch (error) {
-      console.error('Error updating organization:', error);
-      toast.error('Failed to update organization');
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!editingOrg) return;
-    
-    setEditingOrg(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        [e.target.name]: e.target.value
-      };
-    });
+  const handleRetry = () => {
+    refetch();
+    toast.info('Retrying to fetch organizations...');
   };
 
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-primary" />
-            Organizations
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {error ? (
-            <div className="space-y-4">
-              <div className="text-destructive">
-                Failed to load organizations. Please try again later.
-              </div>
-              <button 
-                onClick={() => refetch()}
-                className="text-sm text-primary hover:underline"
-              >
-                Retry
-              </button>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Building2 className="h-5 w-5 text-primary" />
+          Organizations
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {error ? (
+          <div className="space-y-4">
+            <div className="text-destructive">
+              Failed to load organizations. Please try again later.
             </div>
-          ) : (
-            <OrganizationTable 
-              organizations={organizations || []} 
-              isLoading={isLoading} 
-              onEdit={handleEdit} 
-              onDelete={handleDelete} 
-            />
-          )}
-        </CardContent>
-      </Card>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Organization</DialogTitle>
-          </DialogHeader>
-          {editingOrg && (
-            <OrganizationForm
-              formData={{
-                name: editingOrg.name,
-                domain: editingOrg.domain || ''
-              }}
-              handleInputChange={handleInputChange}
-              handleSubmit={handleSubmit}
-              mode="edit"
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
+            <button 
+              onClick={handleRetry}
+              className="text-sm text-primary hover:underline"
+            >
+              Retry
+            </button>
+          </div>
+        ) : (
+          <OrganizationTable 
+            organizations={organizations || []} 
+            isLoading={isLoading} 
+            onEdit={() => {}} 
+            onDelete={() => {}} 
+          />
+        )}
+      </CardContent>
+    </Card>
   );
 };

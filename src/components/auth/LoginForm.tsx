@@ -7,14 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Label } from "@/components/ui/label";
 import { Mail, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { toast } from "sonner";
 
 interface LoginFormProps {
   onRequestDemo: () => void;
@@ -23,90 +21,56 @@ interface LoginFormProps {
 const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast: uiToast } = useToast();
+  const { toast } = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
     if (!username || !password) {
-      uiToast({
+      toast({
         title: "Invalid Credentials",
         description: "Please enter both username and password",
         variant: "destructive",
       });
-      setIsLoading(false);
       return;
     }
 
-    try {
-      // Query the user's email using their SA ID
-      const { data: profiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('sa_id', username)
-        .single();
+    // Test credentials validation
+    const validCredentials = [
+      { id: "6010203040512", password: "Test6010203040512", type: "regular" },
+      { id: "5010203040512", password: "Test5010203040512", type: "org_admin" },
+      { id: "4010203040512", password: "Test4010203040512", type: "global_admin" }
+    ];
 
-      if (profileError || !profiles) {
-        console.error('Profile lookup error:', profileError);
-        toast.error("Invalid credentials");
-        setIsLoading(false);
-        return;
-      }
+    const matchedCredential = validCredentials.find(
+      cred => cred.id === username && cred.password === password
+    );
 
-      // Now authenticate with Supabase using the email associated with the SA ID
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: `${username}@example.com`,
-        password: password,
+    if (!matchedCredential) {
+      toast({
+        title: "Invalid Credentials",
+        description: "Please check your username and password",
+        variant: "destructive",
       });
-
-      if (signInError) {
-        console.error('Sign in error:', signInError);
-        toast.error("Invalid credentials");
-        setIsLoading(false);
-        return;
-      }
-
-      // After successful authentication, check the user role
-      const { data: isGlobalAdmin, error: adminCheckError } = await supabase.rpc('is_global_admin');
-      
-      if (adminCheckError) {
-        console.error('Error checking admin status:', adminCheckError);
-        toast.error("Failed to verify admin status");
-        setIsLoading(false);
-        return;
-      }
-
-      if (isGlobalAdmin) {
-        navigate("/admin");
-        toast.success("Welcome, Global Admin!");
-      } else {
-        // Check if user is an org admin
-        const { data: isOrgAdmin, error: orgAdminCheckError } = await supabase.rpc('is_org_admin');
-        
-        if (orgAdminCheckError) {
-          console.error('Error checking org admin status:', orgAdminCheckError);
-          toast.error("Failed to verify organization admin status");
-          setIsLoading(false);
-          return;
-        }
-
-        if (isOrgAdmin) {
-          navigate("/organization");
-          toast.success("Welcome, Organization Admin!");
-        } else {
-          navigate("/chat");
-          toast.success("Welcome!");
-        }
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      toast.error("An error occurred during login");
-    } finally {
-      setIsLoading(false);
+      return;
     }
+
+    switch (matchedCredential.type) {
+      case "global_admin":
+        navigate("/admin");
+        break;
+      case "org_admin":
+        navigate("/organization");
+        break;
+      default:
+        navigate("/chat");
+    }
+
+    toast({
+      title: "Login Successful",
+      description: `Welcome ${matchedCredential.type.replace('_', ' ')} user!`,
+    });
   };
 
   return (
@@ -146,7 +110,6 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full focus:ring-primary"
-                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -171,15 +134,13 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full focus:ring-primary"
-                disabled={isLoading}
               />
             </div>
             <Button 
               type="submit" 
               className="w-full bg-primary hover:bg-primary/90 transition-colors duration-300"
-              disabled={isLoading}
             >
-              {isLoading ? "Logging in..." : "Login"}
+              Login
             </Button>
           </form>
         </CardContent>
@@ -189,7 +150,6 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
               type="button"
               onClick={onRequestDemo}
               className="text-primary hover:text-primary/80 text-sm font-medium transition-colors inline-flex items-center gap-2"
-              disabled={isLoading}
             >
               <Mail className="w-4 h-4" />
               Request a Demo
@@ -199,7 +159,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
       </Card>
       <div className="mt-4">
         <span className="text-xs text-gray-500">
-          Version 1.98
+          Version 1.91
         </span>
       </div>
     </div>

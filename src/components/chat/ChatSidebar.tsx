@@ -1,15 +1,13 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Briefcase, LayoutDashboard, FileText, Settings, Clock, Calendar, Users, LogOut } from "lucide-react";
+import { MessageSquare, Briefcase, LayoutDashboard, FileText, Settings, Clock, Calendar, Users } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewMessageDialog } from "./NewMessageDialog";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -72,34 +70,7 @@ export function ChatSidebar({
   selectedConversation,
   onSelectConversation,
 }: ChatSidebarProps) {
-  const navigate = useNavigate();
-  const [displayName, setDisplayName] = useState<string>("");
   const totalUnreadCount = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', user.id)
-          .single();
-
-        if (profileData) {
-          setDisplayName(`${profileData.first_name} ${profileData.last_name}`);
-        }
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
-  };
 
   return (
     <div className="h-full bg-gray-50">
@@ -111,30 +82,6 @@ export function ChatSidebar({
           onChange={(e) => onSearchChange(e.target.value)}
           className="w-full"
         />
-        {displayName && (
-          <div className="flex items-center gap-2 px-2 py-1.5 bg-white rounded-lg shadow-sm">
-            <div className="relative">
-              <div className="w-2.5 h-2.5 bg-green-500 rounded-full absolute -right-0.5 -bottom-0.5 ring-2 ring-white" />
-              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-primary">
-                  {displayName.split(' ').map(n => n[0]).join('')}
-                </span>
-              </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{displayName}</p>
-              <p className="text-xs text-muted-foreground">Online</p>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={handleLogout}
-              className="ml-auto"
-            >
-              <LogOut className="w-4 h-4" />
-            </Button>
-          </div>
-        )}
       </div>
       <Tabs value={activeTab} onValueChange={onTabChange} className="h-[calc(100%-5rem)]">
         <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
