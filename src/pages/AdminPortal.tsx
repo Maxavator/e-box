@@ -8,7 +8,7 @@ import { OrganizationManagement } from "@/components/admin/OrganizationManagemen
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { StatsCards } from "@/components/admin/dashboard/StatsCards";
-import { NavigationCards } from "@/components/admin/dashboard/NavigationCards";
+import { LookupTools } from "@/components/admin/dashboard/LookupTools";
 
 const AdminPortal = () => {
   const navigate = useNavigate();
@@ -32,8 +32,9 @@ const AdminPortal = () => {
         return <SystemSettings />;
       default:
         return (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <StatsCards />
+            <LookupTools />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Button
                 variant="outline"
