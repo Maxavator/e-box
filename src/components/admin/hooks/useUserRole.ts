@@ -2,7 +2,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { UserRole } from "@/integrations/supabase/schema";
+import type { Database } from "@/integrations/supabase/types";
+
+type UserRoleType = Database['public']['Enums']['user_role'];
 
 export const useUserRole = () => {
   const { data: isAdmin, isLoading: isAdminLoading, error: adminError } = useQuery({
@@ -12,10 +14,11 @@ export const useUserRole = () => {
       if (error) throw error;
       return data;
     },
-    retry: 1,
-    onError: (error) => {
-      console.error('Error checking admin status:', error);
-      toast.error("Failed to verify admin status");
+    meta: {
+      onError: (error: Error) => {
+        console.error('Error checking admin status:', error);
+        toast.error("Failed to verify admin status");
+      }
     }
   });
 
@@ -32,12 +35,13 @@ export const useUserRole = () => {
         .single();
 
       if (error) throw error;
-      return data?.role as UserRole;
+      return data?.role as UserRoleType;
     },
-    retry: 1,
-    onError: (error) => {
-      console.error('Error fetching user role:', error);
-      toast.error("Failed to fetch user role");
+    meta: {
+      onError: (error: Error) => {
+        console.error('Error fetching user role:', error);
+        toast.error("Failed to fetch user role");
+      }
     }
   });
 

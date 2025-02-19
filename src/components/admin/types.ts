@@ -14,6 +14,6 @@ export interface UserFormData {
   email: string;
   firstName: string;
   lastName: string;
-  role: string;
+  role: UserRole['role'];
   organizationId: string;
 }

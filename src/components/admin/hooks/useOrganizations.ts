@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Profile } from "@/types/database";
+import type { Organization } from "../types";
 
 export const useOrganizations = (isAdmin: boolean | undefined, userRole: string | undefined) => {
   const { 
@@ -25,10 +26,11 @@ export const useOrganizations = (isAdmin: boolean | undefined, userRole: string 
       return data as Profile;
     },
     enabled: userRole === 'org_admin',
-    retry: 1,
-    onError: (error) => {
-      console.error('Error fetching user profile:', error);
-      toast.error("Failed to fetch user profile");
+    meta: {
+      onError: (error: Error) => {
+        console.error('Error fetching user profile:', error);
+        toast.error("Failed to fetch user profile");
+      }
     }
   });
 
@@ -49,13 +51,14 @@ export const useOrganizations = (isAdmin: boolean | undefined, userRole: string 
         .order('name');
 
       if (error) throw error;
-      return data;
+      return data as Organization[];
     },
     enabled: isAdmin || userRole === 'org_admin',
-    retry: 1,
-    onError: (error) => {
-      console.error('Error fetching organizations:', error);
-      toast.error("Failed to fetch organizations");
+    meta: {
+      onError: (error: Error) => {
+        console.error('Error fetching organizations:', error);
+        toast.error("Failed to fetch organizations");
+      }
     }
   });
 

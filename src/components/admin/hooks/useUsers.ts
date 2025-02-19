@@ -3,11 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Profile } from "@/types/database";
+import type { UserWithRole } from "../types";
 
 export const useUsers = (
   isAdmin: boolean | undefined, 
   userRole: string | undefined, 
-  userProfile: Profile | null | undefined
+  userProfile: Profile | undefined
 ) => {
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
@@ -55,10 +56,14 @@ export const useUsers = (
                 ...profile,
                 user_roles: userRoles || [],
                 organizations: organizationData
-              };
+              } as UserWithRole;
             } catch (error) {
               console.error('Error fetching user details:', error);
-              return profile;
+              return {
+                ...profile,
+                user_roles: [],
+                organizations: []
+              } as UserWithRole;
             }
           })
         );
@@ -70,10 +75,11 @@ export const useUsers = (
       }
     },
     enabled: (isAdmin || userRole === 'org_admin') && (!userRole || userRole === 'org_admin' ? !!userProfile?.organization_id : true),
-    retry: 1,
-    onError: (error) => {
-      console.error('Error fetching users:', error);
-      toast.error("Failed to fetch users");
+    meta: {
+      onError: (error: Error) => {
+        console.error('Error fetching users:', error);
+        toast.error("Failed to fetch users");
+      }
     }
   });
 
