@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, Briefcase, LayoutDashboard, FileText, Settings, Clock, Calendar, Users } from "lucide-react";
@@ -26,7 +27,7 @@ const DeskFeatures = () => {
   const handleFeatureClick = (feature: string) => {
     switch (feature) {
       case 'dashboard':
-        navigate('/organization');
+        window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'dashboard' }));
         break;
       case 'calendar':
       case 'contacts':
