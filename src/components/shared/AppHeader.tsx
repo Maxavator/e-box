@@ -1,7 +1,5 @@
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { UserProfile } from "@/components/user/UserProfile";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AppHeaderProps {
@@ -42,7 +40,7 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
           <img 
             src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
             alt="Afrovation" 
-            className="h-8"
+            className="h-12" // Increased from h-8 to h-12
           />
         </button>
         {displayName && (
