@@ -11,10 +11,11 @@ import { useToast } from "@/components/ui/use-toast";
 interface Task {
   id: string;
   title: string;
-  completed: boolean;
+  completed: boolean | null;
   due_date: string | null;
-  created_at: string;
+  created_at: string | null;
   user_id: string;
+  updated_at: string | null;
 }
 
 export const TaskManager = () => {
@@ -22,11 +23,18 @@ export const TaskManager = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: tasks, isLoading } = useQuery({
+  const { data: tasks, isLoading, isError } = useQuery({
     queryKey: ['calendar-tasks'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to view your tasks",
+          variant: "destructive",
+        });
+        return [];
+      }
 
       const { data, error } = await supabase
         .from('calendar_tasks')
@@ -34,15 +42,32 @@ export const TaskManager = () => {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data as Task[];
-    }
+      if (error) {
+        console.error('Error fetching tasks:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load tasks",
+          variant: "destructive",
+        });
+        return [];
+      }
+
+      return data || [];
+    },
+    retry: false
   });
 
   const addTaskMutation = useMutation({
     mutationFn: async (title: string) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to add tasks",
+          variant: "destructive",
+        });
+        throw new Error("No user found");
+      }
 
       const { data, error } = await supabase
         .from('calendar_tasks')
@@ -53,17 +78,23 @@ export const TaskManager = () => {
             completed: false
           }
         ])
-        .select()
-        .single();
+        .select();
 
       if (error) throw error;
-      return data;
+      return data?.[0];
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendar-tasks'] });
       toast({
         title: "Task added",
         description: "Your task has been added successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to add task: " + error.message,
+        variant: "destructive",
       });
     }
   });
@@ -74,14 +105,20 @@ export const TaskManager = () => {
         .from('calendar_tasks')
         .update({ completed })
         .eq('id', id)
-        .select()
-        .single();
+        .select();
 
       if (error) throw error;
-      return data;
+      return data?.[0];
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendar-tasks'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update task: " + error.message,
+        variant: "destructive",
+      });
     }
   });
 
@@ -100,6 +137,13 @@ export const TaskManager = () => {
         title: "Task deleted",
         description: "Your task has been deleted successfully",
       });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete task: " + error.message,
+        variant: "destructive",
+      });
     }
   });
 
@@ -107,8 +151,12 @@ export const TaskManager = () => {
     e.preventDefault();
     if (!newTask.trim()) return;
 
-    await addTaskMutation.mutateAsync(newTask);
-    setNewTask("");
+    try {
+      await addTaskMutation.mutateAsync(newTask);
+      setNewTask("");
+    } catch (error) {
+      // Error is handled by mutation's onError
+    }
   };
 
   return (
@@ -134,6 +182,10 @@ export const TaskManager = () => {
 
         {isLoading ? (
           <div className="text-center py-4">Loading tasks...</div>
+        ) : isError ? (
+          <div className="text-center py-4 text-red-600">Failed to load tasks</div>
+        ) : tasks?.length === 0 ? (
+          <div className="text-center py-4 text-gray-500">No tasks yet</div>
         ) : (
           <div className="space-y-2">
             {tasks?.map((task) => (
