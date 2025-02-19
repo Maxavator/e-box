@@ -20,7 +20,7 @@ export const LookupTools = () => {
 
     setIsLoading(true);
     try {
-      // First get the profiles
+      // First get the profiles - only search string fields
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
@@ -29,7 +29,7 @@ export const LookupTools = () => {
             name
           )
         `)
-        .or(`first_name.ilike.%${userQuery}%,last_name.ilike.%${userQuery}%,id.ilike.%${userQuery}%`)
+        .or(`first_name.ilike.%${userQuery}%,last_name.ilike.%${userQuery}%`)
         .limit(5);
 
       if (profilesError) throw profilesError;
