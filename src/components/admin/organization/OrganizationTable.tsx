@@ -8,8 +8,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 
 interface Organization {
   id: string;
@@ -18,6 +19,9 @@ interface Organization {
   logo_url: string | null;
   created_at: string;
   updated_at: string;
+  _count?: {
+    profiles: number;
+  };
 }
 
 interface OrganizationTableProps {
@@ -55,8 +59,9 @@ export const OrganizationTable = ({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Name</TableHead>
+          <TableHead>Organization</TableHead>
           <TableHead>Domain</TableHead>
+          <TableHead>Members</TableHead>
           <TableHead>Created</TableHead>
           <TableHead>Last Updated</TableHead>
           <TableHead className="text-right">Actions</TableHead>
@@ -65,23 +70,55 @@ export const OrganizationTable = ({
       <TableBody>
         {organizations.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={5} className="text-center text-muted-foreground">
+            <TableCell colSpan={6} className="text-center text-muted-foreground">
               No organizations found
             </TableCell>
           </TableRow>
         ) : (
           organizations.map((org) => (
-            <TableRow key={org.id}>
-              <TableCell className="font-medium">{org.name}</TableCell>
-              <TableCell>{org.domain || '-'}</TableCell>
+            <TableRow key={org.id} className="group">
+              <TableCell className="font-medium">
+                <div className="flex items-center gap-3">
+                  {org.logo_url ? (
+                    <img 
+                      src={org.logo_url} 
+                      alt={org.name} 
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-primary font-semibold">
+                        {org.name.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                  <span>{org.name}</span>
+                </div>
+              </TableCell>
+              <TableCell>
+                {org.domain ? (
+                  <Badge variant="outline" className="font-mono">
+                    {org.domain}
+                  </Badge>
+                ) : (
+                  "-"
+                )}
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  <span>{org._count?.profiles || 0}</span>
+                </div>
+              </TableCell>
               <TableCell>{formatDate(org.created_at)}</TableCell>
               <TableCell>{formatDate(org.updated_at)}</TableCell>
               <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => onEdit(org)}
+                    className="hover:text-primary"
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -89,6 +126,7 @@ export const OrganizationTable = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => onDelete(org.id)}
+                    className="hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

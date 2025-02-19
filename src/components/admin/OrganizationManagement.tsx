@@ -26,7 +26,7 @@ export const OrganizationManagement = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('organizations')
-        .select('*')
+        .select('*, profiles:profiles(count)')
         .order('name');
       if (error) throw error;
       return data as Organization[];
@@ -122,7 +122,12 @@ export const OrganizationManagement = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Organization Management</h2>
+        <div>
+          <h2 className="text-xl font-bold">Organization Management</h2>
+          <p className="text-sm text-muted-foreground">
+            Manage and monitor organizations across the platform
+          </p>
+        </div>
         <Dialog open={isAddOrgOpen} onOpenChange={setIsAddOrgOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -160,7 +165,7 @@ export const OrganizationManagement = () => {
 
       <div className="border rounded-lg">
         <OrganizationTable
-          organizations={organizations}
+          organizations={organizations || []}
           isLoading={isLoading}
           onEdit={handleEdit}
           onDelete={handleDelete}
