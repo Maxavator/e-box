@@ -2,39 +2,104 @@
 import { supabase } from "@/integrations/supabase/client";
 
 const sampleMessages = [
-  "Hey, how's it going?",
-  "Just checking in on the project status",
-  "Can we schedule a meeting for tomorrow?",
-  "Have you seen the latest updates?",
-  "Great work on the presentation!",
-  "Let's discuss this in our next sync",
-  "Don't forget about the deadline",
-  "Thanks for your help!",
+  "Hi, can you review the latest project timeline?",
+  "The client meeting went well, I'll share the notes shortly",
+  "Have you seen the updated BMC requirements doc?",
+  "Let's schedule a team sync for tomorrow",
+  "The new system deployment is ready for testing",
+  "Please review the compliance documentation",
+  "Great work on the presentation yesterday",
+  "Can we discuss the resource allocation?",
+  "The stakeholder feedback is positive",
+  "Need your input on the technical specifications"
 ];
 
-export const startMessageSimulation = (duration: number = 60000) => {
+async function getBMCUsers() {
+  const { data: profiles, error } = await supabase
+    .from('profiles')
+    .select('id, first_name, last_name')
+    .eq('organization_id', (
+      await supabase
+        .from('organizations')
+        .select('id')
+        .ilike('domain', '%bmc-group.co.za%')
+        .single()
+    ).data?.id);
+
+  if (error || !profiles) {
+    console.error('Error fetching BMC users:', error);
+    return [];
+  }
+
+  return profiles;
+}
+
+async function getOrCreateConversation(user1Id: string, user2Id: string) {
+  // First check if conversation exists
+  const { data: existingConv } = await supabase
+    .from('conversations')
+    .select('id')
+    .or(`and(user1_id.eq.${user1Id},user2_id.eq.${user2Id}),and(user1_id.eq.${user2Id},user2_id.eq.${user1Id})`)
+    .single();
+
+  if (existingConv) return existingConv.id;
+
+  // Create new conversation if it doesn't exist
+  const { data: newConv, error } = await supabase
+    .from('conversations')
+    .insert({
+      user1_id: user1Id,
+      user2_id: user2Id
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating conversation:', error);
+    return null;
+  }
+
+  return newConv.id;
+}
+
+export const startMessageSimulation = async (duration: number = 60000) => {
   const startTime = Date.now();
+  const users = await getBMCUsers();
+
+  if (users.length < 2) {
+    console.error('Not enough BMC users found for simulation');
+    return () => {};
+  }
+
   const interval = setInterval(async () => {
     if (Date.now() - startTime >= duration) {
       clearInterval(interval);
       return;
     }
 
+    // Randomly select two different users
+    const sender = users[Math.floor(Math.random() * users.length)];
+    let receiver;
+    do {
+      receiver = users[Math.floor(Math.random() * users.length)];
+    } while (receiver.id === sender.id);
+
+    // Get or create conversation
+    const conversationId = await getOrCreateConversation(sender.id, receiver.id);
+    if (!conversationId) return;
+
+    // Send message
     const randomMessage = sampleMessages[Math.floor(Math.random() * sampleMessages.length)];
-    const randomConversationId = Math.random() < 0.5 ? '1' : '2'; // Simulate messages in two conversations
-
+    
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
       await supabase.from('messages').insert({
-        conversation_id: randomConversationId,
-        content: randomMessage,
-        sender_id: Math.random() < 0.5 ? user.id : 'other-user-id', // Simulate messages from different users
-        created_at: new Date().toISOString(),
+        conversation_id: conversationId,
+        sender_id: sender.id,
+        content: `[${sender.first_name}]: ${randomMessage}`,
+        created_at: new Date().toISOString()
       });
 
-      console.log('Simulated message sent:', randomMessage);
+      console.log(`Simulated message from ${sender.first_name} to ${receiver.first_name}`);
     } catch (error) {
       console.error('Error sending simulated message:', error);
     }
