@@ -21,7 +21,6 @@ import type { Organization } from "../types";
 export const OrganizationsList = () => {
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [userOrgId, setUserOrgId] = useState<string | null>(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   useEffect(() => {
@@ -45,28 +44,14 @@ export const OrganizationsList = () => {
         return;
       }
 
-      // Get user's organization
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('organization_id')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) {
-        console.error('Error fetching user profile:', profileError);
-        toast.error("Failed to fetch user profile");
-        return;
-      }
-
       setUserRole(roleData?.role || null);
-      setUserOrgId(profileData?.organization_id || null);
     };
 
     fetchUserInfo();
   }, []);
 
   const { data: organizations, isLoading } = useQuery({
-    queryKey: ['organizations', userRole, userOrgId],
+    queryKey: ['organizations', userRole],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -93,6 +78,16 @@ export const OrganizationsList = () => {
   const handleLogin = () => {
     navigate("/auth");
   };
+
+  if (!userRole) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-center text-gray-500">Loading user role...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <>
