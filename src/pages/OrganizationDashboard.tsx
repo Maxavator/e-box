@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, MessageSquare, BarChart, Building2, Shield } from "lucide-react";
+import { Users, MessageSquare, BarChart, Building2, Shield, LogOut } from "lucide-react";
 import { Policies } from "@/components/desk/Policies";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
@@ -12,10 +12,12 @@ import { OrganizationManagement } from "@/components/admin/OrganizationManagemen
 import { OrganizationsList } from "@/components/admin/organization/OrganizationsList";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 
 const OrganizationDashboard = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { toast } = useToast();
   const [userInfo, setUserInfo] = useState<{ orgName: string; isAdmin: boolean }>({ 
     orgName: '', 
     isAdmin: false 
@@ -50,8 +52,20 @@ const OrganizationDashboard = () => {
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account",
+      });
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "Error logging out",
+        description: "There was a problem logging out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleLogoClick = () => {
@@ -66,12 +80,22 @@ const OrganizationDashboard = () => {
         <header className="space-y-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
             <h1 className="heading-responsive font-bold tracking-tight">Organization Dashboard</h1>
-            {userInfo.orgName && (
-              <p className="text-muted-foreground text-responsive">
-                {userInfo.orgName}
-                {userInfo.isAdmin && <span className="ml-2 text-primary">(Admin)</span>}
-              </p>
-            )}
+            <div className="flex items-center gap-4">
+              {userInfo.orgName && (
+                <p className="text-muted-foreground text-responsive">
+                  {userInfo.orgName}
+                  {userInfo.isAdmin && <span className="ml-2 text-primary">(Admin)</span>}
+                </p>
+              )}
+              <Button 
+                variant="destructive" 
+                onClick={handleLogout}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </Button>
+            </div>
           </div>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <p className="text-muted-foreground text-responsive">
