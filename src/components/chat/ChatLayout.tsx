@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { NewMessageDialog } from "./NewMessageDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 
 interface ChatLayoutProps {
   searchQuery: string;
@@ -71,28 +72,42 @@ export function ChatLayout({
     <div className="flex h-screen flex-col">
       <AppHeader onLogoClick={onLogoClick} />
       <div className="flex flex-1 overflow-hidden">
-        <ChatSidebar
-          searchQuery={searchQuery}
-          onSearchChange={onSearchChange}
-          activeTab={activeTab}
-          onTabChange={onTabChange}
-          conversations={conversations}
-          selectedConversation={selectedConversation}
-          onSelectConversation={onSelectConversation}
-          onCalendarActionClick={onCalendarActionClick}
-          calendarView={calendarView}
-          isMobile={isMobile}
-          onLogout={onLogout}
-        />
-        <ChatContent
-          conversation={selectedConversation}
-          newMessage={newMessage}
-          onNewMessageChange={onNewMessageChange}
-          onSendMessage={onSendMessage}
-          onEditMessage={onEditMessage}
-          onDeleteMessage={onDeleteMessage}
-          onReactToMessage={onReactToMessage}
-        />
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="w-full rounded-lg"
+        >
+          <ResizablePanel 
+            defaultSize={25}
+            minSize={20}
+            maxSize={40}
+          >
+            <ChatSidebar
+              searchQuery={searchQuery}
+              onSearchChange={onSearchChange}
+              activeTab={activeTab}
+              onTabChange={onTabChange}
+              conversations={conversations}
+              selectedConversation={selectedConversation}
+              onSelectConversation={onSelectConversation}
+              onCalendarActionClick={onCalendarActionClick}
+              calendarView={calendarView}
+              isMobile={isMobile}
+              onLogout={onLogout}
+            />
+          </ResizablePanel>
+          <ResizableHandle withHandle className="bg-border" />
+          <ResizablePanel defaultSize={75}>
+            <ChatContent
+              conversation={selectedConversation}
+              newMessage={newMessage}
+              onNewMessageChange={onNewMessageChange}
+              onSendMessage={onSendMessage}
+              onEditMessage={onEditMessage}
+              onDeleteMessage={onDeleteMessage}
+              onReactToMessage={onReactToMessage}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
       <Dialog open={showNewMessageDialog} onOpenChange={setShowNewMessageDialog}>
         <DialogContent>
