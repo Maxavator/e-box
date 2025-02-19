@@ -6,17 +6,29 @@ import { Building2 } from "lucide-react";
 import { OrganizationTable } from "./OrganizationTable";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import type { Organization } from "../types";
 
 export const OrganizationsList = () => {
+  const navigate = useNavigate();
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userOrgId, setUserOrgId] = useState<string | null>(null);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast.error("Authentication required");
+        setShowAuthDialog(true);
         return;
       }
 
@@ -57,9 +69,11 @@ export const OrganizationsList = () => {
     queryKey: ['organizations', userRole, userOrgId],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) {
+        setShowAuthDialog(true);
+        throw new Error("Not authenticated");
+      }
 
-      // The RLS policies will automatically filter the results based on the user's role
       const { data, error } = await supabase
         .from('organizations')
         .select('*')
@@ -73,25 +87,47 @@ export const OrganizationsList = () => {
 
       return data as Organization[];
     },
-    enabled: userRole !== null, // Only run query when we have the user role
+    enabled: userRole !== null,
   });
 
+  const handleLogin = () => {
+    navigate("/auth");
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Building2 className="h-5 w-5 text-primary" />
-          Organizations
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <OrganizationTable 
-          organizations={organizations} 
-          isLoading={isLoading} 
-          onEdit={() => {}} 
-          onDelete={() => {}} 
-        />
-      </CardContent>
-    </Card>
+    <>
+      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Authentication Required</DialogTitle>
+            <DialogDescription>
+              Please log in to access the organization list.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={handleLogin} className="w-full">
+              Go to Login
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-primary" />
+            Organizations
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <OrganizationTable 
+            organizations={organizations} 
+            isLoading={isLoading} 
+            onEdit={() => {}} 
+            onDelete={() => {}} 
+          />
+        </CardContent>
+      </Card>
+    </>
   );
 };
