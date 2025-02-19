@@ -15,6 +15,19 @@ import { ContactsList } from "./components/desk/ContactsList";
 
 const queryClient = new QueryClient();
 
+const ContactsWithChat = () => {
+  return (
+    <div className="flex w-full">
+      <div className="w-80 border-r">
+        <Chat />
+      </div>
+      <div className="flex-1">
+        <ContactsList />
+      </div>
+    </div>
+  );
+};
+
 const AppContent = () => {
   const navigate = useNavigate();
 
@@ -39,7 +52,7 @@ const AppContent = () => {
         <Route path="/chat" element={<Chat />} />
         <Route path="/admin" element={<AdminPortal />} />
         <Route path="/organization" element={<OrganizationDashboard />} />
-        <Route path="/contacts" element={<ContactsList />} />
+        <Route path="/contacts" element={<ContactsWithChat />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
