@@ -23,6 +23,7 @@ interface ChatLayoutProps {
   calendarView: 'calendar' | 'inbox';
   onLogout: () => void;
   onLogoClick: () => void;
+  isMobile: boolean;
 }
 
 export const ChatLayout = ({
@@ -43,6 +44,7 @@ export const ChatLayout = ({
   calendarView,
   onLogout,
   onLogoClick,
+  isMobile,
 }: ChatLayoutProps) => {
   return (
     <div className="flex-1 flex flex-col">
