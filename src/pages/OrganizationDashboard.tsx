@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, MessageSquare, BarChart, Building2, Shield, LogOut } from "lucide-react";
+import { Users, MessageSquare, BarChart, Building2, Shield, LogOut, Mail, Globe } from "lucide-react";
 import { Policies } from "@/components/desk/Policies";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
@@ -18,9 +18,20 @@ const OrganizationDashboard = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { toast } = useToast();
-  const [userInfo, setUserInfo] = useState<{ orgName: string; isAdmin: boolean }>({ 
+  const [userInfo, setUserInfo] = useState<{ 
+    orgName: string; 
+    isAdmin: boolean;
+    orgDetails: {
+      name: string;
+      domain?: string;
+      logo_url?: string;
+      created_at: string;
+      updated_at: string;
+    } | null;
+  }>({ 
     orgName: '', 
-    isAdmin: false 
+    isAdmin: false,
+    orgDetails: null
   });
 
   useEffect(() => {
@@ -30,7 +41,7 @@ const OrganizationDashboard = () => {
       if (user) {
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('organizations(name)')
+          .select('organizations(name, domain, logo_url, created_at, updated_at)')
           .eq('id', user.id)
           .single();
 
@@ -43,7 +54,11 @@ const OrganizationDashboard = () => {
         if (profileData) {
           const orgName = profileData.organizations?.name || '';
           const isAdmin = roleData?.role === 'org_admin' || roleData?.role === 'global_admin';
-          setUserInfo({ orgName, isAdmin });
+          setUserInfo({ 
+            orgName, 
+            isAdmin,
+            orgDetails: profileData.organizations
+          });
         }
       }
     };
@@ -70,6 +85,14 @@ const OrganizationDashboard = () => {
 
   const handleLogoClick = () => {
     navigate("/organization");
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   return (
@@ -125,7 +148,43 @@ const OrganizationDashboard = () => {
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
-            <div className="grid-responsive">
+            <div className="grid-responsive gap-6">
+              {userInfo.orgDetails && (
+                <Card className="col-span-full">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-responsive">
+                      <Building2 className="h-5 w-5 text-primary" />
+                      <span>Organization Details</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-medium text-sm text-muted-foreground">Organization Name</h3>
+                        <p className="text-lg">{userInfo.orgDetails.name}</p>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-sm text-muted-foreground">Domain</h3>
+                        <p className="text-lg flex items-center gap-2">
+                          <Globe className="h-4 w-4 text-muted-foreground" />
+                          {userInfo.orgDetails.domain || 'Not set'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-medium text-sm text-muted-foreground">Created</h3>
+                        <p className="text-lg">{formatDate(userInfo.orgDetails.created_at)}</p>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-sm text-muted-foreground">Last Updated</h3>
+                        <p className="text-lg">{formatDate(userInfo.orgDetails.updated_at)}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-responsive">
