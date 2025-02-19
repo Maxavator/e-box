@@ -18,6 +18,9 @@ interface Organization {
   logo_url: string | null;
   created_at: string;
   updated_at: string;
+  _count?: {
+    profiles: number;
+  };
 }
 
 interface OrganizationTableProps {
@@ -57,6 +60,7 @@ export const OrganizationTable = ({
         <TableRow>
           <TableHead>Name</TableHead>
           <TableHead>Domain</TableHead>
+          <TableHead>Members</TableHead>
           <TableHead>Created</TableHead>
           <TableHead>Last Updated</TableHead>
           <TableHead className="text-right">Actions</TableHead>
@@ -65,7 +69,7 @@ export const OrganizationTable = ({
       <TableBody>
         {organizations.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={5} className="text-center text-muted-foreground">
+            <TableCell colSpan={6} className="text-center text-muted-foreground">
               No organizations found
             </TableCell>
           </TableRow>
@@ -74,6 +78,7 @@ export const OrganizationTable = ({
             <TableRow key={org.id}>
               <TableCell className="font-medium">{org.name}</TableCell>
               <TableCell>{org.domain || '-'}</TableCell>
+              <TableCell>{org._count?.profiles || 0}</TableCell>
               <TableCell>{formatDate(org.created_at)}</TableCell>
               <TableCell>{formatDate(org.updated_at)}</TableCell>
               <TableCell className="text-right">
