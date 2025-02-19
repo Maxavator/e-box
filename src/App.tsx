@@ -39,7 +39,16 @@ const AppContent = () => {
         <Route path="/chat" element={<Chat />} />
         <Route path="/admin" element={<AdminPortal />} />
         <Route path="/organization" element={<OrganizationDashboard />} />
-        <Route path="/contacts" element={<ContactsList />} />
+        <Route path="/contacts" element={
+          <div className="flex w-full">
+            <div className="w-80 min-w-80 border-r">
+              <Chat />
+            </div>
+            <div className="flex-1 overflow-auto">
+              <ContactsList />
+            </div>
+          </div>
+        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
