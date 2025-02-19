@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Mail, Info, CardStack } from "lucide-react";
+import { Mail, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -160,7 +159,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
               className="w-1/2"
               onClick={() => setLoginMethod('saId')}
             >
-              <CardStack className="w-4 h-4 mr-2" />
+              <Mail className="w-4 h-4 mr-2" />
               SA ID
             </Button>
           </div>
