@@ -21,20 +21,51 @@ export const useOrganizations = () => {
 
   const queryClient = useQueryClient();
 
+  const { data: isAdmin } = useQuery({
+    queryKey: ['isGlobalAdmin'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('is_global_admin');
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const { data: organizations, isLoading } = useQuery({
     queryKey: ['organizations'],
     queryFn: async () => {
+      if (!isAdmin) {
+        throw new Error("Not authorized to view organizations");
+      }
+
       const { data, error } = await supabase
         .from('organizations')
-        .select('*, profiles:profiles(count)')
+        .select(`
+          *,
+          profiles (
+            id
+          )
+        `)
         .order('name');
+
       if (error) throw error;
-      return data as Organization[];
+
+      // Transform the data to include the member count
+      return data.map(org => ({
+        ...org,
+        profiles: {
+          count: org.profiles?.length || 0
+        }
+      })) as Organization[];
     },
+    enabled: isAdmin !== undefined,
   });
 
   const createMutation = useMutation({
     mutationFn: async (newOrg: OrganizationFormData) => {
+      if (!isAdmin) {
+        throw new Error("Not authorized to create organizations");
+      }
+
       const { data, error } = await supabase
         .from('organizations')
         .insert([{ name: newOrg.name, domain: newOrg.domain || null }])
@@ -56,6 +87,10 @@ export const useOrganizations = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: OrganizationFormData }) => {
+      if (!isAdmin) {
+        throw new Error("Not authorized to update organizations");
+      }
+
       const { error } = await supabase
         .from('organizations')
         .update({ name: data.name, domain: data.domain || null })
@@ -75,6 +110,10 @@ export const useOrganizations = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
+      if (!isAdmin) {
+        throw new Error("Not authorized to delete organizations");
+      }
+
       const { error } = await supabase
         .from('organizations')
         .delete()
@@ -122,6 +161,7 @@ export const useOrganizations = () => {
   return {
     organizations,
     isLoading,
+    isAdmin,
     isAddOrgOpen,
     setIsAddOrgOpen,
     isEditOrgOpen,

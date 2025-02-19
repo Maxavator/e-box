@@ -32,10 +32,15 @@ export const useUserManagement = () => {
   const { data: userRole } = useQuery({
     queryKey: ['userRole'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
+        .eq('user_id', user.id)
         .single();
+
       if (error) throw error;
       return data?.role;
     },
@@ -44,10 +49,15 @@ export const useUserManagement = () => {
   const { data: userProfile } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       const { data, error } = await supabase
         .from('profiles')
         .select('organization_id')
+        .eq('id', user.id)
         .single();
+
       if (error) throw error;
       return data;
     },
@@ -57,10 +67,15 @@ export const useUserManagement = () => {
   const { data: organizations } = useQuery({
     queryKey: ['organizations'],
     queryFn: async () => {
+      if (!isAdmin && userRole !== 'org_admin') {
+        throw new Error("Not authorized to view organizations");
+      }
+
       const { data, error } = await supabase
         .from('organizations')
         .select('*')
         .order('name');
+
       if (error) throw error;
       return data;
     },
@@ -70,29 +85,41 @@ export const useUserManagement = () => {
   const { data: users, isLoading } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
+      if (!isAdmin && userRole !== 'org_admin') {
+        throw new Error("Not authorized to view users");
+      }
+
       let query = supabase
         .from('profiles')
         .select(`
           *,
-          user_roles (role),
+          user_roles!user_roles_user_id_fkey (role),
           organizations (name)
         `);
 
       if (userRole === 'org_admin' && userProfile?.organization_id) {
         query = query.eq('organization_id', userProfile.organization_id);
       }
-      
-      const { data: profiles, error: profilesError } = await query;
-      
-      if (profilesError) throw profilesError;
-      return profiles as unknown as UserWithRole[];
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      return data.map(profile => ({
+        ...profile,
+        user_roles: profile.user_roles ? [profile.user_roles] : [],
+        organizations: profile.organizations ? [profile.organizations] : []
+      })) as UserWithRole[];
     },
-    enabled: isAdmin || (userRole === 'org_admin' && !!userProfile?.organization_id),
+    enabled: (isAdmin || userRole === 'org_admin') && (!userRole || userRole === 'org_admin' ? !!userProfile?.organization_id : true),
   });
 
   const updateUserMutation = useMutation({
     mutationFn: async ({ userId, data }: { userId: string, data: UserFormData }) => {
-      // Check if user has permission to update
+      if (!isAdmin && userRole !== 'org_admin') {
+        throw new Error("Not authorized to update users");
+      }
+
+      // Check if org admin is trying to update users from other organizations
       if (userRole === 'org_admin' && userProfile?.organization_id !== data.organizationId) {
         throw new Error("You don't have permission to update users from other organizations");
       }
