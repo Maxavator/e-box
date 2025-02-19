@@ -19,7 +19,7 @@ const OrganizationManagementPage = () => {
   };
 
   const handleLogoClick = () => {
-    navigate("/organization");
+    navigate("/admin");
   };
 
   return (
