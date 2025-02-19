@@ -74,7 +74,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
   };
 
   return (
-    <div className="w-full md:w-1/2 p-8 md:p-16 flex items-center justify-center bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-sm">
+    <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col items-center justify-center bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-sm">
       <Card className="w-full max-w-md animate-fadeIn shadow-xl hover:shadow-2xl transition-shadow duration-300 border-primary/10">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center text-primary">
@@ -155,13 +155,13 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
               Request a Demo
             </button>
           </div>
-          <div className="text-center w-full">
-            <span className="text-xs text-muted-foreground">
-              Version 1.91
-            </span>
-          </div>
         </CardFooter>
       </Card>
+      <div className="mt-4">
+        <span className="text-xs text-muted-foreground">
+          Version 1.91
+        </span>
+      </div>
     </div>
   );
 };
