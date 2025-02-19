@@ -30,6 +30,10 @@ const DeskFeatures = () => {
         <Calendar className="mr-2 h-4 w-4" />
         My Calendar
       </Button>
+      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'contacts' }))}>
+        <Users className="mr-2 h-4 w-4" />
+        Contacts
+      </Button>
       <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'documents' }))}>
         <FileText className="mr-2 h-4 w-4" />
         My Documents
@@ -92,15 +96,6 @@ export function ChatSidebar({
             </div>
           </TabsTrigger>
           <TabsTrigger
-            value="contacts"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
-          >
-            <div className="flex items-center">
-              <Users className="w-4 h-4 mr-2" />
-              <span>Contacts</span>
-            </div>
-          </TabsTrigger>
-          <TabsTrigger
             value="desk"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
           >
@@ -118,22 +113,6 @@ export function ChatSidebar({
             selectedConversation={selectedConversation}
             onSelectConversation={onSelectConversation}
           />
-        </TabsContent>
-
-        <TabsContent value="contacts" className="h-full p-4">
-          <div className="space-y-4">
-            <Button variant="outline" className="w-full">
-              <Users className="w-4 h-4 mr-2" />
-              Add New Contact
-            </Button>
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground">Online</h3>
-              <div className="space-y-1">
-                {/* Placeholder for contacts list */}
-                <p className="text-sm text-muted-foreground">No contacts online</p>
-              </div>
-            </div>
-          </div>
         </TabsContent>
 
         <TabsContent value="desk" className="h-full">
