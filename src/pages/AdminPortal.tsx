@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { NavigationCards } from "@/components/admin/dashboard/NavigationCards";
@@ -15,6 +15,18 @@ const AdminPortal = () => {
   const navigate = useNavigate();
   const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'organizations' | 'settings'>('dashboard');
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please login to access this page");
+        navigate("/auth");
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -29,8 +41,14 @@ const AdminPortal = () => {
     setActiveView('dashboard');
   };
 
-  const handleOrganizationManagement = () => {
-    navigate("/admin/organization");
+  const handleOrganizationManagement = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      navigate("/admin/organization");
+    } else {
+      toast.error("Please login to access organization management");
+      navigate("/auth");
+    }
   };
 
   const handleViewChange = (view: 'dashboard' | 'users' | 'organizations' | 'settings') => {
