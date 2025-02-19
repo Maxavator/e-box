@@ -35,11 +35,16 @@ export const LookupTools = () => {
       if (data.length === 0) {
         toast.info("No users found matching your search");
       } else {
-        const formattedResults = (data as UserWithRole[]).map(user => ({
-          name: `${user.first_name} ${user.last_name}`,
+        // Using a safer type approach
+        const formattedResults = data.map(user => ({
+          name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
           email: user.id,
-          role: user.user_roles?.[0]?.role || 'N/A',
-          organization: user.organizations?.[0]?.name || 'N/A'
+          role: Array.isArray(user.user_roles) && user.user_roles[0]?.role 
+            ? user.user_roles[0].role 
+            : 'N/A',
+          organization: Array.isArray(user.organizations) && user.organizations[0]?.name 
+            ? user.organizations[0].name 
+            : 'N/A'
         }));
         
         toast.success(`Found ${data.length} user(s)`, {
@@ -73,7 +78,9 @@ export const LookupTools = () => {
       const { data, error } = await supabase
         .from('organizations')
         .select(`
-          *,
+          id,
+          name,
+          domain,
           profiles (id)
         `)
         .ilike('name', `%${orgQuery}%`)
@@ -84,10 +91,10 @@ export const LookupTools = () => {
       if (data.length === 0) {
         toast.info("No organizations found matching your search");
       } else {
-        const formattedResults = (data as Organization[]).map(org => ({
-          name: org.name,
+        const formattedResults = data.map(org => ({
+          name: org.name || 'N/A',
           domain: org.domain || 'N/A',
-          memberCount: org.profiles?.length || 0
+          memberCount: Array.isArray(org.profiles) ? org.profiles.length : 0
         }));
 
         toast.success(`Found ${data.length} organization(s)`, {
