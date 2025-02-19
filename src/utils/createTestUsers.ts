@@ -4,8 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 const createUser = async (saId: string, orgId: string, isAdmin: boolean) => {
   try {
     const { data: authUser, error: signUpError } = await supabase.auth.signUp({
-      email: `${saId}@bmcgroup.com`,
-      password: `BMC${saId}`,
+      email: saId,
+      password: `Test${saId}`,
       options: {
         data: {
           first_name: isAdmin ? 'BMC' : 'Staff',
@@ -69,7 +69,7 @@ export const createTestUsers = async () => {
   }
 
   // Create admin user
-  const adminResult = await createUser('5010206060085', org.id, true);
+  const adminResult = await createUser('5010203040512', org.id, true);
   console.log('Admin user creation result:', adminResult);
 
   // Create 20 staff users
