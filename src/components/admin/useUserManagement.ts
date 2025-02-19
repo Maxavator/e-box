@@ -93,8 +93,16 @@ export const useUserManagement = () => {
         .from('profiles')
         .select(`
           *,
-          user_roles!user_roles_user_id_fkey (role),
-          organizations (name)
+          user_roles (
+            id,
+            role,
+            created_at,
+            updated_at,
+            user_id
+          ),
+          organizations!profiles_organization_id_fkey (
+            name
+          )
         `);
 
       if (userRole === 'org_admin' && userProfile?.organization_id) {
@@ -104,11 +112,13 @@ export const useUserManagement = () => {
       const { data, error } = await query;
       if (error) throw error;
 
-      return data.map(profile => ({
+      const transformedData = data.map(profile => ({
         ...profile,
-        user_roles: profile.user_roles ? [profile.user_roles] : [],
+        user_roles: profile.user_roles || [],
         organizations: profile.organizations ? [profile.organizations] : []
-      })) as UserWithRole[];
+      }));
+
+      return transformedData as UserWithRole[];
     },
     enabled: (isAdmin || userRole === 'org_admin') && (!userRole || userRole === 'org_admin' ? !!userProfile?.organization_id : true),
   });

@@ -6,8 +6,8 @@ export type UserRole = Database['public']['Tables']['user_roles']['Row'];
 export type Organization = Database['public']['Tables']['organizations']['Row'];
 
 export interface UserWithRole extends Profile {
-  user_roles: Pick<UserRole, 'role'>[];
-  organizations: Organization[];
+  user_roles: UserRole[];
+  organizations: Pick<Organization, 'name'>[];
 }
 
 export interface UserFormData {
