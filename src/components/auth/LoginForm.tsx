@@ -5,16 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Mail, Info, User } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import { AuthResponse } from "@supabase/supabase-js";
 
 interface LoginFormProps {
   onRequestDemo: () => void;
@@ -107,7 +102,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
 
       // Then sign in with the associated user credentials
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: userData.id, // The user's email will be retrieved based on the SA ID
+        email: userData.id,
         password: saIdPassword,
       });
 
@@ -131,7 +126,9 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
     }
   };
 
-  const handleSuccessfulLogin = async (data: any) => {
+  const handleSuccessfulLogin = async (data: AuthResponse['data']) => {
+    if (!data.user) return;
+    
     // Check user role
     const { data: isAdmin } = await supabase.rpc('is_global_admin');
     
