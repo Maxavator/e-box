@@ -18,6 +18,10 @@ export const useAuth = () => {
     return /^\d{13}$/.test(id);
   };
 
+  const isSaId = (input: string) => {
+    return /^\d+$/.test(input) && input.length === 13;
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -42,12 +46,12 @@ export const useAuth = () => {
       let signInResult;
       
       if (loginMethod === 'email') {
+        const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
         signInResult = await supabase.auth.signInWithPassword({
-          email,
-          password,
+          email: loginEmail,
+          password: isSaId(email) ? email : password,
         });
       } else {
-        // For SA ID login, try both the direct SA ID and the email format
         signInResult = await supabase.auth.signInWithPassword({
           email: saId.includes('@') ? saId : `${saId}@said.auth`,
           password: saId,
@@ -83,6 +87,10 @@ export const useAuth = () => {
     if (loginMethod === 'email') {
       if (!email || !password) {
         toast.error("Please enter both email and password");
+        return;
+      }
+      if (isSaId(email)) {
+        toast.error("Please use the SA ID login method to register with an SA ID");
         return;
       }
       if (password.length < 6) {
