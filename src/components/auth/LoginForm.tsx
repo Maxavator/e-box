@@ -159,7 +159,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
       </Card>
       <div className="mt-4">
         <span className="text-xs text-gray-500">
-          Version 1.91
+          Version 1.92
         </span>
       </div>
     </div>
