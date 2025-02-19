@@ -2,9 +2,13 @@
 import { useNavigate } from "react-router-dom";
 import { useChat } from "@/hooks/use-chat";
 import { ChatLayout } from "@/components/chat/ChatLayout";
+import { useEffect } from "react";
+import { startMessageSimulation } from "@/utils/messageSimulator";
+import { useToast } from "@/components/ui/use-toast";
 
 const Chat = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const {
     searchQuery,
     setSearchQuery,
@@ -22,6 +26,23 @@ const Chat = () => {
     handleReaction,
     handleSelectConversation,
   } = useChat();
+
+  useEffect(() => {
+    toast({
+      title: "Message Simulation Started",
+      description: "Messages will be simulated for the next 60 seconds",
+    });
+
+    const stopSimulation = startMessageSimulation(60000);
+
+    return () => {
+      stopSimulation();
+      toast({
+        title: "Message Simulation Ended",
+        description: "Message simulation has been stopped",
+      });
+    };
+  }, [toast]);
 
   const handleLogout = () => {
     navigate("/");
