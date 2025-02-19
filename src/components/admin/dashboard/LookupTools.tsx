@@ -20,34 +20,42 @@ export const LookupTools = () => {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // First, get the user roles
+      const { data: userRolesData, error: userRolesError } = await supabase
+        .from('user_roles')
+        .select('*')
+        .or(`user_id.ilike.%${userQuery}%`);
+
+      if (userRolesError) throw userRolesError;
+
+      // Then get the profiles with organization info
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
           *,
-          user_roles (role),
-          organizations (name)
+          organizations:organization_id (
+            name
+          )
         `)
         .or(`first_name.ilike.%${userQuery}%,last_name.ilike.%${userQuery}%,id.ilike.%${userQuery}%`)
         .limit(5);
 
-      if (error) throw error;
+      if (profilesError) throw profilesError;
 
-      if (data.length === 0) {
+      if (!profilesData || profilesData.length === 0) {
         toast.info("No users found matching your search");
       } else {
-        // Using a safer type approach
-        const formattedResults = data.map(user => ({
-          name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
-          email: user.id,
-          role: Array.isArray(user.user_roles) && user.user_roles[0]?.role 
-            ? user.user_roles[0].role 
-            : 'N/A',
-          organization: Array.isArray(user.organizations) && user.organizations[0]?.name 
-            ? user.organizations[0].name 
-            : 'N/A'
-        }));
+        const formattedResults = profilesData.map(user => {
+          const userRole = userRolesData?.find(role => role.user_id === user.id);
+          return {
+            name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+            email: user.id,
+            role: userRole?.role || 'N/A',
+            organization: user.organizations?.name || 'N/A'
+          };
+        });
         
-        toast.success(`Found ${data.length} user(s)`, {
+        toast.success(`Found ${profilesData.length} user(s)`, {
           description: (
             <div className="mt-2 space-y-2">
               {formattedResults.map((result, i) => (
@@ -81,14 +89,16 @@ export const LookupTools = () => {
           id,
           name,
           domain,
-          profiles (id)
+          profiles!organization_id (
+            id
+          )
         `)
         .ilike('name', `%${orgQuery}%`)
         .limit(5);
 
       if (error) throw error;
 
-      if (data.length === 0) {
+      if (!data || data.length === 0) {
         toast.info("No organizations found matching your search");
       } else {
         const formattedResults = data.map(org => ({
