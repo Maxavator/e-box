@@ -1,42 +1,50 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, MessageSquare, ArrowUpRight, FileText, Calendar, Megaphone } from "lucide-react";
 import { Documents } from "@/components/desk/Documents";
 import { ContactsList } from "@/components/desk/ContactsList";
+import { Calendar as CalendarComponent } from "@/components/desk/Calendar";
+import { LeaveManager } from "@/components/desk/LeaveManager";
+import { Policies } from "@/components/desk/Policies";
+import { PartnerMessages } from "@/components/desk/PartnerMessages";
+import { Settings } from "@/components/desk/Settings";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const Dashboard = () => {
-  const [showDocuments, setShowDocuments] = useState(false);
-  const [showContacts, setShowContacts] = useState(false);
+  const [currentView, setCurrentView] = useState<string>('dashboard');
   const navigate = useNavigate();
 
-  if (showDocuments) {
-    return <Documents />;
-  }
-
-  if (showContacts) {
-    return <ContactsList />;
-  }
-
-  const handleCardClick = (feature: string) => {
-    switch (feature) {
-      case 'calendar':
-        window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'calendar' }));
-        break;
-      case 'messages':
-        navigate('/chat');
-        break;
+  const renderFeature = () => {
+    switch (currentView) {
       case 'documents':
-        window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'documents' }));
-        break;
+        return <Documents />;
       case 'contacts':
-      case 'team':
-        window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'contacts' }));
-        break;
+        return <ContactsList />;
+      case 'calendar':
+        return <CalendarComponent />;
+      case 'leave':
+        return <LeaveManager />;
+      case 'policies':
+        return <Policies />;
+      case 'messages':
+        return <PartnerMessages />;
+      case 'settings':
+        return <Settings />;
+      default:
+        return renderDashboard();
     }
   };
 
-  return (
+  const handleCardClick = (feature: string) => {
+    if (feature === 'chat') {
+      navigate('/chat');
+      return;
+    }
+    setCurrentView(feature);
+  };
+
+  const renderDashboard = () => (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-6">Welcome back, John</h2>
       
@@ -57,7 +65,7 @@ export const Dashboard = () => {
 
         <Card 
           className="cursor-pointer hover:shadow-md transition-shadow"
-          onClick={() => handleCardClick('messages')}
+          onClick={() => handleCardClick('chat')}
         >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-500">New Messages</CardTitle>
@@ -84,7 +92,7 @@ export const Dashboard = () => {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <Card>
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
@@ -146,49 +154,94 @@ export const Dashboard = () => {
         </Card>
       </div>
 
-      <div className="mt-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <button 
-                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
-                onClick={() => handleCardClick('documents')}
-              >
-                <FileText className="w-5 h-5 mb-2 text-blue-600" />
-                <p className="font-medium">View Documents</p>
-                <p className="text-sm text-gray-500">Access your files</p>
-              </button>
-              <button 
-                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
-                onClick={() => handleCardClick('calendar')}
-              >
-                <Calendar className="w-5 h-5 mb-2 text-green-600" />
-                <p className="font-medium">Schedule Meeting</p>
-                <p className="text-sm text-gray-500">Book a time slot</p>
-              </button>
-              <button 
-                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
-                onClick={() => handleCardClick('messages')}
-              >
-                <MessageSquare className="w-5 h-5 mb-2 text-purple-600" />
-                <p className="font-medium">Send Message</p>
-                <p className="text-sm text-gray-500">Contact support</p>
-              </button>
-              <button 
-                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
-                onClick={() => handleCardClick('team')}
-              >
-                <Users className="w-5 h-5 mb-2 text-orange-600" />
-                <p className="font-medium">Team Directory</p>
-                <p className="text-sm text-gray-500">Find colleagues</p>
-              </button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <button 
+              className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
+              onClick={() => handleCardClick('documents')}
+            >
+              <FileText className="w-5 h-5 mb-2 text-blue-600" />
+              <p className="font-medium">Documents</p>
+              <p className="text-sm text-gray-500">Access files</p>
+            </button>
+            <button 
+              className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
+              onClick={() => handleCardClick('calendar')}
+            >
+              <Calendar className="w-5 h-5 mb-2 text-green-600" />
+              <p className="font-medium">Calendar</p>
+              <p className="text-sm text-gray-500">View schedule</p>
+            </button>
+            <button 
+              className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
+              onClick={() => handleCardClick('leave')}
+            >
+              <Calendar className="w-5 h-5 mb-2 text-purple-600" />
+              <p className="font-medium">Leave</p>
+              <p className="text-sm text-gray-500">Manage leave</p>
+            </button>
+            <button 
+              className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
+              onClick={() => handleCardClick('contacts')}
+            >
+              <Users className="w-5 h-5 mb-2 text-orange-600" />
+              <p className="font-medium">Contacts</p>
+              <p className="text-sm text-gray-500">View directory</p>
+            </button>
+            <button 
+              className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
+              onClick={() => handleCardClick('policies')}
+            >
+              <Building2 className="w-5 h-5 mb-2 text-indigo-600" />
+              <p className="font-medium">Policies</p>
+              <p className="text-sm text-gray-500">View policies</p>
+            </button>
+            <button 
+              className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
+              onClick={() => handleCardClick('messages')}
+            >
+              <MessageSquare className="w-5 h-5 mb-2 text-rose-600" />
+              <p className="font-medium">Messages</p>
+              <p className="text-sm text-gray-500">View messages</p>
+            </button>
+            <button 
+              className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
+              onClick={() => handleCardClick('settings')}
+            >
+              <Users className="w-5 h-5 mb-2 text-slate-600" />
+              <p className="font-medium">Settings</p>
+              <p className="text-sm text-gray-500">Manage account</p>
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  return (
+    <div className="flex-1 min-h-screen bg-gray-50">
+      <header className="h-16 bg-white border-b px-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-500">System Overview</p>
+        </div>
+        {currentView !== 'dashboard' && (
+          <button
+            onClick={() => setCurrentView('dashboard')}
+            className="text-sm text-primary hover:text-primary/80 transition-colors"
+          >
+            Back to Dashboard
+          </button>
+        )}
+      </header>
+
+      {renderFeature()}
     </div>
   );
 };
+
+export default Dashboard;
