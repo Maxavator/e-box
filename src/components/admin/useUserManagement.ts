@@ -20,58 +20,40 @@ export const useUserManagement = () => {
 
   const queryClient = useQueryClient();
 
-  // First, get the current user's ID
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error) throw error;
-      return user;
-    },
-  });
-
-  // Then check if user is global admin
-  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
+  const { data: isAdmin } = useQuery({
     queryKey: ['isGlobalAdmin'],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('is_global_admin');
       if (error) throw error;
       return data;
     },
-    enabled: !!currentUser,
   });
 
-  // Get user's role
-  const { data: userRole, isLoading: isRoleLoading } = useQuery({
-    queryKey: ['userRole', currentUser?.id],
+  const { data: userRole } = useQuery({
+    queryKey: ['userRole'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', currentUser?.id)
         .single();
       if (error) throw error;
       return data?.role;
     },
-    enabled: !!currentUser,
   });
 
-  // Get user's profile info if they're an org admin
   const { data: userProfile } = useQuery({
-    queryKey: ['userProfile', currentUser?.id],
+    queryKey: ['userProfile'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('organization_id')
-        .eq('id', currentUser?.id)
         .single();
       if (error) throw error;
       return data;
     },
-    enabled: !!currentUser && userRole === 'org_admin',
+    enabled: userRole === 'org_admin',
   });
 
-  // Get organizations list
   const { data: organizations } = useQuery({
     queryKey: ['organizations'],
     queryFn: async () => {
@@ -82,12 +64,11 @@ export const useUserManagement = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!currentUser && (isAdmin || userRole === 'org_admin'),
+    enabled: isAdmin || userRole === 'org_admin',
   });
 
-  // Get users list
-  const { data: users, isLoading: isUsersLoading } = useQuery({
-    queryKey: ['users', userRole, userProfile?.organization_id],
+  const { data: users, isLoading } = useQuery({
+    queryKey: ['users'],
     queryFn: async () => {
       let query = supabase
         .from('profiles')
@@ -106,7 +87,7 @@ export const useUserManagement = () => {
       if (profilesError) throw profilesError;
       return profiles as unknown as UserWithRole[];
     },
-    enabled: !!currentUser && !isAdminLoading && !isRoleLoading && (isAdmin || userRole === 'org_admin'),
+    enabled: isAdmin || (userRole === 'org_admin' && !!userProfile?.organization_id),
   });
 
   const updateUserMutation = useMutation({
@@ -151,7 +132,7 @@ export const useUserManagement = () => {
     isAdmin,
     organizations,
     users,
-    isLoading: isAdminLoading || isRoleLoading || isUsersLoading,
+    isLoading,
     isAddUserOpen,
     setIsAddUserOpen,
     isEditUserOpen,

@@ -1,34 +1,76 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Mail } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createTestUsers } from "@/utils/test-users";
-import { useAuth } from "@/hooks/use-auth";
+import { Mail, Info } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface LoginFormProps {
   onRequestDemo: () => void;
 }
 
 const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [saId, setSaId] = useState("");
-  const [saIdPassword, setSaIdPassword] = useState("");
-  const [isCreatingUsers, setIsCreatingUsers] = useState(false);
-  const { isLoading, handleEmailLogin, handleSaIdLogin } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    handleEmailLogin(email, password);
-  };
+    
+    if (!username || !password) {
+      toast({
+        title: "Invalid Credentials",
+        description: "Please enter both username and password",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const handleSaIdSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSaIdLogin(saId, saIdPassword);
+    // Test credentials validation
+    const validCredentials = [
+      { id: "6010203040512", password: "Test6010203040512", type: "regular" },
+      { id: "5010203040512", password: "Test5010203040512", type: "org_admin" },
+      { id: "4010203040512", password: "Test4010203040512", type: "global_admin" }
+    ];
+
+    const matchedCredential = validCredentials.find(
+      cred => cred.id === username && cred.password === password
+    );
+
+    if (!matchedCredential) {
+      toast({
+        title: "Invalid Credentials",
+        description: "Please check your username and password",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    switch (matchedCredential.type) {
+      case "global_admin":
+        navigate("/admin");
+        break;
+      case "org_admin":
+        navigate("/organization");
+        break;
+      default:
+        navigate("/chat");
+    }
+
+    toast({
+      title: "Login Successful",
+      description: `Welcome ${matchedCredential.type.replace('_', ' ')} user!`,
+    });
   };
 
   return (
@@ -43,93 +85,64 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="email" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="email">Email</TabsTrigger>
-              <TabsTrigger value="said">SA ID Number</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="email">
-              <form onSubmit={handleEmailSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full focus:ring-primary"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full focus:ring-primary"
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-primary hover:bg-primary/90 transition-colors duration-300"
-                  disabled={isLoading}
-                >
-                  Login with Email
-                </Button>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="said">
-              <form onSubmit={handleSaIdSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="saId">SA ID Number</Label>
-                  <Input
-                    id="saId"
-                    type="text"
-                    placeholder="Enter your SA ID Number"
-                    value={saId}
-                    onChange={(e) => setSaId(e.target.value.replace(/\D/g, '').slice(0, 13))}
-                    className="w-full focus:ring-primary"
-                    maxLength={13}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="saIdPassword">Password</Label>
-                  <Input
-                    id="saIdPassword"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={saIdPassword}
-                    onChange={(e) => setSaIdPassword(e.target.value)}
-                    className="w-full focus:ring-primary"
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-primary hover:bg-primary/90 transition-colors duration-300"
-                  disabled={isLoading}
-                >
-                  Login with SA ID
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-          
-          <div className="mt-4">
-            <Button
-              type="button"
-              onClick={() => createTestUsers(setIsCreatingUsers)}
-              disabled={isCreatingUsers}
-              variant="outline"
-              className="w-full"
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="username">Username</Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>For testing, use:</p>
+                      <p>Regular user: 6010203040512</p>
+                      <p>Org admin: 5010203040512</p>
+                      <p>Global admin: 4010203040512</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full focus:ring-primary"
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Password format: Test + username</p>
+                      <p>Example: Test6010203040512</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full focus:ring-primary"
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full bg-primary hover:bg-primary/90 transition-colors duration-300"
             >
-              {isCreatingUsers ? 'Creating Test Users...' : 'Create Test Users'}
+              Login
             </Button>
-          </div>
+          </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4 pt-4">
           <div className="text-center w-full">
@@ -146,7 +159,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
       </Card>
       <div className="mt-4">
         <span className="text-xs text-gray-500">
-          Version 1.92
+          Version 1.91
         </span>
       </div>
     </div>

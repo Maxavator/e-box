@@ -47,14 +47,6 @@ export const UserManagement = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  if (isLoading) {
-    return (
-      <div className="p-4 text-center">
-        <p className="text-gray-500">Loading...</p>
-      </div>
-    );
-  }
-
   if (!isAdmin && userRole !== 'org_admin') {
     return (
       <div className="p-4 text-center">
