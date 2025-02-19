@@ -39,31 +39,41 @@ export const useAuth = () => {
 
     setIsLoading(true);
     try {
+      let signInResult;
+      
       if (loginMethod === 'email') {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        signInResult = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-
-        if (error) throw error;
-        if (data.session) {
-          toast.success("Login successful!");
-          navigate("/admin");
-        }
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: `${saId}@said.auth`,
+        // For SA ID login, try both the direct SA ID and the email format
+        signInResult = await supabase.auth.signInWithPassword({
+          email: saId.includes('@') ? saId : `${saId}@said.auth`,
           password: saId,
         });
+      }
 
-        if (error) throw error;
-        if (data.session) {
-          toast.success("Login successful!");
-          navigate("/admin");
+      if (signInResult.error) {
+        if (signInResult.error.message.includes('Invalid login credentials')) {
+          if (loginMethod === 'email') {
+            toast.error("Invalid email or password. Please try again.");
+          } else {
+            toast.error("Invalid SA ID. Please try again or sign up if you haven't already.");
+          }
+        } else {
+          toast.error(signInResult.error.message);
         }
+        return;
+      }
+
+      if (signInResult.data.session) {
+        toast.success("Login successful!");
+        navigate("/admin");
       }
     } catch (error: any) {
-      toast.error(error.message || "Failed to login");
+      console.error('Login error:', error);
+      toast.error(error.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -73,6 +83,10 @@ export const useAuth = () => {
     if (loginMethod === 'email') {
       if (!email || !password) {
         toast.error("Please enter both email and password");
+        return;
+      }
+      if (password.length < 6) {
+        toast.error("Password must be at least 6 characters long");
         return;
       }
     } else {
@@ -88,29 +102,53 @@ export const useAuth = () => {
 
     setIsLoading(true);
     try {
+      let signUpResult;
+      
       if (loginMethod === 'email') {
-        const { data, error } = await supabase.auth.signUp({
+        signUpResult = await supabase.auth.signUp({
           email,
           password,
         });
-
-        if (error) throw error;
-        if (data.user) {
-          toast.success("Registration successful! Please check your email to confirm your account.");
-        }
       } else {
-        const { data, error } = await supabase.auth.signUp({
+        signUpResult = await supabase.auth.signUp({
           email: `${saId}@said.auth`,
           password: saId,
+          options: {
+            data: {
+              sa_id: saId,
+            }
+          }
         });
+      }
 
-        if (error) throw error;
-        if (data.user) {
+      if (signUpResult.error) {
+        if (signUpResult.error.message.includes('already registered')) {
+          toast.error("This account already exists. Please try logging in instead.");
+        } else {
+          toast.error(signUpResult.error.message);
+        }
+        return;
+      }
+
+      if (signUpResult.data.user) {
+        if (loginMethod === 'email') {
+          toast.success("Registration successful! Please check your email to confirm your account.");
+        } else {
           toast.success("Registration successful with SA ID!");
+          // Attempt immediate login after SA ID registration
+          const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+            email: `${saId}@said.auth`,
+            password: saId,
+          });
+          
+          if (loginData.session) {
+            navigate("/admin");
+          }
         }
       }
     } catch (error: any) {
-      toast.error(error.message || "Failed to sign up");
+      console.error('Signup error:', error);
+      toast.error(error.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
