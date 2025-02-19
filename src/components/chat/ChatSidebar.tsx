@@ -1,12 +1,13 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Briefcase } from "lucide-react";
+import { MessageSquare, Briefcase, LogOut } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import type { Conversation } from "@/types/chat";
 import { Badge } from "@/components/ui/badge";
 import { DeskFeatures } from "./DeskFeatures";
-import { Sidebar, SidebarContent, SidebarProvider } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarProvider } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -19,6 +20,7 @@ interface ChatSidebarProps {
   onCalendarActionClick: (view: 'calendar' | 'inbox') => void;
   calendarView: string;
   isMobile: boolean;
+  onLogout: () => void;
 }
 
 export function ChatSidebar({
@@ -30,6 +32,7 @@ export function ChatSidebar({
   selectedConversation,
   onSelectConversation,
   calendarView,
+  onLogout,
 }: ChatSidebarProps) {
   const totalUnreadCount = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
 
@@ -89,8 +92,17 @@ export function ChatSidebar({
             </Tabs>
           </div>
         </SidebarContent>
+        <SidebarFooter className="border-t p-4">
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
+            onClick={onLogout}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
+        </SidebarFooter>
       </Sidebar>
     </SidebarProvider>
   );
 }
-

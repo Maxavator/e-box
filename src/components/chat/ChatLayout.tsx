@@ -4,6 +4,7 @@ import { ChatSidebar } from "./ChatSidebar";
 import { ChatContent } from "./ChatContent";
 import { useEffect, useState } from "react";
 import { NewMessageDialog } from "./NewMessageDialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 interface ChatLayoutProps {
@@ -61,9 +62,14 @@ export function ChatLayout({
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
 
+  const handleNewMessage = () => {
+    onSendMessage("New message");
+    setShowNewMessageDialog(false);
+  };
+
   return (
     <div className="flex h-screen flex-col">
-      <AppHeader onLogout={onLogout} onLogoClick={onLogoClick} />
+      <AppHeader onLogoClick={onLogoClick} />
       <div className="flex flex-1 overflow-hidden">
         <ChatSidebar
           searchQuery={searchQuery}
@@ -76,6 +82,7 @@ export function ChatLayout({
           onCalendarActionClick={onCalendarActionClick}
           calendarView={calendarView}
           isMobile={isMobile}
+          onLogout={onLogout}
         />
         <ChatContent
           conversation={selectedConversation}
@@ -94,10 +101,7 @@ export function ChatLayout({
           </DialogHeader>
           <div className="space-y-4 py-4">
             <Button
-              onClick={() => {
-                setShowNewMessageDialog(false);
-                onSendMessage("New message");
-              }}
+              onClick={handleNewMessage}
               className="w-full"
             >
               Start New Conversation
