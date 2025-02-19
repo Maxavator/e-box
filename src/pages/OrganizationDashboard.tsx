@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -86,7 +87,7 @@ const OrganizationDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <AppHeader onLogoClick={handleLogoClick} />
+      <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
 
       <main className="section-padding container-responsive">
         <DashboardHeader 

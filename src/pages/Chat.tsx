@@ -56,10 +56,6 @@ const Chat = () => {
 
   const handleLogout = () => {
     navigate("/");
-    toast({
-      title: "Logged Out",
-      description: "You have been successfully logged out",
-    });
   };
 
   const handleLogoClick = () => {

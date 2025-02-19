@@ -1,12 +1,15 @@
 
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { UserProfile } from "@/components/user/UserProfile";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AppHeaderProps {
+  onLogout: () => void;
   onLogoClick: () => void;
 }
 
-export function AppHeader({ onLogoClick }: AppHeaderProps) {
+export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
   const [displayName, setDisplayName] = useState<string>("");
 
   useEffect(() => {
@@ -48,6 +51,7 @@ export function AppHeader({ onLogoClick }: AppHeaderProps) {
           </span>
         )}
       </div>
+      <UserProfile onLogout={onLogout} />
     </header>
   );
 }
