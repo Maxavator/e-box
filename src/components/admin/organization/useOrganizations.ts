@@ -21,11 +21,18 @@ export const useOrganizations = () => {
 
   const queryClient = useQueryClient();
 
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    },
+  });
+
   const { data: isAdmin } = useQuery({
     queryKey: ['isGlobalAdmin'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) return false;
 
       const { data, error } = await supabase
         .from('user_roles')
@@ -37,12 +44,13 @@ export const useOrganizations = () => {
       if (error) throw error;
       return !!data;
     },
+    enabled: !!user,
   });
 
   const { data: organizations, isLoading } = useQuery({
     queryKey: ['organizations'],
     queryFn: async () => {
-      if (!isAdmin) {
+      if (!user || !isAdmin) {
         throw new Error("Not authorized to view organizations");
       }
 
@@ -58,7 +66,6 @@ export const useOrganizations = () => {
 
       if (error) throw error;
 
-      // Transform the data to include the member count
       return data.map(org => ({
         ...org,
         profiles: {
@@ -66,12 +73,12 @@ export const useOrganizations = () => {
         }
       })) as Organization[];
     },
-    enabled: isAdmin !== undefined,
+    enabled: !!user && isAdmin !== undefined,
   });
 
   const createMutation = useMutation({
     mutationFn: async (newOrg: OrganizationFormData) => {
-      if (!isAdmin) {
+      if (!user || !isAdmin) {
         throw new Error("Not authorized to create organizations");
       }
 
@@ -96,7 +103,7 @@ export const useOrganizations = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: OrganizationFormData }) => {
-      if (!isAdmin) {
+      if (!user || !isAdmin) {
         throw new Error("Not authorized to update organizations");
       }
 
@@ -119,7 +126,7 @@ export const useOrganizations = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      if (!isAdmin) {
+      if (!user || !isAdmin) {
         throw new Error("Not authorized to delete organizations");
       }
 
