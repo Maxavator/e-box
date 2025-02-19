@@ -20,7 +20,7 @@ export function LeaveInformation() {
         <Accordion type="single" collapsible className="space-y-4">
           <AccordionItem value="annual">
             <AccordionTrigger className="text-lg font-medium">
-              Annual Leave
+              Annual Leave (15 days)
             </AccordionTrigger>
             <AccordionContent className="space-y-2 text-gray-600">
               <p>21 consecutive days per year (15 working days)</p>
@@ -39,7 +39,7 @@ export function LeaveInformation() {
 
           <AccordionItem value="sick">
             <AccordionTrigger className="text-lg font-medium">
-              Sick Leave
+              Sick Leave (30 days)
             </AccordionTrigger>
             <AccordionContent className="space-y-2 text-gray-600">
               <p>30 days per 36-month cycle</p>
@@ -58,7 +58,7 @@ export function LeaveInformation() {
 
           <AccordionItem value="maternity">
             <AccordionTrigger className="text-lg font-medium">
-              Maternity Leave
+              Maternity Leave (120 days)
             </AccordionTrigger>
             <AccordionContent className="space-y-2 text-gray-600">
               <p>4 consecutive months</p>
@@ -77,7 +77,7 @@ export function LeaveInformation() {
 
           <AccordionItem value="family">
             <AccordionTrigger className="text-lg font-medium">
-              Family Responsibility Leave
+              Family Responsibility Leave (3 days)
             </AccordionTrigger>
             <AccordionContent className="space-y-2 text-gray-600">
               <p>3 days per year</p>
