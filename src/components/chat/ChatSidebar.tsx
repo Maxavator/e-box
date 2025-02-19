@@ -7,6 +7,7 @@ import type { Conversation } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { NewMessageDialog } from "./NewMessageDialog";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 interface ChatSidebarProps {
   searchQuery: string;
@@ -20,9 +21,11 @@ interface ChatSidebarProps {
 }
 
 const DeskFeatures = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="p-4 space-y-2">
-      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'dashboard' }))}>
+      <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/organization')}>
         <LayoutDashboard className="mr-2 h-4 w-4" />
         Dashboard
       </Button>
@@ -30,7 +33,7 @@ const DeskFeatures = () => {
         <Calendar className="mr-2 h-4 w-4" />
         My Calendar
       </Button>
-      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'contacts' }))}>
+      <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/contacts')}>
         <Users className="mr-2 h-4 w-4" />
         Contacts List
       </Button>
