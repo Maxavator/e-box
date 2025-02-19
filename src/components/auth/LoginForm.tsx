@@ -72,11 +72,13 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
             })
             .eq('id', authData.user.id);
 
-          // Set user role
+          // Insert user role (changed from update to insert)
           await supabase
             .from('user_roles')
-            .update({ role: user.role })
-            .eq('user_id', authData.user.id);
+            .insert({ 
+              user_id: authData.user.id,
+              role: user.role 
+            });
         }
       }
 
