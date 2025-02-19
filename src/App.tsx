@@ -1,63 +1,38 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { useEffect } from "react";
-import Auth from "./pages/Auth";
-import Chat from "./pages/Chat";
-import AdminPortal from "./pages/AdminPortal";
-import OrganizationDashboard from "./pages/OrganizationDashboard";
-import NotFound from "./pages/NotFound";
-import { ContactsList } from "./components/desk/ContactsList";
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/shared/theme-provider";
+
+import Index from "@/pages/Index";
+import Auth from "@/pages/Auth";
+import Dashboard from "@/pages/Dashboard";
+import Chat from "@/pages/Chat";
+import NotFound from "@/pages/NotFound";
+import AdminPortal from "@/pages/AdminPortal";
+import OrganizationManagementPage from "@/pages/OrganizationManagement";
 
 const queryClient = new QueryClient();
 
-const AppContent = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const handleFeatureSelect = (event: CustomEvent<string>) => {
-      if (event.detail === 'contacts') {
-        navigate('/contacts');
-      }
-    };
-
-    window.addEventListener('desk-feature-selected', handleFeatureSelect as EventListener);
-
-    return () => {
-      window.removeEventListener('desk-feature-selected', handleFeatureSelect as EventListener);
-    };
-  }, [navigate]);
-
+function App() {
   return (
-    <div className="min-h-screen flex w-full bg-background">
-      <Routes>
-        <Route path="/" element={<Auth />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/admin" element={<AdminPortal />} />
-        <Route path="/organization" element={<OrganizationDashboard />} />
-        <Route path="/contacts" element={<ContactsList />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/admin" element={<AdminPortal />} />
+            <Route path="/admin/organization" element={<OrganizationManagementPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <TooltipProvider>
-        <SidebarProvider>
-          <AppContent />
-          <Toaster />
-          <Sonner />
-        </SidebarProvider>
-      </TooltipProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+}
 
 export default App;
