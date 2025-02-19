@@ -20,7 +20,7 @@ export const useUserManagement = () => {
 
   const queryClient = useQueryClient();
 
-  const { data: isAdmin } = useQuery({
+  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
     queryKey: ['isGlobalAdmin'],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('is_global_admin');
@@ -29,7 +29,7 @@ export const useUserManagement = () => {
     },
   });
 
-  const { data: userRole } = useQuery({
+  const { data: userRole, isLoading: isRoleLoading } = useQuery({
     queryKey: ['userRole'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -67,7 +67,7 @@ export const useUserManagement = () => {
     enabled: isAdmin || userRole === 'org_admin',
   });
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading: isUsersLoading } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       let query = supabase
@@ -87,7 +87,7 @@ export const useUserManagement = () => {
       if (profilesError) throw profilesError;
       return profiles as unknown as UserWithRole[];
     },
-    enabled: isAdmin || (userRole === 'org_admin' && !!userProfile?.organization_id),
+    enabled: !isAdminLoading && !isRoleLoading && (isAdmin || userRole === 'org_admin'),
   });
 
   const updateUserMutation = useMutation({
@@ -132,7 +132,7 @@ export const useUserManagement = () => {
     isAdmin,
     organizations,
     users,
-    isLoading,
+    isLoading: isAdminLoading || isRoleLoading || isUsersLoading,
     isAddUserOpen,
     setIsAddUserOpen,
     isEditUserOpen,
