@@ -4,6 +4,7 @@ import { ChatSidebar } from "./ChatSidebar";
 import { ChatContent } from "./ChatContent";
 import { useEffect, useState } from "react";
 import { NewMessageDialog } from "./NewMessageDialog";
+import { Button } from "@/components/ui/button";
 
 interface ChatLayoutProps {
   searchQuery: string;
@@ -73,7 +74,6 @@ export function ChatLayout({
           selectedConversation={selectedConversation}
           onSelectConversation={onSelectConversation}
           onCalendarActionClick={onCalendarActionClick}
-          onNewMessage={() => setShowNewMessageDialog(true)}
           calendarView={calendarView}
           isMobile={isMobile}
         />
@@ -87,10 +87,24 @@ export function ChatLayout({
           onReactToMessage={onReactToMessage}
         />
       </div>
-      <NewMessageDialog
-        open={showNewMessageDialog}
-        onOpenChange={setShowNewMessageDialog}
-      />
+      <Dialog open={showNewMessageDialog} onOpenChange={setShowNewMessageDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New Message</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <Button
+              onClick={() => {
+                setShowNewMessageDialog(false);
+                onSendMessage("New message");
+              }}
+              className="w-full"
+            >
+              Start New Conversation
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
