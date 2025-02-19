@@ -1,5 +1,4 @@
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -7,16 +6,15 @@ import { UserManagement } from "@/components/admin/UserManagement";
 import { OrganizationManagement } from "@/components/admin/OrganizationManagement";
 import { OrganizationsList } from "@/components/admin/organization/OrganizationsList";
 import { AppHeader } from "@/components/shared/AppHeader";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import { Policies } from "@/components/desk/Policies";
 import { DashboardHeader } from "@/components/organization/DashboardHeader";
 import { OrganizationDetailsCard } from "@/components/organization/OrganizationDetailsCard";
 import { OverviewCards } from "@/components/organization/OverviewCards";
+import { Separator } from "@/components/ui/separator";
 
 const OrganizationDashboard = () => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const { toast } = useToast();
   const [userInfo, setUserInfo] = useState<{ 
     orgName: string; 
@@ -99,42 +97,44 @@ const OrganizationDashboard = () => {
           onManageOrg={() => navigate("/organization/manage")}
         />
 
-        <Tabs defaultValue="overview" className="mt-8">
-          <TabsList className={`w-full justify-start ${isMobile ? 'flex-wrap' : ''}`}>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="organizations">Organizations</TabsTrigger>
-            <TabsTrigger value="policies">Policies</TabsTrigger>
-            {userInfo.isAdmin && (
-              <TabsTrigger value="admin">Administration</TabsTrigger>
-            )}
-          </TabsList>
-
-          <TabsContent value="overview" className="mt-6">
+        <div className="mt-8 space-y-12">
+          <section>
+            <h2 className="text-2xl font-semibold mb-6">Overview</h2>
             <div className="grid-responsive gap-6">
               {userInfo.orgDetails && (
                 <OrganizationDetailsCard orgDetails={userInfo.orgDetails} />
               )}
               <OverviewCards isAdmin={userInfo.isAdmin} />
             </div>
-          </TabsContent>
+          </section>
 
-          <TabsContent value="organizations" className="mt-6">
+          <Separator />
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-6">Organizations</h2>
             <OrganizationsList />
-          </TabsContent>
+          </section>
 
-          <TabsContent value="policies">
+          <Separator />
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-6">Policies</h2>
             <Policies />
-          </TabsContent>
+          </section>
 
           {userInfo.isAdmin && (
-            <TabsContent value="admin">
-              <div className="space-y-6">
-                <UserManagement />
-                <OrganizationManagement />
-              </div>
-            </TabsContent>
+            <>
+              <Separator />
+              <section>
+                <h2 className="text-2xl font-semibold mb-6">Administration</h2>
+                <div className="space-y-6">
+                  <UserManagement />
+                  <OrganizationManagement />
+                </div>
+              </section>
+            </>
           )}
-        </Tabs>
+        </div>
       </main>
     </div>
   );
