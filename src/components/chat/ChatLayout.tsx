@@ -1,32 +1,32 @@
 
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { AppHeader } from "@/components/shared/AppHeader";
 import { ChatSidebar } from "./ChatSidebar";
 import { ChatContent } from "./ChatContent";
-import { AppHeader } from "@/components/shared/AppHeader";
-import type { Conversation } from "@/types/chat";
+import { useEffect, useState } from "react";
+import { NewMessageDialog } from "./NewMessageDialog";
 
 interface ChatLayoutProps {
   searchQuery: string;
-  onSearchChange: (value: string) => void;
+  onSearchChange: (query: string) => void;
   activeTab: string;
-  onTabChange: (value: string) => void;
-  conversations: Conversation[];
-  selectedConversation: Conversation | null;
-  onSelectConversation: (conversation: Conversation) => void;
+  onTabChange: (tab: string) => void;
+  conversations: any[];
+  selectedConversation: any;
+  onSelectConversation: (conversation: any) => void;
   onCalendarActionClick: (view: 'calendar' | 'inbox') => void;
   newMessage: string;
-  onNewMessageChange: (value: string) => void;
-  onSendMessage: () => void;
-  onEditMessage: (messageId: string, newText: string) => void;
+  onNewMessageChange: (message: string) => void;
+  onSendMessage: (message: string) => void;
+  onEditMessage: (messageId: string, content: string) => void;
   onDeleteMessage: (messageId: string) => void;
-  onReactToMessage: (messageId: string, emoji: string) => void;
-  calendarView: 'calendar' | 'inbox';
+  onReactToMessage: (messageId: string, reaction: string) => void;
+  calendarView: string;
   onLogout: () => void;
   onLogoClick: () => void;
   isMobile: boolean;
 }
 
-export const ChatLayout = ({
+export function ChatLayout({
   searchQuery,
   onSearchChange,
   activeTab,
@@ -45,41 +45,52 @@ export const ChatLayout = ({
   onLogout,
   onLogoClick,
   isMobile,
-}: ChatLayoutProps) => {
+}: ChatLayoutProps) {
+  const [showNewMessageDialog, setShowNewMessageDialog] = useState(false);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'n' && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        setShowNewMessageDialog(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
+
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex h-screen flex-col">
       <AppHeader onLogout={onLogout} onLogoClick={onLogoClick} />
-      
-      <ResizablePanelGroup direction="horizontal" className="flex-1">
-        <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
-          <ChatSidebar
-            searchQuery={searchQuery}
-            onSearchChange={onSearchChange}
-            activeTab={activeTab}
-            onTabChange={onTabChange}
-            conversations={conversations}
-            selectedConversation={selectedConversation}
-            onSelectConversation={onSelectConversation}
-            onCalendarActionClick={onCalendarActionClick}
-          />
-        </ResizablePanel>
-        
-        <ResizableHandle withHandle />
-        
-        <ResizablePanel defaultSize={75}>
-          <ChatContent
-            activeTab={activeTab}
-            selectedConversation={selectedConversation}
-            newMessage={newMessage}
-            onNewMessageChange={onNewMessageChange}
-            onSendMessage={onSendMessage}
-            onEditMessage={onEditMessage}
-            onDeleteMessage={onDeleteMessage}
-            onReactToMessage={onReactToMessage}
-            calendarView={calendarView}
-          />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+      <div className="flex flex-1 overflow-hidden">
+        <ChatSidebar
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+          activeTab={activeTab}
+          onTabChange={onTabChange}
+          conversations={conversations}
+          selectedConversation={selectedConversation}
+          onSelectConversation={onSelectConversation}
+          onCalendarActionClick={onCalendarActionClick}
+          onNewMessage={() => setShowNewMessageDialog(true)}
+          calendarView={calendarView}
+          isMobile={isMobile}
+        />
+        <ChatContent
+          conversation={selectedConversation}
+          newMessage={newMessage}
+          onNewMessageChange={onNewMessageChange}
+          onSendMessage={onSendMessage}
+          onEditMessage={onEditMessage}
+          onDeleteMessage={onDeleteMessage}
+          onReactToMessage={onReactToMessage}
+        />
+      </div>
+      <NewMessageDialog
+        open={showNewMessageDialog}
+        onOpenChange={setShowNewMessageDialog}
+      />
     </div>
   );
-};
+}
