@@ -7,14 +7,15 @@ import { useOrganizations } from "./organization/useOrganizations";
 import { QuickStatsCard } from "../organization/cards/QuickStatsCard";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserRole } from "./hooks/useUserRole";
 
 const OrganizationManagement = () => {
   const navigate = useNavigate();
+  const { isAdmin, userRole, isLoading: isRoleLoading } = useUserRole();
   
   const {
     organizations,
     isLoading,
-    isAdmin,
     isAddOrgOpen,
     setIsAddOrgOpen,
     isEditOrgOpen,
@@ -42,27 +43,47 @@ const OrganizationManagement = () => {
 
   // Redirect if not admin
   useEffect(() => {
-    if (isAdmin === false) {
+    if (!isRoleLoading && !isAdmin) {
       toast.error("You don't have permission to access this page");
       navigate("/");
     }
-  }, [isAdmin, navigate]);
+  }, [isAdmin, isRoleLoading, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedOrg) {
-      updateMutation.mutate({ id: selectedOrg.id, data: formData });
-    } else {
-      createMutation.mutate(formData);
+    
+    if (!isAdmin) {
+      toast.error("You don't have permission to perform this action");
+      return;
+    }
+
+    try {
+      if (selectedOrg) {
+        await updateMutation.mutateAsync({ id: selectedOrg.id, data: formData });
+        toast.success("Organization updated successfully");
+      } else {
+        await createMutation.mutateAsync(formData);
+        toast.success("Organization created successfully");
+      }
+      setIsAddOrgOpen(false);
+      setIsEditOrgOpen(false);
+    } catch (error) {
+      console.error('Organization operation failed:', error);
+      toast.error("Failed to perform organization operation");
     }
   };
 
   const handleEdit = (org: typeof organizations[0]) => {
+    if (!isAdmin) {
+      toast.error("You don't have permission to edit organizations");
+      return;
+    }
+    
     setFormData({
       name: org.name,
       domain: org.domain || "",
@@ -71,9 +92,24 @@ const OrganizationManagement = () => {
     setIsEditOrgOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id);
+  const handleDelete = async (id: string) => {
+    if (!isAdmin) {
+      toast.error("You don't have permission to delete organizations");
+      return;
+    }
+
+    try {
+      await deleteMutation.mutateAsync(id);
+      toast.success("Organization deleted successfully");
+    } catch (error) {
+      console.error('Failed to delete organization:', error);
+      toast.error("Failed to delete organization");
+    }
   };
+
+  if (isRoleLoading) {
+    return <div className="flex items-center justify-center p-8">Loading...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -84,16 +120,18 @@ const OrganizationManagement = () => {
             Manage and monitor organizations across the platform
           </p>
         </div>
-        <OrganizationDialogs
-          isAddOrgOpen={isAddOrgOpen}
-          setIsAddOrgOpen={setIsAddOrgOpen}
-          isEditOrgOpen={isEditOrgOpen}
-          setIsEditOrgOpen={setIsEditOrgOpen}
-          formData={formData}
-          handleInputChange={handleInputChange}
-          handleSubmit={handleSubmit}
-          isLoading={createMutation.isPending || updateMutation.isPending}
-        />
+        {isAdmin && (
+          <OrganizationDialogs
+            isAddOrgOpen={isAddOrgOpen}
+            setIsAddOrgOpen={setIsAddOrgOpen}
+            isEditOrgOpen={isEditOrgOpen}
+            setIsEditOrgOpen={setIsEditOrgOpen}
+            formData={formData}
+            handleInputChange={handleInputChange}
+            handleSubmit={handleSubmit}
+            isLoading={createMutation.isPending || updateMutation.isPending}
+          />
+        )}
       </div>
 
       <QuickStatsCard />
@@ -104,6 +142,7 @@ const OrganizationManagement = () => {
           isLoading={isLoading}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          isAdmin={isAdmin}
         />
       </div>
     </div>
