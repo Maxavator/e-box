@@ -10,6 +10,7 @@ import Chat from "./pages/Chat";
 import AdminPortal from "./pages/AdminPortal";
 import OrganizationDashboard from "./pages/OrganizationDashboard";
 import NotFound from "./pages/NotFound";
+import { ContactsList } from "./components/desk/ContactsList";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
               <Route path="/chat" element={<Chat />} />
               <Route path="/admin" element={<AdminPortal />} />
               <Route path="/organization" element={<OrganizationDashboard />} />
+              <Route path="/contacts" element={<ContactsList />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
