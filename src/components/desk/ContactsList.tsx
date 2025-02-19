@@ -140,6 +140,32 @@ export const ContactsList = () => {
     }
   });
 
+  useEffect(() => {
+    const channel = supabase
+      .channel('contacts-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'contacts'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['contacts'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const filteredContacts = contacts?.filter(contact => {
+    const fullName = `${contact.contact.first_name} ${contact.contact.last_name}`.toLowerCase();
+    return fullName.includes(searchQuery.toLowerCase());
+  });
+
   const handleStartChat = async (contactId: string) => {
     try {
       const { data: userData } = await supabase.auth.getUser();
@@ -172,32 +198,6 @@ export const ContactsList = () => {
       toast.error("Failed to start conversation");
     }
   };
-
-  const filteredContacts = contacts?.filter(contact => {
-    const fullName = `${contact.contact.first_name} ${contact.contact.last_name}`.toLowerCase();
-    return fullName.includes(searchQuery.toLowerCase());
-  });
-
-  useEffect(() => {
-    const channel = supabase
-      .channel('contacts-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'contacts'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['contacts'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
 
   return (
     <div className="p-6 max-w-[1200px] mx-auto">
