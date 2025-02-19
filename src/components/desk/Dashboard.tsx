@@ -33,6 +33,9 @@ export const Dashboard = () => {
       case 'contacts':
         setShowContacts(true);
         break;
+      case 'team':
+        window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'contacts' }));
+        break;
     }
   };
 
@@ -155,7 +158,7 @@ export const Dashboard = () => {
             <div className="grid grid-cols-2 gap-4">
               <button 
                 className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
-                onClick={() => setShowDocuments(true)}
+                onClick={() => handleCardClick('documents')}
               >
                 <FileText className="w-5 h-5 mb-2 text-blue-600" />
                 <p className="font-medium">View Documents</p>
@@ -177,7 +180,10 @@ export const Dashboard = () => {
                 <p className="font-medium">Send Message</p>
                 <p className="text-sm text-gray-500">Contact support</p>
               </button>
-              <button className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left">
+              <button 
+                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
+                onClick={() => handleCardClick('team')}
+              >
                 <Users className="w-5 h-5 mb-2 text-orange-600" />
                 <p className="font-medium">Team Directory</p>
                 <p className="text-sm text-gray-500">Find colleagues</p>
