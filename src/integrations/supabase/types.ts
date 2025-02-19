@@ -9,414 +9,99 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      calendar_events: {
+      chat_participants: {
         Row: {
-          created_at: string
-          creator_id: string
-          description: string | null
-          end_time: string
-          id: string
-          is_online: boolean | null
-          location: string | null
-          meeting_link: string | null
-          start_time: string
-          title: string
-          updated_at: string
+          chat_id: string
+          joined_at: string | null
+          profile_id: string
         }
         Insert: {
-          created_at?: string
-          creator_id: string
-          description?: string | null
-          end_time: string
-          id?: string
-          is_online?: boolean | null
-          location?: string | null
-          meeting_link?: string | null
-          start_time: string
-          title: string
-          updated_at?: string
+          chat_id: string
+          joined_at?: string | null
+          profile_id: string
         }
         Update: {
-          created_at?: string
-          creator_id?: string
-          description?: string | null
-          end_time?: string
-          id?: string
-          is_online?: boolean | null
-          location?: string | null
-          meeting_link?: string | null
-          start_time?: string
-          title?: string
-          updated_at?: string
+          chat_id?: string
+          joined_at?: string | null
+          profile_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "calendar_events_creator_id_fkey"
-            columns: ["creator_id"]
+            foreignKeyName: "chat_participants_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_participants_profile_id_fkey"
+            columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
-      calendar_invites: {
+      chats: {
         Row: {
-          created_at: string
-          event_id: string
-          id: string
-          invitee_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          event_id: string
-          id?: string
-          invitee_id: string
-          status: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          event_id?: string
-          id?: string
-          invitee_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "calendar_invites_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "calendar_events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "calendar_invites_invitee_id_fkey"
-            columns: ["invitee_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      calendar_tasks: {
-        Row: {
-          completed: boolean | null
           created_at: string | null
-          due_date: string | null
           id: string
-          title: string
-          updated_at: string | null
-          user_id: string
+          is_group: boolean | null
+          name: string | null
+          organization_id: string | null
         }
         Insert: {
-          completed?: boolean | null
           created_at?: string | null
-          due_date?: string | null
           id?: string
-          title: string
-          updated_at?: string | null
-          user_id: string
+          is_group?: boolean | null
+          name?: string | null
+          organization_id?: string | null
         }
         Update: {
-          completed?: boolean | null
           created_at?: string | null
-          due_date?: string | null
           id?: string
-          title?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      contacts: {
-        Row: {
-          contact_id: string
-          created_at: string
-          id: string
-          is_favorite: boolean | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          contact_id: string
-          created_at?: string
-          id?: string
-          is_favorite?: boolean | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          contact_id?: string
-          created_at?: string
-          id?: string
-          is_favorite?: boolean | null
-          updated_at?: string
-          user_id?: string
+          is_group?: boolean | null
+          name?: string | null
+          organization_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "contacts_contact_id_fkey"
-            columns: ["contact_id"]
+            foreignKeyName: "chats_organization_id_fkey"
+            columns: ["organization_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "contacts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
-      }
-      conversations: {
-        Row: {
-          created_at: string
-          id: string
-          updated_at: string
-          user1_id: string
-          user2_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user1_id: string
-          user2_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user1_id?: string
-          user2_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "conversations_user1_id_fkey"
-            columns: ["user1_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "conversations_user2_id_fkey"
-            columns: ["user2_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      documents: {
-        Row: {
-          category: string
-          content_type: string | null
-          created_at: string | null
-          description: string | null
-          file_path: string
-          id: string
-          is_verified: boolean | null
-          last_modified_by: string | null
-          name: string
-          requires_otp: boolean | null
-          size: string | null
-          updated_at: string | null
-          version: string | null
-        }
-        Insert: {
-          category: string
-          content_type?: string | null
-          created_at?: string | null
-          description?: string | null
-          file_path: string
-          id?: string
-          is_verified?: boolean | null
-          last_modified_by?: string | null
-          name: string
-          requires_otp?: boolean | null
-          size?: string | null
-          updated_at?: string | null
-          version?: string | null
-        }
-        Update: {
-          category?: string
-          content_type?: string | null
-          created_at?: string | null
-          description?: string | null
-          file_path?: string
-          id?: string
-          is_verified?: boolean | null
-          last_modified_by?: string | null
-          name?: string
-          requires_otp?: boolean | null
-          size?: string | null
-          updated_at?: string | null
-          version?: string | null
-        }
-        Relationships: []
-      }
-      helpdesk_tickets: {
-        Row: {
-          assigned_to: string | null
-          created_at: string
-          created_by: string
-          department: string | null
-          description: string
-          id: string
-          priority: Database["public"]["Enums"]["ticket_priority"]
-          resolved_at: string | null
-          status: Database["public"]["Enums"]["ticket_status"]
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          assigned_to?: string | null
-          created_at?: string
-          created_by: string
-          department?: string | null
-          description: string
-          id?: string
-          priority?: Database["public"]["Enums"]["ticket_priority"]
-          resolved_at?: string | null
-          status?: Database["public"]["Enums"]["ticket_status"]
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          assigned_to?: string | null
-          created_at?: string
-          created_by?: string
-          department?: string | null
-          description?: string
-          id?: string
-          priority?: Database["public"]["Enums"]["ticket_priority"]
-          resolved_at?: string | null
-          status?: Database["public"]["Enums"]["ticket_status"]
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      leave_balances: {
-        Row: {
-          annual_days_total: number
-          annual_days_used: number
-          created_at: string
-          id: string
-          maternity_days_total: number
-          maternity_days_used: number
-          paternity_days_total: number
-          paternity_days_used: number
-          sick_days_total: number
-          sick_days_used: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          annual_days_total?: number
-          annual_days_used?: number
-          created_at?: string
-          id?: string
-          maternity_days_total?: number
-          maternity_days_used?: number
-          paternity_days_total?: number
-          paternity_days_used?: number
-          sick_days_total?: number
-          sick_days_used?: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          annual_days_total?: number
-          annual_days_used?: number
-          created_at?: string
-          id?: string
-          maternity_days_total?: number
-          maternity_days_used?: number
-          paternity_days_total?: number
-          paternity_days_used?: number
-          sick_days_total?: number
-          sick_days_used?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      leave_requests: {
-        Row: {
-          approved_at: string | null
-          approved_by: string | null
-          created_at: string
-          end_date: string
-          id: string
-          leave_type: Database["public"]["Enums"]["leave_type"]
-          reason: string | null
-          start_date: string
-          status: Database["public"]["Enums"]["leave_status"]
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          approved_at?: string | null
-          approved_by?: string | null
-          created_at?: string
-          end_date: string
-          id?: string
-          leave_type: Database["public"]["Enums"]["leave_type"]
-          reason?: string | null
-          start_date: string
-          status?: Database["public"]["Enums"]["leave_status"]
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          approved_at?: string | null
-          approved_by?: string | null
-          created_at?: string
-          end_date?: string
-          id?: string
-          leave_type?: Database["public"]["Enums"]["leave_type"]
-          reason?: string | null
-          start_date?: string
-          status?: Database["public"]["Enums"]["leave_status"]
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
       }
       messages: {
         Row: {
+          chat_id: string | null
           content: string
-          conversation_id: string
-          created_at: string
+          created_at: string | null
           id: string
-          sender_id: string
+          sender_id: string | null
         }
         Insert: {
+          chat_id?: string | null
           content: string
-          conversation_id: string
-          created_at?: string
+          created_at?: string | null
           id?: string
-          sender_id: string
+          sender_id?: string | null
         }
         Update: {
+          chat_id?: string | null
           content?: string
-          conversation_id?: string
-          created_at?: string
+          created_at?: string | null
           id?: string
-          sender_id?: string
+          sender_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "messages_conversation_id_fkey"
-            columns: ["conversation_id"]
+            foreignKeyName: "messages_chat_id_fkey"
+            columns: ["chat_id"]
             isOneToOne: false
-            referencedRelation: "conversations"
+            referencedRelation: "chats"
             referencedColumns: ["id"]
           },
           {
@@ -430,230 +115,53 @@ export type Database = {
       }
       organizations: {
         Row: {
-          created_at: string
-          domain: string | null
+          created_at: string | null
           id: string
-          logo_url: string | null
           name: string
-          updated_at: string
         }
         Insert: {
-          created_at?: string
-          domain?: string | null
+          created_at?: string | null
           id?: string
-          logo_url?: string | null
           name: string
-          updated_at?: string
         }
         Update: {
-          created_at?: string
-          domain?: string | null
+          created_at?: string | null
           id?: string
-          logo_url?: string | null
           name?: string
-          updated_at?: string
         }
         Relationships: []
       }
-      partner_messages: {
-        Row: {
-          created_at: string
-          id: string
-          is_read: boolean | null
-          message: string
-          receiver_id: string
-          sender_id: string
-          subject: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_read?: boolean | null
-          message: string
-          receiver_id: string
-          sender_id: string
-          subject: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_read?: boolean | null
-          message?: string
-          receiver_id?: string
-          sender_id?: string
-          subject?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "partner_messages_receiver_id_fkey"
-            columns: ["receiver_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "partner_messages_sender_id_fkey"
-            columns: ["sender_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       profiles: {
         Row: {
-          avatar_url: string | null
-          created_at: string
-          default_notification_time: Database["public"]["Enums"]["calendar_notification_time"]
-          first_name: string | null
+          created_at: string | null
+          full_name: string
           id: string
-          last_name: string | null
+          id_number: string
           organization_id: string | null
-          sa_id: string | null
-          updated_at: string
+          role: string
         }
         Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          default_notification_time?: Database["public"]["Enums"]["calendar_notification_time"]
-          first_name?: string | null
-          id: string
-          last_name?: string | null
+          created_at?: string | null
+          full_name: string
+          id?: string
+          id_number: string
           organization_id?: string | null
-          sa_id?: string | null
-          updated_at?: string
+          role: string
         }
         Update: {
-          avatar_url?: string | null
-          created_at?: string
-          default_notification_time?: Database["public"]["Enums"]["calendar_notification_time"]
-          first_name?: string | null
+          created_at?: string | null
+          full_name?: string
           id?: string
-          last_name?: string | null
+          id_number?: string
           organization_id?: string | null
-          sa_id?: string | null
-          updated_at?: string
+          role?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fk_organization"
+            foreignKeyName: "profiles_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      ticket_attachments: {
-        Row: {
-          content_type: string | null
-          created_at: string
-          file_name: string
-          file_path: string
-          id: string
-          size: string | null
-          ticket_id: string
-          uploaded_by: string
-        }
-        Insert: {
-          content_type?: string | null
-          created_at?: string
-          file_name: string
-          file_path: string
-          id?: string
-          size?: string | null
-          ticket_id: string
-          uploaded_by: string
-        }
-        Update: {
-          content_type?: string | null
-          created_at?: string
-          file_name?: string
-          file_path?: string
-          id?: string
-          size?: string | null
-          ticket_id?: string
-          uploaded_by?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ticket_attachments_ticket_id_fkey"
-            columns: ["ticket_id"]
-            isOneToOne: false
-            referencedRelation: "helpdesk_tickets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      ticket_comments: {
-        Row: {
-          content: string
-          created_at: string
-          created_by: string
-          id: string
-          is_internal: boolean | null
-          ticket_id: string
-          updated_at: string
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          created_by: string
-          id?: string
-          is_internal?: boolean | null
-          ticket_id: string
-          updated_at?: string
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          created_by?: string
-          id?: string
-          is_internal?: boolean | null
-          ticket_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ticket_comments_ticket_id_fkey"
-            columns: ["ticket_id"]
-            isOneToOne: false
-            referencedRelation: "helpdesk_tickets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["user_role"]
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_user_roles_profile"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -663,44 +171,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      check_role: {
-        Args: {
-          role_to_check: Database["public"]["Enums"]["user_role"]
-        }
-        Returns: boolean
-      }
-      generate_sa_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      has_role: {
-        Args: {
-          role: Database["public"]["Enums"]["user_role"]
-        }
-        Returns: boolean
-      }
-      is_global_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_org_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      calendar_notification_time:
-        | "5_min"
-        | "10_min"
-        | "15_min"
-        | "30_min"
-        | "1_hour"
-        | "1_day"
-      leave_status: "pending" | "approved" | "rejected"
-      leave_type: "annual" | "sick" | "maternity" | "paternity" | "unpaid"
-      ticket_priority: "low" | "medium" | "high" | "urgent"
-      ticket_status: "open" | "in_progress" | "resolved" | "closed"
-      user_role: "global_admin" | "org_admin" | "staff"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
