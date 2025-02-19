@@ -5,21 +5,44 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bell, Globe, Lock, Moon, User, KeyRound, Laptop } from "lucide-react";
+import { Bell, Globe, Lock, Moon, User, KeyRound, Laptop, AtSign, Phone, MapPin, Languages, BellRing, Mail, Clock } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export const Settings = () => {
-  const [notifications, setNotifications] = useState(true);
-  const [emailUpdates, setEmailUpdates] = useState(true);
+  // User Information
+  const [name, setName] = useState("John Doe");
+  const [email, setEmail] = useState("john.doe@example.com");
+  const [phone, setPhone] = useState("+1 234 567 8900");
+  const [bio, setBio] = useState("Software Engineer passionate about building great products.");
+  const [timezone, setTimezone] = useState("utc");
+  const [language, setLanguage] = useState("en");
+
+  // Appearance Settings
   const [darkMode, setDarkMode] = useState(false);
+  const [compactMode, setCompactMode] = useState(false);
+  const [fontSize, setFontSize] = useState("medium");
+  const [highContrast, setHighContrast] = useState(false);
+
+  // Notification Settings
+  const [pushNotifications, setPushNotifications] = useState(true);
+  const [emailUpdates, setEmailUpdates] = useState(true);
+  const [weeklyDigest, setWeeklyDigest] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [desktopAlerts, setDesktopAlerts] = useState(true);
+
+  // Security Settings
   const [twoFactorAuth, setTwoFactorAuth] = useState(false);
+  const [sessionTimeout, setSessionTimeout] = useState(false);
+  const [loginAlerts, setLoginAlerts] = useState(true);
+
   const { toast } = useToast();
 
-  const handleSave = () => {
+  const handleSave = (section: string) => {
     toast({
-      title: "Settings saved",
+      title: `${section} settings saved`,
       description: "Your preferences have been updated successfully.",
     });
   };
@@ -57,21 +80,48 @@ export const Settings = () => {
           <Card>
             <CardHeader>
               <CardTitle>Account Information</CardTitle>
-              <CardDescription>Update your account details and preferences.</CardDescription>
+              <CardDescription>Update your personal information and preferences.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" placeholder="Enter your name" />
+                  <div className="flex">
+                    <Input 
+                      id="name" 
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" type="email" placeholder="Enter your email" />
+                  <div className="flex">
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <div className="flex">
+                    <Input 
+                      id="phone" 
+                      type="tel" 
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="timezone">Timezone</Label>
-                  <Select>
+                  <Select value={timezone} onValueChange={setTimezone}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select timezone" />
                     </SelectTrigger>
@@ -85,7 +135,7 @@ export const Settings = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="language">Language</Label>
-                  <Select>
+                  <Select value={language} onValueChange={setLanguage}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select language" />
                     </SelectTrigger>
@@ -97,8 +147,18 @@ export const Settings = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea 
+                    id="bio" 
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Tell us about yourself"
+                    className="h-32"
+                  />
+                </div>
               </div>
-              <Button onClick={handleSave}>Save Changes</Button>
+              <Button onClick={() => handleSave('Account')}>Save Changes</Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -107,7 +167,7 @@ export const Settings = () => {
           <Card>
             <CardHeader>
               <CardTitle>Appearance</CardTitle>
-              <CardDescription>Customize your app experience.</CardDescription>
+              <CardDescription>Customize your application experience.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
@@ -127,11 +187,20 @@ export const Settings = () => {
                       Reduce spacing in the interface
                     </p>
                   </div>
-                  <Switch />
+                  <Switch checked={compactMode} onCheckedChange={setCompactMode} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>High Contrast</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Increase contrast for better visibility
+                    </p>
+                  </div>
+                  <Switch checked={highContrast} onCheckedChange={setHighContrast} />
                 </div>
                 <div className="space-y-2">
                   <Label>Font Size</Label>
-                  <Select>
+                  <Select value={fontSize} onValueChange={setFontSize}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select size" />
                     </SelectTrigger>
@@ -143,7 +212,7 @@ export const Settings = () => {
                   </Select>
                 </div>
               </div>
-              <Button onClick={handleSave}>Save Changes</Button>
+              <Button onClick={() => handleSave('Appearance')}>Save Changes</Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -152,22 +221,28 @@ export const Settings = () => {
           <Card>
             <CardHeader>
               <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>Choose what notifications you want to receive.</CardDescription>
+              <CardDescription>Choose how you want to be notified.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Push Notifications</Label>
+                    <div className="flex items-center gap-2">
+                      <BellRing className="w-4 h-4" />
+                      <Label>Push Notifications</Label>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       Receive notifications on your device
                     </p>
                   </div>
-                  <Switch checked={notifications} onCheckedChange={setNotifications} />
+                  <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Email Updates</Label>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      <Label>Email Updates</Label>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       Receive email notifications
                     </p>
@@ -176,15 +251,36 @@ export const Settings = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Weekly Digest</Label>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      <Label>Weekly Digest</Label>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       Get a summary of your weekly activity
                     </p>
                   </div>
-                  <Switch />
+                  <Switch checked={weeklyDigest} onCheckedChange={setWeeklyDigest} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Sound Notifications</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Play sounds for important alerts
+                    </p>
+                  </div>
+                  <Switch checked={soundEnabled} onCheckedChange={setSoundEnabled} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Desktop Alerts</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Show desktop notifications
+                    </p>
+                  </div>
+                  <Switch checked={desktopAlerts} onCheckedChange={setDesktopAlerts} />
                 </div>
               </div>
-              <Button onClick={handleSave}>Save Changes</Button>
+              <Button onClick={() => handleSave('Notification')}>Save Changes</Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -193,7 +289,7 @@ export const Settings = () => {
           <Card>
             <CardHeader>
               <CardTitle>Security Settings</CardTitle>
-              <CardDescription>Manage your security preferences.</CardDescription>
+              <CardDescription>Manage your account security preferences.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
@@ -213,7 +309,16 @@ export const Settings = () => {
                       Automatically log out after inactivity
                     </p>
                   </div>
-                  <Switch />
+                  <Switch checked={sessionTimeout} onCheckedChange={setSessionTimeout} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Login Alerts</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Get notified of new login attempts
+                    </p>
+                  </div>
+                  <Switch checked={loginAlerts} onCheckedChange={setLoginAlerts} />
                 </div>
                 <div className="space-y-2">
                   <Label>Password</Label>
@@ -223,7 +328,7 @@ export const Settings = () => {
                   </Button>
                 </div>
               </div>
-              <Button onClick={handleSave}>Save Changes</Button>
+              <Button onClick={() => handleSave('Security')}>Save Changes</Button>
             </CardContent>
           </Card>
         </TabsContent>
