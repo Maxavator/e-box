@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { UserWithRole } from "@/components/admin/types";
+import type { Organization } from "@/types/database";
 
 export const LookupTools = () => {
   const [userQuery, setUserQuery] = useState("");
@@ -33,7 +35,7 @@ export const LookupTools = () => {
       if (data.length === 0) {
         toast.info("No users found matching your search");
       } else {
-        const formattedResults = data.map(user => ({
+        const formattedResults = (data as UserWithRole[]).map(user => ({
           name: `${user.first_name} ${user.last_name}`,
           email: user.id,
           role: user.user_roles?.[0]?.role || 'N/A',
@@ -82,7 +84,7 @@ export const LookupTools = () => {
       if (data.length === 0) {
         toast.info("No organizations found matching your search");
       } else {
-        const formattedResults = data.map(org => ({
+        const formattedResults = (data as Organization[]).map(org => ({
           name: org.name,
           domain: org.domain || 'N/A',
           memberCount: org.profiles?.length || 0
