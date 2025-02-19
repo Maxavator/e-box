@@ -20,15 +20,7 @@ export const LookupTools = () => {
 
     setIsLoading(true);
     try {
-      // First, get the user roles
-      const { data: userRolesData, error: userRolesError } = await supabase
-        .from('user_roles')
-        .select('*')
-        .or(`user_id.ilike.%${userQuery}%`);
-
-      if (userRolesError) throw userRolesError;
-
-      // Then get the profiles with organization info
+      // First get the profiles
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
@@ -44,32 +36,41 @@ export const LookupTools = () => {
 
       if (!profilesData || profilesData.length === 0) {
         toast.info("No users found matching your search");
-      } else {
-        const formattedResults = profilesData.map(user => {
-          const userRole = userRolesData?.find(role => role.user_id === user.id);
-          return {
-            name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
-            email: user.id,
-            role: userRole?.role || 'N/A',
-            organization: user.organizations?.name || 'N/A'
-          };
-        });
-        
-        toast.success(`Found ${profilesData.length} user(s)`, {
-          description: (
-            <div className="mt-2 space-y-2">
-              {formattedResults.map((result, i) => (
-                <div key={i} className="text-sm border-b pb-2">
-                  <div className="font-semibold">{result.name}</div>
-                  <div className="text-xs text-gray-500">
-                    {result.email} | {result.role} | {result.organization}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )
-        });
+        return;
       }
+
+      // Then get user roles for the found profiles
+      const { data: userRolesData, error: userRolesError } = await supabase
+        .from('user_roles')
+        .select('*')
+        .in('user_id', profilesData.map(profile => profile.id));
+
+      if (userRolesError) throw userRolesError;
+
+      const formattedResults = profilesData.map(user => {
+        const userRole = userRolesData?.find(role => role.user_id === user.id);
+        return {
+          name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+          email: user.id,
+          role: userRole?.role || 'N/A',
+          organization: user.organizations?.name || 'N/A'
+        };
+      });
+      
+      toast.success(`Found ${profilesData.length} user(s)`, {
+        description: (
+          <div className="mt-2 space-y-2">
+            {formattedResults.map((result, i) => (
+              <div key={i} className="text-sm border-b pb-2">
+                <div className="font-semibold">{result.name}</div>
+                <div className="text-xs text-gray-500">
+                  {result.email} | {result.role} | {result.organization}
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      });
     } catch (error: any) {
       toast.error("Error looking up user: " + error.message);
     } finally {
