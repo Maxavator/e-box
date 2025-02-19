@@ -2,12 +2,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, Settings } from "lucide-react";
 
-interface NavigationCardsProps {
-  activeView: string;
-  onViewChange: (view: 'dashboard' | 'users' | 'organizations' | 'settings') => void;
+export interface NavigationCardsProps {
+  activeView?: string;
+  onViewChange?: (view: 'dashboard' | 'users' | 'organizations' | 'settings') => void;
+  onOrganizationManagement?: () => void;
 }
 
-export const NavigationCards = ({ activeView, onViewChange }: NavigationCardsProps) => {
+export const NavigationCards = ({ 
+  activeView, 
+  onViewChange,
+  onOrganizationManagement 
+}: NavigationCardsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <NavCard
@@ -15,21 +20,21 @@ export const NavigationCards = ({ activeView, onViewChange }: NavigationCardsPro
         description="Add, remove, and manage user access and permissions"
         icon={<Users className="w-5 h-5 text-brand-600" />}
         isActive={activeView === 'users'}
-        onClick={() => onViewChange('users')}
+        onClick={() => onViewChange?.('users')}
       />
       <NavCard
         title="Organizations Management"
         description="Manage organization settings and administrators"
         icon={<Building2 className="w-5 h-5 text-brand-600" />}
         isActive={activeView === 'organizations'}
-        onClick={() => onViewChange('organizations')}
+        onClick={onOrganizationManagement}
       />
       <NavCard
         title="System Settings"
         description="Configure system-wide settings and preferences"
         icon={<Settings className="w-5 h-5 text-brand-600" />}
         isActive={activeView === 'settings'}
-        onClick={() => onViewChange('settings')}
+        onClick={() => onViewChange?.('settings')}
       />
     </div>
   );
@@ -39,8 +44,8 @@ interface NavCardProps {
   title: string;
   description: string;
   icon: React.ReactNode;
-  isActive: boolean;
-  onClick: () => void;
+  isActive?: boolean;
+  onClick?: () => void;
 }
 
 const NavCard = ({ title, description, icon, isActive, onClick }: NavCardProps) => (
