@@ -5,10 +5,12 @@ import { ChatLayout } from "@/components/chat/ChatLayout";
 import { useEffect } from "react";
 import { startMessageSimulation } from "@/utils/messageSimulator";
 import { useToast } from "@/components/ui/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Chat = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const {
     searchQuery,
     setSearchQuery,
@@ -84,6 +86,7 @@ const Chat = () => {
       calendarView={calendarView}
       onLogout={handleLogout}
       onLogoClick={handleLogoClick}
+      isMobile={isMobile}
     />
   );
 };
