@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { OrganizationManagement } from "@/components/admin/OrganizationManagement";
+import { OrganizationsList } from "@/components/admin/organization/OrganizationsList";
 import { AppHeader } from "@/components/shared/AppHeader";
 
 const OrganizationDashboard = () => {
@@ -88,6 +89,7 @@ const OrganizationDashboard = () => {
           <Tabs defaultValue="overview" className="mt-8">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="organizations">Organizations</TabsTrigger>
               <TabsTrigger value="policies">Policies</TabsTrigger>
               {userInfo.isAdmin && (
                 <TabsTrigger value="admin">Administration</TabsTrigger>
@@ -158,6 +160,10 @@ const OrganizationDashboard = () => {
                   </Card>
                 )}
               </div>
+            </TabsContent>
+
+            <TabsContent value="organizations" className="mt-6">
+              <OrganizationsList />
             </TabsContent>
 
             <TabsContent value="policies">
