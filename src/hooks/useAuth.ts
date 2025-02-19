@@ -22,6 +22,10 @@ export const useAuth = () => {
     return /^\d+$/.test(input) && input.length === 13;
   };
 
+  const formatSaIdPassword = (id: string) => {
+    return `Test${id}`;
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -47,21 +51,28 @@ export const useAuth = () => {
       
       if (loginMethod === 'email') {
         const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
+        const loginPassword = isSaId(email) ? formatSaIdPassword(email) : password;
+        
         signInResult = await supabase.auth.signInWithPassword({
           email: loginEmail,
-          password: isSaId(email) ? email : password,
+          password: loginPassword,
         });
       } else {
         signInResult = await supabase.auth.signInWithPassword({
-          email: saId.includes('@') ? saId : `${saId}@said.auth`,
-          password: saId,
+          email: `${saId}@said.auth`,
+          password: formatSaIdPassword(saId),
         });
       }
 
       if (signInResult.error) {
+        console.error('Login error details:', signInResult.error);
         if (signInResult.error.message.includes('Invalid login credentials')) {
           if (loginMethod === 'email') {
-            toast.error("Invalid email or password. Please try again.");
+            if (isSaId(email)) {
+              toast.error("Invalid SA ID or password. Remember: if using SA ID, the password format is 'Test' followed by your SA ID");
+            } else {
+              toast.error("Invalid email or password. Please try again.");
+            }
           } else {
             toast.error("Invalid SA ID. Please try again or sign up if you haven't already.");
           }
@@ -118,9 +129,10 @@ export const useAuth = () => {
           password,
         });
       } else {
+        const saIdPassword = formatSaIdPassword(saId);
         signUpResult = await supabase.auth.signUp({
           email: `${saId}@said.auth`,
-          password: saId,
+          password: saIdPassword,
           options: {
             data: {
               sa_id: saId,
@@ -146,7 +158,7 @@ export const useAuth = () => {
           // Attempt immediate login after SA ID registration
           const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
             email: `${saId}@said.auth`,
-            password: saId,
+            password: formatSaIdPassword(saId),
           });
           
           if (loginData.session) {
