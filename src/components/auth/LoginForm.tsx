@@ -42,9 +42,23 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
     }
 
     try {
-      // First authenticate with Supabase
+      // Query the user's email using their SA ID
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('sa_id', username)
+        .single();
+
+      if (profileError || !profiles) {
+        console.error('Profile lookup error:', profileError);
+        toast.error("Invalid credentials");
+        setIsLoading(false);
+        return;
+      }
+
+      // Now authenticate with Supabase using the email associated with the SA ID
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: `${username}@example.com`,  // Using a placeholder email since we're using SA ID
+        email: `${username}@example.com`,
         password: password,
       });
 
