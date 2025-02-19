@@ -23,11 +23,13 @@ interface LoginFormProps {
 const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast: uiToast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     if (!username || !password) {
       uiToast({
@@ -35,62 +37,61 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
         description: "Please enter both username and password",
         variant: "destructive",
       });
-      return;
-    }
-
-    // Test credentials validation
-    const validCredentials = [
-      { id: "6010203040512", password: "Test6010203040512", type: "regular" },
-      { id: "5010203040512", password: "Test5010203040512", type: "org_admin" },
-      { id: "4010203040512", password: "Test4010203040512", type: "global_admin" }
-    ];
-
-    const matchedCredential = validCredentials.find(
-      cred => cred.id === username && cred.password === password
-    );
-
-    if (!matchedCredential) {
-      uiToast({
-        title: "Invalid Credentials",
-        description: "Please check your username and password",
-        variant: "destructive",
-      });
+      setIsLoading(false);
       return;
     }
 
     try {
-      // Check if user is global admin
-      if (matchedCredential.type === "global_admin") {
-        const { data: isGlobalAdmin, error: adminCheckError } = await supabase.rpc('is_global_admin');
+      // First authenticate with Supabase
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: `${username}@example.com`,  // Using a placeholder email since we're using SA ID
+        password: password,
+      });
+
+      if (signInError) {
+        console.error('Sign in error:', signInError);
+        toast.error("Invalid credentials");
+        setIsLoading(false);
+        return;
+      }
+
+      // After successful authentication, check the user role
+      const { data: isGlobalAdmin, error: adminCheckError } = await supabase.rpc('is_global_admin');
+      
+      if (adminCheckError) {
+        console.error('Error checking admin status:', adminCheckError);
+        toast.error("Failed to verify admin status");
+        setIsLoading(false);
+        return;
+      }
+
+      if (isGlobalAdmin) {
+        navigate("/admin");
+        toast.success("Welcome, Global Admin!");
+      } else {
+        // Check if user is an org admin
+        const { data: isOrgAdmin, error: orgAdminCheckError } = await supabase.rpc('is_org_admin');
         
-        if (adminCheckError) {
-          console.error('Error checking admin status:', adminCheckError);
-          toast.error("Failed to verify admin status");
+        if (orgAdminCheckError) {
+          console.error('Error checking org admin status:', orgAdminCheckError);
+          toast.error("Failed to verify organization admin status");
+          setIsLoading(false);
           return;
         }
 
-        if (!isGlobalAdmin) {
-          toast.error("Access denied: Admin privileges required");
-          return;
-        }
-      }
-
-      // Route based on user type
-      switch (matchedCredential.type) {
-        case "global_admin":
-          navigate("/admin");
-          break;
-        case "org_admin":
+        if (isOrgAdmin) {
           navigate("/organization");
-          break;
-        default:
+          toast.success("Welcome, Organization Admin!");
+        } else {
           navigate("/chat");
+          toast.success("Welcome!");
+        }
       }
-
-      toast.success(`Welcome ${matchedCredential.type.replace('_', ' ')} user!`);
     } catch (error) {
       console.error('Login error:', error);
       toast.error("An error occurred during login");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -131,6 +132,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full focus:ring-primary"
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -155,13 +157,15 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full focus:ring-primary"
+                disabled={isLoading}
               />
             </div>
             <Button 
               type="submit" 
               className="w-full bg-primary hover:bg-primary/90 transition-colors duration-300"
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </CardContent>
@@ -171,6 +175,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
               type="button"
               onClick={onRequestDemo}
               className="text-primary hover:text-primary/80 text-sm font-medium transition-colors inline-flex items-center gap-2"
+              disabled={isLoading}
             >
               <Mail className="w-4 h-4" />
               Request a Demo
