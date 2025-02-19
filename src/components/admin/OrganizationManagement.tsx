@@ -8,7 +8,7 @@ import { QuickStatsCard } from "../organization/cards/QuickStatsCard";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-export const OrganizationManagement = () => {
+const OrganizationManagement = () => {
   const navigate = useNavigate();
   
   const {
@@ -109,3 +109,5 @@ export const OrganizationManagement = () => {
     </div>
   );
 };
+
+export default OrganizationManagement;
