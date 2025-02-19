@@ -28,19 +28,27 @@ const Chat = () => {
   } = useChat();
 
   useEffect(() => {
-    toast({
-      title: "Message Simulation Started",
-      description: "Messages will be simulated for the next 60 seconds",
-    });
+    let cleanup: (() => void) | undefined;
 
-    const stopSimulation = startMessageSimulation(60000);
+    const startSimulation = async () => {
+      toast({
+        title: "Message Simulation Started",
+        description: "Messages will be simulated for the next 60 seconds",
+      });
+
+      cleanup = await startMessageSimulation(60000);
+    };
+
+    startSimulation();
 
     return () => {
-      stopSimulation();
-      toast({
-        title: "Message Simulation Ended",
-        description: "Message simulation has been stopped",
-      });
+      if (cleanup) {
+        cleanup();
+        toast({
+          title: "Message Simulation Ended",
+          description: "Message simulation has been stopped",
+        });
+      }
     };
   }, [toast]);
 

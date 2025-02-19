@@ -15,55 +15,76 @@ const sampleMessages = [
 ];
 
 async function getBMCUsers() {
-  const { data: profiles, error } = await supabase
-    .from('profiles')
-    .select('id, first_name, last_name')
-    .eq('organization_id', (
-      await supabase
-        .from('organizations')
-        .select('id')
-        .ilike('domain', '%bmc-group.co.za%')
-        .single()
-    ).data?.id);
+  try {
+    // First get the BMC organization
+    const { data: org, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .ilike('domain', '%bmc-group.co.za%')
+      .single();
 
-  if (error || !profiles) {
-    console.error('Error fetching BMC users:', error);
+    if (orgError || !org) {
+      console.error('Error fetching BMC organization:', orgError);
+      return [];
+    }
+
+    // Then get the users from that organization
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name')
+      .eq('organization_id', org.id);
+
+    if (profilesError || !profiles) {
+      console.error('Error fetching BMC users:', profilesError);
+      return [];
+    }
+
+    return profiles;
+  } catch (error) {
+    console.error('Error in getBMCUsers:', error);
     return [];
   }
-
-  return profiles;
 }
 
 async function getOrCreateConversation(user1Id: string, user2Id: string) {
-  // First check if conversation exists
-  const { data: existingConv } = await supabase
-    .from('conversations')
-    .select('id')
-    .or(`and(user1_id.eq.${user1Id},user2_id.eq.${user2Id}),and(user1_id.eq.${user2Id},user2_id.eq.${user1Id})`)
-    .single();
+  try {
+    // First check if conversation exists
+    const { data: existingConv, error: fetchError } = await supabase
+      .from('conversations')
+      .select('id')
+      .or(`user1_id.eq.${user1Id},user2_id.eq.${user2Id}`)
+      .or(`user1_id.eq.${user2Id},user2_id.eq.${user1Id}`)
+      .single();
 
-  if (existingConv) return existingConv.id;
+    if (existingConv) return existingConv.id;
+    if (fetchError && fetchError.code !== 'PGRST116') { // Not found error
+      console.error('Error fetching conversation:', fetchError);
+      return null;
+    }
 
-  // Create new conversation if it doesn't exist
-  const { data: newConv, error } = await supabase
-    .from('conversations')
-    .insert({
-      user1_id: user1Id,
-      user2_id: user2Id
-    })
-    .select()
-    .single();
+    // Create new conversation if it doesn't exist
+    const { data: newConv, error: createError } = await supabase
+      .from('conversations')
+      .insert({
+        user1_id: user1Id,
+        user2_id: user2Id
+      })
+      .select()
+      .single();
 
-  if (error) {
-    console.error('Error creating conversation:', error);
+    if (createError) {
+      console.error('Error creating conversation:', createError);
+      return null;
+    }
+
+    return newConv.id;
+  } catch (error) {
+    console.error('Error in getOrCreateConversation:', error);
     return null;
   }
-
-  return newConv.id;
 }
 
 export const startMessageSimulation = async (duration: number = 60000) => {
-  const startTime = Date.now();
   const users = await getBMCUsers();
 
   if (users.length < 2) {
@@ -71,6 +92,7 @@ export const startMessageSimulation = async (duration: number = 60000) => {
     return () => {};
   }
 
+  const startTime = Date.now();
   const interval = setInterval(async () => {
     if (Date.now() - startTime >= duration) {
       clearInterval(interval);
@@ -103,7 +125,7 @@ export const startMessageSimulation = async (duration: number = 60000) => {
     } catch (error) {
       console.error('Error sending simulated message:', error);
     }
-  }, 3000); // Send a new message every 3 seconds
+  }, 3000);
 
   return () => clearInterval(interval);
 };
