@@ -48,6 +48,38 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_invites: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          invitee_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          invitee_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          invitee_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_invites_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "calendar_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calendar_tasks: {
         Row: {
           completed: boolean | null
@@ -174,6 +206,51 @@ export type Database = {
         }
         Relationships: []
       }
+      leave_balances: {
+        Row: {
+          annual_days_total: number | null
+          annual_days_used: number | null
+          created_at: string | null
+          id: string
+          maternity_days_total: number | null
+          maternity_days_used: number | null
+          paternity_days_total: number | null
+          paternity_days_used: number | null
+          sick_days_total: number | null
+          sick_days_used: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          annual_days_total?: number | null
+          annual_days_used?: number | null
+          created_at?: string | null
+          id?: string
+          maternity_days_total?: number | null
+          maternity_days_used?: number | null
+          paternity_days_total?: number | null
+          paternity_days_used?: number | null
+          sick_days_total?: number | null
+          sick_days_used?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          annual_days_total?: number | null
+          annual_days_used?: number | null
+          created_at?: string | null
+          id?: string
+          maternity_days_total?: number | null
+          maternity_days_used?: number | null
+          paternity_days_total?: number | null
+          paternity_days_used?: number | null
+          sick_days_total?: number | null
+          sick_days_used?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       leave_requests: {
         Row: {
           created_at: string | null
@@ -266,6 +343,36 @@ export type Database = {
           logo_url?: string | null
           name?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      partner_messages: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          receiver_id: string
+          sender_id: string
+          subject: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          receiver_id: string
+          sender_id: string
+          subject: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          receiver_id?: string
+          sender_id?: string
+          subject?: string
         }
         Relationships: []
       }
