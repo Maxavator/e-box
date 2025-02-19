@@ -1,18 +1,25 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import type { UserRole } from "@/integrations/supabase/schema";
 
 export const useUserRole = () => {
-  const { data: isAdmin } = useQuery({
+  const { data: isAdmin, isLoading: isAdminLoading, error: adminError } = useQuery({
     queryKey: ['isGlobalAdmin'],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('is_global_admin');
       if (error) throw error;
       return data;
     },
+    retry: 1,
+    onError: (error) => {
+      console.error('Error checking admin status:', error);
+      toast.error("Failed to verify admin status");
+    }
   });
 
-  const { data: userRole } = useQuery({
+  const { data: userRole, isLoading: isRoleLoading, error: roleError } = useQuery({
     queryKey: ['userRole'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -25,9 +32,17 @@ export const useUserRole = () => {
         .single();
 
       if (error) throw error;
-      return data?.role;
+      return data?.role as UserRole;
     },
+    retry: 1,
+    onError: (error) => {
+      console.error('Error fetching user role:', error);
+      toast.error("Failed to fetch user role");
+    }
   });
 
-  return { isAdmin, userRole };
+  const isLoading = isAdminLoading || isRoleLoading;
+  const error = adminError || roleError;
+
+  return { isAdmin, userRole, isLoading, error };
 };

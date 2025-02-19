@@ -1,9 +1,15 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import type { Profile } from "@/types/database";
 
 export const useOrganizations = (isAdmin: boolean | undefined, userRole: string | undefined) => {
-  const { data: userProfile } = useQuery({
+  const { 
+    data: userProfile, 
+    isLoading: isProfileLoading,
+    error: profileError 
+  } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -11,17 +17,26 @@ export const useOrganizations = (isAdmin: boolean | undefined, userRole: string 
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('organization_id')
+        .select('*')
         .eq('id', user.id)
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Profile;
     },
     enabled: userRole === 'org_admin',
+    retry: 1,
+    onError: (error) => {
+      console.error('Error fetching user profile:', error);
+      toast.error("Failed to fetch user profile");
+    }
   });
 
-  const { data: organizations } = useQuery({
+  const { 
+    data: organizations,
+    isLoading: isOrgsLoading,
+    error: orgsError
+  } = useQuery({
     queryKey: ['organizations'],
     queryFn: async () => {
       if (!isAdmin && userRole !== 'org_admin') {
@@ -37,7 +52,15 @@ export const useOrganizations = (isAdmin: boolean | undefined, userRole: string 
       return data;
     },
     enabled: isAdmin || userRole === 'org_admin',
+    retry: 1,
+    onError: (error) => {
+      console.error('Error fetching organizations:', error);
+      toast.error("Failed to fetch organizations");
+    }
   });
 
-  return { organizations, userProfile };
+  const isLoading = isProfileLoading || isOrgsLoading;
+  const error = profileError || orgsError;
+
+  return { organizations, userProfile, isLoading, error };
 };
