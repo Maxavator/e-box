@@ -25,7 +25,7 @@ const DeskFeatures = () => {
 
   return (
     <div className="p-4 space-y-2">
-      <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/organization')}>
+      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'dashboard' }))}>
         <LayoutDashboard className="mr-2 h-4 w-4" />
         Dashboard
       </Button>
@@ -33,7 +33,7 @@ const DeskFeatures = () => {
         <Calendar className="mr-2 h-4 w-4" />
         My Calendar
       </Button>
-      <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/contacts')}>
+      <Button variant="ghost" className="w-full justify-start" onClick={() => window.dispatchEvent(new CustomEvent('desk-feature-selected', { detail: 'contacts' }))}>
         <Users className="mr-2 h-4 w-4" />
         Contacts List
       </Button>
