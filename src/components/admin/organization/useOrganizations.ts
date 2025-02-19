@@ -24,9 +24,18 @@ export const useOrganizations = () => {
   const { data: isAdmin } = useQuery({
     queryKey: ['isGlobalAdmin'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('is_global_admin');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'global_admin')
+        .maybeSingle();
+
       if (error) throw error;
-      return data;
+      return !!data;
     },
   });
 
