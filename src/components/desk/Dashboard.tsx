@@ -2,15 +2,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, MessageSquare, ArrowUpRight, FileText, Calendar, Megaphone } from "lucide-react";
 import { Documents } from "@/components/desk/Documents";
+import { ContactsList } from "@/components/desk/ContactsList";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const Dashboard = () => {
   const [showDocuments, setShowDocuments] = useState(false);
+  const [showContacts, setShowContacts] = useState(false);
   const navigate = useNavigate();
 
   if (showDocuments) {
     return <Documents />;
+  }
+
+  if (showContacts) {
+    return <ContactsList />;
   }
 
   const handleCardClick = (feature: string) => {
@@ -23,6 +29,9 @@ export const Dashboard = () => {
         break;
       case 'documents':
         setShowDocuments(true);
+        break;
+      case 'contacts':
+        setShowContacts(true);
         break;
     }
   };
