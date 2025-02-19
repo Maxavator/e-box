@@ -1,4 +1,17 @@
 
+import type { Database } from "@/integrations/supabase/types";
+
+type DBTables = Database['public']['Tables']
+
+export interface Organization extends DBTables['organizations']['Row'] {}
+
+export interface Profile extends DBTables['profiles']['Row'] {}
+
+export interface UserRole extends DBTables['user_roles']['Row'] {}
+
+export type LeaveType = Database['public']['Enums']['leave_type'];
+export type LeaveStatus = Database['public']['Enums']['leave_status'];
+
 export interface Conversation {
   id: string;
   user1_id: string;
@@ -31,28 +44,4 @@ export interface Document {
   last_modified_by?: string;
   created_at: string;
   updated_at: string;
-}
-
-export type LeaveType = 'annual' | 'sick' | 'maternity' | 'paternity';
-export type LeaveStatus = 'pending' | 'approved' | 'rejected';
-
-export interface Profile {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  avatar_url: string | null;
-  organization_id: string | null;
-  role: string;
-  calendar_notification_time?: number;
-  default_notification_time?: number;
-  created_at: string;
-}
-
-export interface UserRole {
-  id: string;
-  user_id: string;
-  role: 'global_admin' | 'org_admin' | 'staff';
-  leave_type?: LeaveType[];
-  leave_status?: LeaveStatus[];
-  created_at: string;
 }
