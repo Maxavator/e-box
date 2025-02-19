@@ -13,64 +13,77 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LoginFormProps {
   onRequestDemo: () => void;
 }
 
 const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!username || !password) {
+    if (!email || !password) {
       toast({
         title: "Invalid Credentials",
-        description: "Please enter both username and password",
+        description: "Please enter both email and password",
         variant: "destructive",
       });
       return;
     }
 
-    // Test credentials validation
-    const validCredentials = [
-      { id: "6010203040512", password: "Test6010203040512", type: "regular" },
-      { id: "5010203040512", password: "Test5010203040512", type: "org_admin" },
-      { id: "4010203040512", password: "Test4010203040512", type: "global_admin" }
-    ];
-
-    const matchedCredential = validCredentials.find(
-      cred => cred.id === username && cred.password === password
-    );
-
-    if (!matchedCredential) {
-      toast({
-        title: "Invalid Credentials",
-        description: "Please check your username and password",
-        variant: "destructive",
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      return;
-    }
 
-    switch (matchedCredential.type) {
-      case "global_admin":
+      if (error) {
+        toast({
+          title: "Login Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check user role
+      const { data: isAdmin } = await supabase.rpc('is_global_admin');
+      
+      if (isAdmin) {
         navigate("/admin");
-        break;
-      case "org_admin":
-        navigate("/organization");
-        break;
-      default:
-        navigate("/chat");
-    }
+      } else {
+        // Check if user is an org admin
+        const { data: userData, error: userError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', data.user.id)
+          .single();
 
-    toast({
-      title: "Login Successful",
-      description: `Welcome ${matchedCredential.type.replace('_', ' ')} user!`,
-    });
+        if (!userError && userData?.role === 'org_admin') {
+          navigate("/organization");
+        } else {
+          navigate("/chat");
+        }
+      }
+
+      toast({
+        title: "Login Successful",
+        description: "Welcome back!",
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login Failed",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -87,46 +100,18 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="username">Username</Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>For testing, use:</p>
-                      <p>Regular user: 6010203040512</p>
-                      <p>Org admin: 5010203040512</p>
-                      <p>Global admin: 4010203040512</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                placeholder="Enter your username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full focus:ring-primary"
               />
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Password format: Test + username</p>
-                      <p>Example: Test6010203040512</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
