@@ -11,8 +11,9 @@ interface OrganizationDialogsProps {
   isEditOrgOpen: boolean;
   setIsEditOrgOpen: (open: boolean) => void;
   formData: OrganizationFormData;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleSubmit: (e: React.FormEvent) => void;
+  isLoading?: boolean;
 }
 
 export const OrganizationDialogs = ({
@@ -23,6 +24,7 @@ export const OrganizationDialogs = ({
   formData,
   handleInputChange,
   handleSubmit,
+  isLoading,
 }: OrganizationDialogsProps) => {
   return (
     <>
@@ -42,6 +44,7 @@ export const OrganizationDialogs = ({
             handleInputChange={handleInputChange}
             handleSubmit={handleSubmit}
             mode="add"
+            isLoading={isLoading}
           />
         </DialogContent>
       </Dialog>
@@ -56,6 +59,7 @@ export const OrganizationDialogs = ({
             handleInputChange={handleInputChange}
             handleSubmit={handleSubmit}
             mode="edit"
+            isLoading={isLoading}
           />
         </DialogContent>
       </Dialog>

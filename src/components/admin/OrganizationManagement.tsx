@@ -20,7 +20,7 @@ export const OrganizationManagement = () => {
     deleteMutation,
   } = useOrganizations();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -38,6 +38,7 @@ export const OrganizationManagement = () => {
     setFormData({
       name: org.name,
       domain: org.domain || "",
+      logo_url: org.logo_url || "",
     });
     setIsEditOrgOpen(true);
   };
@@ -63,6 +64,7 @@ export const OrganizationManagement = () => {
           formData={formData}
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
+          isLoading={createMutation.isPending || updateMutation.isPending}
         />
       </div>
 
