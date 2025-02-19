@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
@@ -6,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, Users, Clock, MapPin } from "lucide-react";
+import { TaskManager } from "@/components/calendar/TaskManager";
 
 export function Calendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -85,45 +85,8 @@ export function Calendar() {
           </ScrollArea>
         </Card>
 
-        {/* Upcoming Events */}
-        <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
-          <div className="flex items-center gap-2 mb-6">
-            <Users className="h-6 w-6 text-primary" />
-            <h2 className="text-xl font-semibold text-gray-900">Upcoming Events</h2>
-          </div>
-          <ScrollArea className="h-[400px] pr-4">
-            {events && events.length > 0 ? (
-              <div className="space-y-4">
-                {events.map((event) => (
-                  <Card key={event.id} className="p-4 hover:shadow-md transition-shadow duration-200">
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-gray-900">{event.title}</h3>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <CalendarDays className="h-4 w-4" />
-                        <span>{new Date(event.start_time).toLocaleDateString(undefined, {
-                          weekday: 'long',
-                          month: 'long',
-                          day: 'numeric'
-                        })}</span>
-                      </div>
-                      {event.location && (
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                          <MapPin className="h-4 w-4" />
-                          <span>{event.location}</span>
-                        </div>
-                      )}
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                <Users className="h-12 w-12 mb-2 text-gray-400" />
-                <p>No upcoming events</p>
-              </div>
-            )}
-          </ScrollArea>
-        </Card>
+        {/* Task Manager */}
+        <TaskManager />
       </div>
     </div>
   );
