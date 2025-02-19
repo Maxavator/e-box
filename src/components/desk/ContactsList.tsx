@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,7 +56,7 @@ export const ContactsList = () => {
         .from('contacts')
         .select(`
           is_favorite,
-          contact:contact_id (
+          contact:profiles!contacts_contact_id_fkey (
             id,
             first_name,
             last_name,
@@ -141,7 +140,6 @@ export const ContactsList = () => {
     }
   });
 
-  // Set up real-time subscription
   useEffect(() => {
     const channel = supabase
       .channel('contacts-changes')
@@ -173,7 +171,6 @@ export const ContactsList = () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("Not authenticated");
 
-      // Check if conversation exists
       const { data: existingConversation } = await supabase
         .from('conversations')
         .select('id')
@@ -185,7 +182,6 @@ export const ContactsList = () => {
         return;
       }
 
-      // Create new conversation
       const { data: newConversation, error } = await supabase
         .from('conversations')
         .insert({
