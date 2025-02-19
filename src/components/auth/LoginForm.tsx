@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -23,8 +22,79 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
   const [password, setPassword] = useState("");
   const [saId, setSaId] = useState("");
   const [saIdPassword, setSaIdPassword] = useState("");
+  const [isCreatingUsers, setIsCreatingUsers] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const createTestUsers = async () => {
+    if (isCreatingUsers) return;
+    setIsCreatingUsers(true);
+
+    try {
+      // Create a test organization first
+      const { data: orgData, error: orgError } = await supabase
+        .from('organizations')
+        .insert([{ name: 'Test Organization', domain: 'test.org' }])
+        .select()
+        .single();
+
+      if (orgError) throw orgError;
+
+      // Create test users with their roles
+      const users = [
+        { email: '6010203040512', password: 'Test6010203040512', role: 'staff', saId: '6010203040512' },
+        { email: '5010203040512', password: 'Test5010203040512', role: 'org_admin', saId: '5010203040512' },
+        { email: '4010203040512', password: 'Test4010203040512', role: 'global_admin', saId: '4010203040512' }
+      ];
+
+      for (const user of users) {
+        // Create user in auth system
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: user.email,
+          password: user.password,
+          options: {
+            data: {
+              first_name: user.role === 'staff' ? 'Regular' : user.role === 'org_admin' ? 'Org' : 'Global',
+              last_name: user.role === 'staff' ? 'User' : 'Admin'
+            }
+          }
+        });
+
+        if (authError) throw authError;
+
+        if (authData.user) {
+          // Update profile with SA ID and organization
+          await supabase
+            .from('profiles')
+            .update({ 
+              sa_id: user.saId,
+              organization_id: orgData.id 
+            })
+            .eq('id', authData.user.id);
+
+          // Set user role
+          await supabase
+            .from('user_roles')
+            .update({ role: user.role })
+            .eq('user_id', authData.user.id);
+        }
+      }
+
+      toast({
+        title: "Test Users Created",
+        description: "All test users have been created successfully.",
+      });
+    } catch (error) {
+      console.error('Error creating test users:', error);
+      toast({
+        title: "Error Creating Users",
+        description: "Failed to create test users. Check console for details.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingUsers(false);
+    }
+  };
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -243,6 +313,18 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
               </form>
             </TabsContent>
           </Tabs>
+          
+          <div className="mt-4">
+            <Button
+              type="button"
+              onClick={createTestUsers}
+              disabled={isCreatingUsers}
+              variant="outline"
+              className="w-full"
+            >
+              {isCreatingUsers ? 'Creating Test Users...' : 'Create Test Users'}
+            </Button>
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4 pt-4">
           <div className="text-center w-full">
