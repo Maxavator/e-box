@@ -1,8 +1,10 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, KeyRound } from "lucide-react";
 import type { UserWithRole } from "./types";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface UserTableProps {
   users: UserWithRole[] | undefined;
@@ -11,6 +13,21 @@ interface UserTableProps {
 }
 
 export const UserTable = ({ users, isLoading, onEditUser }: UserTableProps) => {
+  const handlePasswordReset = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/admin`,
+      });
+      
+      if (error) throw error;
+      
+      toast.success("Password reset email sent successfully");
+    } catch (error: any) {
+      console.error("Password reset error:", error);
+      toast.error(error.message || "Failed to send password reset email");
+    }
+  };
+
   return (
     <div className="border rounded-lg">
       <Table>
@@ -20,7 +37,7 @@ export const UserTable = ({ users, isLoading, onEditUser }: UserTableProps) => {
             <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Organization</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -36,10 +53,18 @@ export const UserTable = ({ users, isLoading, onEditUser }: UserTableProps) => {
               <TableCell>{user.id}</TableCell>
               <TableCell>{user.user_roles?.[0]?.role || 'N/A'}</TableCell>
               <TableCell>{user.organizations?.[0]?.name || 'N/A'}</TableCell>
-              <TableCell>
+              <TableCell className="text-right space-x-2">
                 <Button variant="ghost" size="sm" onClick={() => onEditUser(user)}>
                   <Pencil className="h-4 w-4 mr-2" />
                   Edit
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handlePasswordReset(user.id)}
+                >
+                  <KeyRound className="h-4 w-4 mr-2" />
+                  Reset Password
                 </Button>
               </TableCell>
             </TableRow>
