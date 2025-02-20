@@ -29,9 +29,15 @@ export const useAuthActions = ({
       let signInResult;
       
       if (isSaId(email)) {
+        // Format SA ID for login
+        const formattedEmail = `${email}@said.auth`;
+        const formattedPassword = formatSaIdPassword(email);
+        
+        console.log('Attempting SA ID login with:', { email: formattedEmail });
+        
         signInResult = await supabase.auth.signInWithPassword({
-          email: `${email}@said.auth`,
-          password,
+          email: formattedEmail,
+          password: formattedPassword // Use the formatted password for SA ID
         });
       } else {
         signInResult = await supabase.auth.signInWithPassword({
