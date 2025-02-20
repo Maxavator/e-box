@@ -44,6 +44,12 @@ export const useUserRole = () => {
         .maybeSingle();
 
       if (error) throw error;
+      
+      // Check if user has an org_admin role
+      if (data?.role === 'org_admin') {
+        return 'org_admin';
+      }
+      
       return data?.role as UserRoleType;
     },
     meta: {

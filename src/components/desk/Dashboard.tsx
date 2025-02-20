@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Building2, MessageSquare, ArrowUpRight, FileText, Calendar, Megaphone } from "lucide-react";
+import { Users, Building2, MessageSquare, ArrowUpRight, FileText, Calendar, Megaphone, ShieldCheck } from "lucide-react";
 import { Documents } from "@/components/desk/Documents";
 import { ContactsList } from "@/components/desk/ContactsList";
 import { Calendar as CalendarComponent } from "@/components/desk/Calendar";
@@ -10,10 +10,14 @@ import { PartnerMessages } from "@/components/desk/PartnerMessages";
 import { Settings } from "@/components/desk/Settings";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserRole } from "@/components/admin/hooks/useUserRole";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export const Dashboard = () => {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const navigate = useNavigate();
+  const { userRole } = useUserRole();
 
   const renderFeature = () => {
     switch (currentView) {
@@ -41,12 +45,28 @@ export const Dashboard = () => {
       navigate('/chat');
       return;
     }
+    if (feature === 'admin') {
+      navigate('/admin');
+      return;
+    }
     setCurrentView(feature);
   };
 
   const renderDashboard = () => (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Welcome back, John</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Welcome back, John</h2>
+        {userRole === 'org_admin' && (
+          <Button
+            onClick={() => handleCardClick('admin')}
+            className="flex items-center gap-2"
+            variant="outline"
+          >
+            <ShieldCheck className="w-4 h-4" />
+            Access Admin Tools
+          </Button>
+        )}
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <Card 
