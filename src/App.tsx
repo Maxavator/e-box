@@ -105,6 +105,11 @@ function App() {
                   <OrganizationManagementPage />
                 </AdminRoute>
               } />
+              <Route path="/organization" element={
+                <ProtectedRoute>
+                  <OrganizationManagementPage />
+                </ProtectedRoute>
+              } />
 
               {/* Catch-all Route */}
               <Route path="*" element={<NotFound />} />

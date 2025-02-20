@@ -23,11 +23,13 @@ export const Dashboard = () => {
   const renderFeature = () => {
     switch (currentView) {
       case 'documents':
-        return <Documents />;
+        navigate('/documents');
+        return null;
       case 'contacts':
         return <ContactsList />;
       case 'calendar':
-        return <CalendarComponent />;
+        navigate('/calendar');
+        return null;
       case 'leave':
         return <LeaveManager />;
       case 'policies':
@@ -52,6 +54,14 @@ export const Dashboard = () => {
     }
     if (feature === 'calendar') {
       navigate('/calendar');
+      return;
+    }
+    if (feature === 'documents') {
+      navigate('/documents');
+      return;
+    }
+    if (feature === 'organization') {
+      navigate('/organization');
       return;
     }
     setCurrentView(feature);
