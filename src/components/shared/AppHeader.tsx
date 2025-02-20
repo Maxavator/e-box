@@ -4,6 +4,7 @@ import { UserProfile } from "@/components/user/UserProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { UserInfo } from "@/components/user/UserInfo";
 import { AdminMenu } from "@/components/admin/AdminMenu";
+import { useQuery } from "@tanstack/react-query";
 
 interface AppHeaderProps {
   onLogout: () => void;
@@ -11,25 +12,29 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      return session;
+    },
+  });
 
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        const { data: roleData } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .single();
+  const { data: userRole } = useQuery({
+    queryKey: ['userRole', session?.user?.id],
+    enabled: !!session?.user?.id,
+    queryFn: async () => {
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session!.user.id)
+        .single();
+      return roleData?.role;
+    },
+  });
 
-        setIsAdmin(roleData?.role === 'org_admin' || roleData?.role === 'global_admin');
-      }
-    };
-
-    fetchUserRole();
-  }, []);
+  const isAdmin = userRole === 'org_admin' || userRole === 'global_admin';
 
   return (
     <header className="border-b bg-white p-4 flex items-center justify-between">
@@ -44,11 +49,11 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
             className="h-8"
           />
         </button>
-        <UserInfo />
+        {session && <UserInfo />}
       </div>
       <div className="flex items-center gap-4">
         {isAdmin && <AdminMenu />}
-        <UserProfile onLogout={onLogout} />
+        {session && <UserProfile onLogout={onLogout} />}
       </div>
     </header>
   );

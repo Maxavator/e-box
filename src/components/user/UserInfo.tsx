@@ -3,35 +3,37 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { OnlineStatus } from "./OnlineStatus";
+import { useQuery } from "@tanstack/react-query";
 
 interface UserInfoProps {
   className?: string;
 }
 
 export function UserInfo({ className }: UserInfoProps) {
-  const [displayName, setDisplayName] = useState<string>("");
-  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      return session;
+    },
+  });
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('first_name, last_name, avatar_url')
-          .eq('id', user.id)
-          .single();
+  const { data: profile } = useQuery({
+    queryKey: ['profile', session?.user?.id],
+    enabled: !!session?.user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, avatar_url')
+        .eq('id', session!.user.id)
+        .single();
+      return data;
+    },
+  });
 
-        if (profileData) {
-          setDisplayName(`${profileData.first_name} ${profileData.last_name}`);
-          setAvatarUrl(profileData.avatar_url || '');
-        }
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
+  const displayName = profile ? `${profile.first_name} ${profile.last_name}` : '';
+  const avatarUrl = profile?.avatar_url || '';
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
