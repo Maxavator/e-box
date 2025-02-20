@@ -14,6 +14,7 @@ import NotFound from "@/pages/NotFound";
 import AdminPortal from "@/pages/AdminPortal";
 import OrganizationManagementPage from "@/pages/OrganizationManagement";
 import { Documents } from "@/components/desk/Documents";
+import { Calendar } from "@/components/desk/Calendar";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,11 @@ function App() {
               <Route path="/documents" element={
                 <ProtectedRoute>
                   <Documents />
+                </ProtectedRoute>
+              } />
+              <Route path="/calendar" element={
+                <ProtectedRoute>
+                  <Calendar />
                 </ProtectedRoute>
               } />
 

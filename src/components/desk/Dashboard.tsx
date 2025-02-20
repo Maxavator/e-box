@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, MessageSquare, ArrowUpRight, FileText, Calendar, Megaphone, ShieldCheck } from "lucide-react";
 import { Documents } from "@/components/desk/Documents";
@@ -47,6 +48,10 @@ export const Dashboard = () => {
     }
     if (feature === 'admin') {
       navigate('/admin');
+      return;
+    }
+    if (feature === 'calendar') {
+      navigate('/calendar');
       return;
     }
     setCurrentView(feature);
