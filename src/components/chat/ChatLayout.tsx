@@ -42,12 +42,10 @@ export const ChatLayout = ({
   onDeleteMessage,
   onReactToMessage,
   calendarView,
-  onLogout,
-  onLogoClick,
   isMobile,
 }: ChatLayoutProps) => {
   return (
-    <MainLayout onLogout={onLogout} onLogoClick={onLogoClick}>
+    <MainLayout>
       <div className="flex-1 h-[calc(100vh-4rem)] bg-background flex overflow-hidden">
         <ResizablePanelGroup direction="horizontal" className="flex-1">
           <ResizablePanel 
@@ -90,4 +88,4 @@ export const ChatLayout = ({
       </div>
     </MainLayout>
   );
-}
+};
