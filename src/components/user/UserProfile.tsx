@@ -2,14 +2,18 @@
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { LogOut, CircleDot } from "lucide-react";
+import { LogOut, CircleDot, User, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface UserProfileProps {
   onLogout: () => void;
@@ -21,6 +25,7 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
     lastName: string;
     avatarUrl: string | null;
   } | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -46,9 +51,24 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
     fetchUserInfo();
   }, []);
 
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Logged out successfully");
+      onLogout();
+    } catch (error) {
+      toast.error("Failed to logout");
+    }
+  };
+
   if (!userInfo) return null;
 
   const initials = `${userInfo.firstName?.[0] || ''}${userInfo.lastName?.[0] || ''}`;
+  const fullName = `${userInfo.firstName} ${userInfo.lastName}`;
 
   return (
     <div className="flex items-center gap-4">
@@ -56,15 +76,6 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
         <CircleDot className="w-3 h-3 text-green-500" />
         <span className="text-sm text-muted-foreground">Online</span>
       </div>
-
-      <Button 
-        variant="outline" 
-        onClick={onLogout}
-        className="flex items-center gap-2"
-      >
-        <LogOut className="w-4 h-4" />
-        Logout
-      </Button>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -75,15 +86,25 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem className="flex justify-between">
-            <span>
-              {userInfo.firstName} {userInfo.lastName}
-            </span>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{fullName}</p>
+              <p className="text-xs leading-none text-muted-foreground">User Profile</p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleProfileClick} className="cursor-pointer">
+            <User className="mr-2 h-4 w-4" />
+            <span>Profile Settings</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={onLogout}>
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
+          <DropdownMenuSeparator />
+          <DropdownMenuItem 
+            onClick={handleLogout}
+            className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-100"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log Out</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
