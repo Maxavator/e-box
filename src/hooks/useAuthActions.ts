@@ -20,37 +20,35 @@ export const useAuthActions = ({
     e.preventDefault();
     
     if (!email || !password) {
-      toast.error("Please enter both email/SA ID and password");
+      toast.error("Please enter both email and password");
       return;
     }
 
     setIsLoading(true);
     
     try {
+      // Transform SA ID to email format if needed
       const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password,
       });
 
-      if (error) {
-        const errorMessage = {
-          'Email not confirmed': "Please verify your email address before logging in",
-          'Invalid login credentials': "Invalid email or password",
-          'Database error querying schema': "Unable to connect to the authentication service. Please try again later."
-        }[error.message] || error.message;
-        
-        toast.error(errorMessage);
-        return;
-      }
+      if (error) throw error;
 
       if (data.session) {
         toast.success("Login successful!");
         navigate("/admin");
       }
-    } catch (error) {
-      console.error('Unexpected login error:', error);
-      toast.error("An unexpected error occurred. Please try again later.");
+    } catch (error: any) {
+      const errorMessage = {
+        'Email not confirmed': "Please verify your email address",
+        'Invalid login credentials': "Invalid email or password",
+        'Database error querying schema': "Connection error. Please try again",
+      }[error.message] || "Login failed. Please try again.";
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

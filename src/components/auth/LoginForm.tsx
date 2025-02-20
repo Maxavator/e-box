@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Mail } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { LoginFormFields } from "./LoginFormFields";
-import { useState, useEffect } from "react";
 
 interface LoginFormProps {
   onRequestDemo: () => void;
@@ -20,25 +19,6 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
     handleLogin,
   } = useAuth();
 
-  const [version, setVersion] = useState("1.99");
-
-  useEffect(() => {
-    // Pre-fill test credentials
-    setEmail("test@example.com");
-    setPassword("testpass123");
-
-    // Update version in development
-    if (import.meta.env.DEV) {
-      const updateVersion = () => {
-        const timestamp = new Date().toISOString().slice(11, 16);
-        setVersion(`1.99-dev-${timestamp}`);
-      };
-      updateVersion();
-      const interval = setInterval(updateVersion, 7200000);
-      return () => clearInterval(interval);
-    }
-  }, [setEmail, setPassword]);
-
   return (
     <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col items-center justify-center bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-sm">
       <Card className="w-full max-w-md animate-fadeIn shadow-xl hover:shadow-2xl transition-shadow duration-300 border-primary/10">
@@ -48,9 +28,6 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
           </CardTitle>
           <CardDescription className="text-center text-gray-500">
             Enter your credentials to continue
-          </CardDescription>
-          <CardDescription className="text-center text-blue-500 text-sm">
-            Test Account Credentials Pre-filled
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -67,7 +44,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
                 className="w-full bg-primary hover:bg-primary/90 transition-colors duration-300"
                 disabled={isLoading}
               >
-                {isLoading ? "Loading..." : "Login"}
+                {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </div>
           </form>
@@ -85,11 +62,6 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
           </div>
         </CardFooter>
       </Card>
-      <div className="mt-4">
-        <span className="text-xs text-gray-500">
-          Version {version}
-        </span>
-      </div>
     </div>
   );
 };
