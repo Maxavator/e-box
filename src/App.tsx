@@ -33,12 +33,7 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode;
 
   // For admin routes, check if user has required role
   if (requiredRole && userRole !== requiredRole && userRole !== 'global_admin') {
-    return <Navigate to="/chat" replace />;
-  }
-
-  // For standard users, redirect to chat
-  if (userRole === 'staff' && window.location.pathname === '/dashboard') {
-    return <Navigate to="/chat" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
@@ -57,7 +52,7 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (userRole !== 'org_admin' && userRole !== 'global_admin') {
-    return <Navigate to="/chat" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
