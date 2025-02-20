@@ -30,12 +30,11 @@ export const useAuthActions = ({
       // Transform SA ID to email format if needed
       const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
       
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      
-      // If user is already logged in, just navigate
-      if (sessionData?.session) {
-        navigate("/admin");
-        return;
+      // First attempt to check connection
+      const { error: testError } = await supabase.auth.getSession();
+      if (testError) {
+        console.error('Initial connection test failed:', testError);
+        throw new Error('Unable to establish connection. Please try again.');
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -47,7 +46,7 @@ export const useAuthActions = ({
         // Handle specific error cases
         if (error.message.includes('Database error querying schema')) {
           console.error('Database connection error:', error);
-          throw new Error('Unable to connect to authentication service');
+          throw new Error('Connection error. Please check your internet connection and try again.');
         }
         throw error;
       }
@@ -60,7 +59,8 @@ export const useAuthActions = ({
       const errorMessage = {
         'Email not confirmed': "Please verify your email address",
         'Invalid login credentials': "Invalid email or password",
-        'Unable to connect to authentication service': "Authentication service unavailable. Please try again later.",
+        'Unable to establish connection. Please try again.': "Unable to connect. Please check your internet connection and try again.",
+        'Connection error. Please check your internet connection and try again.': "Connection error. Please check your internet connection and try again."
       }[error.message] || "Login failed. Please try again.";
       
       toast.error(errorMessage);
