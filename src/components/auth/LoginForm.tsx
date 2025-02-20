@@ -20,14 +20,14 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
     handleLogin,
   } = useAuth();
 
-  const [version, setVersion] = useState("1.91");
+  const [version, setVersion] = useState("1.99");
 
   useEffect(() => {
     // Only update version in development environment
     if (import.meta.env.DEV) {
       const updateVersion = () => {
         const timestamp = new Date().toISOString().slice(11, 16); // Get HH:mm
-        setVersion(`1.91-dev-${timestamp}`);
+        setVersion(`1.99-dev-${timestamp}`);
       };
 
       // Update immediately
