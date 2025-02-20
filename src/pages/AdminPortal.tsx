@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { NavigationCards } from "@/components/admin/dashboard/NavigationCards";
 import { LookupTools } from "@/components/admin/dashboard/LookupTools";
@@ -14,7 +14,9 @@ import { Link2 } from "lucide-react";
 
 const AdminPortal = () => {
   const navigate = useNavigate();
-  const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'organizations' | 'settings'>('dashboard');
+  const location = useLocation();
+  const initialView = location.state?.view || 'dashboard';
+  const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'organizations' | 'settings'>(initialView);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -28,6 +30,13 @@ const AdminPortal = () => {
     checkAuth();
   }, [navigate]);
 
+  // Update active view when location state changes
+  useEffect(() => {
+    if (location.state?.view) {
+      setActiveView(location.state.view);
+    }
+  }, [location.state]);
+
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -40,6 +49,7 @@ const AdminPortal = () => {
 
   const handleLogoClick = () => {
     setActiveView('dashboard');
+    navigate('/admin', { state: { view: 'dashboard' } });
   };
 
   const handleViewChange = (view: 'dashboard' | 'users' | 'organizations' | 'settings') => {
@@ -59,7 +69,10 @@ const AdminPortal = () => {
           </div>
           {activeView !== 'dashboard' && (
             <button
-              onClick={() => setActiveView('dashboard')}
+              onClick={() => {
+                setActiveView('dashboard');
+                navigate('/admin', { state: { view: 'dashboard' } });
+              }}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
             >
               <Link2 className="w-4 h-4" />

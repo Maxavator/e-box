@@ -1,6 +1,6 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export interface NavigationCardsProps {
   activeView?: string;
@@ -11,6 +11,13 @@ export const NavigationCards = ({
   activeView, 
   onViewChange
 }: NavigationCardsProps) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = (view: 'dashboard' | 'users' | 'organizations' | 'settings') => {
+    onViewChange?.(view);
+    navigate('/admin', { state: { view } });
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <NavCard
@@ -18,21 +25,21 @@ export const NavigationCards = ({
         description="Add, remove, and manage user access and permissions"
         icon={<Users className="w-5 h-5 text-brand-600" />}
         isActive={activeView === 'users'}
-        onClick={() => onViewChange?.('users')}
+        onClick={() => handleCardClick('users')}
       />
       <NavCard
         title="Organizations Management"
         description="Manage organization settings and administrators"
         icon={<Building2 className="w-5 h-5 text-brand-600" />}
         isActive={activeView === 'organizations'}
-        onClick={() => onViewChange?.('organizations')}
+        onClick={() => handleCardClick('organizations')}
       />
       <NavCard
         title="System Settings"
         description="Configure system-wide settings and preferences"
         icon={<Settings className="w-5 h-5 text-brand-600" />}
         isActive={activeView === 'settings'}
-        onClick={() => onViewChange?.('settings')}
+        onClick={() => handleCardClick('settings')}
       />
     </div>
   );
