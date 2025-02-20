@@ -3,6 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { UserRole } from "@/types/database";
+
+interface UserWithRoles {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  user_roles: { role: UserRole['role'] }[];
+}
 
 export const OrganizationUsersList = () => {
   const { data: organizationData, isLoading: isOrgLoading } = useQuery({
@@ -11,7 +19,7 @@ export const OrganizationUsersList = () => {
       const { data: org, error } = await supabase
         .from('organizations')
         .select('*')
-        .eq('name', 'Golder Manufacturing')
+        .eq('name', 'Golder Manufacturing (Pty) Ltd.')
         .single();
       
       if (error) throw error;
@@ -19,15 +27,17 @@ export const OrganizationUsersList = () => {
     },
   });
 
-  const { data: users, isLoading: isUsersLoading } = useQuery({
+  const { data: users, isLoading: isUsersLoading } = useQuery<UserWithRoles[]>({
     queryKey: ['organization-users', organizationData?.id],
     queryFn: async () => {
-      if (!organizationData?.id) return null;
+      if (!organizationData?.id) return [];
       
       const { data, error } = await supabase
         .from('profiles')
         .select(`
-          *,
+          id,
+          first_name,
+          last_name,
           user_roles (
             role
           )
@@ -35,7 +45,7 @@ export const OrganizationUsersList = () => {
         .eq('organization_id', organizationData.id);
       
       if (error) throw error;
-      return data;
+      return data as UserWithRoles[];
     },
     enabled: !!organizationData?.id,
   });
@@ -51,7 +61,7 @@ export const OrganizationUsersList = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Golder Manufacturing Users</CardTitle>
+        <CardTitle>Golder Manufacturing (Pty) Ltd. Users</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
