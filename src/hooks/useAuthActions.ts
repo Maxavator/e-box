@@ -30,39 +30,70 @@ export const useAuthActions = ({
       // Transform SA ID to email format if needed
       const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
       
-      // First attempt to check connection
-      const { error: testError } = await supabase.auth.getSession();
-      if (testError) {
-        console.error('Initial connection test failed:', testError);
-        throw new Error('Unable to establish connection. Please try again.');
+      // First get current session to check connection
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session check failed:', sessionError);
+        throw new Error('Unable to connect to authentication service. Please try again.');
       }
 
+      // Sign in user
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password,
       });
 
       if (error) {
-        // Handle specific error cases
-        if (error.message.includes('Database error querying schema')) {
-          console.error('Database connection error:', error);
-          throw new Error('Connection error. Please check your internet connection and try again.');
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Invalid email or password');
+        }
+        if (error.message.includes('Email not confirmed')) {
+          throw new Error('Please verify your email address');
         }
         throw error;
       }
 
-      if (data?.session) {
-        toast.success("Login successful!");
+      if (!data?.user) {
+        throw new Error('Login failed. Please try again.');
+      }
+
+      // Fetch user role
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .maybeSingle();
+
+      if (roleError) {
+        console.error('Error fetching user role:', roleError);
+        // Don't throw here, we can still proceed with login
+      }
+
+      const userRole = roleData?.role || 'user';
+
+      // Fetch user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError);
+        // Don't throw here, we can still proceed with login
+      }
+
+      toast.success("Login successful!");
+
+      // Navigate based on user role
+      if (userRole === 'global_admin' || userRole === 'org_admin') {
         navigate("/admin");
+      } else {
+        navigate("/chat");
       }
     } catch (error: any) {
-      const errorMessage = {
-        'Email not confirmed': "Please verify your email address",
-        'Invalid login credentials': "Invalid email or password",
-        'Unable to establish connection. Please try again.': "Unable to connect. Please check your internet connection and try again.",
-        'Connection error. Please check your internet connection and try again.': "Connection error. Please check your internet connection and try again."
-      }[error.message] || "Login failed. Please try again.";
-      
+      const errorMessage = error?.message || "An unexpected error occurred";
       toast.error(errorMessage);
       console.error('Login error:', error);
     } finally {
