@@ -72,10 +72,15 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
 
   return (
     <div className="flex items-center gap-4">
-      <div className="flex items-center gap-2">
-        <CircleDot className="w-3 h-3 text-green-500" />
-        <span className="text-sm text-muted-foreground">Online</span>
-      </div>
+      <Button 
+        variant="destructive" 
+        size="sm" 
+        onClick={handleLogout}
+        className="flex items-center gap-2"
+      >
+        <LogOut className="h-4 w-4" />
+        Logout
+      </Button>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
