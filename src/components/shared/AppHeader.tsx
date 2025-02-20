@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface AppHeaderProps {
   onLogout: () => void;
@@ -50,6 +51,17 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
     fetchUserInfo();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Logged out successfully");
+      navigate('/auth');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error("Failed to logout");
+    }
+  };
+
   const handleAdminNav = (path: string) => {
     navigate(path);
   };
@@ -87,7 +99,7 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
                 <Settings className="h-4 w-4 mr-2" />
                 Admin Portal
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAdminNav('/organization/manage')}>
+              <DropdownMenuItem onClick={() => handleAdminNav('/organization')}>
                 <Building2 className="h-4 w-4 mr-2" />
                 Organization Management
               </DropdownMenuItem>
@@ -98,7 +110,7 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-        <UserProfile onLogout={onLogout} />
+        <UserProfile onLogout={handleLogout} />
       </div>
     </header>
   );
