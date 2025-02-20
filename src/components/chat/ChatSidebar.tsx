@@ -30,14 +30,14 @@ const DeskFeatures = () => {
   };
 
   return (
-    <ScrollArea className="h-[calc(100vh-12rem)]">
-      <div className="space-y-1 p-2">
+    <ScrollArea className="h-[calc(100vh-14rem)]">
+      <div className="space-y-1 p-4">
         <Button 
           variant="ghost" 
-          className="w-full justify-start"
+          className="w-full justify-start h-12"
           onClick={() => handleFeatureClick('/dashboard')}
         >
-          <LayoutDashboard className="mr-2 h-4 w-4" />
+          <LayoutDashboard className="mr-3 h-5 w-5" />
           Dashboard
           {updatesCount > 0 && (
             <Badge variant="secondary" className="ml-auto">
@@ -48,55 +48,55 @@ const DeskFeatures = () => {
         
         <Button 
           variant="ghost" 
-          className="w-full justify-start"
+          className="w-full justify-start h-12"
           onClick={() => handleFeatureClick('/calendar')}
         >
-          <Calendar className="mr-2 h-4 w-4" />
+          <Calendar className="mr-3 h-5 w-5" />
           My Calendar
         </Button>
         
         <Button 
           variant="ghost" 
-          className="w-full justify-start"
+          className="w-full justify-start h-12"
           onClick={() => handleFeatureClick('/contacts')}
         >
-          <Users className="mr-2 h-4 w-4" />
+          <Users className="mr-3 h-5 w-5" />
           Contacts List
         </Button>
         
         <Button 
           variant="ghost" 
-          className="w-full justify-start"
+          className="w-full justify-start h-12"
           onClick={() => handleFeatureClick('/documents')}
         >
-          <FileText className="mr-2 h-4 w-4" />
+          <FileText className="mr-3 h-5 w-5" />
           My Documents
         </Button>
         
         <Button 
           variant="ghost" 
-          className="w-full justify-start"
+          className="w-full justify-start h-12"
           onClick={() => handleFeatureClick('/leave')}
         >
-          <Clock className="mr-2 h-4 w-4" />
+          <Clock className="mr-3 h-5 w-5" />
           Leave Manager
         </Button>
         
         <Button 
           variant="ghost" 
-          className="w-full justify-start"
+          className="w-full justify-start h-12"
           onClick={() => handleFeatureClick('/policies')}
         >
-          <FileText className="mr-2 h-4 w-4" />
+          <FileText className="mr-3 h-5 w-5" />
           Policies
         </Button>
         
         <Button 
           variant="ghost" 
-          className="w-full justify-start"
+          className="w-full justify-start h-12"
           onClick={() => handleFeatureClick('/settings')}
         >
-          <Settings className="mr-2 h-4 w-4" />
+          <Settings className="mr-3 h-5 w-5" />
           Settings
         </Button>
       </div>
@@ -116,26 +116,26 @@ export function ChatSidebar({
   const totalUnreadCount = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
 
   return (
-    <div className="h-full flex flex-col bg-background border-r">
+    <div className="h-full flex flex-col bg-background">
       <div className="p-4 border-b">
         <Input
           type="search"
-          placeholder="Search..."
+          placeholder="Search messages and contacts..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full"
+          className="w-full bg-secondary"
         />
       </div>
       
       <Tabs value={activeTab} onValueChange={onTabChange} className="flex-1">
-        <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
+        <TabsList className="w-full justify-start rounded-none border-b bg-transparent h-12 p-0">
           <TabsTrigger
             value="chats"
-            className="flex-1 relative rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
+            className="flex-1 relative rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white h-full"
           >
             <div className="flex items-center">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              <span>Chats</span>
+              <MessageSquare className="w-5 h-5 mr-2" />
+              <span className="font-medium">Chats</span>
               {totalUnreadCount > 0 && (
                 <Badge 
                   variant="destructive" 
@@ -148,11 +148,11 @@ export function ChatSidebar({
           </TabsTrigger>
           <TabsTrigger
             value="desk"
-            className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white"
+            className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-white h-full"
           >
             <div className="flex items-center">
-              <Briefcase className="w-4 h-4 mr-2" />
-              <span>Desk</span>
+              <Briefcase className="w-5 h-5 mr-2" />
+              <span className="font-medium">Desk</span>
             </div>
           </TabsTrigger>
         </TabsList>

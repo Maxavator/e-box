@@ -46,9 +46,14 @@ export const ChatLayout = ({
 }: ChatLayoutProps) => {
   return (
     <MainLayout>
-      <div className="flex-1 min-h-screen bg-background flex">
+      <div className="flex-1 h-[calc(100vh-4rem)] bg-background flex overflow-hidden">
         <ResizablePanelGroup direction="horizontal" className="flex-1">
-          <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+          <ResizablePanel 
+            defaultSize={25} 
+            minSize={20} 
+            maxSize={40}
+            className="bg-white"
+          >
             <ChatSidebar
               searchQuery={searchQuery}
               onSearchChange={onSearchChange}
@@ -61,9 +66,12 @@ export const ChatLayout = ({
             />
           </ResizablePanel>
           
-          <ResizableHandle withHandle />
+          <ResizableHandle withHandle className="bg-border" />
           
-          <ResizablePanel defaultSize={75}>
+          <ResizablePanel 
+            defaultSize={75}
+            className="bg-white"
+          >
             <ChatContent
               activeTab={activeTab}
               selectedConversation={selectedConversation}
