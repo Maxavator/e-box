@@ -23,22 +23,21 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
   const [version, setVersion] = useState("1.99");
 
   useEffect(() => {
-    // Only update version in development environment
+    // Pre-fill test credentials
+    setEmail("test@example.com");
+    setPassword("testpass123");
+
+    // Update version in development
     if (import.meta.env.DEV) {
       const updateVersion = () => {
-        const timestamp = new Date().toISOString().slice(11, 16); // Get HH:mm
+        const timestamp = new Date().toISOString().slice(11, 16);
         setVersion(`1.99-dev-${timestamp}`);
       };
-
-      // Update immediately
       updateVersion();
-
-      // Update every 2 hours (7200000 milliseconds)
       const interval = setInterval(updateVersion, 7200000);
-
       return () => clearInterval(interval);
     }
-  }, []);
+  }, [setEmail, setPassword]);
 
   return (
     <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col items-center justify-center bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-sm">
@@ -49,6 +48,9 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
           </CardTitle>
           <CardDescription className="text-center text-gray-500">
             Enter your credentials to continue
+          </CardDescription>
+          <CardDescription className="text-center text-blue-500 text-sm">
+            Test Account Credentials Pre-filled
           </CardDescription>
         </CardHeader>
         <CardContent>
