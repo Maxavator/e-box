@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { isSaId } from "@/utils/saIdValidation";
+import type { UserRoleType } from "@/types/database";
 
 interface UseAuthActionsProps {
   email: string;
@@ -28,7 +29,7 @@ const handleLogin = async ({
     // Transform SA ID to email format if needed
     const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
 
-    // Attempt login with timeout
+    // Attempt login
     const { data, error } = await supabase.auth.signInWithPassword({
       email: loginEmail,
       password,
@@ -45,8 +46,7 @@ const handleLogin = async ({
         'Database error': 'Service temporarily unavailable. Please try again',
       };
 
-      const errorMessage = Object.entries(errorMap)
-        .find(([key]) => error.message.includes(key))?.[1] 
+      const errorMessage = errorMap[Object.keys(errorMap).find(key => error.message.includes(key)) || ''] 
         || 'Unable to connect. Please try again.';
       
       throw new Error(errorMessage);
@@ -69,7 +69,7 @@ const handleLogin = async ({
       return;
     }
 
-    const userRole = roleData || 'user';
+    const userRole = (roleData || 'user') as UserRoleType;
     console.log('Role fetched:', userRole);
     
     toast.success("Login successful!");

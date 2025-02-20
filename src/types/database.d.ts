@@ -16,6 +16,7 @@ export interface UserRole extends DBTables['user_roles']['Row'] {
 
 export type LeaveType = Database['public']['Enums']['leave_type'];
 export type LeaveStatus = Database['public']['Enums']['leave_status'];
+export type UserRoleType = 'global_admin' | 'org_admin' | 'staff' | 'user';
 
 export interface Conversation {
   id: string;
