@@ -31,28 +31,13 @@ export const useAuthActions = ({
       if (isSaId(email)) {
         // For SA ID login, use the SA ID as both email and password
         const formattedEmail = `${email}@said.auth`;
-        
-        console.log('Attempting SA ID login with:', { 
-          email: formattedEmail,
-          isSaId: true 
-        });
-        
-        // First try with provided password
         signInResult = await supabase.auth.signInWithPassword({
           email: formattedEmail,
-          password: password
+          password
         });
-
-        // If that fails, try with SA ID as password
-        if (signInResult.error) {
-          console.log('First attempt failed, trying with SA ID as password');
-          signInResult = await supabase.auth.signInWithPassword({
-            email: formattedEmail,
-            password: email // Use SA ID itself as password
-          });
-        }
       } else {
         // Regular email login
+        console.log('Attempting login with:', { email });
         signInResult = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -60,9 +45,12 @@ export const useAuthActions = ({
       }
 
       if (signInResult.error) {
-        console.error('Login error details:', signInResult.error);
-        if (signInResult.error.message.includes('Invalid login credentials')) {
-          toast.error("Invalid credentials. If using SA ID, use your SA ID as password.");
+        console.error('Login error:', signInResult.error);
+        
+        if (signInResult.error.message.includes('Email not confirmed')) {
+          toast.error("Please verify your email address before logging in");
+        } else if (signInResult.error.message.includes('Invalid login credentials')) {
+          toast.error("Invalid email or password");
         } else {
           toast.error(signInResult.error.message);
         }
@@ -70,6 +58,7 @@ export const useAuthActions = ({
       }
 
       if (signInResult.data.session) {
+        console.log('Login successful');
         toast.success("Login successful!");
         navigate("/admin");
       }
