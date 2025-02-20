@@ -26,79 +26,107 @@ export const useAuthActions = ({
 
     setIsLoading(true);
     
-    try {
-      // Transform SA ID to email format if needed
-      const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
-      
-      // First get current session to check connection
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error('Session check failed:', sessionError);
-        throw new Error('Unable to connect to authentication service. Please try again.');
-      }
+    const maxRetries = 3;
+    let retryCount = 0;
 
-      // Sign in user
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password,
-      });
-
-      if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          throw new Error('Invalid email or password');
+    while (retryCount < maxRetries) {
+      try {
+        // Transform SA ID to email format if needed
+        const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
+        
+        // First get current session to check connection
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          if (sessionError.message.includes('Database error querying schema') && retryCount < maxRetries - 1) {
+            console.log(`Retry attempt ${retryCount + 1} of ${maxRetries}`);
+            retryCount++;
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+            continue;
+          }
+          throw new Error('Unable to connect to authentication service. Please try again.');
         }
-        if (error.message.includes('Email not confirmed')) {
-          throw new Error('Please verify your email address');
+
+        // Sign in user
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: loginEmail,
+          password,
+        });
+
+        if (error) {
+          if (error.message.includes('Database error querying schema') && retryCount < maxRetries - 1) {
+            console.log(`Retry attempt ${retryCount + 1} of ${maxRetries}`);
+            retryCount++;
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+            continue;
+          }
+          if (error.message.includes('Invalid login credentials')) {
+            throw new Error('Invalid email or password');
+          }
+          if (error.message.includes('Email not confirmed')) {
+            throw new Error('Please verify your email address');
+          }
+          throw error;
         }
-        throw error;
+
+        if (!data?.user) {
+          throw new Error('Login failed. Please try again.');
+        }
+
+        // Fetch user role
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        if (roleError) {
+          console.error('Error fetching user role:', roleError);
+          // Don't throw here, we can still proceed with login
+        }
+
+        const userRole = roleData?.role || 'user';
+
+        // Fetch user profile
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error('Error fetching user profile:', profileError);
+          // Don't throw here, we can still proceed with login
+        }
+
+        toast.success("Login successful!");
+
+        // Navigate based on user role
+        if (userRole === 'global_admin' || userRole === 'org_admin') {
+          navigate("/admin");
+        } else {
+          navigate("/chat");
+        }
+
+        // Successfully logged in, break the retry loop
+        break;
+
+      } catch (error: any) {
+        const errorMessage = error?.message || "An unexpected error occurred";
+        
+        // If this was our last retry, show the error
+        if (retryCount === maxRetries - 1) {
+          toast.error(errorMessage);
+          console.error('Login error:', error);
+        } else {
+          console.log(`Retry attempt ${retryCount + 1} of ${maxRetries} failed:`, error);
+          retryCount++;
+          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+        }
       }
-
-      if (!data?.user) {
-        throw new Error('Login failed. Please try again.');
-      }
-
-      // Fetch user role
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', data.user.id)
-        .maybeSingle();
-
-      if (roleError) {
-        console.error('Error fetching user role:', roleError);
-        // Don't throw here, we can still proceed with login
-      }
-
-      const userRole = roleData?.role || 'user';
-
-      // Fetch user profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .maybeSingle();
-
-      if (profileError) {
-        console.error('Error fetching user profile:', profileError);
-        // Don't throw here, we can still proceed with login
-      }
-
-      toast.success("Login successful!");
-
-      // Navigate based on user role
-      if (userRole === 'global_admin' || userRole === 'org_admin') {
-        navigate("/admin");
-      } else {
-        navigate("/chat");
-      }
-    } catch (error: any) {
-      const errorMessage = error?.message || "An unexpected error occurred";
-      toast.error(errorMessage);
-      console.error('Login error:', error);
-    } finally {
-      setIsLoading(false);
     }
+    
+    setIsLoading(false);
   };
 
   return { handleLogin };
