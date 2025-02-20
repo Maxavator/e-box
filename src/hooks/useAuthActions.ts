@@ -47,6 +47,12 @@ export const useAuthActions = ({
       if (signInResult.error) {
         console.error('Login error:', signInResult.error);
         
+        // Handle specific error cases
+        if (signInResult.error.message.includes('Database error querying schema')) {
+          toast.error("System error. Please try again in a few moments.");
+          return;
+        }
+        
         if (signInResult.error.message.includes('Email not confirmed')) {
           toast.error("Please verify your email address before logging in");
         } else if (signInResult.error.message.includes('Invalid login credentials')) {
@@ -64,7 +70,7 @@ export const useAuthActions = ({
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      toast.error(error.message || "An unexpected error occurred");
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
