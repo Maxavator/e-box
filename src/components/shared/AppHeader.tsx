@@ -27,7 +27,44 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>('online');
+  const [lastActivity, setLastActivity] = useState<Date>(new Date());
   const navigate = useNavigate();
+
+  // Track user activity
+  useEffect(() => {
+    const updateLastActivity = () => {
+      setLastActivity(new Date());
+      if (onlineStatus === 'away') {
+        setOnlineStatus('online');
+        toast.success("Welcome back! You're now online");
+      }
+    };
+
+    // Events to track user activity
+    const events = ['mousedown', 'keydown', 'mousemove', 'wheel', 'touchstart'];
+    events.forEach(event => {
+      window.addEventListener(event, updateLastActivity);
+    });
+
+    // Check activity status every 30 minutes
+    const intervalId = setInterval(() => {
+      const now = new Date();
+      const timeDiff = now.getTime() - lastActivity.getTime();
+      const minutesDiff = Math.floor(timeDiff / 1000 / 60);
+
+      if (minutesDiff >= 30 && onlineStatus === 'online') {
+        setOnlineStatus('away');
+        toast.info("You're now away due to inactivity");
+      }
+    }, 1800000); // 30 minutes in milliseconds
+
+    return () => {
+      events.forEach(event => {
+        window.removeEventListener(event, updateLastActivity);
+      });
+      clearInterval(intervalId);
+    };
+  }, [lastActivity, onlineStatus]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -75,7 +112,9 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
 
   const handleStatusChange = async (newStatus: OnlineStatus) => {
     setOnlineStatus(newStatus);
-    // You could persist this to the database if needed
+    if (newStatus === 'online') {
+      setLastActivity(new Date());
+    }
     toast.success(`Status updated to ${newStatus}`);
   };
 
