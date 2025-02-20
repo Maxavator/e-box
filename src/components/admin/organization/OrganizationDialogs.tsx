@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Building2 } from "lucide-react";
 import { OrganizationForm } from "./OrganizationForm";
-import type { OrganizationFormData } from "./useOrganizations";
+import type { OrganizationFormData } from "./types";
 
 interface OrganizationDialogsProps {
   isAddOrgOpen: boolean;
