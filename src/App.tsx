@@ -13,6 +13,7 @@ import Chat from "@/pages/Chat";
 import NotFound from "@/pages/NotFound";
 import AdminPortal from "@/pages/AdminPortal";
 import OrganizationManagementPage from "@/pages/OrganizationManagement";
+import { Documents } from "@/components/desk/Documents";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,11 @@ function App() {
               <Route path="/chat" element={
                 <ProtectedRoute>
                   <Chat />
+                </ProtectedRoute>
+              } />
+              <Route path="/documents" element={
+                <ProtectedRoute>
+                  <Documents />
                 </ProtectedRoute>
               } />
 
