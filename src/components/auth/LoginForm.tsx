@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Mail } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { LoginMethodSelector } from "./LoginMethodSelector";
 import { LoginFormFields } from "./LoginFormFields";
 
 interface LoginFormProps {
@@ -16,11 +15,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
     setEmail,
     password,
     setPassword,
-    saId,
-    setSaId,
     isLoading,
-    loginMethod,
-    setLoginMethod,
     handleLogin,
     handleSignUp,
   } = useAuth();
@@ -37,19 +32,12 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <LoginMethodSelector
-            loginMethod={loginMethod}
-            onMethodChange={setLoginMethod}
-          />
           <form onSubmit={handleLogin} className="space-y-4">
             <LoginFormFields
-              loginMethod={loginMethod}
               email={email}
               setEmail={setEmail}
               password={password}
               setPassword={setPassword}
-              saId={saId}
-              setSaId={setSaId}
             />
             <div className="space-y-4">
               <Button 

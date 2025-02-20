@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export type LoginMethod = 'email' | 'saId';
-
 // Test accounts configuration
 const TEST_ACCOUNTS = {
   REGULAR: "6010203040512",
@@ -16,9 +14,7 @@ const TEST_ACCOUNTS = {
 export const useAuth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [saId, setSaId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');
   const navigate = useNavigate();
 
   const isTestAccount = (id: string) => {
@@ -43,65 +39,39 @@ export const useAuth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (loginMethod === 'email') {
-      if (!email || !password) {
-        toast.error("Please enter both email and password");
-        return;
-      }
-    } else {
-      if (!saId) {
-        toast.error("Please enter your SA ID number");
-        return;
-      }
-      if (!validateSaId(saId)) {
-        toast.error("Please enter a valid 13-digit SA ID number");
-        return;
-      }
+    if (!email || !password) {
+      toast.error("Please enter both email/SA ID and password");
+      return;
     }
 
     setIsLoading(true);
     try {
       let signInResult;
       
-      if (loginMethod === 'email') {
-        // Handle test accounts and regular SA ID format
-        if (isSaId(email)) {
-          signInResult = await supabase.auth.signInWithPassword({
-            email: `${email}@said.auth`,
-            password: formatSaIdPassword(email),
-          });
-        } else {
-          signInResult = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-        }
+      // Handle test accounts and regular SA ID format
+      if (isSaId(email)) {
+        signInResult = await supabase.auth.signInWithPassword({
+          email: `${email}@said.auth`,
+          password: formatSaIdPassword(email),
+        });
       } else {
         signInResult = await supabase.auth.signInWithPassword({
-          email: `${saId}@said.auth`,
-          password: formatSaIdPassword(saId),
+          email,
+          password,
         });
       }
 
       if (signInResult.error) {
         console.error('Login error details:', signInResult.error);
         if (signInResult.error.message.includes('Invalid login credentials')) {
-          if (loginMethod === 'email') {
-            if (isSaId(email)) {
-              const isTest = isTestAccount(email);
-              toast.error(isTest 
-                ? `For test account ${email}, use password: Test${email}`
-                : "Invalid SA ID number or password format incorrect"
-              );
-            } else {
-              toast.error("Invalid email or password");
-            }
-          } else {
-            const isTest = isTestAccount(saId);
+          if (isSaId(email)) {
+            const isTest = isTestAccount(email);
             toast.error(isTest 
-              ? `For test account ${saId}, use password: Test${saId}`
+              ? `For test account ${email}, use password: Test${email}`
               : "Invalid SA ID number or password format incorrect"
             );
+          } else {
+            toast.error("Invalid email or password");
           }
         } else {
           toast.error(signInResult.error.message);
@@ -122,49 +92,40 @@ export const useAuth = () => {
   };
 
   const handleSignUp = async () => {
-    if (loginMethod === 'email') {
-      if (!email || !password) {
-        toast.error("Please enter both email and password");
-        return;
-      }
-      if (isSaId(email)) {
-        toast.error("Please use the SA ID login method to register with an SA ID");
-        return;
-      }
-      if (password.length < 6) {
-        toast.error("Password must be at least 6 characters long");
-        return;
-      }
-    } else {
-      if (!saId) {
-        toast.error("Please enter your SA ID number");
-        return;
-      }
-      if (!validateSaId(saId)) {
+    if (!email || !password) {
+      toast.error("Please enter both email/SA ID and password");
+      return;
+    }
+
+    if (isSaId(email)) {
+      if (!validateSaId(email)) {
         toast.error("Please enter a valid 13-digit SA ID number");
         return;
       }
+    } else if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
     }
 
     setIsLoading(true);
     try {
       let signUpResult;
       
-      if (loginMethod === 'email') {
+      if (isSaId(email)) {
+        const saIdPassword = formatSaIdPassword(email);
         signUpResult = await supabase.auth.signUp({
-          email,
-          password,
-        });
-      } else {
-        const saIdPassword = formatSaIdPassword(saId);
-        signUpResult = await supabase.auth.signUp({
-          email: `${saId}@said.auth`,
+          email: `${email}@said.auth`,
           password: saIdPassword,
           options: {
             data: {
-              sa_id: saId,
+              sa_id: email,
             }
           }
+        });
+      } else {
+        signUpResult = await supabase.auth.signUp({
+          email,
+          password,
         });
       }
 
@@ -178,19 +139,19 @@ export const useAuth = () => {
       }
 
       if (signUpResult.data.user) {
-        if (loginMethod === 'email') {
-          toast.success("Registration successful! Please check your email to confirm your account.");
-        } else {
+        if (isSaId(email)) {
           toast.success("Registration successful with SA ID!");
           // Attempt immediate login after SA ID registration
           const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-            email: `${saId}@said.auth`,
-            password: formatSaIdPassword(saId),
+            email: `${email}@said.auth`,
+            password: formatSaIdPassword(email),
           });
           
           if (loginData.session) {
             navigate("/admin");
           }
+        } else {
+          toast.success("Registration successful! Please check your email to confirm your account.");
         }
       }
     } catch (error: any) {
@@ -206,11 +167,7 @@ export const useAuth = () => {
     setEmail,
     password,
     setPassword,
-    saId,
-    setSaId,
     isLoading,
-    loginMethod,
-    setLoginMethod,
     handleLogin,
     handleSignUp,
   };
