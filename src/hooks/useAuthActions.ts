@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { isSaId, formatSaIdPassword } from "@/utils/saIdValidation";
+import { isSaId } from "@/utils/saIdValidation";
 
 interface UseAuthActionsProps {
   email: string;
@@ -27,44 +27,28 @@ export const useAuthActions = ({
     setIsLoading(true);
     
     try {
-      let signInResult;
-      
-      if (isSaId(email)) {
-        const formattedEmail = `${email}@said.auth`;
-        signInResult = await supabase.auth.signInWithPassword({
-          email: formattedEmail,
-          password
-        });
-      } else {
-        console.log('Attempting login with:', { email });
-        signInResult = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-      }
+      const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password,
+      });
 
-      if (signInResult.error) {
-        console.error('Login error:', signInResult.error);
+      if (error) {
+        const errorMessage = {
+          'Email not confirmed': "Please verify your email address before logging in",
+          'Invalid login credentials': "Invalid email or password",
+          'Database error querying schema': "Unable to connect to the authentication service. Please try again later."
+        }[error.message] || error.message;
         
-        // Handle specific error cases
-        if (signInResult.error.message.includes('Email not confirmed')) {
-          toast.error("Please verify your email address before logging in");
-        } else if (signInResult.error.message.includes('Invalid login credentials')) {
-          toast.error("Invalid email or password");
-        } else if (signInResult.error.message.includes('Database error querying schema')) {
-          toast.error("Unable to connect to the authentication service. Please try again later.");
-        } else {
-          toast.error(signInResult.error.message);
-        }
+        toast.error(errorMessage);
         return;
       }
 
-      if (signInResult.data.session) {
-        console.log('Login successful');
+      if (data.session) {
         toast.success("Login successful!");
         navigate("/admin");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Unexpected login error:', error);
       toast.error("An unexpected error occurred. Please try again later.");
     } finally {
@@ -72,7 +56,5 @@ export const useAuthActions = ({
     }
   };
 
-  return {
-    handleLogin,
-  };
+  return { handleLogin };
 };
