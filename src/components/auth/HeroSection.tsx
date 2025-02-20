@@ -19,7 +19,7 @@ const HeroSection = () => {
             <h1 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight">
               Transform Your Stakeholder Engagement
             </h1>
-            <p className="text-xl lg:text-2xl opacity-90 leading-relaxed">
+            <p className="text-lg lg:text-xl opacity-90 leading-relaxed">
               South Africa's premier enterprise communication platform. Built for businesses, designed for growth... Executives to Desk-less Staff, All Staff.
             </p>
           </div>
