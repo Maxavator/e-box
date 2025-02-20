@@ -69,7 +69,7 @@ const handleLogin = async ({
       return;
     }
 
-    const userRole = (roleData || 'user') as UserRoleType;
+    const userRole = (roleData as UserRoleType) || 'user';
     console.log('Role fetched:', userRole);
     
     toast.success("Login successful!");
