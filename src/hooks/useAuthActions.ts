@@ -13,6 +13,7 @@ interface UseAuthActionsProps {
 // Track our last request time
 let lastRequestTime = 0;
 const MIN_REQUEST_INTERVAL = 2000; // 2 seconds between requests
+const MAX_RETRIES = 2;
 
 export const useAuthActions = ({
   email,
@@ -42,51 +43,68 @@ export const useAuthActions = ({
       // Transform SA ID to email format if needed
       const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
 
-      // First clear any existing session
-      await supabase.auth.signOut();
-      
-      // Small delay to ensure session is cleared
-      await new Promise(resolve => setTimeout(resolve, 100));
+      let lastError = null;
+      let data = null;
 
-      // Attempt login
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password,
-      });
+      // Try authentication with retries
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          if (attempt > 0) {
+            // Add increasing delay between retries
+            await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+          }
 
-      if (authError) {
-        console.error('Auth error details:', {
-          message: authError.message,
-          status: authError.status,
-          name: authError.name
-        });
-        
-        if (authError.message.includes('Invalid login credentials')) {
-          throw new Error('Invalid email or password');
+          const result = await supabase.auth.signInWithPassword({
+            email: loginEmail,
+            password,
+          });
+
+          if (!result.error) {
+            data = result.data;
+            break; // Success! Exit retry loop
+          }
+
+          lastError = result.error;
+
+          if (result.error.message.includes('Invalid login credentials')) {
+            throw new Error('Invalid email or password');
+          }
+          if (result.error.message.includes('Email not confirmed')) {
+            throw new Error('Please verify your email address');
+          }
+          if (result.error.message.includes('rate limit')) {
+            throw new Error('Too many login attempts. Please wait a moment and try again.');
+          }
+
+          // Only continue retrying for specific errors
+          if (!result.error.message.includes('Database error querying schema')) {
+            throw result.error;
+          }
+
+          console.log(`Retry attempt ${attempt + 1} of ${MAX_RETRIES}`);
+
+        } catch (error: any) {
+          // If it's a known error type, throw immediately
+          if (error.message && !error.message.includes('Database error querying schema')) {
+            throw error;
+          }
+          lastError = error;
         }
-        if (authError.message.includes('Email not confirmed')) {
-          throw new Error('Please verify your email address');
-        }
-        if (authError.message.includes('rate limit')) {
-          throw new Error('Too many login attempts. Please wait a moment and try again.');
-        }
-        if (authError.message.includes('Database error querying schema')) {
-          throw new Error('Connection error. Please try again.');
-        }
-        throw new Error('Login failed. Please try again.');
       }
 
+      // If we exhausted retries without success
       if (!data?.user) {
-        throw new Error('No user data received. Please try again.');
+        console.error('Final auth error:', lastError);
+        throw new Error('Unable to connect. Please try again in a few moments.');
       }
 
+      // Try to fetch user role
       try {
-        // Attempt to fetch user role
         const { data: roleData } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', data.user.id)
-          .single();
+          .maybeSingle();
 
         const userRole = roleData?.role || 'user';
         
@@ -99,8 +117,8 @@ export const useAuthActions = ({
           navigate("/chat");
         }
       } catch (roleError) {
+        // If role fetch fails, proceed with default route
         console.error('Role fetch error:', roleError);
-        // If role fetch fails, navigate to default route
         toast.success("Login successful!");
         navigate("/chat");
       }
