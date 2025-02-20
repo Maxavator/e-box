@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Conversation } from "@/types/chat";
+import type { Conversation, Message } from "@/types/chat";
 import { getUserById } from "@/data/chat";
 
 export const useConversations = () => {
@@ -13,6 +13,8 @@ export const useConversations = () => {
     const fetchConversations = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      console.log('Fetching conversations for user:', user.id);
 
       const { data: convos, error } = await supabase
         .from('conversations')
@@ -30,34 +32,58 @@ export const useConversations = () => {
         return;
       }
 
+      console.log('Fetched conversations:', convos);
+
       // Transform conversations
       const transformedConvos: Conversation[] = await Promise.all(
         convos.map(async (conv) => {
           const otherUserId = conv.user1_id === user.id ? conv.user2_id : conv.user1_id;
           
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('first_name, last_name')
-            .eq('id', otherUserId)
-            .single();
+          // Fetch messages for this conversation
+          const { data: messages, error: messagesError } = await supabase
+            .from('messages')
+            .select('*')
+            .eq('conversation_id', conv.id)
+            .order('created_at', { ascending: true });
+
+          if (messagesError) {
+            console.error('Error fetching messages:', messagesError);
+            return null;
+          }
+
+          console.log(`Fetched ${messages?.length} messages for conversation:`, conv.id);
+
+          // Transform messages
+          const transformedMessages: Message[] = messages?.map(msg => ({
+            id: msg.id,
+            senderId: msg.sender_id,
+            text: msg.content,
+            timestamp: new Date(msg.created_at).toLocaleString(),
+            status: 'sent',
+            reactions: [],
+            sender: msg.sender_id === user.id ? 'me' : 'them'
+          })) || [];
 
           return {
             id: conv.id,
             userId: otherUserId,
             unreadCount: 0,
-            messages: [],
-            lastMessage: ''
+            messages: transformedMessages,
+            lastMessage: transformedMessages[transformedMessages.length - 1]?.text || ''
           };
         })
       );
 
-      setConversations(transformedConvos);
+      const validConvos = transformedConvos.filter(Boolean) as Conversation[];
+      console.log('Transformed conversations:', validConvos);
+      setConversations(validConvos);
     };
 
     fetchConversations();
   }, []);
 
   const handleSelectConversation = async (conversation: Conversation) => {
+    console.log('Selecting conversation:', conversation.id);
     const updatedConversation = { ...conversation, unreadCount: 0 };
     setSelectedConversation(updatedConversation);
     

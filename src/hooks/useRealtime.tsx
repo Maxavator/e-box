@@ -11,6 +11,9 @@ export const useRealtime = (
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!selectedConversation) return;
+
+    // Enable REALTIME for messages table
     const channel = supabase
       .channel('chat_messages')
       .on(
@@ -18,53 +21,60 @@ export const useRealtime = (
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'messages'
+          table: 'messages',
+          filter: `conversation_id=eq.${selectedConversation.id}`
         },
-        async (payload: any) => {
+        async (payload) => {
+          console.log('New message received:', payload);
           const { data: { user } } = await supabase.auth.getUser();
-          if (!user || !selectedConversation) return;
+          if (!user) return;
 
           const newMessage = payload.new;
           
-          if (selectedConversation.id === newMessage.conversation_id) {
-            const newMessageObj: Message = {
-              id: newMessage.id,
-              senderId: newMessage.sender_id,
-              text: newMessage.content,
-              timestamp: newMessage.created_at,
-              status: 'sent',
-              reactions: [],
-              sender: newMessage.sender_id === user.id ? 'me' : 'them'
-            };
+          // Transform the message to match our Message type
+          const messageObj: Message = {
+            id: newMessage.id,
+            senderId: newMessage.sender_id,
+            text: newMessage.content,
+            timestamp: new Date(newMessage.created_at).toLocaleString(),
+            status: 'sent',
+            reactions: [],
+            sender: newMessage.sender_id === user.id ? 'me' : 'them'
+          };
 
-            const updatedConversation: Conversation = {
-              ...selectedConversation,
-              messages: [...selectedConversation.messages, newMessageObj],
+          // Update the conversation with the new message
+          setSelectedConversation(prev => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              messages: [...prev.messages, messageObj],
               lastMessage: newMessage.content
             };
+          });
 
-            setSelectedConversation(updatedConversation);
+          // Show notification for messages from others
+          if (newMessage.sender_id !== user.id) {
+            const { data: senderProfile } = await supabase
+              .from('profiles')
+              .select('first_name, last_name')
+              .eq('id', newMessage.sender_id)
+              .single();
 
-            if (newMessage.sender_id !== user.id) {
-              const { data: senderProfile } = await supabase
-                .from('profiles')
-                .select('first_name, last_name')
-                .eq('id', newMessage.sender_id)
-                .single();
-
-              if (senderProfile) {
-                toast({
-                  title: "New Message",
-                  description: `From ${senderProfile.first_name} ${senderProfile.last_name}`
-                });
-              }
+            if (senderProfile) {
+              toast({
+                title: "New Message",
+                description: `From ${senderProfile.first_name} ${senderProfile.last_name}`
+              });
             }
           }
         }
       )
       .subscribe();
 
+    console.log('Realtime subscription started for conversation:', selectedConversation.id);
+
     return () => {
+      console.log('Cleaning up realtime subscription');
       supabase.removeChannel(channel);
     };
   }, [selectedConversation?.id, setSelectedConversation, toast]);
