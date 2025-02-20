@@ -36,6 +36,11 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode;
     return <Navigate to="/dashboard" replace />;
   }
 
+  // For standard users, redirect to chat if they try to access dashboard
+  if (userRole === 'staff' && window.location.pathname === '/dashboard') {
+    return <Navigate to="/chat" replace />;
+  }
+
   return <>{children}</>;
 };
 
@@ -52,7 +57,7 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (userRole !== 'org_admin' && userRole !== 'global_admin') {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/chat" replace />;
   }
 
   return <>{children}</>;
