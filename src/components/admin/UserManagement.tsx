@@ -21,6 +21,8 @@ export const UserManagement = () => {
     setSelectedUser,
     formData,
     setFormData,
+    handleSubmit,
+    createUserMutation,
     updateUserMutation,
   } = useUserManagement();
 
@@ -34,13 +36,6 @@ export const UserManagement = () => {
       organizationId: user.organization_id || "",
     });
     setIsEditUserOpen(true);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (selectedUser) {
-      updateUserMutation.mutate({ userId: selectedUser.id, data: formData });
-    }
   };
 
   const handleFormChange = (field: keyof typeof formData, value: string) => {
@@ -81,6 +76,7 @@ export const UserManagement = () => {
         organizations={organizations}
         onSubmit={handleSubmit}
         onFormChange={handleFormChange}
+        isSubmitting={createUserMutation.isPending}
       />
 
       <UserDialog
@@ -92,12 +88,14 @@ export const UserManagement = () => {
         onSubmit={handleSubmit}
         onFormChange={handleFormChange}
         isEdit
+        isSubmitting={updateUserMutation.isPending}
       />
 
       <UserTable
         users={users}
         isLoading={isLoading}
         onEditUser={handleEditUser}
+        isAdmin={!!isAdmin}
       />
     </div>
   );

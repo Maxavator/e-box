@@ -22,7 +22,7 @@ export const useUserManagement = () => {
   const { isAdmin, userRole, isLoading: isRoleLoading, error: roleError } = useUserRole();
   const { organizations, userProfile, isLoading: isOrgsLoading, error: orgsError } = useOrganizations(isAdmin, userRole);
   const { users, isLoading: isUsersLoading, error: usersError } = useUsers(isAdmin, userRole, userProfile);
-  const { updateUserMutation } = useUserMutations(isAdmin, userRole, userProfile);
+  const { createUserMutation, updateUserMutation } = useUserMutations(isAdmin, userRole, userProfile);
 
   const isLoading = isRoleLoading || isOrgsLoading || isUsersLoading;
   const error = roleError || orgsError || usersError;
@@ -32,6 +32,36 @@ export const useUserManagement = () => {
     console.error('User management error:', error);
     toast.error("There was an error loading user management data");
   }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      if (selectedUser) {
+        await updateUserMutation.mutateAsync({ 
+          userId: selectedUser.id, 
+          data: formData 
+        });
+        setIsEditUserOpen(false);
+      } else {
+        await createUserMutation.mutateAsync(formData);
+        setIsAddUserOpen(false);
+      }
+      
+      // Reset form
+      setFormData({
+        email: "",
+        firstName: "",
+        lastName: "",
+        role: "staff",
+        organizationId: "",
+      });
+      setSelectedUser(null);
+    } catch (error) {
+      // Error handling is done in mutation callbacks
+      console.error('Form submission error:', error);
+    }
+  };
 
   return {
     isAdmin,
@@ -48,6 +78,8 @@ export const useUserManagement = () => {
     setSelectedUser,
     formData,
     setFormData,
+    handleSubmit,
+    createUserMutation,
     updateUserMutation,
     userProfile,
   };

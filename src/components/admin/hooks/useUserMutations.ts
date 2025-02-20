@@ -13,6 +13,69 @@ export const useUserMutations = (
 ) => {
   const queryClient = useQueryClient();
 
+  const createUserMutation = useMutation({
+    mutationFn: async (data: UserFormData) => {
+      if (!isAdmin && userRole !== 'org_admin') {
+        throw new Error("Not authorized to create users");
+      }
+
+      if (userRole === 'org_admin' && userProfile?.organization_id !== data.organizationId) {
+        throw new Error("You don't have permission to create users in other organizations");
+      }
+
+      try {
+        // Create auth user
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+          email: data.email,
+          email_confirm: true,
+          password: 'DefaultPass123!', // This will be changed on first login
+          user_metadata: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+          }
+        });
+
+        if (authError) throw authError;
+        if (!authData.user) throw new Error("Failed to create user");
+
+        // Create profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            first_name: data.firstName,
+            last_name: data.lastName,
+            organization_id: data.organizationId || null,
+          });
+
+        if (profileError) throw profileError;
+
+        // Assign role
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: authData.user.id,
+            role: data.role as Database['public']['Enums']['user_role'],
+          });
+
+        if (roleError) throw roleError;
+
+        return authData.user;
+      } catch (error) {
+        console.error('Error creating user:', error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast.success("User created successfully");
+    },
+    onError: (error: Error) => {
+      console.error('Mutation error:', error);
+      toast.error(`Failed to create user: ${error.message}`);
+    }
+  });
+
   const updateUserMutation = useMutation({
     mutationFn: async ({ userId, data }: { userId: string, data: UserFormData }) => {
       if (!isAdmin && userRole !== 'org_admin') {
@@ -58,5 +121,5 @@ export const useUserMutations = (
     }
   });
 
-  return { updateUserMutation };
+  return { createUserMutation, updateUserMutation };
 };

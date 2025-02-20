@@ -15,6 +15,7 @@ interface UserDialogProps {
   onSubmit: (e: React.FormEvent) => void;
   onFormChange: (field: keyof UserFormData, value: string) => void;
   isEdit?: boolean;
+  isSubmitting?: boolean;
 }
 
 export const UserDialog = ({
@@ -26,6 +27,7 @@ export const UserDialog = ({
   onSubmit,
   onFormChange,
   isEdit = false,
+  isSubmitting = false,
 }: UserDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -43,6 +45,7 @@ export const UserDialog = ({
                 value={formData.email}
                 onChange={(e) => onFormChange('email', e.target.value)}
                 placeholder="user@example.com"
+                required
               />
             </div>
           )}
@@ -53,6 +56,7 @@ export const UserDialog = ({
               value={formData.firstName}
               onChange={(e) => onFormChange('firstName', e.target.value)}
               placeholder="John"
+              required
             />
           </div>
           <div className="space-y-2">
@@ -62,6 +66,7 @@ export const UserDialog = ({
               value={formData.lastName}
               onChange={(e) => onFormChange('lastName', e.target.value)}
               placeholder="Doe"
+              required
             />
           </div>
           <div className="space-y-2">
@@ -98,8 +103,19 @@ export const UserDialog = ({
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" className="w-full">
-            {isEdit ? 'Update User' : 'Add User'}
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <span className="flex items-center gap-2">
+                <span className="animate-spin">⚪</span>
+                {isEdit ? "Updating..." : "Creating..."}
+              </span>
+            ) : (
+              isEdit ? "Update User" : "Add User"
+            )}
           </Button>
         </form>
       </DialogContent>
