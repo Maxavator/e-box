@@ -29,17 +29,30 @@ export const useAuthActions = ({
       let signInResult;
       
       if (isSaId(email)) {
-        // Format SA ID for login
+        // For SA ID login, use the SA ID as both email and password
         const formattedEmail = `${email}@said.auth`;
-        const formattedPassword = formatSaIdPassword(email);
         
-        console.log('Attempting SA ID login with:', { email: formattedEmail });
+        console.log('Attempting SA ID login with:', { 
+          email: formattedEmail,
+          isSaId: true 
+        });
         
+        // First try with provided password
         signInResult = await supabase.auth.signInWithPassword({
           email: formattedEmail,
-          password: formattedPassword // Use the formatted password for SA ID
+          password: password
         });
+
+        // If that fails, try with SA ID as password
+        if (signInResult.error) {
+          console.log('First attempt failed, trying with SA ID as password');
+          signInResult = await supabase.auth.signInWithPassword({
+            email: formattedEmail,
+            password: email // Use SA ID itself as password
+          });
+        }
       } else {
+        // Regular email login
         signInResult = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -49,7 +62,7 @@ export const useAuthActions = ({
       if (signInResult.error) {
         console.error('Login error details:', signInResult.error);
         if (signInResult.error.message.includes('Invalid login credentials')) {
-          toast.error("Invalid credentials");
+          toast.error("Invalid credentials. If using SA ID, use your SA ID as password.");
         } else {
           toast.error(signInResult.error.message);
         }
