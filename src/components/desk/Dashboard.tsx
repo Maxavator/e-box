@@ -37,7 +37,8 @@ export const Dashboard = () => {
       case 'messages':
         return <PartnerMessages />;
       case 'settings':
-        return <Settings />;
+        navigate('/profile');
+        return null;
       default:
         return renderDashboard();
     }
@@ -62,6 +63,10 @@ export const Dashboard = () => {
     }
     if (feature === 'organization') {
       navigate('/organization');
+      return;
+    }
+    if (feature === 'profile') {
+      navigate('/profile');
       return;
     }
     setCurrentView(feature);

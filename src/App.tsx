@@ -15,6 +15,7 @@ import AdminPortal from "@/pages/AdminPortal";
 import OrganizationManagementPage from "@/pages/OrganizationManagement";
 import { Documents } from "@/components/desk/Documents";
 import { Calendar } from "@/components/desk/Calendar";
+import { Settings } from "@/components/desk/Settings";
 
 const queryClient = new QueryClient();
 
@@ -91,6 +92,11 @@ function App() {
               <Route path="/calendar" element={
                 <ProtectedRoute>
                   <Calendar />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Settings />
                 </ProtectedRoute>
               } />
 
