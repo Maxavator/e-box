@@ -16,7 +16,7 @@ const HeroSection = () => {
       <div className="max-w-xl space-y-12 relative z-10 p-12 text-white">
         <div className="space-y-6">
           <div className="space-y-2">
-            <h1 className="text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
+            <h1 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight">
               Transform Your Stakeholder Engagement
             </h1>
             <p className="text-xl lg:text-2xl opacity-90 leading-relaxed">
