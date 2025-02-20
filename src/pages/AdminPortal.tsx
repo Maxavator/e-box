@@ -11,31 +11,34 @@ import OrganizationManagement from "@/components/admin/OrganizationManagement";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link2 } from "lucide-react";
+import { useUserRole } from "@/components/admin/hooks/useUserRole";
 
 const AdminPortal = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const initialView = location.state?.view || 'dashboard';
   const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'organizations' | 'settings'>(initialView);
+  const { isAdmin, userRole, isLoading } = useUserRole();
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAccess = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      
       if (!session) {
         toast.error("Please login to access this page");
         navigate("/auth");
+        return;
+      }
+
+      // Wait for role check to complete
+      if (!isLoading && !isAdmin && userRole !== 'org_admin') {
+        toast.error("You don't have permission to access the admin portal");
+        navigate("/");
       }
     };
 
-    checkAuth();
-  }, [navigate]);
-
-  // Update active view when location state changes
-  useEffect(() => {
-    if (location.state?.view) {
-      setActiveView(location.state.view);
-    }
-  }, [location.state]);
+    checkAccess();
+  }, [navigate, isAdmin, userRole, isLoading]);
 
   const handleLogout = async () => {
     try {
@@ -55,6 +58,20 @@ const AdminPortal = () => {
   const handleViewChange = (view: 'dashboard' | 'users' | 'organizations' | 'settings') => {
     setActiveView(view);
   };
+
+  // Show loading state while checking permissions
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  // If not admin or org_admin, this will redirect through the useEffect
+  if (!isAdmin && userRole !== 'org_admin') {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
