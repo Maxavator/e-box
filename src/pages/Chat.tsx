@@ -4,8 +4,9 @@ import { useChat } from "@/hooks/use-chat";
 import { ChatLayout } from "@/components/chat/ChatLayout";
 import { useEffect } from "react";
 import { startMessageSimulation } from "@/utils/messageSimulator";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -54,8 +55,22 @@ const Chat = () => {
     };
   }, [toast]);
 
-  const handleLogout = () => {
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Success",
+        description: "Logged out successfully",
+      });
+      navigate("/auth");
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to logout",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleLogoClick = () => {
