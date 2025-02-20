@@ -42,24 +42,19 @@ export const useAuthActions = ({
       // Transform SA ID to email format if needed
       const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
 
-      // First attempt to get the current session
-      const { data: currentSession } = await supabase.auth.getSession();
-      
-      // If there's an existing session, sign out first
-      if (currentSession?.session) {
-        await supabase.auth.signOut();
-      }
-
-      // Wait a moment before attempting login
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Attempt login
+      // Attempt login directly without session check
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password,
       });
 
       if (error) {
+        console.error('Auth error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
+        
         if (error.message.includes('Invalid login credentials')) {
           throw new Error('Invalid email or password');
         }
@@ -69,25 +64,28 @@ export const useAuthActions = ({
         if (error.message.includes('rate limit')) {
           throw new Error('Too many login attempts. Please wait a moment and try again.');
         }
-        if (error.message.includes('Database error querying schema')) {
-          throw new Error('Unable to connect right now. Please refresh the page and try again.');
-        }
-        throw error;
+        throw new Error('Authentication failed. Please check your credentials and try again.');
       }
 
       if (!data?.user) {
         throw new Error('Login failed. Please try again.');
       }
 
-      // Fetch user role with simplified query
-      const { data: roleData } = await supabase
+      // Success! Now fetch the user role
+      const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', data.user.id)
-        .maybeSingle();
+        .limit(1)
+        .single();
+
+      if (roleError) {
+        console.error('Role fetch error:', roleError);
+        // Continue with default role if role fetch fails
+      }
 
       const userRole = roleData?.role || 'user';
-
+      
       toast.success("Login successful!");
 
       // Navigate based on user role
