@@ -2,7 +2,7 @@
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { ChatSidebar } from "./ChatSidebar";
 import { ChatContent } from "./ChatContent";
-import { AppHeader } from "@/components/shared/AppHeader";
+import { MainLayout } from "@/components/shared/MainLayout";
 import type { Conversation } from "@/types/chat";
 
 interface ChatLayoutProps {
@@ -42,44 +42,42 @@ export const ChatLayout = ({
   onDeleteMessage,
   onReactToMessage,
   calendarView,
-  onLogout,
-  onLogoClick,
   isMobile,
 }: ChatLayoutProps) => {
   return (
-    <div className="flex-1 flex flex-col">
-      <AppHeader onLogout={onLogout} onLogoClick={onLogoClick} />
-      
-      <ResizablePanelGroup direction="horizontal" className="flex-1">
-        <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
-          <ChatSidebar
-            searchQuery={searchQuery}
-            onSearchChange={onSearchChange}
-            activeTab={activeTab}
-            onTabChange={onTabChange}
-            conversations={conversations}
-            selectedConversation={selectedConversation}
-            onSelectConversation={onSelectConversation}
-            onCalendarActionClick={onCalendarActionClick}
-          />
-        </ResizablePanel>
-        
-        <ResizableHandle withHandle />
-        
-        <ResizablePanel defaultSize={75}>
-          <ChatContent
-            activeTab={activeTab}
-            selectedConversation={selectedConversation}
-            newMessage={newMessage}
-            onNewMessageChange={onNewMessageChange}
-            onSendMessage={onSendMessage}
-            onEditMessage={onEditMessage}
-            onDeleteMessage={onDeleteMessage}
-            onReactToMessage={onReactToMessage}
-            calendarView={calendarView}
-          />
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </div>
+    <MainLayout>
+      <div className="flex-1 min-h-screen bg-background flex">
+        <ResizablePanelGroup direction="horizontal" className="flex-1">
+          <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+            <ChatSidebar
+              searchQuery={searchQuery}
+              onSearchChange={onSearchChange}
+              activeTab={activeTab}
+              onTabChange={onTabChange}
+              conversations={conversations}
+              selectedConversation={selectedConversation}
+              onSelectConversation={onSelectConversation}
+              onCalendarActionClick={onCalendarActionClick}
+            />
+          </ResizablePanel>
+          
+          <ResizableHandle withHandle />
+          
+          <ResizablePanel defaultSize={75}>
+            <ChatContent
+              activeTab={activeTab}
+              selectedConversation={selectedConversation}
+              newMessage={newMessage}
+              onNewMessageChange={onNewMessageChange}
+              onSendMessage={onSendMessage}
+              onEditMessage={onEditMessage}
+              onDeleteMessage={onDeleteMessage}
+              onReactToMessage={onReactToMessage}
+              calendarView={calendarView}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
+    </MainLayout>
   );
 };
