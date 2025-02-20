@@ -58,7 +58,7 @@ const handleLogin = async ({
 
     // Get user role using the secure function
     const { data: roleData, error: roleError } = await supabase
-      .rpc('get_user_role', { user_id: data.user.id })
+      .rpc<UserRoleType>('get_user_role', { user_id: data.user.id })
       .single();
 
     if (roleError) {
@@ -69,7 +69,7 @@ const handleLogin = async ({
       return;
     }
 
-    const userRole = (roleData as UserRoleType) || 'user';
+    const userRole: UserRoleType = roleData ?? 'user';
     console.log('Role fetched:', userRole);
     
     toast.success("Login successful!");
