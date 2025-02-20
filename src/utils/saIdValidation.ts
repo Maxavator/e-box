@@ -7,5 +7,5 @@ export const isSaId = (input: string): boolean => {
 
 // Function to format SA ID into password
 export const formatSaIdPassword = (saId: string): string => {
-  return `Test${saId}`;
+  return saId; // Use the SA ID itself as the password
 };
