@@ -7,13 +7,9 @@ import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { useChat } from "@/hooks/use-chat";
 import { Documents } from "@/components/desk/Documents";
 import { ContactsList } from "@/components/desk/ContactsList";
-import { Calendar as CalendarComponent } from "@/components/desk/Calendar";
 import { LeaveManager } from "@/components/desk/LeaveManager";
 import { Policies } from "@/components/desk/Policies";
-import { PartnerMessages } from "@/components/desk/PartnerMessages";
 import { Settings } from "@/components/desk/Settings";
-
-// Import new components
 import { DashboardHeader } from "./dashboard/DashboardHeader";
 import { StatsCards } from "./dashboard/StatsCards";
 import { ActivitySection } from "./dashboard/ActivitySection";
@@ -24,7 +20,7 @@ import { toast } from "sonner";
 export const Dashboard = () => {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const navigate = useNavigate();
-  const { userRole } = useUserRole();
+  const { userRole, isLoading: isRoleLoading } = useUserRole();
   const {
     searchQuery,
     setSearchQuery,
@@ -36,6 +32,23 @@ export const Dashboard = () => {
     filteredConversations,
     handleSelectConversation,
   } = useChat();
+
+  // Show loading state while checking user role
+  if (isRoleLoading) {
+    return (
+      <MainLayout>
+        <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  // Redirect staff users to chat
+  if (userRole === 'staff') {
+    navigate('/chat');
+    return null;
+  }
 
   const handleNavigation = (route: string) => {
     try {
