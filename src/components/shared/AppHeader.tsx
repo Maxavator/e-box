@@ -3,24 +3,30 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/components/user/UserProfile";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings, Users, Building2 } from "lucide-react";
+import { Settings, Users, Building2, Circle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface AppHeaderProps {
   onLogout: () => void;
   onLogoClick: () => void;
 }
 
+type OnlineStatus = 'online' | 'away' | 'offline' | 'busy';
+
 export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
   const [displayName, setDisplayName] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>('online');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,7 +36,7 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
       if (user) {
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('first_name, last_name')
+          .select('first_name, last_name, avatar_url')
           .eq('id', user.id)
           .single();
 
@@ -42,6 +48,7 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
 
         if (profileData) {
           setDisplayName(`${profileData.first_name} ${profileData.last_name}`);
+          setAvatarUrl(profileData.avatar_url || '');
         }
 
         setIsAdmin(roleData?.role === 'org_admin' || roleData?.role === 'global_admin');
@@ -51,15 +58,25 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
     fetchUserInfo();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast.success("Logged out successfully");
-      navigate('/auth');
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast.error("Failed to logout");
+  const getStatusColor = (status: OnlineStatus) => {
+    switch (status) {
+      case 'online':
+        return 'text-green-500';
+      case 'away':
+        return 'text-yellow-500';
+      case 'busy':
+        return 'text-red-500';
+      case 'offline':
+        return 'text-gray-500';
+      default:
+        return 'text-gray-500';
     }
+  };
+
+  const handleStatusChange = async (newStatus: OnlineStatus) => {
+    setOnlineStatus(newStatus);
+    // You could persist this to the database if needed
+    toast.success(`Status updated to ${newStatus}`);
   };
 
   const handleAdminNav = (path: string) => {
@@ -79,11 +96,43 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
             className="h-8"
           />
         </button>
-        {displayName && (
-          <span className="text-sm font-medium text-muted-foreground">
-            Welcome, {displayName}
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={avatarUrl} />
+            <AvatarFallback>
+              {displayName?.split(' ').map(n => n[0]).join('')}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">
+              {displayName}
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+                <Circle className={`h-2 w-2 ${getStatusColor(onlineStatus)}`} />
+                <span className="capitalize">{onlineStatus}</span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[200px]">
+                <DropdownMenuItem onClick={() => handleStatusChange('online')}>
+                  <Circle className="h-2 w-2 text-green-500 mr-2" />
+                  Online
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange('away')}>
+                  <Circle className="h-2 w-2 text-yellow-500 mr-2" />
+                  Away
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange('busy')}>
+                  <Circle className="h-2 w-2 text-red-500 mr-2" />
+                  Busy
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange('offline')}>
+                  <Circle className="h-2 w-2 text-gray-500 mr-2" />
+                  Appear Offline
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
       </div>
       <div className="flex items-center gap-4">
         {isAdmin && (
@@ -110,7 +159,7 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-        <UserProfile onLogout={handleLogout} />
+        <UserProfile onLogout={onLogout} />
       </div>
     </header>
   );
