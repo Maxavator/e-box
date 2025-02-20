@@ -19,6 +19,7 @@ import { StatsCards } from "./dashboard/StatsCards";
 import { ActivitySection } from "./dashboard/ActivitySection";
 import { AnnouncementsSection } from "./dashboard/AnnouncementsSection";
 import { QuickActions } from "./dashboard/QuickActions";
+import { toast } from "sonner";
 
 export const Dashboard = () => {
   const [currentView, setCurrentView] = useState<string>('dashboard');
@@ -36,41 +37,56 @@ export const Dashboard = () => {
     handleSelectConversation,
   } = useChat();
 
-  const handleCalendarActionClick = (view: 'calendar' | 'inbox') => {
-    setCalendarView(view);
-    setActiveTab('calendar');
+  const handleNavigation = (route: string) => {
+    try {
+      navigate(route);
+      toast.success(`Navigating to ${route.replace('/', '')}`);
+    } catch (error) {
+      console.error('Navigation error:', error);
+      toast.error('Failed to navigate. Please try again.');
+    }
   };
 
   const handleCardClick = (feature: string) => {
     switch (feature) {
       case 'chat':
-        navigate('/chat');
+        handleNavigation('/chat');
         break;
       case 'admin':
-        navigate('/admin');
+        handleNavigation('/admin');
         break;
       case 'calendar':
-        navigate('/calendar');
+        handleNavigation('/calendar');
         break;
       case 'documents':
-        navigate('/documents');
+        handleNavigation('/documents');
         break;
       case 'organization':
-        navigate('/organization');
+        handleNavigation('/organization');
         break;
       case 'profile':
-        navigate('/profile');
+        handleNavigation('/profile');
         break;
       default:
         setCurrentView(feature);
+        break;
+    }
+  };
+
+  const handleCalendarActionClick = (view: 'calendar' | 'inbox') => {
+    setCalendarView(view);
+    if (view === 'calendar') {
+      handleNavigation('/calendar');
+    } else {
+      setActiveTab('calendar');
     }
   };
 
   const renderDashboard = () => (
-    <div className="p-6">
+    <div className="p-6 space-y-6">
       <StatsCards onCardClick={handleCardClick} />
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ActivitySection />
         <AnnouncementsSection />
       </div>
@@ -82,22 +98,24 @@ export const Dashboard = () => {
   const renderFeature = () => {
     switch (currentView) {
       case 'documents':
-        navigate('/documents');
+        handleNavigation('/documents');
         return null;
       case 'contacts':
         return <ContactsList />;
       case 'calendar':
-        navigate('/calendar');
+        handleNavigation('/calendar');
         return null;
       case 'leave':
         return <LeaveManager />;
       case 'policies':
         return <Policies />;
       case 'messages':
-        navigate('/chat');
+      case 'chat':
+        handleNavigation('/chat');
         return null;
       case 'settings':
-        navigate('/profile');
+      case 'profile':
+        handleNavigation('/profile');
         return null;
       default:
         return renderDashboard();
@@ -106,9 +124,9 @@ export const Dashboard = () => {
 
   return (
     <MainLayout>
-      <div className="flex-1 min-h-screen bg-gray-50 flex">
+      <div className="flex-1 min-h-screen bg-background flex">
         {userRole !== 'org_admin' && (
-          <div className="w-80 border-r bg-white">
+          <div className="w-80 border-r bg-card">
             <ChatSidebar
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
