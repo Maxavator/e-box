@@ -45,12 +45,15 @@ export const useUserRole = () => {
 
       if (error) throw error;
       
+      // If no role is found, return 'user' as default role
+      if (!data) return 'user' as UserRoleType;
+      
       // Check if user has an org_admin role
-      if (data?.role === 'org_admin') {
-        return 'org_admin';
+      if (data.role === 'org_admin') {
+        return 'org_admin' as UserRoleType;
       }
       
-      return data?.role as UserRoleType;
+      return data.role as UserRoleType;
     },
     meta: {
       onError: (error: Error) => {
