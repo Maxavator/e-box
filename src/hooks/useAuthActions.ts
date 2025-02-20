@@ -13,7 +13,6 @@ interface UseAuthActionsProps {
 // Track our last request time
 let lastRequestTime = 0;
 const MIN_REQUEST_INTERVAL = 2000; // 2 seconds between requests
-const MAX_RETRIES = 2;
 
 export const useAuthActions = ({
   email,
@@ -38,75 +37,66 @@ export const useAuthActions = ({
     lastRequestTime = now;
 
     setIsLoading(true);
-
-    let retryCount = 0;
     
     try {
       // Transform SA ID to email format if needed
       const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
 
-      while (retryCount <= MAX_RETRIES) {
-        try {
-          // Sign in user without signing out first
-          const { data, error } = await supabase.auth.signInWithPassword({
-            email: loginEmail,
-            password,
-          });
-
-          if (error) {
-            if (error.message.includes('Invalid login credentials')) {
-              throw new Error('Invalid email or password');
-            }
-            if (error.message.includes('Email not confirmed')) {
-              throw new Error('Please verify your email address');
-            }
-            if (error.message.includes('rate limit')) {
-              throw new Error('Too many login attempts. Please wait a moment and try again.');
-            }
-            // For schema errors, retry with delay
-            if (error.message.includes('Database error querying schema')) {
-              if (retryCount < MAX_RETRIES) {
-                retryCount++;
-                await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
-                continue;
-              }
-              throw new Error('Service temporarily unavailable. Please try again in a few moments.');
-            }
-            throw error;
-          }
-
-          if (!data?.user) {
-            throw new Error('Login failed. Please try again.');
-          }
-
-          // If we get here, login was successful
-          // Fetch user role with simplified query
-          const { data: roleData } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', data.user.id)
-            .maybeSingle();
-
-          const userRole = roleData?.role || 'user';
-
-          toast.success("Login successful!");
-
-          // Navigate based on user role
-          if (userRole === 'global_admin' || userRole === 'org_admin') {
-            navigate("/admin");
-          } else {
-            navigate("/chat");
-          }
-          
-          return; // Exit successful login
-        } catch (innerError: any) {
-          if (retryCount === MAX_RETRIES) {
-            throw innerError; // Re-throw if we're out of retries
-          }
-          retryCount++;
-          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
-        }
+      // First attempt to get the current session
+      const { data: currentSession } = await supabase.auth.getSession();
+      
+      // If there's an existing session, sign out first
+      if (currentSession?.session) {
+        await supabase.auth.signOut();
       }
+
+      // Wait a moment before attempting login
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Attempt login
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password,
+      });
+
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Invalid email or password');
+        }
+        if (error.message.includes('Email not confirmed')) {
+          throw new Error('Please verify your email address');
+        }
+        if (error.message.includes('rate limit')) {
+          throw new Error('Too many login attempts. Please wait a moment and try again.');
+        }
+        if (error.message.includes('Database error querying schema')) {
+          throw new Error('Unable to connect right now. Please refresh the page and try again.');
+        }
+        throw error;
+      }
+
+      if (!data?.user) {
+        throw new Error('Login failed. Please try again.');
+      }
+
+      // Fetch user role with simplified query
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .maybeSingle();
+
+      const userRole = roleData?.role || 'user';
+
+      toast.success("Login successful!");
+
+      // Navigate based on user role
+      if (userRole === 'global_admin' || userRole === 'org_admin') {
+        navigate("/admin");
+      } else {
+        navigate("/chat");
+      }
+
     } catch (error: any) {
       const errorMessage = error?.message || "An unexpected error occurred";
       toast.error(errorMessage);
