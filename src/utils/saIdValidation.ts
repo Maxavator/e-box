@@ -1,8 +1,11 @@
 
 import { TEST_ACCOUNTS } from "@/constants/auth";
 
-export const isTestAccount = (id: string) => {
-  return Object.values(TEST_ACCOUNTS).includes(id);
+type TestAccountValues = typeof TEST_ACCOUNTS[keyof typeof TEST_ACCOUNTS];
+
+export const isTestAccount = (id: string): id is TestAccountValues => {
+  const testValues = Object.values(TEST_ACCOUNTS) as TestAccountValues[];
+  return testValues.includes(id as TestAccountValues);
 };
 
 export const isSaId = (input: string) => {
