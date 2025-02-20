@@ -7,7 +7,7 @@ import { LookupTools } from "@/components/admin/dashboard/LookupTools";
 import { StatsCards } from "@/components/admin/dashboard/StatsCards";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
-import { OrganizationManagement } from "@/components/admin/OrganizationManagement";
+import OrganizationManagement from "@/components/admin/OrganizationManagement";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link2 } from "lucide-react";
