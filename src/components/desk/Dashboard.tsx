@@ -12,13 +12,30 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { MainLayout } from "@/components/shared/MainLayout";
+import { ChatSidebar } from "@/components/chat/ChatSidebar";
+import { useChat } from "@/hooks/use-chat";
 
 export const Dashboard = () => {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const navigate = useNavigate();
   const { userRole } = useUserRole();
+  const {
+    searchQuery,
+    setSearchQuery,
+    activeTab,
+    setActiveTab,
+    calendarView,
+    setCalendarView,
+    selectedConversation,
+    filteredConversations,
+    handleSelectConversation,
+  } = useChat();
+
+  const handleCalendarActionClick = (view: 'calendar' | 'inbox') => {
+    setCalendarView(view);
+    setActiveTab('calendar');
+  };
 
   const renderFeature = () => {
     switch (currentView) {
@@ -264,23 +281,39 @@ export const Dashboard = () => {
 
   return (
     <MainLayout>
-      <div className="flex-1 min-h-screen bg-gray-50">
-        <header className="h-16 bg-white border-b px-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-sm text-gray-500">System Overview</p>
+      <div className="flex-1 min-h-screen bg-gray-50 flex">
+        {userRole !== 'org_admin' && (
+          <div className="w-80 border-r bg-white">
+            <ChatSidebar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              conversations={filteredConversations}
+              selectedConversation={selectedConversation}
+              onSelectConversation={handleSelectConversation}
+              onCalendarActionClick={handleCalendarActionClick}
+            />
           </div>
-          {currentView !== 'dashboard' && (
-            <button
-              onClick={() => setCurrentView('dashboard')}
-              className="text-sm text-primary hover:text-primary/80 transition-colors"
-            >
-              Back to Dashboard
-            </button>
-          )}
-        </header>
+        )}
+        <div className="flex-1">
+          <header className="h-16 bg-white border-b px-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-sm text-gray-500">System Overview</p>
+            </div>
+            {currentView !== 'dashboard' && (
+              <button
+                onClick={() => setCurrentView('dashboard')}
+                className="text-sm text-primary hover:text-primary/80 transition-colors"
+              >
+                Back to Dashboard
+              </button>
+            )}
+          </header>
 
-        {renderFeature()}
+          {renderFeature()}
+        </div>
       </div>
     </MainLayout>
   );
