@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { MainLayout } from "@/components/shared/MainLayout";
@@ -20,7 +20,7 @@ import { toast } from "sonner";
 export const Dashboard = () => {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const navigate = useNavigate();
-  const { userRole, isLoading: isRoleLoading } = useUserRole();
+  const { userRole, isLoading: isRoleLoading, error: roleError } = useUserRole();
   const {
     searchQuery,
     setSearchQuery,
@@ -33,7 +33,12 @@ export const Dashboard = () => {
     handleSelectConversation,
   } = useChat();
 
-  // Show loading state while checking user role
+  useEffect(() => {
+    if (!isRoleLoading && userRole === 'staff') {
+      navigate('/chat');
+    }
+  }, [userRole, isRoleLoading, navigate]);
+
   if (isRoleLoading) {
     return (
       <MainLayout>
@@ -44,10 +49,15 @@ export const Dashboard = () => {
     );
   }
 
-  // Redirect staff users to chat
-  if (userRole === 'staff') {
-    navigate('/chat');
-    return null;
+  if (roleError) {
+    console.error('Role error:', roleError);
+    return (
+      <MainLayout>
+        <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
+          <div className="text-red-500">Error loading dashboard. Please try again.</div>
+        </div>
+      </MainLayout>
+    );
   }
 
   const handleNavigation = (route: string) => {
@@ -134,6 +144,17 @@ export const Dashboard = () => {
         return renderDashboard();
     }
   };
+
+  // Only render the main dashboard content if we have a valid role
+  if (!userRole) {
+    return (
+      <MainLayout>
+        <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
+          <div className="text-red-500">Access denied. Please log in again.</div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
