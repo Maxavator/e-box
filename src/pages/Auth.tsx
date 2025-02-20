@@ -3,6 +3,7 @@ import { useState } from "react";
 import HeroSection from "@/components/auth/HeroSection";
 import LoginForm from "@/components/auth/LoginForm";
 import DemoRequestDialog from "@/components/auth/DemoRequestDialog";
+import { OrganizationUsersList } from "@/components/admin/OrganizationUsersList";
 
 const Auth = () => {
   const [isDemoDialogOpen, setIsDemoDialogOpen] = useState(false);
@@ -21,6 +22,9 @@ const Auth = () => {
           </div>
         </div>
         <LoginForm onRequestDemo={() => setIsDemoDialogOpen(true)} />
+        <div className="w-full max-w-md mt-8 px-4">
+          <OrganizationUsersList />
+        </div>
       </div>
       <DemoRequestDialog 
         open={isDemoDialogOpen} 
