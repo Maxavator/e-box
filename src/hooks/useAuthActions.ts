@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { isSaId, formatSaIdPassword, isTestAccount } from "@/utils/saIdValidation";
+import { isSaId, formatSaIdPassword, isTestAccount, validateSaId } from "@/utils/saIdValidation";
 
 interface UseAuthActionsProps {
   email: string;

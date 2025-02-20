@@ -2,7 +2,7 @@
 import { TEST_ACCOUNTS } from "@/constants/auth";
 
 export const isTestAccount = (id: string) => {
-  return Object.values(TEST_ACCOUNTS).includes(id);
+  return Object.values(TEST_ACCOUNTS).includes(id as keyof typeof TEST_ACCOUNTS);
 };
 
 export const validateSaId = (id: string) => {
