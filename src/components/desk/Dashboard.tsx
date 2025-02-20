@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, MessageSquare, ArrowUpRight, FileText, Calendar, Megaphone, ShieldCheck } from "lucide-react";
 import { Documents } from "@/components/desk/Documents";
@@ -13,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 export const Dashboard = () => {
   const [currentView, setCurrentView] = useState<string>('dashboard');
@@ -243,24 +243,26 @@ export const Dashboard = () => {
   );
 
   return (
-    <div className="flex-1 min-h-screen bg-gray-50">
-      <header className="h-16 bg-white border-b px-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500">System Overview</p>
-        </div>
-        {currentView !== 'dashboard' && (
-          <button
-            onClick={() => setCurrentView('dashboard')}
-            className="text-sm text-primary hover:text-primary/80 transition-colors"
-          >
-            Back to Dashboard
-          </button>
-        )}
-      </header>
+    <MainLayout>
+      <div className="flex-1 min-h-screen bg-gray-50">
+        <header className="h-16 bg-white border-b px-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-sm text-gray-500">System Overview</p>
+          </div>
+          {currentView !== 'dashboard' && (
+            <button
+              onClick={() => setCurrentView('dashboard')}
+              className="text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              Back to Dashboard
+            </button>
+          )}
+        </header>
 
-      {renderFeature()}
-    </div>
+        {renderFeature()}
+      </div>
+    </MainLayout>
   );
 };
 
