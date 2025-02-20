@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { MainLayout } from "@/components/layout/MainLayout";
+import { MainLayout } from "@/components/shared/MainLayout";
 
 export const Dashboard = () => {
   const [currentView, setCurrentView] = useState<string>('dashboard');
