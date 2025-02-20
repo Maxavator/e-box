@@ -9,7 +9,7 @@ export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { handleLogin, handleSignUp } = useAuthActions({
+  const { handleLogin } = useAuthActions({
     email,
     password,
     setIsLoading,
@@ -23,6 +23,5 @@ export const useAuth = () => {
     setPassword,
     isLoading,
     handleLogin,
-    handleSignUp,
   };
 };

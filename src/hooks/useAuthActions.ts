@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { isSaId, formatSaIdPassword, isTestAccount, validateSaId } from "@/utils/saIdValidation";
+import { isSaId, formatSaIdPassword, isTestAccount } from "@/utils/saIdValidation";
 
 interface UseAuthActionsProps {
   email: string;
@@ -70,79 +70,7 @@ export const useAuthActions = ({
     }
   };
 
-  const handleSignUp = async () => {
-    if (!email || !password) {
-      toast.error("Please enter both email/SA ID and password");
-      return;
-    }
-
-    if (isSaId(email)) {
-      if (!validateSaId(email)) {
-        toast.error("Please enter a valid 13-digit SA ID number");
-        return;
-      }
-    } else if (password.length < 6) {
-      toast.error("Password must be at least 6 characters long");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      let signUpResult;
-      
-      if (isSaId(email)) {
-        const saIdPassword = formatSaIdPassword(email);
-        signUpResult = await supabase.auth.signUp({
-          email: `${email}@said.auth`,
-          password: saIdPassword,
-          options: {
-            data: {
-              sa_id: email,
-            }
-          }
-        });
-      } else {
-        signUpResult = await supabase.auth.signUp({
-          email,
-          password,
-        });
-      }
-
-      if (signUpResult.error) {
-        if (signUpResult.error.message.includes('already registered')) {
-          toast.error("This account already exists. Please try logging in instead.");
-        } else {
-          toast.error(signUpResult.error.message);
-        }
-        return;
-      }
-
-      if (signUpResult.data.user) {
-        if (isSaId(email)) {
-          toast.success("Registration successful with SA ID!");
-          // Attempt immediate login after SA ID registration
-          const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-            email: `${email}@said.auth`,
-            password: formatSaIdPassword(email),
-          });
-          
-          if (loginData.session) {
-            navigate("/admin");
-          }
-        } else {
-          toast.success("Registration successful! Please check your email to confirm your account.");
-        }
-      }
-    } catch (error: any) {
-      console.error('Signup error:', error);
-      toast.error(error.message || "An unexpected error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return {
     handleLogin,
-    handleSignUp,
   };
 };

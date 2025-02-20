@@ -17,7 +17,6 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
     setPassword,
     isLoading,
     handleLogin,
-    handleSignUp,
   } = useAuth();
 
   return (
@@ -46,15 +45,6 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
                 disabled={isLoading}
               >
                 {isLoading ? "Loading..." : "Login"}
-              </Button>
-              <Button 
-                type="button" 
-                variant="outline"
-                className="w-full"
-                onClick={handleSignUp}
-                disabled={isLoading}
-              >
-                Sign Up
               </Button>
             </div>
           </form>
