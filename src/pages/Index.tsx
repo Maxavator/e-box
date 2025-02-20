@@ -23,8 +23,8 @@ const Index = () => {
             setStatus("Welcome back! Redirecting you to admin portal...");
             setTimeout(() => navigate('/admin'), 1000);
           } else {
-            setStatus("Welcome back! Taking you to your dashboard...");
-            setTimeout(() => navigate('/dashboard'), 1000);
+            setStatus("Welcome back! Taking you to your messages...");
+            setTimeout(() => navigate('/chat'), 1000);
           }
         }
       } else if (!isLoading) {
