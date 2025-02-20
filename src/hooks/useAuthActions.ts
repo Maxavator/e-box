@@ -29,18 +29,43 @@ export const useAuthActions = ({
       let signInResult;
       
       if (isSaId(email)) {
-        // For test accounts, use the exact formatted password
+        const formattedEmail = `${email}@said.auth`;
         const expectedPassword = formatSaIdPassword(email);
+
+        // For test accounts, verify the exact password
         if (isTestAccount(email) && password !== expectedPassword) {
           toast.error(`For test account ${email}, use password: ${expectedPassword}`);
           setIsLoading(false);
           return;
         }
 
+        // First try to sign in
         signInResult = await supabase.auth.signInWithPassword({
-          email: `${email}@said.auth`,
-          password: formatSaIdPassword(email), // Always use formatted password for SA ID
+          email: formattedEmail,
+          password: expectedPassword,
         });
+
+        // If sign in fails due to no user, create the account for test accounts
+        if (signInResult.error && isTestAccount(email)) {
+          console.log('Attempting to create test account...');
+          const signUpResult = await supabase.auth.signUp({
+            email: formattedEmail,
+            password: expectedPassword,
+          });
+
+          if (signUpResult.error) {
+            console.error('Sign up error:', signUpResult.error);
+            toast.error("Failed to create test account");
+            setIsLoading(false);
+            return;
+          }
+
+          // Try signing in again after creating the account
+          signInResult = await supabase.auth.signInWithPassword({
+            email: formattedEmail,
+            password: expectedPassword,
+          });
+        }
       } else {
         signInResult = await supabase.auth.signInWithPassword({
           email,
