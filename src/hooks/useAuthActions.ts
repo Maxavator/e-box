@@ -42,6 +42,9 @@ export const useAuthActions = ({
       // Transform SA ID to email format if needed
       const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
 
+      // First try to sign out to clear any problematic session state
+      await supabase.auth.signOut();
+
       // Sign in user
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
@@ -49,6 +52,11 @@ export const useAuthActions = ({
       });
 
       if (error) {
+        // Handle specific database schema error
+        if (error.message.includes('Database error querying schema')) {
+          console.error('Database schema error:', error);
+          throw new Error('Unable to connect to the authentication service. Please try again in a moment.');
+        }
         if (error.message.includes('Invalid login credentials')) {
           throw new Error('Invalid email or password');
         }
@@ -65,7 +73,13 @@ export const useAuthActions = ({
         throw new Error('Login failed. Please try again.');
       }
 
-      // Fetch user role
+      // Get the session to ensure it's properly established
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session) {
+        throw new Error('Failed to establish session. Please try logging in again.');
+      }
+
+      // Fetch user role with simplified query
       const { data: roleData } = await supabase
         .from('user_roles')
         .select('role')
@@ -87,6 +101,9 @@ export const useAuthActions = ({
       const errorMessage = error?.message || "An unexpected error occurred";
       toast.error(errorMessage);
       console.error('Login error:', error);
+      
+      // Clear any problematic session state on error
+      await supabase.auth.signOut();
     } finally {
       setIsLoading(false);
     }
