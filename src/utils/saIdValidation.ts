@@ -9,8 +9,3 @@ export const isSaId = (input: string): boolean => {
 export const formatSaIdPassword = (saId: string): string => {
   return `Test${saId}`;
 };
-
-// Function to check if it's a test account
-export const isTestAccount = (saId: string): boolean => {
-  return ["0000000000000", "1111111111111", "2222222222222"].includes(saId);
-};
