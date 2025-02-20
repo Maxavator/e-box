@@ -9,7 +9,9 @@ interface UserWithRoles {
   id: string;
   first_name: string | null;
   last_name: string | null;
-  user_roles: { role: UserRole['role'] }[];
+  user_roles: {
+    role: UserRole['role'];
+  }[];
 }
 
 export const OrganizationUsersList = () => {
@@ -32,20 +34,34 @@ export const OrganizationUsersList = () => {
     queryFn: async () => {
       if (!organizationData?.id) return [];
       
-      const { data, error } = await supabase
+      // First get all profiles for the organization
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select(`
           id,
           first_name,
-          last_name,
-          user_roles (
-            role
-          )
+          last_name
         `)
         .eq('organization_id', organizationData.id);
-      
-      if (error) throw error;
-      return data as UserWithRoles[];
+
+      if (profilesError) throw profilesError;
+
+      // Then get their roles
+      const usersWithRoles = await Promise.all((profiles || []).map(async (profile) => {
+        const { data: userRoles, error: rolesError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', profile.id);
+
+        if (rolesError) throw rolesError;
+
+        return {
+          ...profile,
+          user_roles: userRoles || []
+        } as UserWithRoles;
+      }));
+
+      return usersWithRoles;
     },
     enabled: !!organizationData?.id,
   });
