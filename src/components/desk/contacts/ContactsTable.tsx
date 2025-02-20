@@ -24,8 +24,17 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
   const navigate = useNavigate();
 
   const filteredContacts = contacts?.filter(contact => {
-    const fullName = `${contact.contact.first_name} ${contact.contact.last_name}`.toLowerCase();
-    return fullName.includes(searchQuery.toLowerCase());
+    const searchLower = searchQuery.toLowerCase();
+    const firstName = (contact.contact.first_name || '').toLowerCase();
+    const lastName = (contact.contact.last_name || '').toLowerCase();
+    const fullName = `${firstName} ${lastName}`.toLowerCase();
+    
+    // Search in individual fields and combined full name
+    return (
+      firstName.includes(searchLower) ||
+      lastName.includes(searchLower) ||
+      fullName.includes(searchLower)
+    );
   });
 
   const handleStartChat = async (contactId: string) => {
@@ -78,7 +87,7 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
         ) : filteredContacts?.length === 0 ? (
           <TableRow>
             <TableCell colSpan={3} className="text-center text-muted-foreground">
-              No contacts found. Try adding some from your organization!
+              No contacts found. Try a different search term or add some contacts from your organization!
             </TableCell>
           </TableRow>
         ) : (
