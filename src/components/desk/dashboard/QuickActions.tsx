@@ -15,36 +15,36 @@ export const QuickActions = ({ onActionClick }: QuickActionsProps) => {
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button 
-            className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
+            className="p-4 border rounded-lg hover:bg-muted/50 transition-colors text-left dark:hover:bg-muted"
             onClick={() => onActionClick('documents')}
           >
             <FileText className="w-5 h-5 mb-2 text-blue-600" />
             <p className="font-medium">Documents</p>
-            <p className="text-sm text-gray-500">Access files</p>
+            <p className="text-sm text-muted-foreground">Access files</p>
           </button>
           <button 
-            className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
+            className="p-4 border rounded-lg hover:bg-muted/50 transition-colors text-left dark:hover:bg-muted"
             onClick={() => onActionClick('calendar')}
           >
             <Calendar className="w-5 h-5 mb-2 text-green-600" />
             <p className="font-medium">Calendar</p>
-            <p className="text-sm text-gray-500">View schedule</p>
+            <p className="text-sm text-muted-foreground">View schedule</p>
           </button>
           <button 
-            className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
-            onClick={() => onActionClick('contacts')}
-          >
-            <Users className="w-5 h-5 mb-2 text-orange-600" />
-            <p className="font-medium">Contacts</p>
-            <p className="text-sm text-gray-500">View directory</p>
-          </button>
-          <button 
-            className="p-4 border rounded-lg hover:bg-gray-50 transition-colors text-left"
-            onClick={() => onActionClick('messages')}
+            className="p-4 border rounded-lg hover:bg-muted/50 transition-colors text-left dark:hover:bg-muted"
+            onClick={() => onActionClick('chat')}
           >
             <MessageSquare className="w-5 h-5 mb-2 text-rose-600" />
             <p className="font-medium">Messages</p>
-            <p className="text-sm text-gray-500">View messages</p>
+            <p className="text-sm text-muted-foreground">View messages</p>
+          </button>
+          <button 
+            className="p-4 border rounded-lg hover:bg-muted/50 transition-colors text-left dark:hover:bg-muted"
+            onClick={() => onActionClick('profile')}
+          >
+            <Users className="w-5 h-5 mb-2 text-orange-600" />
+            <p className="font-medium">Profile</p>
+            <p className="text-sm text-muted-foreground">View settings</p>
           </button>
         </div>
       </CardContent>

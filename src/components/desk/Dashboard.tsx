@@ -94,7 +94,8 @@ export const Dashboard = () => {
       case 'policies':
         return <Policies />;
       case 'messages':
-        return <PartnerMessages />;
+        navigate('/chat');
+        return null;
       case 'settings':
         navigate('/profile');
         return null;
