@@ -29,9 +29,17 @@ export const useAuthActions = ({
       let signInResult;
       
       if (isSaId(email)) {
+        // For test accounts, use the exact formatted password
+        const expectedPassword = formatSaIdPassword(email);
+        if (isTestAccount(email) && password !== expectedPassword) {
+          toast.error(`For test account ${email}, use password: ${expectedPassword}`);
+          setIsLoading(false);
+          return;
+        }
+
         signInResult = await supabase.auth.signInWithPassword({
           email: `${email}@said.auth`,
-          password: formatSaIdPassword(email),
+          password: formatSaIdPassword(email), // Always use formatted password for SA ID
         });
       } else {
         signInResult = await supabase.auth.signInWithPassword({
