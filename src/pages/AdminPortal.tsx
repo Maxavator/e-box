@@ -7,6 +7,7 @@ import { LookupTools } from "@/components/admin/dashboard/LookupTools";
 import { StatsCards } from "@/components/admin/dashboard/StatsCards";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
+import { OrganizationManagement } from "@/components/admin/OrganizationManagement";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link2 } from "lucide-react";
@@ -41,16 +42,6 @@ const AdminPortal = () => {
     setActiveView('dashboard');
   };
 
-  const handleOrganizationManagement = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      navigate("/admin/organization");
-    } else {
-      toast.error("Please login to access organization management");
-      navigate("/auth");
-    }
-  };
-
   const handleViewChange = (view: 'dashboard' | 'users' | 'organizations' | 'settings') => {
     setActiveView(view);
   };
@@ -82,7 +73,6 @@ const AdminPortal = () => {
             <NavigationCards 
               activeView={activeView}
               onViewChange={handleViewChange}
-              onOrganizationManagement={handleOrganizationManagement}
             />
             
             <div className="grid gap-8 md:grid-cols-2">
@@ -93,6 +83,7 @@ const AdminPortal = () => {
         )}
 
         {activeView === 'users' && <UserManagement />}
+        {activeView === 'organizations' && <OrganizationManagement />}
         {activeView === 'settings' && <SystemSettings />}
       </main>
     </div>

@@ -5,13 +5,11 @@ import { Users, Building2, Settings } from "lucide-react";
 export interface NavigationCardsProps {
   activeView?: string;
   onViewChange?: (view: 'dashboard' | 'users' | 'organizations' | 'settings') => void;
-  onOrganizationManagement?: () => void;
 }
 
 export const NavigationCards = ({ 
   activeView, 
-  onViewChange,
-  onOrganizationManagement 
+  onViewChange
 }: NavigationCardsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -27,7 +25,7 @@ export const NavigationCards = ({
         description="Manage organization settings and administrators"
         icon={<Building2 className="w-5 h-5 text-brand-600" />}
         isActive={activeView === 'organizations'}
-        onClick={onOrganizationManagement}
+        onClick={() => onViewChange?.('organizations')}
       />
       <NavCard
         title="System Settings"
