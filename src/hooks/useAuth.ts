@@ -9,12 +9,20 @@ export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { handleLogin } = useAuthActions({
+  const { handleLogin: handleLoginAction } = useAuthActions({
     email,
     password,
     setIsLoading,
     navigate,
   });
+
+  const handleLogin = async () => {
+    try {
+      await handleLoginAction();
+    } catch (error) {
+      console.error("Login error:", error);
+    }
+  };
 
   return {
     email,

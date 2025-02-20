@@ -19,6 +19,11 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
     handleLogin,
   } = useAuth();
 
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await handleLogin();
+  };
+
   return (
     <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col items-center justify-center bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-sm">
       <Card className="w-full max-w-md animate-fadeIn shadow-xl hover:shadow-2xl transition-shadow duration-300 border-primary/10">
@@ -31,7 +36,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-4">
             <LoginFormFields
               email={email}
               setEmail={setEmail}
