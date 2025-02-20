@@ -123,7 +123,7 @@ export function ChatSidebar({
           placeholder="Search messages and contacts..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full bg-secondary"
+          className="w-full bg-white border-input focus-visible:ring-1"
         />
       </div>
       
