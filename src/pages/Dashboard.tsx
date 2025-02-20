@@ -1,33 +1,86 @@
 
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Users, Building2, MessageSquare, ArrowUpRight, 
-  Activity, LineChart, Clock, CheckCircle2 
+  Activity, LineChart, Clock, CheckCircle2,
+  FileText, Calendar, User, Settings,
+  MessageCircle
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useUserRole } from "@/components/admin/hooks/useUserRole";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { NavigationCards } from "@/components/admin/dashboard/NavigationCards";
+import { toast } from "sonner";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const { isAdmin, userRole, isLoading } = useUserRole();
+  const [userName, setUserName] = useState("User");
+  const [lastUpdate, setLastUpdate] = useState("5 mins ago");
+
+  const refreshData = () => {
+    setLastUpdate("Just now");
+    toast.success("Dashboard data refreshed");
+  };
+
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'documents':
+        navigate('/documents');
+        break;
+      case 'calendar':
+        navigate('/calendar');
+        break;
+      case 'messages':
+        navigate('/chat');
+        break;
+      case 'profile':
+        navigate('/profile');
+        break;
+      default:
+        navigate(`/${action}`);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 min-h-screen bg-background">
       <header className="h-16 bg-card border-b px-8 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Welcome back, John</p>
+          <p className="text-sm text-muted-foreground">
+            Welcome back, {userName}
+            {isAdmin && " (Admin)"}
+          </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="w-4 h-4" />
-            <span>Last updated: 5 mins ago</span>
+            <span>Last updated: {lastUpdate}</span>
           </div>
-          <button className="text-sm text-primary hover:text-primary/80 transition-colors">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={refreshData}
+            className="text-sm text-primary hover:text-primary/80 transition-colors"
+          >
             Refresh Data
-          </button>
+          </Button>
         </div>
       </header>
 
-      <div className="p-8">
-        {/* Statistics Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="p-8 space-y-8">
+        {/* Stats Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             title="Total Users"
             value="2,834"
@@ -37,15 +90,15 @@ const Dashboard = () => {
             trend="12"
           />
           <StatsCard
-            title="Active Organizations"
-            value="147"
-            change="+12"
+            title={isAdmin ? "Active Organizations" : "Team Members"}
+            value={isAdmin ? "147" : "24"}
+            change={isAdmin ? "+12" : "+3"}
             period="this month"
             icon={<Building2 className="w-4 h-4" />}
             trend="8"
           />
           <StatsCard
-            title="Messages Sent"
+            title="Messages"
             value="92.5k"
             change="+15.2k"
             period="this month"
@@ -53,20 +106,61 @@ const Dashboard = () => {
             trend="24"
           />
           <StatsCard
-            title="System Uptime"
-            value="99.9%"
-            change="+0.2"
+            title={isAdmin ? "System Uptime" : "Tasks Completed"}
+            value={isAdmin ? "99.9%" : "85%"}
+            change={isAdmin ? "+0.2" : "+15"}
             period="Last 30 days"
             icon={<Activity className="w-4 h-4" />}
             trend="0.2"
           />
         </div>
 
-        {/* Activity Charts Section */}
+        {/* Admin Navigation Cards */}
+        {isAdmin && (
+          <div className="border-t pt-8">
+            <h2 className="text-lg font-semibold mb-6">Admin Tools</h2>
+            <NavigationCards />
+          </div>
+        )}
+
+        {/* Quick Actions */}
+        {!isAdmin && (
+          <div>
+            <h2 className="text-lg font-semibold mb-6">Quick Actions</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <QuickActionCard
+                title="Documents"
+                description="Access your files"
+                icon={<FileText className="w-5 h-5" />}
+                onClick={() => handleQuickAction('documents')}
+              />
+              <QuickActionCard
+                title="Calendar"
+                description="View schedule"
+                icon={<Calendar className="w-5 h-5" />}
+                onClick={() => handleQuickAction('calendar')}
+              />
+              <QuickActionCard
+                title="Messages"
+                description="Chat with team"
+                icon={<MessageCircle className="w-5 h-5" />}
+                onClick={() => handleQuickAction('messages')}
+              />
+              <QuickActionCard
+                title="Profile"
+                description="Update settings"
+                icon={<User className="w-5 h-5" />}
+                onClick={() => handleQuickAction('profile')}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Activity Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="border shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-semibold">User Activity</CardTitle>
+              <CardTitle className="text-lg font-semibold">Activity Overview</CardTitle>
               <LineChart className="w-5 h-5 text-muted-foreground" />
             </CardHeader>
             <CardContent className="p-6">
@@ -95,7 +189,7 @@ const Dashboard = () => {
                 {recentTasks.map((task, index) => (
                   <div 
                     key={index}
-                    className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors mb-2"
+                    className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors mb-2 cursor-pointer"
                   >
                     <div className={`w-2 h-2 mt-2 rounded-full ${task.statusColor}`} />
                     <div>
@@ -144,6 +238,30 @@ const StatsCard = ({ title, value, change, period, icon, trend }: StatsCardProps
       </div>
       <p className="text-xs text-muted-foreground mt-1">{change} {period}</p>
     </CardContent>
+  </Card>
+);
+
+interface QuickActionCardProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+}
+
+const QuickActionCard = ({ title, description, icon, onClick }: QuickActionCardProps) => (
+  <Card 
+    className="cursor-pointer hover:shadow-md transition-shadow"
+    onClick={onClick}
+  >
+    <CardHeader className="flex flex-row items-start gap-4 pb-2">
+      <div className="p-2 bg-primary/10 rounded-lg">
+        {icon}
+      </div>
+      <div>
+        <CardTitle className="text-base">{title}</CardTitle>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </div>
+    </CardHeader>
   </Card>
 );
 
