@@ -18,11 +18,11 @@ export const LoginFormFields = ({
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">Email or SA ID Number</Label>
         <Input
           id="email"
-          type="email"
-          placeholder="Enter your email"
+          type="text"
+          placeholder="Enter your email or SA ID number"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full focus:ring-primary"
