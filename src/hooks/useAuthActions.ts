@@ -42,56 +42,66 @@ export const useAuthActions = ({
       // Transform SA ID to email format if needed
       const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
 
-      // Attempt login directly without session check
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // First clear any existing session
+      await supabase.auth.signOut();
+      
+      // Small delay to ensure session is cleared
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Attempt login
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password,
       });
 
-      if (error) {
+      if (authError) {
         console.error('Auth error details:', {
-          message: error.message,
-          status: error.status,
-          name: error.name
+          message: authError.message,
+          status: authError.status,
+          name: authError.name
         });
         
-        if (error.message.includes('Invalid login credentials')) {
+        if (authError.message.includes('Invalid login credentials')) {
           throw new Error('Invalid email or password');
         }
-        if (error.message.includes('Email not confirmed')) {
+        if (authError.message.includes('Email not confirmed')) {
           throw new Error('Please verify your email address');
         }
-        if (error.message.includes('rate limit')) {
+        if (authError.message.includes('rate limit')) {
           throw new Error('Too many login attempts. Please wait a moment and try again.');
         }
-        throw new Error('Authentication failed. Please check your credentials and try again.');
-      }
-
-      if (!data?.user) {
+        if (authError.message.includes('Database error querying schema')) {
+          throw new Error('Connection error. Please try again.');
+        }
         throw new Error('Login failed. Please try again.');
       }
 
-      // Success! Now fetch the user role
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', data.user.id)
-        .limit(1)
-        .single();
-
-      if (roleError) {
-        console.error('Role fetch error:', roleError);
-        // Continue with default role if role fetch fails
+      if (!data?.user) {
+        throw new Error('No user data received. Please try again.');
       }
 
-      const userRole = roleData?.role || 'user';
-      
-      toast.success("Login successful!");
+      try {
+        // Attempt to fetch user role
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', data.user.id)
+          .single();
 
-      // Navigate based on user role
-      if (userRole === 'global_admin' || userRole === 'org_admin') {
-        navigate("/admin");
-      } else {
+        const userRole = roleData?.role || 'user';
+        
+        toast.success("Login successful!");
+
+        // Navigate based on user role
+        if (userRole === 'global_admin' || userRole === 'org_admin') {
+          navigate("/admin");
+        } else {
+          navigate("/chat");
+        }
+      } catch (roleError) {
+        console.error('Role fetch error:', roleError);
+        // If role fetch fails, navigate to default route
+        toast.success("Login successful!");
         navigate("/chat");
       }
 
