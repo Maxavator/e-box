@@ -40,7 +40,7 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
         >
           <img 
             src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
-            alt="Logo" 
+            alt="e-Box by Afrovation" 
             className="h-8"
           />
         </button>
