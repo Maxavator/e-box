@@ -43,7 +43,6 @@ const handleLogin = async ({
         'Invalid login credentials': 'Invalid email or password',
         'Email not confirmed': 'Please verify your email address',
         'Rate limit exceeded': 'Too many login attempts. Please wait a moment',
-        'Database error': 'Service temporarily unavailable. Please try again',
       };
 
       const errorMessage = errorMap[Object.keys(errorMap).find(key => error.message.includes(key)) || ''] 
@@ -56,29 +55,38 @@ const handleLogin = async ({
       throw new Error('Login failed. Please try again.');
     }
 
-    // Get user role from user_roles table
-    const { data: roleData, error: roleError } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', data.user.id)
-      .maybeSingle();
+    try {
+      // Get user role from user_roles table
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .maybeSingle();
 
-    if (roleError) {
+      if (roleError) {
+        console.error('Role fetch error:', roleError);
+        // Continue with default role if there's an error
+        toast.success("Login successful!");
+        navigate("/chat");
+        return;
+      }
+
+      // Default to 'user' if no role is found
+      const userRole: UserRoleType = roleData?.role || 'user';
+      console.log('Role fetched:', userRole);
+      
+      toast.success("Login successful!");
+
+      // Navigate based on user role
+      if (userRole === 'global_admin' || userRole === 'org_admin') {
+        navigate("/admin");
+      } else {
+        navigate("/chat");
+      }
+    } catch (roleError) {
+      // If role fetch fails, continue with default navigation
       console.error('Role fetch error:', roleError);
-      toast.error("Error fetching user role. Please try again.");
-      return;
-    }
-
-    // Default to 'user' if no role is found
-    const userRole: UserRoleType = roleData?.role || 'user';
-    console.log('Role fetched:', userRole);
-    
-    toast.success("Login successful!");
-
-    // Navigate based on user role
-    if (userRole === 'global_admin' || userRole === 'org_admin') {
-      navigate("/admin");
-    } else {
+      toast.success("Login successful!");
       navigate("/chat");
     }
 
