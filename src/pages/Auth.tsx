@@ -1,12 +1,62 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import HeroSection from "@/components/auth/HeroSection";
 import LoginForm from "@/components/auth/LoginForm";
 import DemoRequestDialog from "@/components/auth/DemoRequestDialog";
 import { OrganizationUsersList } from "@/components/admin/OrganizationUsersList";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
   const [isDemoDialogOpen, setIsDemoDialogOpen] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        // Fetch user role
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        // Navigate based on role
+        if (roleData?.role === 'global_admin' || roleData?.role === 'org_admin') {
+          navigate('/admin');
+        } else {
+          navigate('/chat');
+        }
+      }
+    };
+
+    checkSession();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+
+          if (roleData?.role === 'global_admin' || roleData?.role === 'org_admin') {
+            navigate('/admin');
+          } else {
+            navigate('/chat');
+          }
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row items-stretch bg-gradient-to-b from-brand-50 to-background">

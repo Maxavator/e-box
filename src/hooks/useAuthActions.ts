@@ -26,14 +26,11 @@ const handleLogin = async ({
   console.log('Starting login process...');
 
   try {
+    // First sign out to ensure clean state
+    await supabase.auth.signOut();
+    
     // Transform SA ID to email format if needed
     const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
-
-    // First check if we have an existing session
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      await supabase.auth.signOut();
-    }
 
     // Attempt login
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -43,32 +40,36 @@ const handleLogin = async ({
 
     if (error) {
       console.error('Auth error:', error);
-      throw new Error(error.message);
+      throw error;
     }
 
     if (!data?.user) {
       throw new Error('No user data returned');
     }
 
-    // Get user role
+    console.log('Successfully authenticated user:', data.user.id);
+
+    // Fetch user role with error handling
     const { data: roleData, error: roleError } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', data.user.id)
-      .single();
+      .maybeSingle();
 
-    if (roleError && !roleError.message.includes('no rows returned')) {
+    if (roleError) {
       console.error('Role fetch error:', roleError);
-      throw new Error('Error fetching user role');
+      // Default to chat route if role fetch fails
+      toast.success("Login successful!");
+      navigate("/chat");
+      return;
     }
 
-    // Default to 'user' if no role is found
-    const userRole: UserRoleType = (roleData?.role as UserRoleType) || 'user';
-    console.log('Role fetched:', userRole);
-    
+    const userRole = roleData?.role as UserRoleType || 'user';
+    console.log('User role:', userRole);
+
     toast.success("Login successful!");
 
-    // Navigate based on user role
+    // Navigate based on role
     if (userRole === 'global_admin' || userRole === 'org_admin') {
       navigate("/admin");
     } else {
@@ -77,16 +78,18 @@ const handleLogin = async ({
 
   } catch (error: any) {
     console.error('Login error:', error);
-    let errorMessage = 'Login failed. Please try again.';
+    
+    // Map error messages to user-friendly versions
+    const errorMessages: Record<string, string> = {
+      'Invalid login credentials': 'Invalid email or password',
+      'Email not confirmed': 'Please verify your email address',
+      'Rate limit exceeded': 'Too many attempts. Please try again later',
+      'Service unavailable': 'Service temporarily unavailable. Please try again'
+    };
 
-    // Map common error messages to user-friendly versions
-    if (error.message.includes('Invalid login credentials')) {
-      errorMessage = 'Invalid email or password';
-    } else if (error.message.includes('Email not confirmed')) {
-      errorMessage = 'Please verify your email address';
-    } else if (error.message.includes('Rate limit exceeded')) {
-      errorMessage = 'Too many login attempts. Please wait a moment';
-    }
+    const errorMessage = errorMessages[Object.keys(errorMessages).find(key => 
+      error.message?.includes(key)
+    ) ?? ''] || 'Login failed. Please try again';
 
     toast.error(errorMessage);
   } finally {
