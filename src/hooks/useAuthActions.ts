@@ -26,9 +26,6 @@ const handleLogin = async ({
   console.log('Starting login process...');
 
   try {
-    // First sign out to ensure clean state
-    await supabase.auth.signOut();
-    
     // Transform SA ID to email format if needed
     const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
 
@@ -40,36 +37,44 @@ const handleLogin = async ({
 
     if (error) {
       console.error('Auth error:', error);
-      throw error;
+      
+      // Map Supabase errors to user-friendly messages
+      const errorMap: Record<string, string> = {
+        'Invalid login credentials': 'Invalid email or password',
+        'Email not confirmed': 'Please verify your email address',
+        'Rate limit exceeded': 'Too many login attempts. Please wait a moment',
+        'Database error': 'Service temporarily unavailable. Please try again',
+      };
+
+      const errorMessage = errorMap[Object.keys(errorMap).find(key => error.message.includes(key)) || ''] 
+        || 'Unable to connect. Please try again.';
+      
+      throw new Error(errorMessage);
     }
 
-    if (!data?.user) {
-      throw new Error('No user data returned');
+    if (!data.user) {
+      throw new Error('Login failed. Please try again.');
     }
 
-    console.log('Successfully authenticated user:', data.user.id);
-
-    // Fetch user role with error handling
+    // Get user role using the secure function
     const { data: roleData, error: roleError } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', data.user.id)
-      .maybeSingle();
+      .rpc('get_user_role', { user_id: data.user.id })
+      .single();
 
     if (roleError) {
       console.error('Role fetch error:', roleError);
-      // Default to chat route if role fetch fails
+      // Continue with default role
       toast.success("Login successful!");
       navigate("/chat");
       return;
     }
 
-    const userRole = roleData?.role as UserRoleType || 'user';
-    console.log('User role:', userRole);
-
+    const userRole = (roleData || 'user') as UserRoleType;
+    console.log('Role fetched:', userRole);
+    
     toast.success("Login successful!");
 
-    // Navigate based on role
+    // Navigate based on user role
     if (userRole === 'global_admin' || userRole === 'org_admin') {
       navigate("/admin");
     } else {
@@ -77,21 +82,9 @@ const handleLogin = async ({
     }
 
   } catch (error: any) {
-    console.error('Login error:', error);
-    
-    // Map error messages to user-friendly versions
-    const errorMessages: Record<string, string> = {
-      'Invalid login credentials': 'Invalid email or password',
-      'Email not confirmed': 'Please verify your email address',
-      'Rate limit exceeded': 'Too many attempts. Please try again later',
-      'Service unavailable': 'Service temporarily unavailable. Please try again'
-    };
-
-    const errorMessage = errorMessages[Object.keys(errorMessages).find(key => 
-      error.message?.includes(key)
-    ) ?? ''] || 'Login failed. Please try again';
-
+    const errorMessage = error?.message || "An unexpected error occurred";
     toast.error(errorMessage);
+    console.error('Login error:', error);
   } finally {
     setIsLoading(false);
   }

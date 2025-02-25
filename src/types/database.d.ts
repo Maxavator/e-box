@@ -11,7 +11,7 @@ export interface Profile extends DBTables['profiles']['Row'] {
 }
 
 export interface UserRole extends DBTables['user_roles']['Row'] {
-  role: UserRoleType;
+  role: 'global_admin' | 'org_admin' | 'staff';
 }
 
 export type LeaveType = Database['public']['Enums']['leave_type'];
