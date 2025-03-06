@@ -1,12 +1,53 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import HeroSection from "@/components/auth/HeroSection";
 import LoginForm from "@/components/auth/LoginForm";
 import DemoRequestDialog from "@/components/auth/DemoRequestDialog";
 import { OrganizationUsersList } from "@/components/admin/OrganizationUsersList";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
   const [isDemoDialogOpen, setIsDemoDialogOpen] = useState(false);
+  const navigate = useNavigate();
+
+  // Check for existing session and redirect if needed
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        // Get user role
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+          
+        const userRole = roleData?.role;
+        
+        // Redirect based on role
+        if (userRole === 'global_admin' || userRole === 'org_admin') {
+          navigate('/admin');
+        } else {
+          navigate('/chat');
+        }
+      }
+    };
+    
+    checkSession();
+    
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        checkSession();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row items-stretch bg-gradient-to-b from-brand-50 to-background">

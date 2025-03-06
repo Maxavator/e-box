@@ -26,14 +26,33 @@ const handleLogin = async ({
   console.log('Starting login process...');
 
   try {
+    // Clear any existing sessions first to avoid conflicts
+    await supabase.auth.signOut();
+    
     // Transform SA ID to email format if needed
     const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
 
-    // Attempt login
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: loginEmail,
-      password,
-    });
+    // Attempt login with retry logic
+    let attempts = 0;
+    const maxAttempts = 2;
+    let loginResult;
+    
+    while (attempts < maxAttempts) {
+      try {
+        loginResult = await supabase.auth.signInWithPassword({
+          email: loginEmail,
+          password,
+        });
+        break; // If successful, exit the retry loop
+      } catch (retryError) {
+        console.log(`Login attempt ${attempts + 1} failed, retrying...`);
+        attempts++;
+        if (attempts >= maxAttempts) throw retryError;
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait before retry
+      }
+    }
+
+    const { data, error } = loginResult || { data: {}, error: new Error("Login failed") };
 
     if (error) {
       console.error('Auth error:', error);
@@ -46,7 +65,7 @@ const handleLogin = async ({
         'Database error': 'Service temporarily unavailable. Please try again',
       };
 
-      const errorMessage = errorMap[Object.keys(errorMap).find(key => error.message.includes(key)) || ''] 
+      const errorMessage = errorMap[Object.keys(errorMap).find(key => error.message?.includes(key)) || ''] 
         || 'Unable to connect. Please try again.';
       
       throw new Error(errorMessage);
