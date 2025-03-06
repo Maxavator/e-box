@@ -56,20 +56,21 @@ const handleLogin = async ({
       throw new Error('Login failed. Please try again.');
     }
 
-    // Get user role using the secure function
+    // Get user role from user_roles table
     const { data: roleData, error: roleError } = await supabase
-      .rpc('get_user_role', { user_id: data.user.id })
-      .single();
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', data.user.id)
+      .maybeSingle();
 
     if (roleError) {
       console.error('Role fetch error:', roleError);
-      // Continue with default role
-      toast.success("Login successful!");
-      navigate("/chat");
+      toast.error("Error fetching user role. Please try again.");
       return;
     }
 
-    const userRole = (roleData || 'user') as UserRoleType;
+    // Default to 'user' if no role is found
+    const userRole: UserRoleType = roleData?.role || 'user';
     console.log('Role fetched:', userRole);
     
     toast.success("Login successful!");
