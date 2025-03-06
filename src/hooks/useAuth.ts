@@ -9,19 +9,25 @@ export const useAuth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isConnectionChecking, setIsConnectionChecking] = useState(true);
   const navigate = useNavigate();
 
   // Check if there are any connection issues with Supabase
   useEffect(() => {
     const checkConnection = async () => {
       try {
+        setIsConnectionChecking(true);
         // Simple ping to check connectivity
-        const { error } = await supabase.from('user_roles').select('count').limit(1);
-        if (error && error.code !== 'PGRST116') {
-          console.error('Supabase connection issue:', error);
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Supabase auth check failed:', error);
         }
+        
+        setIsConnectionChecking(false);
       } catch (err) {
         console.error('Supabase connectivity check failed:', err);
+        setIsConnectionChecking(false);
       }
     };
     
@@ -36,6 +42,11 @@ export const useAuth = () => {
   });
 
   const handleLogin = async () => {
+    if (isConnectionChecking) {
+      toast.error("Still checking connection. Please wait a moment.");
+      return;
+    }
+    
     try {
       await handleLoginAction();
     } catch (error) {
@@ -50,6 +61,7 @@ export const useAuth = () => {
     password,
     setPassword,
     isLoading,
+    isConnectionChecking,
     handleLogin,
   };
 };

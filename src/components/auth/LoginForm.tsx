@@ -16,6 +16,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
     password,
     setPassword,
     isLoading,
+    isConnectionChecking,
     handleLogin,
   } = useAuth();
 
@@ -23,6 +24,14 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
     e.preventDefault();
     await handleLogin();
   };
+
+  const buttonText = isConnectionChecking 
+    ? "Checking connection..." 
+    : isLoading 
+      ? "Signing in..." 
+      : "Sign in";
+
+  const isButtonDisabled = isLoading || isConnectionChecking;
 
   return (
     <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col items-center justify-center bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-sm">
@@ -47,9 +56,9 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
               <Button 
                 type="submit" 
                 className="w-full bg-primary hover:bg-primary/90 transition-colors duration-300"
-                disabled={isLoading}
+                disabled={isButtonDisabled}
               >
-                {isLoading ? "Signing in..." : "Sign in"}
+                {buttonText}
               </Button>
             </div>
           </form>
