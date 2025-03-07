@@ -1,22 +1,35 @@
 
-import type { Database } from "@/integrations/supabase/types";
+import type { UserRoleType, LeaveType, LeaveStatus } from "./supabase-types";
 
-type DBTables = Database['public']['Tables']
-
-export interface Organization extends DBTables['organizations']['Row'] {}
-
-export interface Profile extends DBTables['profiles']['Row'] {
-  organization_id?: string;
-  calendar_notification_time?: number;
+export interface Organization {
+  id: string;
+  name: string;
+  domain: string | null;
+  logo_url: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface UserRole extends DBTables['user_roles']['Row'] {
+export interface Profile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  organization_id: string | null;
+  avatar_url: string | null;
+  calendar_notification_time: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserRole {
+  id: string;
+  user_id: string;
   role: UserRoleType;
+  created_at: string;
+  updated_at: string;
 }
 
-export type LeaveType = Database['public']['Enums']['leave_type'];
-export type LeaveStatus = Database['public']['Enums']['leave_status'];
-export type UserRoleType = 'global_admin' | 'org_admin' | 'staff' | 'user';
+export type { UserRoleType, LeaveType, LeaveStatus };
 
 export interface Conversation {
   id: string;
@@ -39,15 +52,15 @@ export interface CalendarTask {
 export interface Document {
   id: string;
   name: string;
-  description?: string;
-  category?: string;
-  size?: string;
-  version?: string;
-  content_type?: string;
-  file_path?: string;
-  is_verified: boolean;
+  description: string | null;
+  category: string | null;
+  size: string | null;
+  version: string | null;
+  content_type: string | null;
+  file_path: string | null;
+  isVerified: boolean;
   requires_otp: boolean;
-  last_modified_by?: string;
+  lastModifiedBy: string | null;
   created_at: string;
   updated_at: string;
 }

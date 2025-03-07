@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,7 +6,7 @@ import { Check, List, Plus, Trash, X } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import type { CalendarTask } from "@/types/database";
+import type { CalendarTask } from "@/types/supabase-types";
 
 export const TaskManager = () => {
   const [newTask, setNewTask] = useState("");
