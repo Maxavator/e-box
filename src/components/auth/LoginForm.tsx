@@ -1,9 +1,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Mail } from "lucide-react";
+import { Mail, AlertCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { LoginFormFields } from "./LoginFormFields";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface LoginFormProps {
   onRequestDemo: () => void;
@@ -17,6 +18,7 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
     setPassword,
     isLoading,
     isConnectionChecking,
+    connectionError,
     handleLogin,
   } = useAuth();
 
@@ -45,6 +47,15 @@ const LoginForm = ({ onRequestDemo }: LoginFormProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {connectionError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Database connection error: {connectionError}
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <form onSubmit={onSubmit} className="space-y-4">
             <LoginFormFields
               email={email}

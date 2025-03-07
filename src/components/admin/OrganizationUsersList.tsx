@@ -1,18 +1,20 @@
 
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
-import type { UserRole } from "@/types/database";
+import { supabase } from "@/integrations/supabase/client";
+import { UserRole } from "@/types/database";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface UserWithRoles {
   id: string;
   first_name: string | null;
   last_name: string | null;
   user_roles: {
-    role: UserRole['role'];
+    role: UserRole;
   }[];
+  email?: string;
 }
 
 export const OrganizationUsersList = () => {
@@ -26,7 +28,7 @@ export const OrganizationUsersList = () => {
         setIsLoading(true);
         setError(null);
         
-        // Fetch all users regardless of organization for demo purposes
+        // Fetch all profiles
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select(`
@@ -47,8 +49,12 @@ export const OrganizationUsersList = () => {
 
             if (rolesError) throw rolesError;
 
+            // Get email from auth.users if needed
+            const { data: userData } = await supabase.auth.admin.getUserById(profile.id);
+            
             return {
               ...profile,
+              email: userData?.user?.email,
               user_roles: userRoles || []
             } as UserWithRoles;
           } catch (error) {
@@ -79,9 +85,12 @@ export const OrganizationUsersList = () => {
       </CardHeader>
       <CardContent>
         {error ? (
-          <div className="p-4 text-red-500 bg-red-50 rounded-md">
-            Error: {error}
-          </div>
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Error: {error}
+            </AlertDescription>
+          </Alert>
         ) : (
           <Table>
             <TableHeader>
@@ -107,7 +116,7 @@ export const OrganizationUsersList = () => {
               ) : !users?.length ? (
                 <TableRow>
                   <TableCell colSpan={3} className="text-center py-8">
-                    No users found. Make sure Supabase is properly configured.
+                    No users found. Make sure Supabase is properly configured and you've created some users.
                   </TableCell>
                 </TableRow>
               ) : (
@@ -116,7 +125,7 @@ export const OrganizationUsersList = () => {
                     <TableCell>
                       {user.first_name || ''} {user.last_name || ''}
                     </TableCell>
-                    <TableCell>{user.id}</TableCell>
+                    <TableCell>{user.email || user.id}</TableCell>
                     <TableCell>
                       {user.user_roles?.[0]?.role || 'No role assigned'}
                     </TableCell>

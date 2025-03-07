@@ -10,6 +10,7 @@ export const useAuth = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isConnectionChecking, setIsConnectionChecking] = useState(true);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Check if there are any connection issues with Supabase
@@ -17,16 +18,22 @@ export const useAuth = () => {
     const checkConnection = async () => {
       try {
         setIsConnectionChecking(true);
+        setConnectionError(null);
+        
         // Simple ping to check connectivity
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Supabase auth check failed:', error);
+          setConnectionError(error.message);
+        } else {
+          console.log('Supabase connection successful');
         }
         
         setIsConnectionChecking(false);
-      } catch (err) {
+      } catch (err: any) {
         console.error('Supabase connectivity check failed:', err);
+        setConnectionError(err.message || 'Failed to connect to database');
         setIsConnectionChecking(false);
       }
     };
@@ -47,11 +54,16 @@ export const useAuth = () => {
       return;
     }
     
+    if (connectionError) {
+      toast.error(`Connection error: ${connectionError}. Please try again later.`);
+      return;
+    }
+    
     try {
       await handleLoginAction();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      toast.error("Login failed. Please try again.");
+      toast.error(error.message || "Login failed. Please try again.");
     }
   };
 
@@ -62,6 +74,7 @@ export const useAuth = () => {
     setPassword,
     isLoading,
     isConnectionChecking,
+    connectionError,
     handleLogin,
   };
 };
