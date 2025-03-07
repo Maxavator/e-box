@@ -3,7 +3,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { UserRole } from "@/types/database";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
@@ -12,7 +11,7 @@ interface UserWithRoles {
   first_name: string | null;
   last_name: string | null;
   user_roles: {
-    role: UserRole;
+    role: string;
   }[];
   email?: string;
 }
@@ -48,13 +47,9 @@ export const OrganizationUsersList = () => {
               .eq('user_id', profile.id);
 
             if (rolesError) throw rolesError;
-
-            // Get email from auth.users if needed
-            const { data: userData } = await supabase.auth.admin.getUserById(profile.id);
             
             return {
               ...profile,
-              email: userData?.user?.email,
               user_roles: userRoles || []
             } as UserWithRoles;
           } catch (error) {
