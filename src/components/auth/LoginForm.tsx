@@ -9,11 +9,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+// Define interface for user structure
 interface SupabaseUser {
   id: string;
-  email: string;
-  email_confirmed_at: string | null;
-  // Add other properties as needed
+  email?: string;
+  email_confirmed_at?: string | null;
 }
 
 const LoginForm = () => {
@@ -65,7 +65,7 @@ const LoginForm = () => {
         const foundUser = data.users.find(u => {
           // Type-safe check for user object and email property
           if (typeof u === 'object' && u !== null && 'email' in u) {
-            return u.email === loginEmail;
+            return (u as { email: string }).email === loginEmail;
           }
           return false;
         });
@@ -75,12 +75,18 @@ const LoginForm = () => {
           return;
         }
         
-        // Check if email is confirmed (safely access properties)
-        if (typeof foundUser === 'object' && 'email_confirmed_at' in foundUser && !foundUser.email_confirmed_at) {
+        // Check if email is confirmed (safely access properties with type assertion)
+        if (
+          typeof foundUser === 'object' && 
+          foundUser !== null && 
+          'email_confirmed_at' in foundUser && 
+          !foundUser.email_confirmed_at
+        ) {
           // Auto-confirm the email
           if ('id' in foundUser) {
+            const userId = (foundUser as SupabaseUser).id;
             const { error: updateError } = await supabase.auth.admin.updateUserById(
-              foundUser.id as string,
+              userId,
               { email_confirm: true }
             );
             

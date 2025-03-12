@@ -13,9 +13,8 @@ interface UseAuthActionsProps {
 
 interface SupabaseUser {
   id: string;
-  email: string;
-  email_confirmed_at: string | null;
-  // Add other properties as needed
+  email?: string;
+  email_confirmed_at?: string | null;
 }
 
 const handleLogin = async ({
@@ -73,16 +72,17 @@ const handleLogin = async ({
           
           if (userData && userData.users) {
             const userFound = userData.users.find(u => {
-              // Make sure we type check and safely access properties
+              // Type-safe check with proper type assertion
               if (typeof u === 'object' && u !== null && 'email' in u) {
-                return u.email === loginEmail;
+                return (u as { email: string }).email === loginEmail;
               }
               return false;
             });
             
             if (userFound && typeof userFound === 'object' && 'id' in userFound) {
+              const userId = (userFound as SupabaseUser).id;
               const { error: confirmError } = await supabase.auth.admin.updateUserById(
-                userFound.id as string,
+                userId,
                 { email_confirm: true }
               );
               
