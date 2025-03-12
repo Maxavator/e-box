@@ -7,19 +7,21 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Check, X, Clock } from "lucide-react";
 import { toast } from "sonner";
 
+interface CalendarEvent {
+  id: string;
+  title: string;
+  description: string | null;
+  start_time: string;
+  end_time: string;
+  location: string | null;
+  is_online: boolean;
+  meeting_link: string | null;
+}
+
 interface CalendarInvite {
   id: string;
   status: string;
-  event: {
-    id: string;
-    title: string;
-    description: string | null;
-    start_time: string;
-    end_time: string;
-    location: string | null;
-    is_online: boolean;
-    meeting_link: string | null;
-  };
+  event: CalendarEvent;
 }
 
 export function CalendarInbox() {
@@ -45,7 +47,26 @@ export function CalendarInbox() {
         .eq('status', 'pending');
 
       if (error) throw error;
-      return data as CalendarInvite[];
+      
+      // Transform the data to match the CalendarInvite interface
+      const transformedData = data.map((item: any) => ({
+        id: item.id,
+        status: item.status,
+        event: Array.isArray(item.event) && item.event.length > 0 
+          ? item.event[0] 
+          : {
+              id: '',
+              title: '',
+              description: null,
+              start_time: '',
+              end_time: '',
+              location: null,
+              is_online: false,
+              meeting_link: null
+            }
+      }));
+      
+      return transformedData as CalendarInvite[];
     },
   });
 

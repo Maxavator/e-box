@@ -1,9 +1,8 @@
-
 import { Shield, Users, MessageSquare, Scale, FileText } from "lucide-react";
 
 const HeroSection = () => {
   return (
-    <div className="hidden md:flex md:w-1/2 items-center justify-center relative overflow-hidden">
+    <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
       {/* Base background image layer */}
       <div className="absolute inset-0 bg-[url('/lovable-uploads/23758d75-6a83-4a79-bba6-ba0d82eec4cf.png')] bg-cover bg-center bg-no-repeat"></div>
       

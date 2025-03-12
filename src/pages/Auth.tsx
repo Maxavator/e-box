@@ -1,9 +1,9 @@
 
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LoginForm } from "@/components/auth/LoginForm";
-import { HeroSection } from "@/components/auth/HeroSection";
-import { DemoRequestDialog } from "@/components/auth/DemoRequestDialog";
+import LoginForm from "@/components/auth/LoginForm";
+import HeroSection from "@/components/auth/HeroSection";
+import DemoRequestDialog from "@/components/auth/DemoRequestDialog";
 import { CreateGolderOrgButton } from "@/components/auth/CreateGolderOrgButton";
 import { supabase } from "@/integrations/supabase/client";
 
