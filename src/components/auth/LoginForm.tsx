@@ -9,6 +9,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+interface SupabaseUser {
+  id: string;
+  email: string;
+  email_confirmed_at: string | null;
+  // Add other properties as needed
+}
+
 const LoginForm = () => {
   const {
     email,
@@ -55,39 +62,49 @@ const LoginForm = () => {
           return;
         }
         
-        const foundUser = data.users.find(u => u.email === loginEmail);
+        const foundUser = data.users.find(u => {
+          // Type-safe check for user object and email property
+          if (typeof u === 'object' && u !== null && 'email' in u) {
+            return u.email === loginEmail;
+          }
+          return false;
+        });
         
         if (!foundUser) {
           setUserStatus("No user found with this email/ID");
           return;
         }
         
-        // Check if email is confirmed
-        if (!foundUser.email_confirmed_at) {
+        // Check if email is confirmed (safely access properties)
+        if (typeof foundUser === 'object' && 'email_confirmed_at' in foundUser && !foundUser.email_confirmed_at) {
           // Auto-confirm the email
-          const { error: updateError } = await supabase.auth.admin.updateUserById(
-            foundUser.id,
-            { email_confirm: true }
-          );
-          
-          if (updateError) {
-            console.error("Error confirming email:", updateError);
-            setUserStatus("Error confirming email: " + updateError.message);
-            return;
+          if ('id' in foundUser) {
+            const { error: updateError } = await supabase.auth.admin.updateUserById(
+              foundUser.id as string,
+              { email_confirm: true }
+            );
+            
+            if (updateError) {
+              console.error("Error confirming email:", updateError);
+              setUserStatus("Error confirming email: " + updateError.message);
+              return;
+            }
+            
+            setUserStatus("User activated! You can now log in.");
+            toast.success("User email confirmed successfully");
+          } else {
+            setUserStatus("Error: User object is missing ID");
           }
-          
-          setUserStatus("User activated! You can now log in.");
-          toast.success("User email confirmed successfully");
         } else {
           setUserStatus("User is already active");
         }
       } catch (error: any) {
         console.error("Error listing users:", error);
-        setUserStatus("Error retrieving users: " + error.message);
+        setUserStatus("Error retrieving users: " + (error.message || "Unknown error"));
       }
     } catch (error: any) {
       console.error("Error in check user status:", error);
-      setUserStatus("Error: " + error.message);
+      setUserStatus("Error: " + (error.message || "Unknown error"));
     }
   };
 

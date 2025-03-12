@@ -13,19 +13,21 @@ import { OrganizationDetailsCard } from "@/components/organization/OrganizationD
 import { OverviewCards } from "@/components/organization/OverviewCards";
 import { Separator } from "@/components/ui/separator";
 
+interface OrganizationDetails {
+  name: string;
+  domain?: string | null;
+  logo_url?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 const OrganizationDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [userInfo, setUserInfo] = useState<{ 
     orgName: string; 
     isAdmin: boolean;
-    orgDetails: {
-      name: string;
-      domain?: string;
-      logo_url?: string;
-      created_at: string;
-      updated_at: string;
-    } | null;
+    orgDetails: OrganizationDetails | null;
   }>({ 
     orgName: '', 
     isAdmin: false,
@@ -37,27 +39,49 @@ const OrganizationDashboard = () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        const { data: profileData } = await supabase
+        // Fetch organization details
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('organizations(name, domain, logo_url, created_at, updated_at)')
+          .select('organization_id')
           .eq('id', user.id)
           .single();
 
-        const { data: roleData } = await supabase
+        if (profileError || !profileData?.organization_id) {
+          console.error('Error fetching profile:', profileError);
+          return;
+        }
+
+        // Get organization details
+        const { data: orgData, error: orgError } = await supabase
+          .from('organizations')
+          .select('name, domain, logo_url, created_at, updated_at')
+          .eq('id', profileData.organization_id)
+          .single();
+
+        if (orgError || !orgData) {
+          console.error('Error fetching organization:', orgError);
+          return;
+        }
+
+        // Get user role
+        const { data: roleData, error: roleError } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
           .single();
 
-        if (profileData) {
-          const orgName = profileData.organizations?.name || '';
-          const isAdmin = roleData?.role === 'org_admin' || roleData?.role === 'global_admin';
-          setUserInfo({ 
-            orgName, 
-            isAdmin,
-            orgDetails: profileData.organizations
-          });
+        if (roleError) {
+          console.error('Error fetching role:', roleError);
+          return;
         }
+
+        const isAdmin = roleData?.role === 'org_admin' || roleData?.role === 'global_admin';
+        
+        setUserInfo({
+          orgName: orgData.name || '',
+          isAdmin,
+          orgDetails: orgData
+        });
       }
     };
 
