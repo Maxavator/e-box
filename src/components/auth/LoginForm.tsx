@@ -21,7 +21,6 @@ const LoginForm = () => {
     handleLogin,
   } = useAuth();
   
-  const [demoDialogOpen, setDemoDialogOpen] = useState(false);
   const [userStatus, setUserStatus] = useState("");
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,40 +40,50 @@ const LoginForm = () => {
       // Transform SA ID to email format if needed (same logic as in useAuthActions)
       const loginEmail = email.includes('@') ? email : `${email}@said.auth`;
       
-      // Check if user exists in auth
-      const { data, error } = await supabase.auth.admin.listUsers();
-      
-      if (error) {
-        console.error("Error checking user status:", error);
-        setUserStatus("Error: " + error.message);
-        return;
-      }
-      
-      const foundUser = data.users.find(u => u.email === loginEmail);
-      
-      if (!foundUser) {
-        setUserStatus("No user found with this email/ID");
-        return;
-      }
-      
-      // Check if email is confirmed
-      if (!foundUser.email_confirmed_at) {
-        // Auto-confirm the email
-        const { error: updateError } = await supabase.auth.admin.updateUserById(
-          foundUser.id,
-          { email_confirm: true }
-        );
+      try {
+        // Check if user exists in auth
+        const { data, error } = await supabase.auth.admin.listUsers();
         
-        if (updateError) {
-          console.error("Error confirming email:", updateError);
-          setUserStatus("Error confirming email: " + updateError.message);
+        if (error) {
+          console.error("Error checking user status:", error);
+          setUserStatus("Error: " + error.message);
           return;
         }
         
-        setUserStatus("User activated! You can now log in.");
-        toast.success("User email confirmed successfully");
-      } else {
-        setUserStatus("User is already active");
+        if (!data || !data.users) {
+          setUserStatus("Error: Could not retrieve user list");
+          return;
+        }
+        
+        const foundUser = data.users.find(u => u.email === loginEmail);
+        
+        if (!foundUser) {
+          setUserStatus("No user found with this email/ID");
+          return;
+        }
+        
+        // Check if email is confirmed
+        if (!foundUser.email_confirmed_at) {
+          // Auto-confirm the email
+          const { error: updateError } = await supabase.auth.admin.updateUserById(
+            foundUser.id,
+            { email_confirm: true }
+          );
+          
+          if (updateError) {
+            console.error("Error confirming email:", updateError);
+            setUserStatus("Error confirming email: " + updateError.message);
+            return;
+          }
+          
+          setUserStatus("User activated! You can now log in.");
+          toast.success("User email confirmed successfully");
+        } else {
+          setUserStatus("User is already active");
+        }
+      } catch (error: any) {
+        console.error("Error listing users:", error);
+        setUserStatus("Error retrieving users: " + error.message);
       }
     } catch (error: any) {
       console.error("Error in check user status:", error);
