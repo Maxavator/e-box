@@ -2,10 +2,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Mail, AlertCircle } from "lucide-react";
+import { Mail, AlertCircle, Info } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { LoginFormFields } from "./LoginFormFields";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const LoginForm = () => {
   const {
@@ -20,10 +22,64 @@ const LoginForm = () => {
   } = useAuth();
   
   const [demoDialogOpen, setDemoDialogOpen] = useState(false);
+  const [userStatus, setUserStatus] = useState("");
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await handleLogin();
+  };
+
+  const checkUserStatus = async () => {
+    try {
+      if (!email) {
+        toast.error("Please enter an email or SA ID");
+        return;
+      }
+      
+      setUserStatus("Checking user status...");
+      
+      // Transform SA ID to email format if needed (same logic as in useAuthActions)
+      const loginEmail = email.includes('@') ? email : `${email}@said.auth`;
+      
+      // Check if user exists in auth
+      const { data, error } = await supabase.auth.admin.listUsers();
+      
+      if (error) {
+        console.error("Error checking user status:", error);
+        setUserStatus("Error: " + error.message);
+        return;
+      }
+      
+      const foundUser = data.users.find(u => u.email === loginEmail);
+      
+      if (!foundUser) {
+        setUserStatus("No user found with this email/ID");
+        return;
+      }
+      
+      // Check if email is confirmed
+      if (!foundUser.email_confirmed_at) {
+        // Auto-confirm the email
+        const { error: updateError } = await supabase.auth.admin.updateUserById(
+          foundUser.id,
+          { email_confirm: true }
+        );
+        
+        if (updateError) {
+          console.error("Error confirming email:", updateError);
+          setUserStatus("Error confirming email: " + updateError.message);
+          return;
+        }
+        
+        setUserStatus("User activated! You can now log in.");
+        toast.success("User email confirmed successfully");
+      } else {
+        setUserStatus("User is already active");
+      }
+    } catch (error: any) {
+      console.error("Error in check user status:", error);
+      setUserStatus("Error: " + error.message);
+    }
   };
 
   const buttonText = isConnectionChecking 
@@ -52,6 +108,16 @@ const LoginForm = () => {
           </Alert>
         )}
         
+        {userStatus && (
+          <Alert variant={userStatus.includes("Error") ? "destructive" : userStatus.includes("activated") ? "default" : "default"} 
+                className="mb-4 bg-muted">
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              {userStatus}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <form onSubmit={onSubmit} className="space-y-4">
           <LoginFormFields
             email={email}
@@ -59,13 +125,23 @@ const LoginForm = () => {
             password={password}
             setPassword={setPassword}
           />
-          <div className="space-y-4">
+          <div className="space-y-2">
             <Button 
               type="submit" 
               className="w-full"
               disabled={isButtonDisabled}
             >
               {buttonText}
+            </Button>
+            
+            <Button 
+              type="button" 
+              variant="outline"
+              className="w-full mt-2"
+              onClick={checkUserStatus}
+              disabled={isButtonDisabled || !email}
+            >
+              Check/Activate User
             </Button>
           </div>
         </form>

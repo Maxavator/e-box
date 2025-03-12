@@ -31,6 +31,7 @@ const handleLogin = async ({
     
     // Transform SA ID to email format if needed
     const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
+    console.log(`Attempting login with email: ${loginEmail}`);
 
     // Attempt login with retry logic
     let attempts = 0;
@@ -57,10 +58,32 @@ const handleLogin = async ({
     if (error) {
       console.error('Auth error:', error);
       
+      // Check if this is an email confirmation issue
+      if (error.message.includes('Email not confirmed')) {
+        // Try to auto-confirm the email
+        const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
+        
+        if (!userError && userData) {
+          const user = userData.users.find(u => u.email === loginEmail);
+          if (user) {
+            const { error: confirmError } = await supabase.auth.admin.updateUserById(
+              user.id,
+              { email_confirm: true }
+            );
+            
+            if (!confirmError) {
+              toast.success("Account activated. Please try logging in again.");
+              setIsLoading(false);
+              return;
+            }
+          }
+        }
+      }
+      
       // Map Supabase errors to user-friendly messages
       const errorMap: Record<string, string> = {
         'Invalid login credentials': 'Invalid email or password',
-        'Email not confirmed': 'Please verify your email address',
+        'Email not confirmed': 'Please verify your email address or use the Activate button',
         'Rate limit exceeded': 'Too many login attempts. Please wait a moment',
         'Database error': 'Service temporarily unavailable. Please try again',
       };
