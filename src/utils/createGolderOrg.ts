@@ -15,7 +15,12 @@ export const createGolderOrg = async () => {
   try {
     // First create the global admin
     console.log("Creating global admin...");
-    await createGlobalAdmin();
+    const globalAdmin = await createGlobalAdmin();
+    
+    if (!globalAdmin) {
+      toast.error("Failed to create global admin");
+      return;
+    }
 
     // Step 1: Create the organization
     console.log("Creating Golder organization...");
@@ -233,13 +238,13 @@ const createGlobalAdmin = async () => {
     if (authError) {
       console.error("Failed to create global admin auth user:", authError);
       toast.error("Failed to create global admin: " + authError.message);
-      return;
+      return null;
     }
 
     if (!authData.user) {
       console.error("No user returned for global admin");
       toast.error("Failed to create global admin: No user returned");
-      return;
+      return null;
     }
 
     // Create profile for global admin
@@ -254,7 +259,7 @@ const createGlobalAdmin = async () => {
     if (profileError) {
       console.error("Failed to create global admin profile:", profileError);
       toast.error("Failed to create global admin profile: " + profileError.message);
-      return;
+      return null;
     }
 
     // Assign global_admin role
@@ -268,7 +273,7 @@ const createGlobalAdmin = async () => {
     if (roleError) {
       console.error("Failed to assign global_admin role:", roleError);
       toast.error("Failed to assign global_admin role: " + roleError.message);
-      return;
+      return null;
     }
 
     console.log("Global admin created successfully");
@@ -278,5 +283,6 @@ const createGlobalAdmin = async () => {
   } catch (error) {
     console.error("Error creating global admin:", error);
     toast.error("Failed to create global admin. Check console for details.");
+    return null;
   }
 };

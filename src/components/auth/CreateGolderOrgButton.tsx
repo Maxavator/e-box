@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger 
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export function CreateGolderOrgButton() {
   const [isCreating, setIsCreating] = useState(false);
@@ -23,7 +24,11 @@ export function CreateGolderOrgButton() {
     setIsDialogOpen(false);
     
     try {
+      toast.info("Creating test organization and users...");
       await createGolderOrg();
+    } catch (error: any) {
+      console.error("Error creating Golder organization:", error);
+      toast.error(`Failed to create organization: ${error.message || "Unknown error"}`);
     } finally {
       setIsCreating(false);
     }
