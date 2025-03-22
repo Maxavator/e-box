@@ -11,14 +11,14 @@ import { formatSaIdPassword } from "@/utils/saIdValidation";
 
 const LoginForm = () => {
   const [saId, setSaId] = useState("");
-  const [password, setPassword] = useState("StaffPass123!"); // Default password for ease of testing
+  const [password, setPassword] = useState("StaffPass123!"); // Default password is always set here, but not used
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const authActions = useAuthActions({
-    email: saId, // We'll handle this in useAuthActions.ts
-    password,
+    email: saId, // This will be treated as saId in useAuthActions
+    password, // This password is actually ignored in useAuthActions
     setIsLoading,
     navigate,
   });
@@ -36,7 +36,7 @@ const LoginForm = () => {
 
   const fillTestAccount = (saId: string) => {
     setSaId(saId);
-    setPassword("StaffPass123!");
+    setPassword("StaffPass123!"); // Set to standard password for consistency
   };
 
   return (

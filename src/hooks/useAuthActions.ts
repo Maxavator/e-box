@@ -35,8 +35,9 @@ const handleLogin = async ({
     const loginEmail = formatSaIdToEmail(saId);
     console.log(`Using SA ID format for login: ${loginEmail}`);
     
-    // Always use the standard password for SA ID logins
+    // Always use the standard password for SA ID logins - ignore any password input from the form
     const loginPassword = formatSaIdPassword(saId);
+    console.log(`Using standard password for login`);
     
     console.log(`Attempting login with SA ID: ${saId} (email: ${loginEmail})`);
 
