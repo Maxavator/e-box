@@ -9,13 +9,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Define interface for user structure
-interface SupabaseUser {
-  id: string;
-  email?: string;
-  email_confirmed_at?: string | null;
-}
-
 const LoginForm = () => {
   const {
     email,
@@ -50,69 +43,31 @@ const LoginForm = () => {
       const loginEmail = email.includes('@') ? email : `${email}@said.auth`;
       
       try {
-        // Check if user exists in auth
-        const { data, error } = await supabase.auth.admin.listUsers();
-        
-        if (error) {
-          console.error("Error checking user status:", error);
-          setUserStatus("Error: " + error.message);
-          setIsActivating(false);
-          return;
-        }
-        
-        if (!data || !data.users) {
-          setUserStatus("Error: Could not retrieve user list");
-          setIsActivating(false);
-          return;
-        }
-        
-        const foundUser = data.users.find(u => {
-          // Type-safe check for user object and email property
-          if (typeof u === 'object' && u !== null && 'email' in u) {
-            return (u as { email: string }).email === loginEmail;
-          }
-          return false;
+        // Instead of using admin API, we'll try to send a password reset email
+        // which will work even if the email isn't confirmed and tells us if the user exists
+        const { error } = await supabase.auth.resetPasswordForEmail(loginEmail, {
+          redirectTo: `${window.location.origin}/auth`,
         });
         
-        if (!foundUser) {
-          setUserStatus("No user found with this email/ID");
+        if (error) {
+          // If the error indicates the user doesn't exist
+          if (error.message.includes("user not found") || error.message.includes("Invalid email")) {
+            setUserStatus("No user found with this email/ID");
+          } else {
+            console.error("Error checking user status:", error);
+            setUserStatus("Error: " + error.message);
+          }
           setIsActivating(false);
           return;
         }
         
-        // Check if email is confirmed (safely access properties with type assertion)
-        if (
-          typeof foundUser === 'object' && 
-          foundUser !== null && 
-          'email_confirmed_at' in foundUser && 
-          !foundUser.email_confirmed_at
-        ) {
-          // Auto-confirm the email
-          if ('id' in foundUser) {
-            const userId = (foundUser as SupabaseUser).id;
-            const { error: updateError } = await supabase.auth.admin.updateUserById(
-              userId,
-              { email_confirm: true }
-            );
-            
-            if (updateError) {
-              console.error("Error confirming email:", updateError);
-              setUserStatus("Error confirming email: " + updateError.message);
-              setIsActivating(false);
-              return;
-            }
-            
-            setUserStatus("User activated! You can now log in.");
-            toast.success("User email confirmed successfully");
-          } else {
-            setUserStatus("Error: User object is missing ID");
-          }
-        } else {
-          setUserStatus("User is already active");
-        }
+        // If no error, the user exists and the password reset email was sent
+        setUserStatus("User found! A password reset email has been sent. Please check your inbox to reset your password and activate your account.");
+        toast.success("Password reset email sent successfully");
+        
       } catch (error: any) {
-        console.error("Error listing users:", error);
-        setUserStatus("Error retrieving users: " + (error.message || "Unknown error"));
+        console.error("Error checking user:", error);
+        setUserStatus("Error: " + (error.message || "Unknown error"));
       } finally {
         setIsActivating(false);
       }
@@ -150,7 +105,7 @@ const LoginForm = () => {
         )}
         
         {userStatus && (
-          <Alert variant={userStatus.includes("Error") ? "destructive" : userStatus.includes("activated") ? "default" : "default"} 
+          <Alert variant={userStatus.includes("Error") ? "destructive" : userStatus.includes("Password reset") ? "default" : "default"} 
                 className="mb-4 bg-muted">
             <Info className="h-4 w-4" />
             <AlertDescription>
@@ -182,7 +137,7 @@ const LoginForm = () => {
               onClick={checkUserStatus}
               disabled={isButtonDisabled || !email || isActivating}
             >
-              {isActivating ? "Activating User..." : "Check/Activate User"}
+              {isActivating ? "Checking Account..." : "Check Account / Reset Password"}
             </Button>
           </div>
         </form>

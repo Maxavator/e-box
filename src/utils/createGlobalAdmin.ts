@@ -29,7 +29,8 @@ export const createGlobalAdmin = async () => {
         data: {
           first_name: "Global",
           last_name: "Administrator"
-        }
+        },
+        emailRedirectTo: `${window.location.origin}/auth`
       }
     });
 
@@ -126,6 +127,7 @@ export const createGlobalAdmin = async () => {
     console.log("Global admin created successfully");
     toast.success("Global admin created successfully");
     toast.info(`Login with ID: ${saId} and password: ${password}`);
+    toast.info("If you don't receive a confirmation email, use the 'Check Account / Reset Password' button to reset your password and activate your account.");
     
   } catch (error: any) {
     console.error("Error creating global admin:", error);
