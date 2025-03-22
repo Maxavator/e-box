@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { isSaId } from "@/utils/saIdValidation";
+import { isSaId, formatSaIdToEmail } from "@/utils/saIdValidation";
 import type { UserRoleType } from "@/types/database";
 
 interface UseAuthActionsProps {
@@ -9,12 +9,6 @@ interface UseAuthActionsProps {
   password: string;
   setIsLoading: (loading: boolean) => void;
   navigate: (path: string) => void;
-}
-
-interface SupabaseUser {
-  id: string;
-  email?: string;
-  email_confirmed_at?: string | null;
 }
 
 const handleLogin = async ({
@@ -37,47 +31,23 @@ const handleLogin = async ({
     
     // Transform SA ID to email format if needed
     let loginEmail = email;
+    let loginPassword = password;
+    
     if (isSaId(email)) {
-      loginEmail = `${email}@said.auth`;
+      loginEmail = formatSaIdToEmail(email);
       console.log(`Using SA ID format for login: ${loginEmail}`);
+      
+      // For SA ID logins, always use the standard password
+      loginPassword = "StaffPass123!";
     }
+    
     console.log(`Attempting login with email: ${loginEmail}`);
 
-    // Attempt login with retry logic
-    let attempts = 0;
-    const maxAttempts = 2;
-    let loginResult;
-    
-    while (attempts < maxAttempts) {
-      try {
-        loginResult = await supabase.auth.signInWithPassword({
-          email: loginEmail,
-          password,
-        });
-        
-        if (loginResult.error) {
-          console.error(`Login attempt ${attempts + 1} failed:`, loginResult.error);
-          
-          // If this is specific to invalid credentials and we're using an SA ID,
-          // we'll try a different approach in the next iteration
-          if (loginResult.error.message.includes('Invalid login credentials') && isSaId(email)) {
-            console.log('Invalid credentials with SA ID format. Trying alternative method...');
-          }
-          
-          throw loginResult.error;
-        }
-        
-        console.log('Login successful:', loginResult);
-        break; // If successful, exit the retry loop
-      } catch (retryError) {
-        console.log(`Login attempt ${attempts + 1} failed, retrying...`);
-        attempts++;
-        if (attempts >= maxAttempts) throw retryError;
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait before retry
-      }
-    }
-
-    const { data, error } = loginResult || { data: {}, error: new Error("Login failed") };
+    // Attempt login
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    });
 
     if (error) {
       console.error('Auth error:', error);

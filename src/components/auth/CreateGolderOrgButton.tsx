@@ -35,51 +35,53 @@ export function CreateGolderOrgButton() {
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
-        <Button 
-          variant="outline"
-          className="w-full mt-4"
-        >
-          Create Golder Organization & Users
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create Golder Organization</DialogTitle>
-          <DialogDescription className="text-sm">
-            This will create:
-            <div className="mt-2">
-              <ul className="list-disc pl-5 space-y-1">
-                <li><span className="font-medium">Global Admin:</span> Max Dlamini (m@ramutla.com)</li>
-                <li><span className="font-medium">Organization:</span> Golder (Pty) Ltd.</li>
-                <li><span className="font-medium">10 Users:</span> Including 1 Org Admin and 9 Staff</li>
-              </ul>
-            </div>
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex justify-end space-x-4 mt-4">
+    <>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
           <Button 
-            variant="outline" 
-            onClick={() => setIsDialogOpen(false)}
+            variant="outline"
+            className="w-full mt-4"
           >
-            Cancel
+            Create Golder Organization & Users
           </Button>
-          <Button 
-            onClick={handleCreateOrg}
-            disabled={isCreating}
-          >
-            {isCreating ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
-              </>
-            ) : (
-              "Create Now"
-            )}
-          </Button>
-        </div>
-      </DialogContent>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Golder Organization</DialogTitle>
+            <DialogDescription className="text-sm">
+              This will create:
+              <div className="mt-2">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li><span className="font-medium">Global Admin:</span> Max Dlamini (m@ramutla.com)</li>
+                  <li><span className="font-medium">Organization:</span> Golder (Pty) Ltd.</li>
+                  <li><span className="font-medium">10 Users:</span> Including 1 Org Admin and 9 Staff</li>
+                </ul>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end space-x-4 mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleCreateOrg}
+              disabled={isCreating}
+            >
+              {isCreating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Now"
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <Button 
         variant="outline"
@@ -96,6 +98,6 @@ export function CreateGolderOrgButton() {
           "Create Golder Organization (Quick)"
         )}
       </Button>
-    </Dialog>
+    </>
   );
 }

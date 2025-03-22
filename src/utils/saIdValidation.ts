@@ -12,5 +12,5 @@ export const formatSaIdToEmail = (saId: string): string => {
 
 // Function to format SA ID into password
 export const formatSaIdPassword = (saId: string): string => {
-  return saId; // Use the SA ID itself as the password
+  return "StaffPass123!"; // Always use the standard password for SA ID logins
 };

@@ -150,7 +150,7 @@ export const createGolderOrg = async () => {
       try {
         console.log(`Creating user: ${user.firstName} ${user.lastName}`);
         
-        // Create auth user - Using signUp instead of admin.createUser
+        // Create auth user
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: user.email,
           password: 'StaffPass123!',
@@ -175,8 +175,40 @@ export const createGolderOrg = async () => {
           continue;
         }
 
+        console.log(`Auth user created with ID: ${authData.user.id} for ${user.email}`);
+
         // Wait for a moment to ensure the auth user trigger has time to create the profile
         await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Also create a SA ID login by linking additional identity
+        const saIdEmail = `${user.saId}@said.auth`;
+        console.log(`Creating additional login method with SA ID: ${saIdEmail}`);
+        
+        try {
+          // Create an additional user with SA ID format for login
+          const { data: saAuthData, error: saAuthError } = await supabase.auth.signUp({
+            email: saIdEmail,
+            password: 'StaffPass123!',
+            options: {
+              data: {
+                first_name: user.firstName,
+                last_name: user.lastName,
+                sa_id: user.saId,
+                primary_email: user.email
+              }
+            }
+          });
+          
+          if (saAuthError) {
+            console.log(`Note: Could not create additional SA ID login for ${user.email}:`, saAuthError);
+            // Continue anyway as this is just an additional login method
+          } else {
+            console.log(`Successfully created SA ID login for ${user.firstName} ${user.lastName}`);
+          }
+        } catch (saIdError) {
+          console.log(`Error creating SA ID login for ${user.email}:`, saIdError);
+          // Continue anyway as this is just an additional login method
+        }
 
         // Update profile with organization_id rather than creating it
         const { error: profileError } = await supabase
@@ -228,6 +260,11 @@ export const createGolderOrg = async () => {
     } else {
       toast.error("Failed to create any users. Check console for details.");
     }
+
+    // Add login hint toast
+    toast.info("You can now login with either email addresses or SA ID numbers", {
+      duration: 8000
+    });
 
   } catch (error) {
     console.error("Error in creating organization:", error);
