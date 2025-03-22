@@ -16,6 +16,7 @@ import { ActivitySection } from "./dashboard/ActivitySection";
 import { AnnouncementsSection } from "./dashboard/AnnouncementsSection";
 import { QuickActions } from "./dashboard/QuickActions";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export const Dashboard = () => {
   const [currentView, setCurrentView] = useState<string>('dashboard');
@@ -33,8 +34,13 @@ export const Dashboard = () => {
     handleSelectConversation,
   } = useChat();
 
+  // Load user data on component mount
   useEffect(() => {
+    console.log('Dashboard mounted, userRole:', userRole, 'isLoading:', isRoleLoading);
+    
+    // If staff user, redirect to chat
     if (!isRoleLoading && userRole === 'staff') {
+      console.log('Redirecting staff user to chat');
       navigate('/chat');
     }
   }, [userRole, isRoleLoading, navigate]);
@@ -43,7 +49,10 @@ export const Dashboard = () => {
     return (
       <MainLayout>
         <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Loading dashboard...</p>
+          </div>
         </div>
       </MainLayout>
     );
@@ -62,6 +71,7 @@ export const Dashboard = () => {
 
   const handleNavigation = (route: string) => {
     try {
+      console.log(`Navigating to ${route}`);
       navigate(route);
       toast.success(`Navigating to ${route.replace('/', '')}`);
     } catch (error) {
@@ -71,6 +81,7 @@ export const Dashboard = () => {
   };
 
   const handleCardClick = (feature: string) => {
+    console.log('Card clicked:', feature);
     switch (feature) {
       case 'chat':
         handleNavigation('/chat');

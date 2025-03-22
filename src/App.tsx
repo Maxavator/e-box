@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/shared/theme-provider";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
@@ -17,7 +17,14 @@ import { Documents } from "@/components/desk/Documents";
 import { Calendar } from "@/components/desk/Calendar";
 import { Settings } from "@/components/desk/Settings";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode; requiredRole?: string }) => {
@@ -26,18 +33,29 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode;
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
       </div>
     );
   }
 
+  // Check if user is authenticated
+  if (!userRole) {
+    console.log('User not authenticated, redirecting to /auth');
+    return <Navigate to="/auth" replace />;
+  }
+
   // For admin routes, check if user has required role
   if (requiredRole && userRole !== requiredRole && userRole !== 'global_admin') {
+    console.log(`User role: ${userRole} does not have access to ${requiredRole} route`);
     return <Navigate to="/dashboard" replace />;
   }
 
   // For standard users, redirect to chat if they try to access dashboard
   if (userRole === 'staff' && window.location.pathname === '/dashboard') {
+    console.log('Staff user accessing dashboard, redirecting to chat');
     return <Navigate to="/chat" replace />;
   }
 
@@ -51,12 +69,16 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          <p className="text-muted-foreground">Loading admin access...</p>
+        </div>
       </div>
     );
   }
 
   if (userRole !== 'org_admin' && userRole !== 'global_admin') {
+    console.log('Non-admin user attempting to access admin route');
     return <Navigate to="/chat" replace />;
   }
 
@@ -70,7 +92,10 @@ function App() {
         <BrowserRouter>
           <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+              <div className="flex flex-col items-center gap-3">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                <p className="text-muted-foreground">Loading application...</p>
+              </div>
             </div>
           }>
             <Routes>
@@ -127,7 +152,7 @@ function App() {
             </Routes>
           </Suspense>
         </BrowserRouter>
-        <Toaster />
+        <Toaster position="top-right" />
       </ThemeProvider>
     </QueryClientProvider>
   );

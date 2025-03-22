@@ -5,7 +5,7 @@ import {
   Users, Building2, MessageSquare, ArrowUpRight, 
   Activity, LineChart, Clock, CheckCircle2,
   FileText, Calendar, User, Settings,
-  MessageCircle
+  MessageCircle, Loader2
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -13,19 +13,56 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { NavigationCards } from "@/components/admin/dashboard/NavigationCards";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { isAdmin, userRole, isLoading } = useUserRole();
   const [userName, setUserName] = useState("User");
-  const [lastUpdate, setLastUpdate] = useState("5 mins ago");
+  const [lastUpdate, setLastUpdate] = useState("Just now");
+  const [isDataLoading, setIsDataLoading] = useState(false);
+
+  // Fetch user information on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          // Fetch user profile data
+          const { data } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          if (data) {
+            setUserName(`${data.first_name} ${data.last_name}`);
+          } else {
+            setUserName(user.email?.split('@')[0] || "User");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    console.log("Dashboard page mounted, fetching user data");
+    fetchUserData();
+  }, []);
 
   const refreshData = () => {
-    setLastUpdate("Just now");
-    toast.success("Dashboard data refreshed");
+    setIsDataLoading(true);
+    
+    // Simulate data refresh
+    setTimeout(() => {
+      setLastUpdate("Just now");
+      setIsDataLoading(false);
+      toast.success("Dashboard data refreshed");
+    }, 800);
   };
 
   const handleQuickAction = (action: string) => {
+    console.log(`Quick action: ${action}`);
     switch (action) {
       case 'documents':
         navigate('/documents');
@@ -47,9 +84,19 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading dashboard...</p>
+        </div>
       </div>
     );
+  }
+
+  // Redirect staff users to chat
+  if (userRole === 'staff') {
+    console.log("Staff user detected, redirecting to chat");
+    navigate('/chat');
+    return null;
   }
 
   return (
@@ -71,9 +118,17 @@ const Dashboard = () => {
             variant="ghost" 
             size="sm"
             onClick={refreshData}
+            disabled={isDataLoading}
             className="text-sm text-primary hover:text-primary/80 transition-colors"
           >
-            Refresh Data
+            {isDataLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Refreshing...
+              </>
+            ) : (
+              "Refresh Data"
+            )}
           </Button>
         </div>
       </header>
