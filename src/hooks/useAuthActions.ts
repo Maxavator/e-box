@@ -39,6 +39,7 @@ const handleLogin = async ({
     let loginEmail = email;
     if (isSaId(email)) {
       loginEmail = `${email}@said.auth`;
+      console.log(`Using SA ID format for login: ${loginEmail}`);
     }
     console.log(`Attempting login with email: ${loginEmail}`);
 
@@ -53,6 +54,20 @@ const handleLogin = async ({
           email: loginEmail,
           password,
         });
+        
+        if (loginResult.error) {
+          console.error(`Login attempt ${attempts + 1} failed:`, loginResult.error);
+          
+          // If this is specific to invalid credentials and we're using an SA ID,
+          // we'll try a different approach in the next iteration
+          if (loginResult.error.message.includes('Invalid login credentials') && isSaId(email)) {
+            console.log('Invalid credentials with SA ID format. Trying alternative method...');
+          }
+          
+          throw loginResult.error;
+        }
+        
+        console.log('Login successful:', loginResult);
         break; // If successful, exit the retry loop
       } catch (retryError) {
         console.log(`Login attempt ${attempts + 1} failed, retrying...`);

@@ -8,6 +8,7 @@ import { CreateGolderOrgButton } from "@/components/auth/CreateGolderOrgButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { InfoIcon } from "lucide-react";
+import { toast } from "sonner";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -15,9 +16,21 @@ const Auth = () => {
   // Check if user is already logged in
   useEffect(() => {
     const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        navigate("/dashboard");
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Session check error:", error);
+          return;
+        }
+        
+        if (data.session) {
+          console.log("User already logged in, redirecting to dashboard");
+          toast.success("Already logged in");
+          navigate("/dashboard");
+        }
+      } catch (err) {
+        console.error("Failed to check session:", err);
       }
     };
     
@@ -44,8 +57,8 @@ const Auth = () => {
             <InfoIcon className="h-4 w-4" />
             <AlertTitle>For testing purposes</AlertTitle>
             <AlertDescription className="text-xs">
-              You can create test users and an organization using the button below. 
-              The global admin will be created with ID 8010200800185 and users will have IDs like 9001075800087.
+              Use the test accounts provided above to sign in. The email/password 
+              combinations are set up and ready to use in the database.
             </AlertDescription>
           </Alert>
 

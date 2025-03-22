@@ -35,14 +35,14 @@ const LoginForm = () => {
 
   const fillTestAccount = (type: "admin" | "user" | "orgAdmin") => {
     if (type === "admin") {
-      setEmail("8010200800185");
+      setEmail("admin@e-box.co.za");
       setPassword("Admin@2025!Security");
     } else if (type === "orgAdmin") {
-      setEmail("8801015800082");
-      setPassword("StaffPass123!");
+      setEmail("org-admin@e-box.co.za");
+      setPassword("OrgAdmin123!");
     } else {
-      setEmail("9001075800087");
-      setPassword("StaffPass123!");
+      setEmail("user@e-box.co.za");
+      setPassword("UserPass123!");
     }
   };
 
@@ -91,7 +91,7 @@ const LoginForm = () => {
               className="justify-start text-xs"
               onClick={() => fillTestAccount("admin")}
             >
-              Global Admin: 8010200800185 / Admin@2025!Security
+              Global Admin: admin@e-box.co.za / Admin@2025!Security
             </Button>
             <Button 
               variant="outline" 
@@ -99,7 +99,7 @@ const LoginForm = () => {
               className="justify-start text-xs"
               onClick={() => fillTestAccount("orgAdmin")}
             >
-              Org Admin: 8801015800082 / StaffPass123!
+              Org Admin: org-admin@e-box.co.za / OrgAdmin123!
             </Button>
             <Button 
               variant="outline" 
@@ -107,7 +107,7 @@ const LoginForm = () => {
               className="justify-start text-xs"
               onClick={() => fillTestAccount("user")}
             >
-              Regular User: 9001075800087 / StaffPass123!
+              Regular User: user@e-box.co.za / UserPass123!
             </Button>
           </div>
         </div>

@@ -5,6 +5,11 @@ export const isSaId = (input: string): boolean => {
   return saIdRegex.test(input);
 };
 
+// Function to create email format from SA ID for authentication
+export const formatSaIdToEmail = (saId: string): string => {
+  return `${saId}@said.auth`;
+};
+
 // Function to format SA ID into password
 export const formatSaIdPassword = (saId: string): string => {
   return saId; // Use the SA ID itself as the password
