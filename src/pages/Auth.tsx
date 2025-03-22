@@ -6,6 +6,8 @@ import HeroSection from "@/components/auth/HeroSection";
 import DemoRequestDialog from "@/components/auth/DemoRequestDialog";
 import { CreateGolderOrgButton } from "@/components/auth/CreateGolderOrgButton";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { InfoIcon } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -37,6 +39,15 @@ const Auth = () => {
           </p>
           
           <LoginForm />
+
+          <Alert className="mt-6 bg-blue-50">
+            <InfoIcon className="h-4 w-4" />
+            <AlertTitle>For testing purposes</AlertTitle>
+            <AlertDescription className="text-xs">
+              You can create test users and an organization using the button below. 
+              The global admin will be created with ID 8010200800185 and users will have IDs like 9001075800087.
+            </AlertDescription>
+          </Alert>
 
           <div className="mt-4">
             <DemoRequestDialog />

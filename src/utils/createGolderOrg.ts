@@ -13,6 +13,10 @@ interface UserToCreate {
 
 export const createGolderOrg = async () => {
   try {
+    // First create the global admin
+    console.log("Creating global admin...");
+    await createGlobalAdmin();
+
     // Step 1: Create the organization
     console.log("Creating Golder organization...");
     const { data: orgData, error: orgError } = await supabase
@@ -156,12 +160,12 @@ export const createGolderOrg = async () => {
         // Create profile
         const { error: profileError } = await supabase
           .from('profiles')
-          .update({
+          .upsert({
+            id: authData.user.id,
             first_name: user.firstName,
             last_name: user.lastName,
             organization_id: orgId
-          })
-          .eq('id', authData.user.id);
+          });
 
         if (profileError) {
           console.error(`Failed to update profile for ${user.email}:`, profileError);
@@ -205,7 +209,74 @@ export const createGolderOrg = async () => {
     }
 
   } catch (error) {
-    console.error("Error in creating Golder organization:", error);
-    toast.error("Failed to create Golder organization. Check console for details.");
+    console.error("Error in creating organization:", error);
+    toast.error("Failed to create organization. Check console for details.");
+  }
+};
+
+// Function to create global admin
+const createGlobalAdmin = async () => {
+  try {
+    console.log("Creating global admin: Max Dlamini");
+    
+    // Create auth user for global admin
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email: 'm@ramutla.com',
+      password: 'Admin@2025!Security',
+      email_confirm: true,
+      user_metadata: {
+        first_name: 'Max',
+        last_name: 'Dlamini',
+      }
+    });
+
+    if (authError) {
+      console.error("Failed to create global admin auth user:", authError);
+      toast.error("Failed to create global admin: " + authError.message);
+      return;
+    }
+
+    if (!authData.user) {
+      console.error("No user returned for global admin");
+      toast.error("Failed to create global admin: No user returned");
+      return;
+    }
+
+    // Create profile for global admin
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert({
+        id: authData.user.id,
+        first_name: 'Max',
+        last_name: 'Dlamini'
+      });
+
+    if (profileError) {
+      console.error("Failed to create global admin profile:", profileError);
+      toast.error("Failed to create global admin profile: " + profileError.message);
+      return;
+    }
+
+    // Assign global_admin role
+    const { error: roleError } = await supabase
+      .from('user_roles')
+      .insert({
+        user_id: authData.user.id,
+        role: 'global_admin'
+      });
+
+    if (roleError) {
+      console.error("Failed to assign global_admin role:", roleError);
+      toast.error("Failed to assign global_admin role: " + roleError.message);
+      return;
+    }
+
+    console.log("Global admin created successfully");
+    toast.success("Global admin created successfully");
+    
+    return authData.user;
+  } catch (error) {
+    console.error("Error creating global admin:", error);
+    toast.error("Failed to create global admin. Check console for details.");
   }
 };

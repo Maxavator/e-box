@@ -3,14 +3,25 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { createGolderOrg } from "@/utils/createGolderOrg";
 import { Loader2 } from "lucide-react";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger 
+} from "@/components/ui/dialog";
 
 export function CreateGolderOrgButton() {
   const [isCreating, setIsCreating] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleCreateOrg = async () => {
     if (isCreating) return;
     
     setIsCreating(true);
+    setIsDialogOpen(false);
+    
     try {
       await createGolderOrg();
     } finally {
@@ -19,20 +30,65 @@ export function CreateGolderOrgButton() {
   };
 
   return (
-    <Button 
-      variant="outline"
-      onClick={handleCreateOrg}
-      disabled={isCreating}
-      className="w-full mt-4"
-    >
-      {isCreating ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Creating Golder organization...
-        </>
-      ) : (
-        "Create Golder Organization"
-      )}
-    </Button>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogTrigger asChild>
+        <Button 
+          variant="outline"
+          className="w-full mt-4"
+        >
+          Create Test Organization & Users
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create Test Organization</DialogTitle>
+          <DialogDescription>
+            This will create:
+            <ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
+              <li><span className="font-medium">Global Admin:</span> Max Dlamini (m@ramutla.com)</li>
+              <li><span className="font-medium">Organization:</span> Golder (Pty) Ltd.</li>
+              <li><span className="font-medium">10 Users:</span> Including 1 Org Admin and 9 Staff</li>
+            </ul>
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-end space-x-4 mt-4">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsDialogOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleCreateOrg}
+            disabled={isCreating}
+          >
+            {isCreating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              "Create Now"
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+      
+      <Button 
+        variant="outline"
+        onClick={handleCreateOrg}
+        disabled={isCreating}
+        className="w-full mt-2"
+      >
+        {isCreating ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Creating Golder organization...
+          </>
+        ) : (
+          "Create Golder Organization (Quick)"
+        )}
+      </Button>
+    </Dialog>
   );
 }

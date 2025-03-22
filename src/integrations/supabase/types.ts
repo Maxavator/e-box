@@ -316,6 +316,47 @@ export type Database = {
         }
         Relationships: []
       }
+      organization_metrics: {
+        Row: {
+          active_users: number | null
+          created_at: string
+          id: string
+          organization_id: string
+          storage_used: number | null
+          total_documents: number | null
+          total_users: number | null
+          updated_at: string
+        }
+        Insert: {
+          active_users?: number | null
+          created_at?: string
+          id?: string
+          organization_id: string
+          storage_used?: number | null
+          total_documents?: number | null
+          total_users?: number | null
+          updated_at?: string
+        }
+        Update: {
+          active_users?: number | null
+          created_at?: string
+          id?: string
+          organization_id?: string
+          storage_used?: number | null
+          total_documents?: number | null
+          total_users?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_metrics_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string
@@ -350,6 +391,7 @@ export type Database = {
           created_at: string
           first_name: string | null
           id: string
+          last_activity: string | null
           last_name: string | null
           organization_id: string | null
           updated_at: string
@@ -360,6 +402,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id: string
+          last_activity?: string | null
           last_name?: string | null
           organization_id?: string | null
           updated_at?: string
@@ -370,6 +413,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id?: string
+          last_activity?: string | null
           last_name?: string | null
           organization_id?: string | null
           updated_at?: string
@@ -407,6 +451,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_statistics: {
+        Row: {
+          action_count: number | null
+          created_at: string
+          id: string
+          last_login: string | null
+          login_count: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_count?: number | null
+          created_at?: string
+          id?: string
+          last_login?: string | null
+          login_count?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_count?: number | null
+          created_at?: string
+          id?: string
+          last_login?: string | null
+          login_count?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_statistics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
