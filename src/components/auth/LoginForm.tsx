@@ -29,6 +29,7 @@ const LoginForm = () => {
   } = useAuth();
   
   const [userStatus, setUserStatus] = useState("");
+  const [isActivating, setIsActivating] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,6 +44,7 @@ const LoginForm = () => {
       }
       
       setUserStatus("Checking user status...");
+      setIsActivating(true);
       
       // Transform SA ID to email format if needed (same logic as in useAuthActions)
       const loginEmail = email.includes('@') ? email : `${email}@said.auth`;
@@ -54,11 +56,13 @@ const LoginForm = () => {
         if (error) {
           console.error("Error checking user status:", error);
           setUserStatus("Error: " + error.message);
+          setIsActivating(false);
           return;
         }
         
         if (!data || !data.users) {
           setUserStatus("Error: Could not retrieve user list");
+          setIsActivating(false);
           return;
         }
         
@@ -72,6 +76,7 @@ const LoginForm = () => {
         
         if (!foundUser) {
           setUserStatus("No user found with this email/ID");
+          setIsActivating(false);
           return;
         }
         
@@ -93,6 +98,7 @@ const LoginForm = () => {
             if (updateError) {
               console.error("Error confirming email:", updateError);
               setUserStatus("Error confirming email: " + updateError.message);
+              setIsActivating(false);
               return;
             }
             
@@ -107,10 +113,13 @@ const LoginForm = () => {
       } catch (error: any) {
         console.error("Error listing users:", error);
         setUserStatus("Error retrieving users: " + (error.message || "Unknown error"));
+      } finally {
+        setIsActivating(false);
       }
     } catch (error: any) {
       console.error("Error in check user status:", error);
       setUserStatus("Error: " + (error.message || "Unknown error"));
+      setIsActivating(false);
     }
   };
 
@@ -171,9 +180,9 @@ const LoginForm = () => {
               variant="outline"
               className="w-full mt-2"
               onClick={checkUserStatus}
-              disabled={isButtonDisabled || !email}
+              disabled={isButtonDisabled || !email || isActivating}
             >
-              Check/Activate User
+              {isActivating ? "Activating User..." : "Check/Activate User"}
             </Button>
           </div>
         </form>

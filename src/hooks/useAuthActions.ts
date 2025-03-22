@@ -66,36 +66,9 @@ const handleLogin = async ({
       
       // Check if this is an email confirmation issue
       if (error.message.includes('Email not confirmed')) {
-        try {
-          // Try to auto-confirm the email
-          const { data: userData } = await supabase.auth.admin.listUsers();
-          
-          if (userData && userData.users) {
-            const userFound = userData.users.find(u => {
-              // Type-safe check with proper type assertion
-              if (typeof u === 'object' && u !== null && 'email' in u) {
-                return (u as { email: string }).email === loginEmail;
-              }
-              return false;
-            });
-            
-            if (userFound && typeof userFound === 'object' && 'id' in userFound) {
-              const userId = (userFound as SupabaseUser).id;
-              const { error: confirmError } = await supabase.auth.admin.updateUserById(
-                userId,
-                { email_confirm: true }
-              );
-              
-              if (!confirmError) {
-                toast.success("Account activated. Please try logging in again.");
-                setIsLoading(false);
-                return;
-              }
-            }
-          }
-        } catch (adminError) {
-          console.error('Error activating user:', adminError);
-        }
+        toast.error("Your email is not confirmed. Please use the 'Check/Activate User' button to activate your account.");
+        setIsLoading(false);
+        return;
       }
       
       // Map Supabase errors to user-friendly messages
