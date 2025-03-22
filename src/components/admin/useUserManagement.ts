@@ -6,6 +6,8 @@ import { useUsers } from "./hooks/useUsers";
 import { useUserMutations } from "./hooks/useUserMutations";
 import type { UserWithRole, UserFormData } from "./types";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useUserManagement = () => {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -24,7 +26,49 @@ export const useUserManagement = () => {
   const { users, isLoading: isUsersLoading, error: usersError } = useUsers(isAdmin, userRole, userProfile);
   const { createUserMutation, updateUserMutation } = useUserMutations(isAdmin, userRole, userProfile);
 
-  const isLoading = isRoleLoading || isOrgsLoading || isUsersLoading;
+  // Get platform statistics for global admins
+  const { data: statistics, isLoading: isStatsLoading } = useQuery({
+    queryKey: ['platformStatistics'],
+    queryFn: async () => {
+      if (!isAdmin || userRole !== 'global_admin') return null;
+      
+      try {
+        // Count total users
+        const { count: totalUsers, error: usersError } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+          
+        if (usersError) throw usersError;
+        
+        // Count total organizations
+        const { count: totalOrgs, error: orgsError } = await supabase
+          .from('organizations')
+          .select('*', { count: 'exact', head: true });
+          
+        if (orgsError) throw orgsError;
+        
+        // Count admin users
+        const { count: totalAdmins, error: adminsError } = await supabase
+          .from('user_roles')
+          .select('*', { count: 'exact', head: true })
+          .in('role', ['global_admin', 'org_admin']);
+          
+        if (adminsError) throw adminsError;
+        
+        return {
+          totalUsers,
+          totalOrgs,
+          totalAdmins
+        };
+      } catch (error) {
+        console.error('Error fetching platform statistics:', error);
+        return null;
+      }
+    },
+    enabled: isAdmin && userRole === 'global_admin'
+  });
+
+  const isLoading = isRoleLoading || isOrgsLoading || isUsersLoading || isStatsLoading;
   const error = roleError || orgsError || usersError;
 
   // Show error toast if there's an error
@@ -82,5 +126,6 @@ export const useUserManagement = () => {
     createUserMutation,
     updateUserMutation,
     userProfile,
+    statistics
   };
 };

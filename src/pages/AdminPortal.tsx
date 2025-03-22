@@ -8,6 +8,7 @@ import { StatsCards } from "@/components/admin/dashboard/StatsCards";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import OrganizationManagement from "@/components/admin/OrganizationManagement";
+import { GlobalAdminDashboard } from "@/components/admin/GlobalAdminDashboard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link2 } from "lucide-react";
@@ -77,44 +78,52 @@ const AdminPortal = () => {
     <div className="min-h-screen bg-background">
       <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
       <main className="container mx-auto p-8 space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Admin Portal</h1>
-            <p className="text-muted-foreground">
-              Manage your organization's settings and users
-            </p>
-          </div>
-          {activeView !== 'dashboard' && (
-            <button
-              onClick={() => {
-                setActiveView('dashboard');
-                navigate('/admin', { state: { view: 'dashboard' } });
-              }}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-            >
-              <Link2 className="w-4 h-4" />
-              Back to Dashboard
-            </button>
-          )}
-        </div>
-
-        {activeView === 'dashboard' && (
+        {userRole === 'global_admin' ? (
+          // Show the enhanced Global Admin Dashboard for global_admin users
+          <GlobalAdminDashboard />
+        ) : (
+          // Show regular Organization Admin interface for org_admin users
           <>
-            <NavigationCards 
-              activeView={activeView}
-              onViewChange={handleViewChange}
-            />
-            
-            <div className="grid gap-8 md:grid-cols-2">
-              <StatsCards />
-              <LookupTools />
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold">Admin Portal</h1>
+                <p className="text-muted-foreground">
+                  Manage your organization's settings and users
+                </p>
+              </div>
+              {activeView !== 'dashboard' && (
+                <button
+                  onClick={() => {
+                    setActiveView('dashboard');
+                    navigate('/admin', { state: { view: 'dashboard' } });
+                  }}
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  <Link2 className="w-4 h-4" />
+                  Back to Dashboard
+                </button>
+              )}
             </div>
+
+            {activeView === 'dashboard' && (
+              <>
+                <NavigationCards 
+                  activeView={activeView}
+                  onViewChange={handleViewChange}
+                />
+                
+                <div className="grid gap-8 md:grid-cols-2">
+                  <StatsCards />
+                  <LookupTools />
+                </div>
+              </>
+            )}
+
+            {activeView === 'users' && <UserManagement />}
+            {activeView === 'organizations' && <OrganizationManagement />}
+            {activeView === 'settings' && <SystemSettings />}
           </>
         )}
-
-        {activeView === 'users' && <UserManagement />}
-        {activeView === 'organizations' && <OrganizationManagement />}
-        {activeView === 'settings' && <SystemSettings />}
       </main>
     </div>
   );
