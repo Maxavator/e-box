@@ -24,7 +24,7 @@ export function CreateGolderOrgButton() {
     setIsDialogOpen(false);
     
     try {
-      toast.info("Creating test organization and users...");
+      toast.info("Creating Golder organization and users...");
       await createGolderOrg();
     } catch (error: any) {
       console.error("Error creating Golder organization:", error);
@@ -41,12 +41,12 @@ export function CreateGolderOrgButton() {
           variant="outline"
           className="w-full mt-4"
         >
-          Create Test Organization & Users
+          Create Golder Organization & Users
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Test Organization</DialogTitle>
+          <DialogTitle>Create Golder Organization</DialogTitle>
           <DialogDescription>
             This will create:
             <ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
