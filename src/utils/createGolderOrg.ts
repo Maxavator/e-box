@@ -175,15 +175,18 @@ export const createGolderOrg = async () => {
           continue;
         }
 
-        // Create profile
+        // Wait for a moment to ensure the auth user trigger has time to create the profile
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Update profile with organization_id rather than creating it
         const { error: profileError } = await supabase
           .from('profiles')
-          .upsert({
-            id: authData.user.id,
+          .update({
             first_name: user.firstName,
             last_name: user.lastName,
             organization_id: orgId
-          });
+          })
+          .eq('id', authData.user.id);
 
         if (profileError) {
           console.error(`Failed to update profile for ${user.email}:`, profileError);
@@ -261,18 +264,21 @@ const createGlobalAdmin = async () => {
       return null;
     }
 
-    // Create profile for global admin
+    // Wait for a moment to ensure the auth user trigger has time to create the profile
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Update the profile instead of creating it (the trigger should have created it)
     const { error: profileError } = await supabase
       .from('profiles')
-      .upsert({
-        id: authData.user.id,
+      .update({
         first_name: 'Max',
         last_name: 'Dlamini'
-      });
+      })
+      .eq('id', authData.user.id);
 
     if (profileError) {
-      console.error("Failed to create global admin profile:", profileError);
-      toast.error("Failed to create global admin profile: " + profileError.message);
+      console.error("Failed to update global admin profile:", profileError);
+      toast.error("Failed to update global admin profile: " + profileError.message);
       return null;
     }
 

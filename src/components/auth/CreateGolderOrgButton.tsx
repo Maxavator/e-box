@@ -47,10 +47,10 @@ export function CreateGolderOrgButton() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create Golder Organization</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm">
             This will create:
             <div className="mt-2">
-              <ul className="list-disc pl-5 space-y-1 text-sm">
+              <ul className="list-disc pl-5 space-y-1">
                 <li><span className="font-medium">Global Admin:</span> Max Dlamini (m@ramutla.com)</li>
                 <li><span className="font-medium">Organization:</span> Golder (Pty) Ltd.</li>
                 <li><span className="font-medium">10 Users:</span> Including 1 Org Admin and 9 Staff</li>
