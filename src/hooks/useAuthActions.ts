@@ -1,24 +1,26 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { isSaId, formatSaIdToEmail } from "@/utils/saIdValidation";
+import { isSaId, formatSaIdToEmail, validateSaId } from "@/utils/saIdValidation";
 import type { UserRoleType } from "@/types/database";
 
 interface UseAuthActionsProps {
-  email: string;
+  email: string; // Will be interpreted as saId
   password: string;
   setIsLoading: (loading: boolean) => void;
   navigate: (path: string) => void;
 }
 
 const handleLogin = async ({
-  email,
+  email: saId,
   password,
   setIsLoading,
   navigate,
 }: UseAuthActionsProps) => {
-  if (!email || !password) {
-    toast.error("Please enter both email and password");
+  // Validate SA ID
+  const validation = validateSaId(saId);
+  if (!validation.isValid) {
+    toast.error(validation.message || "Invalid SA ID");
     return;
   }
 
@@ -29,19 +31,14 @@ const handleLogin = async ({
     // Clear any existing sessions first to avoid conflicts
     await supabase.auth.signOut();
     
-    // Transform SA ID to email format if needed
-    let loginEmail = email;
-    let loginPassword = password;
+    // Transform SA ID to email format
+    const loginEmail = formatSaIdToEmail(saId);
+    console.log(`Using SA ID format for login: ${loginEmail}`);
     
-    if (isSaId(email)) {
-      loginEmail = formatSaIdToEmail(email);
-      console.log(`Using SA ID format for login: ${loginEmail}`);
-      
-      // For SA ID logins, always use the standard password
-      loginPassword = "StaffPass123!";
-    }
+    // For SA ID logins, always use the standard password
+    const loginPassword = "StaffPass123!";
     
-    console.log(`Attempting login with email: ${loginEmail}`);
+    console.log(`Attempting login with SA ID: ${saId} (email: ${loginEmail})`);
 
     // Attempt login
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -54,8 +51,8 @@ const handleLogin = async ({
       
       // Map Supabase errors to user-friendly messages
       const errorMap: Record<string, string> = {
-        'Invalid login credentials': 'Invalid email/ID or password',
-        'Email not confirmed': 'Please verify your email address',
+        'Invalid login credentials': 'Invalid SA ID or password',
+        'Email not confirmed': 'Account not activated. Please contact support.',
         'Rate limit exceeded': 'Too many login attempts. Please wait a moment',
         'Database error': 'Service temporarily unavailable. Please try again',
       };

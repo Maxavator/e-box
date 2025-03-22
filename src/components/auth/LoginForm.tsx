@@ -9,14 +9,14 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [saId, setSaId] = useState("");
+  const [password, setPassword] = useState("StaffPass123!"); // Default password for ease of testing
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const authActions = useAuthActions({
-    email,
+    email: saId, // We'll handle this in useAuthActions.ts
     password,
     setIsLoading,
     navigate,
@@ -33,23 +33,15 @@ const LoginForm = () => {
     }
   };
 
-  const fillTestAccount = (type: "admin" | "user" | "orgAdmin") => {
-    if (type === "admin") {
-      setEmail("admin@e-box.co.za");
-      setPassword("Admin@2025!Security");
-    } else if (type === "orgAdmin") {
-      setEmail("org-admin@e-box.co.za");
-      setPassword("OrgAdmin123!");
-    } else {
-      setEmail("user@e-box.co.za");
-      setPassword("UserPass123!");
-    }
+  const fillTestAccount = (saId: string) => {
+    setSaId(saId);
+    setPassword("StaffPass123!");
   };
 
   return (
     <Card className="mt-6 w-full">
       <CardHeader>
-        <CardTitle className="text-lg">Sign in with your credentials</CardTitle>
+        <CardTitle className="text-lg">Sign in with your SA ID number</CardTitle>
       </CardHeader>
       <CardContent>
         {error && (
@@ -60,8 +52,8 @@ const LoginForm = () => {
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <LoginFormFields
-            email={email}
-            setEmail={setEmail}
+            saId={saId}
+            setSaId={setSaId}
             password={password}
             setPassword={setPassword}
           />
@@ -89,25 +81,25 @@ const LoginForm = () => {
               variant="outline" 
               size="sm" 
               className="justify-start text-xs"
-              onClick={() => fillTestAccount("admin")}
+              onClick={() => fillTestAccount("8801015800082")}
             >
-              Global Admin: admin@e-box.co.za / Admin@2025!Security
+              Org Admin: Thabo Nkosi (8801015800082)
             </Button>
             <Button 
               variant="outline" 
               size="sm" 
               className="justify-start text-xs"
-              onClick={() => fillTestAccount("orgAdmin")}
+              onClick={() => fillTestAccount("9001075800087")}
             >
-              Org Admin: org-admin@e-box.co.za / OrgAdmin123!
+              Staff: Bongani Khumalo (9001075800087)
             </Button>
             <Button 
               variant="outline" 
               size="sm" 
               className="justify-start text-xs"
-              onClick={() => fillTestAccount("user")}
+              onClick={() => fillTestAccount("8606120800186")}
             >
-              Regular User: user@e-box.co.za / UserPass123!
+              Staff: Zanele Ndlovu (8606120800186)
             </Button>
           </div>
         </div>

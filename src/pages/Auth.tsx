@@ -48,17 +48,17 @@ const Auth = () => {
             Sign in to your account
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Enter your credentials below to access your workspace
+            Enter your SA ID number to access your workspace
           </p>
           
           <LoginForm />
 
           <Alert className="mt-6 bg-blue-50">
             <InfoIcon className="h-4 w-4" />
-            <AlertTitle>For testing purposes</AlertTitle>
+            <AlertTitle>Login with SA ID only</AlertTitle>
             <AlertDescription className="text-xs">
-              Use the test accounts provided above to sign in. The email/password 
-              combinations are set up and ready to use in the database.
+              This system only accepts South African ID numbers for login.
+              Use one of the test accounts provided above to sign in.
             </AlertDescription>
           </Alert>
 

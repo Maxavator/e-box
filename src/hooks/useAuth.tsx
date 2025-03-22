@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { useAuthActions } from "./useAuthActions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { validateSaId } from "@/utils/saIdValidation";
 
 export const useAuth = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [saId, setSaId] = useState("");
+  const [password, setPassword] = useState("StaffPass123!");
   const [isLoading, setIsLoading] = useState(false);
   const [isConnectionChecking, setIsConnectionChecking] = useState(true);
   const [connectionError, setConnectionError] = useState<string | null>(null);
@@ -42,7 +43,7 @@ export const useAuth = () => {
   }, []);
 
   const { handleLogin: handleLoginAction } = useAuthActions({
-    email,
+    email: saId, // We'll interpret this as saId in useAuthActions
     password,
     setIsLoading,
     navigate,
@@ -58,6 +59,13 @@ export const useAuth = () => {
       toast.error(`Connection error: ${connectionError}. Please try again later.`);
       return;
     }
+
+    // Validate SA ID
+    const validation = validateSaId(saId);
+    if (!validation.isValid) {
+      toast.error(validation.message || "Invalid SA ID");
+      return;
+    }
     
     try {
       await handleLoginAction();
@@ -68,8 +76,8 @@ export const useAuth = () => {
   };
 
   return {
-    email,
-    setEmail,
+    saId,
+    setSaId,
     password,
     setPassword,
     isLoading,
