@@ -50,18 +50,68 @@ const handleLogin = async ({
     if (error) {
       console.error('Auth error:', error);
       
-      // Map Supabase errors to user-friendly messages
-      const errorMap: Record<string, string> = {
-        'Invalid login credentials': 'Invalid SA ID or password',
-        'Email not confirmed': 'Account not activated. Please contact support.',
-        'Rate limit exceeded': 'Too many login attempts. Please wait a moment',
-        'Database error': 'Service temporarily unavailable. Please try again',
-      };
+      // Check if the user might not exist - we could try creating the user
+      if (error.message?.includes('Invalid login credentials')) {
+        console.log('User might not exist, attempting to create account...');
+        
+        // Try to create the user account first
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: loginEmail,
+          password: loginPassword,
+          options: {
+            data: {
+              sa_id: saId
+            }
+          }
+        });
+        
+        if (signUpError) {
+          console.error('Sign up error:', signUpError);
+          
+          // If user already exists but password might be wrong, provide clear error
+          if (signUpError.message?.includes('User already registered')) {
+            throw new Error('Account exists but credentials may be incorrect. Please contact support.');
+          }
+          
+          throw new Error(signUpError.message || 'Failed to create account');
+        }
+        
+        if (signUpData?.user) {
+          console.log('Account created successfully, attempting login again...');
+          
+          // Try login again after creating account
+          const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+            email: loginEmail,
+            password: loginPassword,
+          });
+          
+          if (loginError) {
+            console.error('Second login attempt error:', loginError);
+            throw new Error('Account created but login failed. Please try again.');
+          }
+          
+          if (!loginData.user) {
+            throw new Error('Login failed after account creation. Please try again.');
+          }
+          
+          // Continue with the newly created and logged in user
+          data.user = loginData.user;
+          data.session = loginData.session;
+        }
+      } else {
+        // Map Supabase errors to user-friendly messages
+        const errorMap: Record<string, string> = {
+          'Invalid login credentials': 'Invalid SA ID or password',
+          'Email not confirmed': 'Account not activated. Please contact support.',
+          'Rate limit exceeded': 'Too many login attempts. Please wait a moment',
+          'Database error': 'Service temporarily unavailable. Please try again',
+        };
 
-      const errorMessage = errorMap[Object.keys(errorMap).find(key => error.message?.includes(key)) || ''] 
-        || 'Unable to connect. Please try again.';
-      
-      throw new Error(errorMessage);
+        const errorMessage = errorMap[Object.keys(errorMap).find(key => error.message?.includes(key)) || ''] 
+          || 'Unable to connect. Please try again.';
+        
+        throw new Error(errorMessage);
+      }
     }
 
     if (!data.user) {
