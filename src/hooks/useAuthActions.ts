@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { isSaId, formatSaIdToEmail, validateSaId } from "@/utils/saIdValidation";
+import { isSaId, formatSaIdToEmail, validateSaId, formatSaIdPassword } from "@/utils/saIdValidation";
 import type { UserRoleType } from "@/types/database";
 
 interface UseAuthActionsProps {
@@ -35,8 +35,8 @@ const handleLogin = async ({
     const loginEmail = formatSaIdToEmail(saId);
     console.log(`Using SA ID format for login: ${loginEmail}`);
     
-    // For SA ID logins, always use the standard password
-    const loginPassword = "StaffPass123!";
+    // Always use the standard password for SA ID logins
+    const loginPassword = formatSaIdPassword(saId);
     
     console.log(`Attempting login with SA ID: ${saId} (email: ${loginEmail})`);
 

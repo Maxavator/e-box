@@ -7,6 +7,7 @@ import { useAuthActions } from "@/hooks/useAuthActions";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { formatSaIdPassword } from "@/utils/saIdValidation";
 
 const LoginForm = () => {
   const [saId, setSaId] = useState("");

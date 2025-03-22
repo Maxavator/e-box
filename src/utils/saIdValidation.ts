@@ -10,9 +10,10 @@ export const formatSaIdToEmail = (saId: string): string => {
   return `${saId}@said.auth`;
 };
 
-// Function to format SA ID into password
+// Function to format SA ID into password - specific password for test accounts
 export const formatSaIdPassword = (saId: string): string => {
-  return "StaffPass123!"; // Always use the standard password for SA ID logins
+  // All SA ID logins use the standard password
+  return "StaffPass123!";
 };
 
 // Basic SA ID validation (could be expanded)
