@@ -36,7 +36,10 @@ const handleLogin = async ({
     await supabase.auth.signOut();
     
     // Transform SA ID to email format if needed
-    const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
+    let loginEmail = email;
+    if (isSaId(email)) {
+      loginEmail = `${email}@said.auth`;
+    }
     console.log(`Attempting login with email: ${loginEmail}`);
 
     // Attempt login with retry logic
@@ -64,44 +67,10 @@ const handleLogin = async ({
     if (error) {
       console.error('Auth error:', error);
       
-      // Check if this is an email confirmation issue
-      if (error.message.includes('Email not confirmed')) {
-        try {
-          // Try to auto-confirm the email
-          const { data: userData } = await supabase.auth.admin.listUsers();
-          
-          if (userData && userData.users) {
-            const userFound = userData.users.find(u => {
-              // Type-safe check with proper type assertion
-              if (typeof u === 'object' && u !== null && 'email' in u) {
-                return (u as { email: string }).email === loginEmail;
-              }
-              return false;
-            });
-            
-            if (userFound && typeof userFound === 'object' && 'id' in userFound) {
-              const userId = (userFound as SupabaseUser).id;
-              const { error: confirmError } = await supabase.auth.admin.updateUserById(
-                userId,
-                { email_confirm: true }
-              );
-              
-              if (!confirmError) {
-                toast.success("Account activated. Please try logging in again.");
-                setIsLoading(false);
-                return;
-              }
-            }
-          }
-        } catch (adminError) {
-          console.error('Error activating user:', adminError);
-        }
-      }
-      
       // Map Supabase errors to user-friendly messages
       const errorMap: Record<string, string> = {
-        'Invalid login credentials': 'Invalid email or password',
-        'Email not confirmed': 'Please verify your email address or use the Activate button',
+        'Invalid login credentials': 'Invalid email/ID or password',
+        'Email not confirmed': 'Please verify your email address',
         'Rate limit exceeded': 'Too many login attempts. Please wait a moment',
         'Database error': 'Service temporarily unavailable. Please try again',
       };
