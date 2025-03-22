@@ -5,7 +5,6 @@ import LoginForm from "@/components/auth/LoginForm";
 import HeroSection from "@/components/auth/HeroSection";
 import DemoRequestDialog from "@/components/auth/DemoRequestDialog";
 import { CreateGolderOrgButton } from "@/components/auth/CreateGolderOrgButton";
-import { CreateGlobalAdminButton } from "@/components/auth/CreateGlobalAdminButton";
 import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
@@ -46,7 +45,6 @@ const Auth = () => {
           <div className="mt-8 border-t pt-4">
             <h3 className="text-sm font-medium">Developer Tools</h3>
             <CreateGolderOrgButton />
-            <CreateGlobalAdminButton />
           </div>
         </div>
       </div>

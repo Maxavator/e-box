@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { isSaId } from "@/utils/saIdValidation";
 import type { UserRoleType } from "@/types/database";
-import { TEST_ACCOUNTS } from "@/constants/auth";
 
 interface UseAuthActionsProps {
   email: string;
@@ -40,18 +39,6 @@ const handleLogin = async ({
     const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
     console.log(`Attempting login with email: ${loginEmail}`);
 
-    // For demo/test accounts, use predefined passwords
-    let actualPassword = password;
-    if (
-      email === TEST_ACCOUNTS.GLOBAL_ADMIN ||
-      email === TEST_ACCOUNTS.ORG_ADMIN ||
-      email === TEST_ACCOUNTS.REGULAR
-    ) {
-      // For test accounts, use a standard password
-      actualPassword = "password123";
-      console.log("Using test account with standard password");
-    }
-
     // Attempt login with retry logic
     let attempts = 0;
     const maxAttempts = 2;
@@ -61,7 +48,7 @@ const handleLogin = async ({
       try {
         loginResult = await supabase.auth.signInWithPassword({
           email: loginEmail,
-          password: actualPassword,
+          password,
         });
         break; // If successful, exit the retry loop
       } catch (retryError) {
@@ -79,9 +66,36 @@ const handleLogin = async ({
       
       // Check if this is an email confirmation issue
       if (error.message.includes('Email not confirmed')) {
-        toast.error("Your email is not confirmed. Please use the 'Check/Activate User' button to activate your account.");
-        setIsLoading(false);
-        return;
+        try {
+          // Try to auto-confirm the email
+          const { data: userData } = await supabase.auth.admin.listUsers();
+          
+          if (userData && userData.users) {
+            const userFound = userData.users.find(u => {
+              // Type-safe check with proper type assertion
+              if (typeof u === 'object' && u !== null && 'email' in u) {
+                return (u as { email: string }).email === loginEmail;
+              }
+              return false;
+            });
+            
+            if (userFound && typeof userFound === 'object' && 'id' in userFound) {
+              const userId = (userFound as SupabaseUser).id;
+              const { error: confirmError } = await supabase.auth.admin.updateUserById(
+                userId,
+                { email_confirm: true }
+              );
+              
+              if (!confirmError) {
+                toast.success("Account activated. Please try logging in again.");
+                setIsLoading(false);
+                return;
+              }
+            }
+          }
+        } catch (adminError) {
+          console.error('Error activating user:', adminError);
+        }
       }
       
       // Map Supabase errors to user-friendly messages
@@ -100,29 +114,6 @@ const handleLogin = async ({
 
     if (!data.user) {
       throw new Error('Login failed. Please try again.');
-    }
-    
-    // Update last_activity in profiles
-    try {
-      await supabase
-        .from('profiles')
-        .update({ last_activity: new Date().toISOString() })
-        .eq('id', data.user.id);
-      
-      // Update user_statistics
-      await supabase
-        .from('user_statistics')
-        .upsert({
-          user_id: data.user.id,
-          last_login: new Date().toISOString(),
-          login_count: 1
-        }, {
-          onConflict: 'user_id',
-          ignoreDuplicates: false
-        });
-    } catch (statsError) {
-      console.error('Error updating user activity stats:', statsError);
-      // Don't fail the login if stats update fails
     }
 
     // Get user role from user_roles table

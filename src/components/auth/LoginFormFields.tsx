@@ -1,9 +1,6 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TEST_ACCOUNTS } from "@/constants/auth";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface LoginFormFieldsProps {
   email: string;
@@ -31,9 +28,6 @@ export const LoginFormFields = ({
           className="w-full focus:ring-primary"
           autoComplete="email"
         />
-        <p className="text-xs text-muted-foreground">
-          For testing, use ID: {TEST_ACCOUNTS.GLOBAL_ADMIN} (admin) or {TEST_ACCOUNTS.REGULAR} (user)
-        </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
@@ -46,19 +40,7 @@ export const LoginFormFields = ({
           className="w-full focus:ring-primary"
           autoComplete="current-password"
         />
-        <p className="text-xs text-muted-foreground">
-          For test accounts, use: password123
-        </p>
       </div>
-
-      <Alert variant="default" className="mt-4 bg-primary/10">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription className="text-xs">
-          Test credentials:<br />
-          - Admin: {TEST_ACCOUNTS.GLOBAL_ADMIN} / password123<br />
-          - Regular user: {TEST_ACCOUNTS.REGULAR} / password123
-        </AlertDescription>
-      </Alert>
     </>
   );
 };
