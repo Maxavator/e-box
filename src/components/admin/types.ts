@@ -6,6 +6,7 @@ export type { Profile, UserRole, Organization };
 export interface UserWithRole extends Profile {
   user_roles: UserRole[];
   organizations: Pick<Organization, 'name'>[];
+  last_activity?: string | null; // Adding this to fix the type error
   user_statistics?: {
     login_count: number;
     action_count: number;

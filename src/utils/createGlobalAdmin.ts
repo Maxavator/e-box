@@ -8,7 +8,7 @@ export const createGlobalAdmin = async () => {
     console.log("Creating global admin user...");
     
     const saId = "4001015000080";
-    const password = "Admin@2025!Security";
+    const password = "password123"; // Changed to match our standard test password
     
     // Validate SA ID
     if (!isSaId(saId)) {

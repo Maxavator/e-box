@@ -61,11 +61,11 @@ export const UserTable = ({ users, isLoading, onEditUser, isAdmin }: UserTablePr
   const getActivityBadgeVariant = (activityLevel: string) => {
     switch (activityLevel) {
       case 'High':
-        return 'success';
+        return 'default'; // Changed from 'success' to a valid variant
       case 'Medium':
-        return 'warning';
+        return 'secondary'; // Changed from 'warning' to a valid variant
       case 'Low':
-        return 'secondary';
+        return 'outline'; // Changed from 'secondary' to maintain consistency
       case 'Inactive':
       default:
         return 'destructive';

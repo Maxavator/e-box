@@ -51,7 +51,7 @@ export const LoginFormFields = ({
         </p>
       </div>
 
-      <Alert variant="info" className="mt-4 bg-primary/10">
+      <Alert variant="default" className="mt-4 bg-primary/10">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription className="text-xs">
           Test credentials:<br />
