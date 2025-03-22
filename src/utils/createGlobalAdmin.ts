@@ -20,11 +20,22 @@ export const createGlobalAdmin = async () => {
     const email = `${saId}@said.auth`;
     
     // Check if user already exists
-    const { data: { users } } = await supabase.auth.admin.listUsers();
+    const { data, error: listError } = await supabase.auth.admin.listUsers();
     
-    const existingUser = users?.find(u => {
+    if (listError) {
+      console.error("Error listing users:", listError);
+      toast.error("Failed to check existing users: " + listError.message);
+      return;
+    }
+
+    const users = data?.users || [];
+    console.log("Found users:", users.length);
+    
+    const existingUser = users.find(u => {
       if (typeof u === 'object' && u !== null && 'email' in u) {
-        return (u as { email: string }).email === email;
+        const userEmail = (u as { email: string }).email;
+        console.log("Checking user:", userEmail);
+        return userEmail === email;
       }
       return false;
     });
@@ -47,8 +58,11 @@ export const createGlobalAdmin = async () => {
       }
       
       toast.success("User updated to global admin successfully");
+      toast.info(`Login with ID: ${saId} and password: ${password}`);
       return;
     }
+    
+    console.log("Creating new admin user with email:", email);
     
     // Create auth user
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
@@ -73,19 +87,19 @@ export const createGlobalAdmin = async () => {
       return;
     }
 
-    console.log("Auth user created successfully");
+    console.log("Auth user created successfully with ID:", authData.user.id);
 
     // Create profile
     const { error: profileError } = await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        id: authData.user.id,
         first_name: "Global",
         last_name: "Administrator"
-      })
-      .eq('id', authData.user.id);
+      });
 
     if (profileError) {
-      console.error("Failed to update admin profile:", profileError);
+      console.error("Failed to create admin profile:", profileError);
       toast.error("Failed to create admin profile: " + profileError.message);
       return;
     }
@@ -106,6 +120,7 @@ export const createGlobalAdmin = async () => {
 
     console.log("Global admin created successfully");
     toast.success("Global admin created successfully");
+    toast.info(`Login with ID: ${saId} and password: ${password}`);
     
   } catch (error: any) {
     console.error("Error creating global admin:", error);
