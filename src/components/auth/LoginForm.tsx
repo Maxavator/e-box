@@ -8,6 +8,7 @@ import { LoginFormFields } from "./LoginFormFields";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { TEST_ACCOUNTS } from "@/constants/auth";
 
 const LoginForm = () => {
   const {
@@ -86,6 +87,16 @@ const LoginForm = () => {
 
   const isButtonDisabled = isLoading || isConnectionChecking;
 
+  const fillTestCredentials = (type: 'admin' | 'user') => {
+    if (type === 'admin') {
+      setEmail(TEST_ACCOUNTS.GLOBAL_ADMIN);
+      setPassword("password123");
+    } else {
+      setEmail(TEST_ACCOUNTS.REGULAR);
+      setPassword("password123");
+    }
+  };
+
   return (
     <Card className="w-full mt-6 border">
       <CardHeader className="space-y-1">
@@ -129,6 +140,26 @@ const LoginForm = () => {
             >
               {buttonText}
             </Button>
+            
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <Button 
+                type="button" 
+                variant="outline"
+                className="w-full"
+                onClick={() => fillTestCredentials('admin')}
+              >
+                Use Admin Account
+              </Button>
+              
+              <Button 
+                type="button" 
+                variant="outline"
+                className="w-full"
+                onClick={() => fillTestCredentials('user')}
+              >
+                Use User Account
+              </Button>
+            </div>
             
             <Button 
               type="button" 

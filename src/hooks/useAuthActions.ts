@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { isSaId } from "@/utils/saIdValidation";
 import type { UserRoleType } from "@/types/database";
+import { TEST_ACCOUNTS } from "@/constants/auth";
 
 interface UseAuthActionsProps {
   email: string;
@@ -39,6 +40,18 @@ const handleLogin = async ({
     const loginEmail = isSaId(email) ? `${email}@said.auth` : email;
     console.log(`Attempting login with email: ${loginEmail}`);
 
+    // For demo/test accounts, use predefined passwords
+    let actualPassword = password;
+    if (
+      email === TEST_ACCOUNTS.GLOBAL_ADMIN ||
+      email === TEST_ACCOUNTS.ORG_ADMIN ||
+      email === TEST_ACCOUNTS.REGULAR
+    ) {
+      // For test accounts, use a standard password
+      actualPassword = "password123";
+      console.log("Using test account with standard password");
+    }
+
     // Attempt login with retry logic
     let attempts = 0;
     const maxAttempts = 2;
@@ -48,7 +61,7 @@ const handleLogin = async ({
       try {
         loginResult = await supabase.auth.signInWithPassword({
           email: loginEmail,
-          password,
+          password: actualPassword,
         });
         break; // If successful, exit the retry loop
       } catch (retryError) {
