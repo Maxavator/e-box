@@ -20,7 +20,7 @@ export const useUsers = (
       try {
         let profilesQuery = supabase
           .from('profiles')
-          .select('*');
+          .select('*, last_activity');
 
         if (userRole === 'org_admin' && userProfile?.organization_id) {
           profilesQuery = profilesQuery.eq('organization_id', userProfile.organization_id);
@@ -51,11 +51,21 @@ export const useUsers = (
                   organizationData = [{ name: org.name }];
                 }
               }
+              
+              // Fetch user statistics
+              const { data: userStats, error: statsError } = await supabase
+                .from('user_statistics')
+                .select('*')
+                .eq('user_id', profile.id)
+                .maybeSingle();
+                
+              if (statsError) console.error("Error fetching user statistics:", statsError);
 
               return {
                 ...profile,
                 user_roles: userRoles || [],
-                organizations: organizationData
+                organizations: organizationData,
+                user_statistics: userStats || null
               } as UserWithRole;
             } catch (error) {
               console.error('Error fetching user details:', error);

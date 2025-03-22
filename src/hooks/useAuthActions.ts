@@ -88,6 +88,29 @@ const handleLogin = async ({
     if (!data.user) {
       throw new Error('Login failed. Please try again.');
     }
+    
+    // Update last_activity in profiles
+    try {
+      await supabase
+        .from('profiles')
+        .update({ last_activity: new Date().toISOString() })
+        .eq('id', data.user.id);
+      
+      // Update user_statistics
+      await supabase
+        .from('user_statistics')
+        .upsert({
+          user_id: data.user.id,
+          last_login: new Date().toISOString(),
+          login_count: 1
+        }, {
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        });
+    } catch (statsError) {
+      console.error('Error updating user activity stats:', statsError);
+      // Don't fail the login if stats update fails
+    }
 
     // Get user role from user_roles table
     const { data: roleData, error: roleError } = await supabase
