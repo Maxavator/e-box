@@ -19,64 +19,66 @@ export const createGlobalAdmin = async () => {
     // Format email from SA ID
     const email = `${saId}@said.auth`;
     
-    // Check if user already exists
-    const { data, error: listError } = await supabase.auth.admin.listUsers();
-    
-    if (listError) {
-      console.error("Error listing users:", listError);
-      toast.error("Failed to check existing users: " + listError.message);
-      return;
-    }
-
-    const users = data?.users || [];
-    console.log("Found users:", users.length);
-    
-    const existingUser = users.find(u => {
-      if (typeof u === 'object' && u !== null && 'email' in u) {
-        const userEmail = (u as { email: string }).email;
-        console.log("Checking user:", userEmail);
-        return userEmail === email;
-      }
-      return false;
-    });
-    
-    if (existingUser) {
-      console.log("User already exists, updating to global admin role");
-      
-      // Update user role to global_admin
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .upsert({
-          user_id: existingUser.id,
-          role: 'global_admin'
-        });
-        
-      if (roleError) {
-        console.error("Error updating user role:", roleError);
-        toast.error("Failed to update user role: " + roleError.message);
-        return;
-      }
-      
-      toast.success("User updated to global admin successfully");
-      toast.info(`Login with ID: ${saId} and password: ${password}`);
-      return;
-    }
-    
     console.log("Creating new admin user with email:", email);
     
-    // Create auth user
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    // Create auth user directly using signUp instead of admin API
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email: email,
       password: password,
-      email_confirm: true,
-      user_metadata: {
-        first_name: "Global",
-        last_name: "Administrator"
+      options: {
+        data: {
+          first_name: "Global",
+          last_name: "Administrator"
+        }
       }
     });
 
     if (authError) {
       console.error("Failed to create admin user:", authError);
+      
+      // Special case: if user already exists, we'll try to sign in and update role
+      if (authError.message.includes("already exists")) {
+        toast.info("Admin user already exists, attempting to sign in and update role");
+        
+        // Try to sign in
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+        
+        if (signInError) {
+          toast.error("Failed to authenticate with existing admin account: " + signInError.message);
+          return;
+        }
+        
+        if (!signInData.user) {
+          toast.error("Failed to authenticate with existing admin account: No user returned");
+          return;
+        }
+        
+        // Update user role to global_admin
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .upsert({
+            user_id: signInData.user.id,
+            role: 'global_admin'
+          });
+          
+        if (roleError) {
+          console.error("Error updating user role:", roleError);
+          toast.error("Failed to update user role: " + roleError.message);
+          return;
+        }
+        
+        toast.success("User updated to global admin successfully");
+        toast.info(`Login with ID: ${saId} and password: ${password}`);
+        
+        // Sign out after making changes
+        await supabase.auth.signOut();
+        
+        return;
+      }
+      
       toast.error("Failed to create admin user: " + authError.message);
       return;
     }
@@ -117,6 +119,9 @@ export const createGlobalAdmin = async () => {
       toast.error("Failed to assign admin role: " + roleError.message);
       return;
     }
+
+    // Sign out after creating the admin user
+    await supabase.auth.signOut();
 
     console.log("Global admin created successfully");
     toast.success("Global admin created successfully");
