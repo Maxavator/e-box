@@ -150,15 +150,16 @@ export const createGolderOrg = async () => {
       try {
         console.log(`Creating user: ${user.firstName} ${user.lastName}`);
         
-        // Create auth user
-        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        // Create auth user - Using signUp instead of admin.createUser
+        const { data: authData, error: authError } = await supabase.auth.signUp({
           email: user.email,
           password: 'StaffPass123!',
-          email_confirm: true,
-          user_metadata: {
-            first_name: user.firstName,
-            last_name: user.lastName,
-            sa_id: user.saId
+          options: {
+            data: {
+              first_name: user.firstName,
+              last_name: user.lastName,
+              sa_id: user.saId
+            }
           }
         });
 
@@ -236,14 +237,15 @@ const createGlobalAdmin = async () => {
   try {
     console.log("Creating global admin: Max Dlamini");
     
-    // Create auth user for global admin
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    // Create auth user for global admin - Using signUp instead of admin.createUser
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email: 'm@ramutla.com',
       password: 'Admin@2025!Security',
-      email_confirm: true,
-      user_metadata: {
-        first_name: 'Max',
-        last_name: 'Dlamini',
+      options: {
+        data: {
+          first_name: 'Max',
+          last_name: 'Dlamini',
+        }
       }
     });
 
