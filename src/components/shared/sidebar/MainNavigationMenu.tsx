@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import {
   MessageSquare,
@@ -53,22 +54,6 @@ export function MainNavigationMenu({
   
   return (
     <SidebarMenu>
-      {/* My Desk as a direct button - No longer a dropdown */}
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="My Desk"
-          onClick={() => handleNavigation("/mydesk")}
-        >
-          <Briefcase className="h-4 w-4" />
-          <span>My Desk {organizationName ? `@${organizationName}` : ''}</span>
-          {(documentsCount > 0 || leaveCount > 0) && (
-            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {documentsCount + leaveCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="Chats" 
@@ -136,6 +121,22 @@ export function MainNavigationMenu({
           </SidebarMenuButton>
         </SidebarMenuItem>
       )}
+      
+      {/* My Desk as a direct button - Moved to the bottom of the list */}
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="My Desk"
+          onClick={() => handleNavigation("/mydesk")}
+        >
+          <Briefcase className="h-4 w-4" />
+          <span>My Desk {organizationName ? `@${organizationName}` : ''}</span>
+          {(documentsCount > 0 || leaveCount > 0) && (
+            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {documentsCount + leaveCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
     </SidebarMenu>
   );
 }
