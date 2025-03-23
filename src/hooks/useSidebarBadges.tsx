@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useChat } from "@/hooks/use-chat";
 
 export function useSidebarBadges() {
   const [chatCount, setChatCount] = useState(0);
@@ -35,6 +34,8 @@ export function useSidebarBadges() {
           
           setDocumentsCount(Math.floor(Math.random() * 5));
           setCalendarCount(Math.floor(Math.random() * 3));
+          setContactsCount(Math.floor(Math.random() * 4));
+          setLeaveCount(Math.floor(Math.random() * 2));
           
           // Set up realtime subscriptions for new messages
           const channel = supabase
@@ -51,6 +52,12 @@ export function useSidebarBadges() {
             })
             .on('broadcast', { event: 'new-calendar-event' }, payload => {
               setCalendarCount(prev => prev + 1);
+            })
+            .on('broadcast', { event: 'new-contact' }, payload => {
+              setContactsCount(prev => prev + 1);
+            })
+            .on('broadcast', { event: 'new-leave' }, payload => {
+              setLeaveCount(prev => prev + 1);
             })
             .subscribe();
             
