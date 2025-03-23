@@ -15,7 +15,6 @@ import {
 import { UserProfileSidebarFooter } from "./UserProfileSidebarFooter";
 import { useSidebarBadges } from "@/hooks/useSidebarBadges";
 import { MainNavigationMenu } from "./sidebar/MainNavigationMenu";
-import { AdminToolsMenu } from "./sidebar/AdminToolsMenu";
 
 export function AppSidebar() {
   const navigate = useNavigate();
@@ -64,18 +63,8 @@ export function AppSidebar() {
             contactsCount={contactsCount}
             leaveCount={leaveCount}
             resetBadgeCount={resetBadgeCount}
+            isAdmin={hasAdminAccess}
           />
-        </SidebarGroup>
-          
-        {/* Admin tools section - Only visible to admin users */}
-        {/* Force display the admin section for debugging */}
-        <SidebarGroup className="mt-6">
-          <SidebarGroupLabel className="text-xs font-medium px-3 py-2">
-            Admin Tools
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <AdminToolsMenu />
-          </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       

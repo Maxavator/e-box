@@ -9,6 +9,7 @@ import {
   Settings,
   Briefcase,
   LayoutDashboard,
+  Shield,
 } from "lucide-react";
 
 import {
@@ -25,6 +26,7 @@ interface MainNavigationMenuProps {
   contactsCount: number;
   leaveCount: number;
   resetBadgeCount: (type: 'chat' | 'documents' | 'calendar' | 'contacts' | 'leave') => void;
+  isAdmin?: boolean;
 }
 
 export function MainNavigationMenu({
@@ -33,7 +35,8 @@ export function MainNavigationMenu({
   calendarCount,
   contactsCount,
   leaveCount,
-  resetBadgeCount
+  resetBadgeCount,
+  isAdmin = false
 }: MainNavigationMenuProps) {
   const navigate = useNavigate();
   
@@ -59,6 +62,19 @@ export function MainNavigationMenu({
           <span>Dashboard</span>
         </SidebarMenuButton>
       </SidebarMenuItem>
+      
+      {/* Admin Portal menu item - only displayed for admin users */}
+      {isAdmin && (
+        <SidebarMenuItem>
+          <SidebarMenuButton 
+            tooltip="Admin Portal" 
+            onClick={() => handleNavigation("/admin")}
+          >
+            <Shield className="h-4 w-4" />
+            <span>Admin Portal</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      )}
       
       <SidebarMenuItem>
         <SidebarMenuButton 
