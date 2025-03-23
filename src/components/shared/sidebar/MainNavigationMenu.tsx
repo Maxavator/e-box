@@ -63,19 +63,6 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* Admin Portal menu item - only displayed for admin users */}
-      {isAdmin && (
-        <SidebarMenuItem>
-          <SidebarMenuButton 
-            tooltip="Admin Portal" 
-            onClick={() => handleNavigation("/admin")}
-          >
-            <Shield className="h-4 w-4" />
-            <span>Admin Portal</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      )}
-      
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="Chats" 
@@ -170,6 +157,19 @@ export function MainNavigationMenu({
           <span>Settings</span>
         </SidebarMenuButton>
       </SidebarMenuItem>
+      
+      {/* Admin Portal menu item - only displayed for admin users */}
+      {isAdmin && (
+        <SidebarMenuItem>
+          <SidebarMenuButton 
+            tooltip="Admin Portal" 
+            onClick={() => handleNavigation("/admin")}
+          >
+            <Shield className="h-4 w-4" />
+            <span>Admin Portal</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      )}
     </SidebarMenu>
   );
 }
