@@ -4,12 +4,15 @@
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
+// Define the Attribute type that was missing
+type Attribute = string;
+
 // Define the ThemeProviderProps interface manually since we can't import from next-themes/dist/types
 interface ThemeProviderProps {
   children: React.ReactNode;
   defaultTheme?: string;
   storageKey?: string;
-  attribute?: string | string[];
+  attribute?: Attribute | Attribute[];
   value?: any;
   enableSystem?: boolean;
   disableTransitionOnChange?: boolean;
