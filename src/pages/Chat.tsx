@@ -60,56 +60,54 @@ const Chat = () => {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <ResizablePanelGroup direction="horizontal" className="h-full flex-1">
-        {/* Chat sidebar */}
-        <ResizablePanel defaultSize={25} minSize={20} maxSize={30} className="h-full">
-          <ChatSidebar
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            conversations={filteredConversations}
-            selectedConversation={selectedConversation}
-            onSelectConversation={handleSelectConversation}
-            onCalendarActionClick={handleCalendarActionClick}
-          />
-        </ResizablePanel>
-        
-        <ResizableHandle withHandle />
-        
-        {/* Chat content */}
-        <ResizablePanel defaultSize={75} className="h-full">
-          <div className="flex flex-col h-full">
-            {selectedConversation ? (
-              <>
-                <div className="bg-muted/20 p-2 border-b flex justify-between items-center">
-                  <h2 className="text-sm font-medium">{selectedConversation.name}</h2>
-                </div>
-                <ChatContent
-                  conversation={selectedConversation}
-                  onEditMessage={handleEditMessage}
-                  onDeleteMessage={handleDeleteMessage}
-                  onReactToMessage={handleReaction}
-                />
-                <ChatInput
-                  value={newMessage}
-                  onChange={setNewMessage}
-                  onSendMessage={handleSendMessage}
-                />
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-full p-8 text-center text-muted-foreground">
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Select a Conversation</h3>
-                  <p>Choose a conversation from the sidebar or start a new one</p>
-                </div>
+    <ResizablePanelGroup direction="horizontal" className="h-full">
+      {/* Chat sidebar */}
+      <ResizablePanel defaultSize={25} minSize={20} maxSize={30} className="h-full">
+        <ChatSidebar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          conversations={filteredConversations}
+          selectedConversation={selectedConversation}
+          onSelectConversation={handleSelectConversation}
+          onCalendarActionClick={handleCalendarActionClick}
+        />
+      </ResizablePanel>
+      
+      <ResizableHandle withHandle />
+      
+      {/* Chat content */}
+      <ResizablePanel defaultSize={75} className="h-full">
+        <div className="flex flex-col h-full">
+          {selectedConversation ? (
+            <>
+              <div className="bg-muted/20 p-2 border-b flex justify-between items-center">
+                <h2 className="text-sm font-medium">{selectedConversation.name}</h2>
               </div>
-            )}
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </div>
+              <ChatContent
+                conversation={selectedConversation}
+                onEditMessage={handleEditMessage}
+                onDeleteMessage={handleDeleteMessage}
+                onReactToMessage={handleReaction}
+              />
+              <ChatInput
+                value={newMessage}
+                onChange={setNewMessage}
+                onSendMessage={handleSendMessage}
+              />
+            </>
+          ) : (
+            <div className="flex items-center justify-center h-full p-8 text-center text-muted-foreground">
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Select a Conversation</h3>
+                <p>Choose a conversation from the sidebar or start a new one</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   );
 }
 

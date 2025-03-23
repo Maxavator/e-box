@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { MainLayout } from "@/components/shared/MainLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Bell, Shield } from "lucide-react";
@@ -103,219 +101,216 @@ export const Settings = () => {
     }
   };
 
-  // Wrap the content with MainLayout to include the sidebar
   return (
-    <MainLayout>
-      <div className="max-w-5xl mx-auto p-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your account settings and preferences
-          </p>
-        </div>
-
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full md:w-auto grid-cols-3 h-auto p-1">
-            <TabsTrigger value="profile" className="flex items-center gap-2 py-2">
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Profile</span>
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-2 py-2">
-              <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">Notifications</span>
-            </TabsTrigger>
-            <TabsTrigger value="security" className="flex items-center gap-2 py-2">
-              <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">Security</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="profile" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
-                <CardDescription>
-                  Update your personal information and how it appears on your profile
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {settings?.avatarUrl && (
-                  <div className="flex flex-col items-center sm:items-start sm:flex-row gap-4 pb-4">
-                    <Avatar className="h-20 w-20">
-                      <AvatarImage src={settings.avatarUrl} alt="Profile picture" />
-                      <AvatarFallback>
-                        {settings.firstName?.[0]}{settings.lastName?.[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col justify-center">
-                      <h3 className="text-lg font-medium">Profile Picture</h3>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        This is your public profile picture visible to other users
-                      </p>
-                      <Button variant="outline" size="sm" className="self-start">
-                        Change Picture
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      value={settings?.firstName || ''}
-                      onChange={(e) => setSettings(prev => prev ? { ...prev, firstName: e.target.value } : null)}
-                      placeholder="Your first name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      value={settings?.lastName || ''}
-                      onChange={(e) => setSettings(prev => prev ? { ...prev, lastName: e.target.value } : null)}
-                      placeholder="Your last name"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="jobTitle">Job Title</Label>
-                  <Input
-                    id="jobTitle"
-                    value={settings?.jobTitle || ''}
-                    onChange={(e) => setSettings(prev => prev ? { ...prev, jobTitle: e.target.value } : null)}
-                    placeholder="Your job title"
-                  />
-                </div>
-                
-                {/* New phone number fields */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="mobilePhone">Mobile Phone Number</Label>
-                    <Input
-                      id="mobilePhone"
-                      value={settings?.mobilePhoneNumber || ''}
-                      onChange={(e) => setSettings(prev => prev ? { ...prev, mobilePhoneNumber: e.target.value } : null)}
-                      placeholder="Your mobile phone number"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="officePhone">Office Telephone Number</Label>
-                    <Input
-                      id="officePhone"
-                      value={settings?.officePhoneNumber || ''}
-                      onChange={(e) => setSettings(prev => prev ? { ...prev, officePhoneNumber: e.target.value } : null)}
-                      placeholder="Your office telephone number"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="phoneExtension">Extension (optional)</Label>
-                  <Input
-                    id="phoneExtension"
-                    value={settings?.phoneExtension || ''}
-                    onChange={(e) => setSettings(prev => prev ? { ...prev, phoneExtension: e.target.value } : null)}
-                    placeholder="Extension number (if applicable)"
-                  />
-                </div>
-                
-                <Button onClick={handleSave} disabled={saving} className="mt-4">
-                  {saving ? "Saving..." : "Save Changes"}
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="notifications" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Notification Preferences</CardTitle>
-                <CardDescription>
-                  Configure how you want to receive notifications
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Email Notifications</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Receive email notifications for important updates
-                    </div>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.emailNotifications}
-                    onCheckedChange={(checked) =>
-                      setNotificationSettings(prev => ({ ...prev, emailNotifications: checked }))
-                    }
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Desktop Notifications</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Show desktop notifications when you receive new messages
-                    </div>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.desktopNotifications}
-                    onCheckedChange={(checked) =>
-                      setNotificationSettings(prev => ({ ...prev, desktopNotifications: checked }))
-                    }
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Calendar Reminders</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Get reminders for upcoming calendar events
-                    </div>
-                  </div>
-                  <Switch
-                    checked={true}
-                    onCheckedChange={() => {}}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="security" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
-                <CardDescription>
-                  Manage your account security preferences
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label>Password</Label>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <Input type="password" value="••••••••••••" disabled className="bg-gray-50" />
-                    <Button variant="outline" className="sm:ml-auto">Change Password</Button>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Last changed 3 months ago
-                  </p>
-                </div>
-
-                <div className="space-y-2 pt-4">
-                  <Label>Two-Factor Authentication</Label>
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm text-muted-foreground">
-                      Add an extra layer of security to your account
-                    </div>
-                    <Button variant="outline">Set up 2FA</Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+    <div className="max-w-5xl mx-auto p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
+        <p className="text-muted-foreground mt-2">
+          Manage your account settings and preferences
+        </p>
       </div>
-    </MainLayout>
+
+      <Tabs defaultValue="profile" className="space-y-6">
+        <TabsList className="grid w-full md:w-auto grid-cols-3 h-auto p-1">
+          <TabsTrigger value="profile" className="flex items-center gap-2 py-2">
+            <User className="h-4 w-4" />
+            <span className="hidden sm:inline">Profile</span>
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="flex items-center gap-2 py-2">
+            <Bell className="h-4 w-4" />
+            <span className="hidden sm:inline">Notifications</span>
+          </TabsTrigger>
+          <TabsTrigger value="security" className="flex items-center gap-2 py-2">
+            <Shield className="h-4 w-4" />
+            <span className="hidden sm:inline">Security</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="profile" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Personal Information</CardTitle>
+              <CardDescription>
+                Update your personal information and how it appears on your profile
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {settings?.avatarUrl && (
+                <div className="flex flex-col items-center sm:items-start sm:flex-row gap-4 pb-4">
+                  <Avatar className="h-20 w-20">
+                    <AvatarImage src={settings.avatarUrl} alt="Profile picture" />
+                    <AvatarFallback>
+                      {settings.firstName?.[0]}{settings.lastName?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col justify-center">
+                    <h3 className="text-lg font-medium">Profile Picture</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      This is your public profile picture visible to other users
+                    </p>
+                    <Button variant="outline" size="sm" className="self-start">
+                      Change Picture
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    value={settings?.firstName || ''}
+                    onChange={(e) => setSettings(prev => prev ? { ...prev, firstName: e.target.value } : null)}
+                    placeholder="Your first name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    value={settings?.lastName || ''}
+                    onChange={(e) => setSettings(prev => prev ? { ...prev, lastName: e.target.value } : null)}
+                    placeholder="Your last name"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle">Job Title</Label>
+                <Input
+                  id="jobTitle"
+                  value={settings?.jobTitle || ''}
+                  onChange={(e) => setSettings(prev => prev ? { ...prev, jobTitle: e.target.value } : null)}
+                  placeholder="Your job title"
+                />
+              </div>
+              
+              {/* New phone number fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="mobilePhone">Mobile Phone Number</Label>
+                  <Input
+                    id="mobilePhone"
+                    value={settings?.mobilePhoneNumber || ''}
+                    onChange={(e) => setSettings(prev => prev ? { ...prev, mobilePhoneNumber: e.target.value } : null)}
+                    placeholder="Your mobile phone number"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="officePhone">Office Telephone Number</Label>
+                  <Input
+                    id="officePhone"
+                    value={settings?.officePhoneNumber || ''}
+                    onChange={(e) => setSettings(prev => prev ? { ...prev, officePhoneNumber: e.target.value } : null)}
+                    placeholder="Your office telephone number"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="phoneExtension">Extension (optional)</Label>
+                <Input
+                  id="phoneExtension"
+                  value={settings?.phoneExtension || ''}
+                  onChange={(e) => setSettings(prev => prev ? { ...prev, phoneExtension: e.target.value } : null)}
+                  placeholder="Extension number (if applicable)"
+                />
+              </div>
+              
+              <Button onClick={handleSave} disabled={saving} className="mt-4">
+                {saving ? "Saving..." : "Save Changes"}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Notification Preferences</CardTitle>
+              <CardDescription>
+                Configure how you want to receive notifications
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Email Notifications</Label>
+                  <div className="text-sm text-muted-foreground">
+                    Receive email notifications for important updates
+                  </div>
+                </div>
+                <Switch
+                  checked={notificationSettings.emailNotifications}
+                  onCheckedChange={(checked) =>
+                    setNotificationSettings(prev => ({ ...prev, emailNotifications: checked }))
+                  }
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Desktop Notifications</Label>
+                  <div className="text-sm text-muted-foreground">
+                    Show desktop notifications when you receive new messages
+                  </div>
+                </div>
+                <Switch
+                  checked={notificationSettings.desktopNotifications}
+                  onCheckedChange={(checked) =>
+                    setNotificationSettings(prev => ({ ...prev, desktopNotifications: checked }))
+                  }
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Calendar Reminders</Label>
+                  <div className="text-sm text-muted-foreground">
+                    Get reminders for upcoming calendar events
+                  </div>
+                </div>
+                <Switch
+                  checked={true}
+                  onCheckedChange={() => {}}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Security Settings</CardTitle>
+              <CardDescription>
+                Manage your account security preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label>Password</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <Input type="password" value="••••••••••••" disabled className="bg-gray-50" />
+                  <Button variant="outline" className="sm:ml-auto">Change Password</Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Last changed 3 months ago
+                </p>
+              </div>
+
+              <div className="space-y-2 pt-4">
+                <Label>Two-Factor Authentication</Label>
+                <div className="flex justify-between items-center">
+                  <div className="text-sm text-muted-foreground">
+                    Add an extra layer of security to your account
+                  </div>
+                  <Button variant="outline">Set up 2FA</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
