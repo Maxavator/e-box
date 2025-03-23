@@ -19,6 +19,30 @@ interface ThemeProviderProps {
   forcedTheme?: string;
 }
 
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+export function ThemeProvider({ 
+  children,
+  attribute,
+  defaultTheme,
+  storageKey,
+  value,
+  enableSystem,
+  disableTransitionOnChange,
+  forcedTheme
+}: ThemeProviderProps) {
+  // Cast attribute to Attribute or Attribute[] to satisfy TypeScript
+  const attributeValue = attribute as Attribute | Attribute[];
+  
+  return (
+    <NextThemesProvider 
+      attribute={attributeValue}
+      defaultTheme={defaultTheme}
+      storageKey={storageKey}
+      value={value}
+      enableSystem={enableSystem}
+      disableTransitionOnChange={disableTransitionOnChange}
+      forcedTheme={forcedTheme}
+    >
+      {children}
+    </NextThemesProvider>
+  );
 }
