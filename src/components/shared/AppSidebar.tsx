@@ -16,7 +16,7 @@ import { MainNavigationMenu } from "./sidebar/MainNavigationMenu";
 
 export function AppSidebar() {
   const navigate = useNavigate();
-  const { isAdmin, userRole, isLoading } = useUserRole();
+  const { isAdmin, userRole, isLoading, error } = useUserRole();
   const { 
     chatCount, 
     documentsCount, 
@@ -34,6 +34,10 @@ export function AppSidebar() {
   console.log('Sidebar - Is admin:', isAdmin);
   console.log('Sidebar - Has admin access:', hasAdminAccess);
   console.log('Sidebar - Admin check details:', { isAdmin, userRole, hasAdminAccess });
+
+  if (error) {
+    console.error('Sidebar - Error fetching user role:', error);
+  }
 
   return (
     <Sidebar>
