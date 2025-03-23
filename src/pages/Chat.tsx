@@ -85,28 +85,30 @@ const Chat = () => {
 
   return (
     <SidebarProvider>
-      <ChatLayout
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        conversations={filteredConversations}
-        selectedConversation={selectedConversation}
-        onSelectConversation={handleSelectConversation}
-        onCalendarActionClick={handleCalendarActionClick}
-        newMessage={newMessage}
-        onNewMessageChange={setNewMessage}
-        onSendMessage={handleSendMessage}
-        onEditMessage={handleEditMessage}
-        onDeleteMessage={handleDeleteMessage}
-        onReactToMessage={handleReaction}
-        calendarView={calendarView}
-        onLogout={handleLogout}
-        onLogoClick={handleLogoClick}
-        isMobile={isMobile}
-      />
+      <div className="flex flex-col min-h-screen w-full">
+        <ChatLayout
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          conversations={filteredConversations}
+          selectedConversation={selectedConversation}
+          onSelectConversation={handleSelectConversation}
+          onCalendarActionClick={handleCalendarActionClick}
+          newMessage={newMessage}
+          onNewMessageChange={setNewMessage}
+          onSendMessage={handleSendMessage}
+          onEditMessage={handleEditMessage}
+          onDeleteMessage={handleDeleteMessage}
+          onReactToMessage={handleReaction}
+          calendarView={calendarView}
+          onLogout={handleLogout}
+          onLogoClick={handleLogoClick}
+          isMobile={isMobile}
+        />
+      </div>
     </SidebarProvider>
   );
-};
+}
 
 export default Chat;
