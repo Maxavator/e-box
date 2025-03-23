@@ -8,9 +8,10 @@ import { ProfileControls } from "./ProfileControls";
 import { OrganizationInfo } from "./OrganizationInfo";
 import { AdminButton } from "./AdminButton";
 import { VersionInfo } from "./VersionInfo";
+import { UserRoleBadge } from "./UserRoleBadge";
 
 export function UserProfileSidebarFooter() {
-  const { isAdmin } = useUserRole();
+  const { isAdmin, userRole } = useUserRole();
   const [userName, setUserName] = useState<{ firstName: string; lastName: string } | null>(null);
 
   // Get current session
@@ -31,7 +32,7 @@ export function UserProfileSidebarFooter() {
       console.log('Fetching profile for user ID:', session?.user?.id);
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name, avatar_url, job_title, email, organization_id')
+        .select('first_name, last_name, avatar_url, job_title, organization_id')
         .eq('id', session!.user.id)
         .single();
       
@@ -104,7 +105,7 @@ export function UserProfileSidebarFooter() {
   const jobTitle = profile?.job_title || '';
   const hasOrganization = !!profile?.organization_id;
 
-  console.log('Rendering user profile:', { firstName, lastName, jobTitle, hasOrganization });
+  console.log('Rendering user profile:', { firstName, lastName, jobTitle, hasOrganization, organizationId: profile?.organization_id });
 
   return (
     <div className="flex flex-col p-3 w-full">
@@ -117,7 +118,11 @@ export function UserProfileSidebarFooter() {
         hasOrganization={hasOrganization}
       />
       
-      <ProfileControls />
+      <div className="flex items-center justify-between mb-3 border border-border/30 rounded-md p-2">
+        <UserRoleBadge />
+        <span className="text-muted-foreground">|</span>
+        <ProfileControls />
+      </div>
       
       <OrganizationInfo organizationId={profile?.organization_id} />
       

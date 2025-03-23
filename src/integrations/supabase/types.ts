@@ -391,6 +391,7 @@ export type Database = {
           created_at: string
           first_name: string | null
           id: string
+          job_title: string | null
           last_activity: string | null
           last_name: string | null
           organization_id: string | null
@@ -402,6 +403,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id: string
+          job_title?: string | null
           last_activity?: string | null
           last_name?: string | null
           organization_id?: string | null
@@ -413,6 +415,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id?: string
+          job_title?: string | null
           last_activity?: string | null
           last_name?: string | null
           organization_id?: string | null
