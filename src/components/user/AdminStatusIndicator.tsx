@@ -36,7 +36,7 @@ export function AdminStatusIndicator() {
   
   return (
     <Badge variant="outline">
-      Regular User
+      User
     </Badge>
   );
 }
