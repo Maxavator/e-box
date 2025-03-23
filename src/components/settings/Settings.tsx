@@ -19,6 +19,9 @@ type Settings = {
   avatarUrl: string | null;
   jobTitle: string;
   calendarNotificationTime: number | null;
+  mobilePhoneNumber: string;
+  officePhoneNumber: string;
+  phoneExtension: string;
 };
 
 export const Settings = () => {
@@ -52,6 +55,9 @@ export const Settings = () => {
           avatarUrl: profile?.avatar_url || null,
           jobTitle: profile?.job_title || '',
           calendarNotificationTime: profile?.calendar_notification_time || null,
+          mobilePhoneNumber: profile?.mobile_phone_number || '',
+          officePhoneNumber: profile?.office_phone_number || '',
+          phoneExtension: profile?.phone_extension || '',
         });
       } catch (error) {
         console.error('Error fetching settings:', error);
@@ -80,6 +86,9 @@ export const Settings = () => {
           last_name: settings.lastName,
           job_title: settings.jobTitle,
           calendar_notification_time: settings.calendarNotificationTime,
+          mobile_phone_number: settings.mobilePhoneNumber,
+          office_phone_number: settings.officePhoneNumber,
+          phone_extension: settings.phoneExtension,
         })
         .eq('id', user.id);
 
@@ -170,6 +179,7 @@ export const Settings = () => {
                     />
                   </div>
                 </div>
+                
                 <div className="space-y-2">
                   <Label htmlFor="jobTitle">Job Title</Label>
                   <Input
@@ -179,6 +189,39 @@ export const Settings = () => {
                     placeholder="Your job title"
                   />
                 </div>
+                
+                {/* New phone number fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="mobilePhone">Mobile Phone Number</Label>
+                    <Input
+                      id="mobilePhone"
+                      value={settings?.mobilePhoneNumber || ''}
+                      onChange={(e) => setSettings(prev => prev ? { ...prev, mobilePhoneNumber: e.target.value } : null)}
+                      placeholder="Your mobile phone number"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="officePhone">Office Telephone Number</Label>
+                    <Input
+                      id="officePhone"
+                      value={settings?.officePhoneNumber || ''}
+                      onChange={(e) => setSettings(prev => prev ? { ...prev, officePhoneNumber: e.target.value } : null)}
+                      placeholder="Your office telephone number"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phoneExtension">Extension (optional)</Label>
+                  <Input
+                    id="phoneExtension"
+                    value={settings?.phoneExtension || ''}
+                    onChange={(e) => setSettings(prev => prev ? { ...prev, phoneExtension: e.target.value } : null)}
+                    placeholder="Extension number (if applicable)"
+                  />
+                </div>
+                
                 <Button onClick={handleSave} disabled={saving} className="mt-4">
                   {saving ? "Saving..." : "Save Changes"}
                 </Button>
