@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import {
@@ -131,7 +132,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       
-      <SidebarFooter className="p-0 border-t-0">
+      <SidebarFooter className="p-0 border-t-0 sticky bottom-0 w-full bg-sidebar">
         <UserProfileSidebarFooter />
       </SidebarFooter>
     </Sidebar>
