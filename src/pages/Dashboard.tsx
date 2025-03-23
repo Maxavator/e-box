@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -14,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { NavigationCards } from "@/components/admin/dashboard/NavigationCards";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { MainLayout } from "@/components/shared/MainLayout";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -22,13 +22,11 @@ const Dashboard = () => {
   const [lastUpdate, setLastUpdate] = useState("Just now");
   const [isDataLoading, setIsDataLoading] = useState(false);
 
-  // Fetch user information on component mount
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          // Fetch user profile data
           const { data } = await supabase
             .from('profiles')
             .select('first_name, last_name')
@@ -53,7 +51,6 @@ const Dashboard = () => {
   const refreshData = () => {
     setIsDataLoading(true);
     
-    // Simulate data refresh
     setTimeout(() => {
       setLastUpdate("Just now");
       setIsDataLoading(false);
@@ -83,16 +80,17 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading dashboard...</p>
+      <MainLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Loading dashboard...</p>
+          </div>
         </div>
-      </div>
+      </MainLayout>
     );
   }
 
-  // Redirect staff users to chat
   if (userRole === 'staff') {
     console.log("Staff user detected, redirecting to chat");
     navigate('/chat');
@@ -100,171 +98,169 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="flex-1 min-h-screen bg-background">
-      <header className="h-16 bg-card border-b px-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            Welcome back, {userName}
-            {isAdmin && " (Admin)"}
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="w-4 h-4" />
-            <span>Last updated: {lastUpdate}</span>
-          </div>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={refreshData}
-            disabled={isDataLoading}
-            className="text-sm text-primary hover:text-primary/80 transition-colors"
-          >
-            {isDataLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Refreshing...
-              </>
-            ) : (
-              "Refresh Data"
-            )}
-          </Button>
-        </div>
-      </header>
-
-      <div className="p-8 space-y-8">
-        {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard
-            title="Total Users"
-            value="2,834"
-            change="+180"
-            period="this month"
-            icon={<Users className="w-4 h-4" />}
-            trend="12"
-          />
-          <StatsCard
-            title={isAdmin ? "Active Organizations" : "Team Members"}
-            value={isAdmin ? "147" : "24"}
-            change={isAdmin ? "+12" : "+3"}
-            period="this month"
-            icon={<Building2 className="w-4 h-4" />}
-            trend="8"
-          />
-          <StatsCard
-            title="Messages"
-            value="92.5k"
-            change="+15.2k"
-            period="this month"
-            icon={<MessageSquare className="w-4 h-4" />}
-            trend="24"
-          />
-          <StatsCard
-            title={isAdmin ? "System Uptime" : "Tasks Completed"}
-            value={isAdmin ? "99.9%" : "85%"}
-            change={isAdmin ? "+0.2" : "+15"}
-            period="Last 30 days"
-            icon={<Activity className="w-4 h-4" />}
-            trend="0.2"
-          />
-        </div>
-
-        {/* Admin Navigation Cards */}
-        {isAdmin && (
-          <div className="border-t pt-8">
-            <h2 className="text-lg font-semibold mb-6">Admin Tools</h2>
-            <NavigationCards />
-          </div>
-        )}
-
-        {/* Quick Actions */}
-        {!isAdmin && (
+    <MainLayout>
+      <div className="flex-1 min-h-screen bg-background">
+        <header className="h-16 bg-card border-b px-8 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold mb-6">Quick Actions</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <QuickActionCard
-                title="Documents"
-                description="Access your files"
-                icon={<FileText className="w-5 h-5" />}
-                onClick={() => handleQuickAction('documents')}
-              />
-              <QuickActionCard
-                title="Calendar"
-                description="View schedule"
-                icon={<Calendar className="w-5 h-5" />}
-                onClick={() => handleQuickAction('calendar')}
-              />
-              <QuickActionCard
-                title="Messages"
-                description="Chat with team"
-                icon={<MessageCircle className="w-5 h-5" />}
-                onClick={() => handleQuickAction('messages')}
-              />
-              <QuickActionCard
-                title="Profile"
-                description="Update settings"
-                icon={<User className="w-5 h-5" />}
-                onClick={() => handleQuickAction('profile')}
-              />
-            </div>
+            <h1 className="text-xl font-bold">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">
+              Welcome back, {userName}
+              {isAdmin && " (Admin)"}
+            </p>
           </div>
-        )}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Clock className="w-4 h-4" />
+              <span>Last updated: {lastUpdate}</span>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={refreshData}
+              disabled={isDataLoading}
+              className="text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              {isDataLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Refreshing...
+                </>
+              ) : (
+                "Refresh Data"
+              )}
+            </Button>
+          </div>
+        </header>
 
-        {/* Activity Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="border shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-semibold">Activity Overview</CardTitle>
-              <LineChart className="w-5 h-5 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="h-[300px] flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full" />
-                    <span className="text-sm font-medium">Active Users</span>
-                  </div>
-                  <span className="text-2xl font-bold">1,245</span>
-                </div>
-                <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
-                  Activity chart will be displayed here
-                </div>
+        <div className="p-8 space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatsCard
+              title="Total Users"
+              value="2,834"
+              change="+180"
+              period="this month"
+              icon={<Users className="w-4 h-4" />}
+              trend="12"
+            />
+            <StatsCard
+              title={isAdmin ? "Active Organizations" : "Team Members"}
+              value={isAdmin ? "147" : "24"}
+              change={isAdmin ? "+12" : "+3"}
+              period="this month"
+              icon={<Building2 className="w-4 h-4" />}
+              trend="8"
+            />
+            <StatsCard
+              title="Messages"
+              value="92.5k"
+              change="+15.2k"
+              period="this month"
+              icon={<MessageSquare className="w-4 h-4" />}
+              trend="24"
+            />
+            <StatsCard
+              title={isAdmin ? "System Uptime" : "Tasks Completed"}
+              value={isAdmin ? "99.9%" : "85%"}
+              change={isAdmin ? "+0.2" : "+15"}
+              period="Last 30 days"
+              icon={<Activity className="w-4 h-4" />}
+              trend="0.2"
+            />
+          </div>
+
+          {isAdmin && (
+            <div className="border-t pt-8">
+              <h2 className="text-lg font-semibold mb-6">Admin Tools</h2>
+              <NavigationCards />
+            </div>
+          )}
+
+          {!isAdmin && (
+            <div>
+              <h2 className="text-lg font-semibold mb-6">Quick Actions</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <QuickActionCard
+                  title="Documents"
+                  description="Access your files"
+                  icon={<FileText className="w-5 h-5" />}
+                  onClick={() => handleQuickAction('documents')}
+                />
+                <QuickActionCard
+                  title="Calendar"
+                  description="View schedule"
+                  icon={<Calendar className="w-5 h-5" />}
+                  onClick={() => handleQuickAction('calendar')}
+                />
+                <QuickActionCard
+                  title="Messages"
+                  description="Chat with team"
+                  icon={<MessageCircle className="w-5 h-5" />}
+                  onClick={() => handleQuickAction('messages')}
+                />
+                <QuickActionCard
+                  title="Profile"
+                  description="Update settings"
+                  icon={<User className="w-5 h-5" />}
+                  onClick={() => handleQuickAction('profile')}
+                />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          )}
 
-          <Card className="border shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-semibold">Recent Tasks</CardTitle>
-              <CheckCircle2 className="w-5 h-5 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="p-6">
-              <ScrollArea className="h-[300px] pr-4">
-                {recentTasks.map((task, index) => (
-                  <div 
-                    key={index}
-                    className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors mb-2 cursor-pointer"
-                  >
-                    <div className={`w-2 h-2 mt-2 rounded-full ${task.statusColor}`} />
-                    <div>
-                      <h4 className="font-medium">{task.title}</h4>
-                      <p className="text-sm text-muted-foreground">{task.description}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-xs text-muted-foreground">{task.time}</span>
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                          {task.category}
-                        </span>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="border shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-lg font-semibold">Activity Overview</CardTitle>
+                <LineChart className="w-5 h-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="h-[300px] flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-primary rounded-full" />
+                      <span className="text-sm font-medium">Active Users</span>
+                    </div>
+                    <span className="text-2xl font-bold">1,245</span>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
+                    Activity chart will be displayed here
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-lg font-semibold">Recent Tasks</CardTitle>
+                <CheckCircle2 className="w-5 h-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="p-6">
+                <ScrollArea className="h-[300px] pr-4">
+                  {recentTasks.map((task, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors mb-2 cursor-pointer"
+                    >
+                      <div className={`w-2 h-2 mt-2 rounded-full ${task.statusColor}`} />
+                      <div>
+                        <h4 className="font-medium">{task.title}</h4>
+                        <p className="text-sm text-muted-foreground">{task.description}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="text-xs text-muted-foreground">{task.time}</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                            {task.category}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </ScrollArea>
-            </CardContent>
-          </Card>
+                  ))}
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 
