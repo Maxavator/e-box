@@ -1,153 +1,176 @@
-
-import { useState, useEffect } from 'react';
-import { Message } from '@/types/chat';
-import { cn } from '@/lib/utils';
-import { Check, Clock, AlertCircle, Edit2, Trash, Heart, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Check, MoreVertical, Pen, Trash2, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import type { Message } from "@/types/chat";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MessageItemProps {
   message: Message;
-  onEdit: (messageId: string, newText: string) => void;
-  onDelete: (messageId: string) => void;
-  onReact: (messageId: string, emoji: string) => void;
+  onEditMessage: (messageId: string, newContent: string) => void;
+  onDeleteMessage: (messageId: string) => void;
+  onReactToMessage: (messageId: string, emoji: string) => void;
+  isAdminChat?: boolean;
 }
 
-const EDIT_TIME_LIMIT = 60000; // 60 seconds in milliseconds
+export function MessageItem({
+  message,
+  onEditMessage,
+  onDeleteMessage,
+  onReactToMessage,
+  isAdminChat = false,
+}: MessageItemProps) {
+  const [editMode, setEditMode] = useState(false);
+  const [editText, setEditText] = useState(message.text);
+  
+  // If this is admin chat, get the sender's profile
+  const { data: senderProfile } = useQuery({
+    queryKey: ['admin-sender', message.senderId, isAdminChat],
+    queryFn: async () => {
+      if (!isAdminChat) return null;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, avatar_url')
+        .eq('id', message.senderId)
+        .single();
+        
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdminChat && message.sender === 'them',
+  });
 
-export default function MessageItem({ message, onEdit, onDelete, onReact }: MessageItemProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedText, setEditedText] = useState(message.text);
-  const [canEdit, setCanEdit] = useState(false);
-  const isMine = message.senderId === 'me';
-
-  useEffect(() => {
-    if (isMine && message.status === 'sent') {
-      const timeSinceMessage = Date.now() - new Date(message.timestamp).getTime();
-      setCanEdit(timeSinceMessage < EDIT_TIME_LIMIT);
-    }
-  }, [message, isMine]);
-
-  const handleEdit = () => {
-    if (editedText !== message.text) {
-      onEdit(message.id, editedText);
-    }
-    setIsEditing(false);
-  };
-
-  const StatusIcon = () => {
-    if (!isMine) return null;
-    
-    switch (message.status) {
-      case 'sending':
-        return <Clock className="h-3 w-3 text-gray-400" />;
-      case 'sent':
-        return <Check className="h-3 w-3 text-green-500" />;
-      case 'error':
-        return <AlertCircle className="h-3 w-3 text-red-500" />;
-      default:
-        return null;
-    }
-  };
-
-  const reactions = [
-    { emoji: "❤️", icon: Heart },
-    { emoji: "👍", icon: ThumbsUp },
-    { emoji: "👎", icon: ThumbsDown },
-    { emoji: "🙏", icon: Heart, label: "Thank you" },
-  ];
-
+  const isSentByMe = message.sender === 'me';
+  
   return (
-    <ContextMenu>
-      <ContextMenuTrigger>
-        <div className={cn(
-          "group flex",
-          isMine ? "justify-end" : "justify-start"
-        )}>
-          <div className={cn(
-            "max-w-[70%] rounded-lg p-3",
-            isMine ? "bg-primary text-primary-foreground" : "bg-muted",
-            "hover:shadow-md transition-shadow"
-          )}>
-            {isEditing ? (
-              <div className="flex flex-col gap-2">
-                <input
-                  type="text"
-                  value={editedText}
-                  onChange={(e) => setEditedText(e.target.value)}
-                  className="bg-white text-black rounded px-2 py-1"
-                  autoFocus
-                  onBlur={handleEdit}
-                  onKeyPress={(e) => e.key === 'Enter' && handleEdit()}
+    <div
+      className={`flex flex-col ${
+        isSentByMe ? 'items-end' : 'items-start'
+      }`}
+    >
+      {isAdminChat && !isSentByMe && (
+        <div className="text-xs text-muted-foreground mb-1">
+          {senderProfile ? `${senderProfile.first_name} ${senderProfile.last_name}` : 'Admin'}
+        </div>
+      )}
+      
+      <div className="flex items-start gap-2 group">
+        {!isSentByMe && (
+          <Avatar className="h-8 w-8">
+            {isAdminChat && senderProfile ? (
+              <AvatarImage src={senderProfile.avatar_url || ''} />
+            ) : (
+              <AvatarImage src={message.avatar} />
+            )}
+            <AvatarFallback>
+              {isAdminChat && senderProfile 
+                ? `${senderProfile.first_name?.[0] || ''}${senderProfile.last_name?.[0] || ''}` 
+                : 'UN'}
+            </AvatarFallback>
+          </Avatar>
+        )}
+        
+        <div className="space-y-1">
+          <div
+            className={`px-4 py-2 rounded-lg text-sm ${
+              isSentByMe
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted'
+            }`}
+          >
+            {editMode ? (
+              <div className="flex">
+                <Input
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  className="min-w-[200px] bg-background h-8"
                 />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => {
+                    onEditMessage(message.id, editText);
+                    setEditMode(false);
+                  }}
+                  className="h-8 w-8"
+                >
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setEditMode(false)}
+                  className="h-8 w-8"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
             ) : (
-              <>
-                <p>{message.text}</p>
-                <div className="flex items-center gap-1 mt-1">
-                  <span className={cn(
-                    "text-xs",
-                    isMine ? "text-primary-foreground/80" : "text-muted-foreground"
-                  )}>
-                    {message.timestamp}
-                    {message.edited && " (edited)"}
-                  </span>
-                  <StatusIcon />
-                </div>
-                {message.reactions && message.reactions.length > 0 && (
-                  <div className="flex gap-1 mt-1">
-                    {message.reactions.map((reaction, index) => (
-                      <span
-                        key={index}
-                        className="bg-white/10 rounded px-1 text-xs"
-                      >
-                        {reaction.emoji} {reaction.users.length}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </>
+              <div>{message.text}</div>
             )}
           </div>
-        </div>
-      </ContextMenuTrigger>
-      <ContextMenuContent>
-        {isMine && canEdit && (
-          <ContextMenuItem
-            onClick={() => setIsEditing(true)}
-          >
-            <Edit2 className="h-4 w-4 mr-2" />
-            Edit
-          </ContextMenuItem>
-        )}
-        {isMine && (
-          <ContextMenuItem
-            onClick={() => onDelete(message.id)}
-            className="text-red-600"
-          >
-            <Trash className="h-4 w-4 mr-2" />
-            Delete
-          </ContextMenuItem>
-        )}
-        <ContextMenuItem>
-          <div className="flex gap-2">
-            {reactions.map((reaction) => (
-              <button
-                key={reaction.emoji + (reaction.label || '')}
-                onClick={() => onReact(message.id, reaction.emoji)}
-                className="hover:bg-gray-100 p-1 rounded"
-                title={reaction.label}
-              >
-                {reaction.emoji}
-              </button>
-            ))}
+          
+          {message.reactions.length > 0 && (
+            <div className="flex gap-1">
+              {message.reactions.map((reaction) => (
+                <Button
+                  key={reaction.emoji}
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  onClick={() => onReactToMessage(message.id, reaction.emoji)}
+                >
+                  <span className="text-xs">
+                    {reaction.emoji} {reaction.users.length}
+                  </span>
+                </Button>
+              ))}
+            </div>
+          )}
+          
+          <div className="text-xs text-muted-foreground">
+            {message.timestamp}
+            {message.edited && ' (edited)'}
           </div>
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+        </div>
+        
+        {isSentByMe && (
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="ghost" className="h-8 w-8">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => {
+                  setEditText(message.text);
+                  setEditMode(true);
+                }}>
+                  <Pen className="h-4 w-4 mr-2" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => onDeleteMessage(message.id)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

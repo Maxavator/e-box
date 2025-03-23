@@ -10,6 +10,7 @@ import {
   Settings,
   Shield,
   Briefcase,
+  UserCog,
 } from "lucide-react";
 
 import {
@@ -109,15 +110,27 @@ export function AppSidebar() {
           </SidebarMenuItem>
           
           {(isAdmin || userRole === 'org_admin' || userRole === 'global_admin') && (
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                tooltip="Admin Tools" 
-                onClick={() => handleNavigation("/admin")}
-              >
-                <Shield className="h-4 w-4" />
-                <span>Admin Tools</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            <>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  tooltip="Admin Tools" 
+                  onClick={() => handleNavigation("/admin")}
+                >
+                  <Shield className="h-4 w-4" />
+                  <span>Admin Tools</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  tooltip="Admin Group Chat" 
+                  onClick={() => handleNavigation("/admin-chat")}
+                >
+                  <UserCog className="h-4 w-4" />
+                  <span>Admin Group</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </>
           )}
           
           <SidebarMenuItem>

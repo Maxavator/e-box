@@ -1,79 +1,102 @@
-
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { MessageSquare } from "lucide-react";
-import type { Conversation } from "@/types/chat";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getUserById } from "@/data/chat";
+import type { Conversation } from "@/types/chat";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Check, MoreVertical, Pen, Shield, Trash2, X } from "lucide-react";
 
 interface ConversationListProps {
   conversations: Conversation[];
   selectedConversation: Conversation | null;
   onSelectConversation: (conversation: Conversation) => void;
+  isAdminChat?: boolean;
 }
 
-export function ConversationList({ 
-  conversations, 
-  selectedConversation, 
-  onSelectConversation 
+export function ConversationList({
+  conversations,
+  selectedConversation,
+  onSelectConversation,
+  isAdminChat = false,
 }: ConversationListProps) {
-  const totalUnreadCount = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
-
   return (
-    <div className="flex flex-col h-full">
-      {totalUnreadCount > 0 && (
-        <div className="px-4 py-2 bg-primary/5 border-b">
-          <div className="flex items-center gap-2 text-sm text-primary">
-            <MessageSquare className="h-4 w-4" />
-            <span>{totalUnreadCount} unread message{totalUnreadCount !== 1 ? 's' : ''}</span>
-          </div>
+    <div className="space-y-1 p-2">
+      {conversations.length === 0 ? (
+        <div className="p-4 text-center text-muted-foreground">
+          {isAdminChat ? "No admin messages yet" : "No conversations yet"}
         </div>
-      )}
-      <ScrollArea className="flex-1">
-        {conversations.map((conversation) => {
-          const lastMessage = conversation.messages[conversation.messages.length - 1];
-          const user = getUserById(conversation.userId);
-          
-          return (
-            <div
-              key={conversation.id}
-              onClick={() => onSelectConversation(conversation)}
-              className={`p-4 cursor-pointer hover:bg-gray-100 ${
-                selectedConversation?.id === conversation.id ? "bg-gray-100" : ""
-              } relative`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Avatar>
-                    <AvatarFallback>
-                      {user?.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
+      ) : (
+        conversations.map((conversation) => {
+          // For admin group chat, use special rendering
+          if (isAdminChat || conversation.isGroup) {
+            return (
+              <button
+                key={conversation.id}
+                className={`flex items-center gap-3 w-full p-3 rounded-lg ${
+                  selectedConversation?.id === conversation.id
+                    ? 'bg-muted'
+                    : 'hover:bg-muted/60'
+                }`}
+                onClick={() => onSelectConversation(conversation)}
+              >
+                <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                  <Shield className="h-5 w-5 text-primary" />
                   {conversation.unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 text-xs font-medium text-white bg-primary rounded-full px-1.5">
+                    <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-xs text-white">
                       {conversation.unreadCount}
                     </span>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className="font-medium">
-                      {user?.name}
-                    </p>
-                    <span className="text-xs text-gray-500">
-                      {lastMessage.timestamp}
+                <div className="flex-1 overflow-hidden">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium truncate">
+                      {conversation.groupName || "e-Box Admin Group"}
                     </span>
                   </div>
-                  <p className={`text-sm truncate ${
-                    conversation.unreadCount > 0 ? "font-medium text-gray-900" : "text-gray-500"
-                  }`}>
-                    {lastMessage.text}
-                  </p>
+                  <div className="truncate text-xs text-muted-foreground">
+                    {conversation.lastMessage || "No messages yet"}
+                  </div>
+                </div>
+              </button>
+            );
+          }
+
+          // Regular conversation rendering
+          const user = getUserById(conversation.userId);
+          if (!user) return null;
+
+          return (
+            <button
+              key={conversation.id}
+              className={`flex items-center gap-3 w-full p-3 rounded-lg ${
+                selectedConversation?.id === conversation.id
+                  ? 'bg-muted'
+                  : 'hover:bg-muted/60'
+              }`}
+              onClick={() => onSelectConversation(conversation)}
+            >
+              <div className="relative">
+                <Avatar>
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback>{user.initials}</AvatarFallback>
+                </Avatar>
+                {conversation.unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-xs text-white">
+                    {conversation.unreadCount}
+                  </span>
+                )}
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium truncate">{user.name}</span>
+                </div>
+                <div className="truncate text-xs text-muted-foreground">
+                  {conversation.lastMessage}
                 </div>
               </div>
-            </div>
+            </button>
           );
-        })}
-      </ScrollArea>
+        })
+      )}
     </div>
   );
 }

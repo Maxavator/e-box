@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -20,7 +19,7 @@ export interface Message {
   edited?: boolean;
   editedAt?: string;
   reactions: Reaction[];
-  sender?: 'me' | 'them';  // Added to support existing code
+  sender?: 'me' | 'them';
 }
 
 export interface Conversation {
@@ -28,7 +27,9 @@ export interface Conversation {
   userId: string;
   unreadCount: number;
   messages: Message[];
-  lastMessage: string;  // Added to support message preview
+  lastMessage: string;
+  isGroup?: boolean;
+  groupName?: string;
 }
 
 export interface Profile {

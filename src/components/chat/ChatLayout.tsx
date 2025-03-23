@@ -1,7 +1,9 @@
-
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { useState } from "react";
+import { AppHeader } from "@/components/shared/AppHeader";
 import { ChatSidebar } from "./ChatSidebar";
 import { ChatContent } from "./ChatContent";
+import { ChatInput } from "./ChatInput";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Conversation } from "@/types/chat";
 
 interface ChatLayoutProps {
@@ -16,16 +18,17 @@ interface ChatLayoutProps {
   newMessage: string;
   onNewMessageChange: (value: string) => void;
   onSendMessage: () => void;
-  onEditMessage: (messageId: string, newText: string) => void;
+  onEditMessage: (messageId: string, newContent: string) => void;
   onDeleteMessage: (messageId: string) => void;
   onReactToMessage: (messageId: string, emoji: string) => void;
   calendarView: 'calendar' | 'inbox';
   onLogout: () => void;
   onLogoClick: () => void;
   isMobile: boolean;
+  isAdminChat?: boolean;
 }
 
-export const ChatLayout = ({
+export function ChatLayout({
   searchQuery,
   onSearchChange,
   activeTab,
@@ -41,17 +44,19 @@ export const ChatLayout = ({
   onDeleteMessage,
   onReactToMessage,
   calendarView,
+  onLogout,
+  onLogoClick,
   isMobile,
-}: ChatLayoutProps) => {
+  isAdminChat = false,
+}: ChatLayoutProps) {
+  const [activeContent, setActiveContent] = useState<'chat' | 'sidebar'>('chat');
+
   return (
-    <div className="flex-1 h-[calc(100vh-4rem)] bg-background flex overflow-hidden">
-      <ResizablePanelGroup direction="horizontal" className="flex-1">
-        <ResizablePanel 
-          defaultSize={25} 
-          minSize={20} 
-          maxSize={40}
-          className="bg-white"
-        >
+    <div className="flex flex-col min-h-screen">
+      <AppHeader onLogout={onLogout} onLogoClick={onLogoClick} />
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <div className={`${isMobile && activeContent === 'chat' ? 'hidden' : 'w-full sm:w-80 border-r'} h-[calc(100vh-4rem)]`}>
           <ChatSidebar
             searchQuery={searchQuery}
             onSearchChange={onSearchChange}
@@ -61,28 +66,44 @@ export const ChatLayout = ({
             selectedConversation={selectedConversation}
             onSelectConversation={onSelectConversation}
             onCalendarActionClick={onCalendarActionClick}
+            isAdminChat={isAdminChat}
           />
-        </ResizablePanel>
+        </div>
         
-        <ResizableHandle withHandle className="bg-border" />
-        
-        <ResizablePanel 
-          defaultSize={75}
-          className="bg-white"
-        >
-          <ChatContent
-            activeTab={activeTab}
-            selectedConversation={selectedConversation}
-            newMessage={newMessage}
-            onNewMessageChange={onNewMessageChange}
-            onSendMessage={onSendMessage}
-            onEditMessage={onEditMessage}
-            onDeleteMessage={onDeleteMessage}
-            onReactToMessage={onReactToMessage}
-            calendarView={calendarView}
-          />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+        {/* Chat content */}
+        <div className={`${isMobile && activeContent === 'sidebar' ? 'hidden' : 'flex-1'} h-[calc(100vh-4rem)]`}>
+          {selectedConversation ? (
+            <div className="flex flex-col h-full">
+              <ChatContent
+                conversation={selectedConversation}
+                onEditMessage={onEditMessage}
+                onDeleteMessage={onDeleteMessage}
+                onReactToMessage={onReactToMessage}
+                isAdminChat={isAdminChat}
+              />
+              <ChatInput
+                value={newMessage}
+                onChange={onNewMessageChange}
+                onSendMessage={onSendMessage}
+              />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full p-8 text-center text-muted-foreground">
+              {isAdminChat ? (
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Welcome to Admin Group Chat</h3>
+                  <p>This is a private channel for e-Box administrators to communicate</p>
+                </div>
+              ) : (
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Select a Conversation</h3>
+                  <p>Choose a conversation from the sidebar or start a new one</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
-};
+}
