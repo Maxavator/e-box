@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 
@@ -15,7 +16,6 @@ import { MainNavigationMenu } from "./sidebar/MainNavigationMenu";
 
 export function AppSidebar() {
   const navigate = useNavigate();
-  const { isAdmin, userRole, isLoading, error } = useUserRole();
   const { 
     chatCount, 
     documentsCount, 
@@ -24,17 +24,6 @@ export function AppSidebar() {
     leaveCount, 
     resetBadgeCount 
   } = useSidebarBadges();
-  
-  const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
-  
-  console.log('Sidebar - User role:', userRole);
-  console.log('Sidebar - Is admin:', isAdmin);
-  console.log('Sidebar - Has admin access:', hasAdminAccess);
-  console.log('Sidebar - Admin check details:', { isAdmin, userRole, hasAdminAccess });
-
-  if (error) {
-    console.error('Sidebar - Error fetching user role:', error);
-  }
 
   const handleLogoClick = () => {
     navigate("/dashboard");
@@ -65,7 +54,6 @@ export function AppSidebar() {
             contactsCount={contactsCount}
             leaveCount={leaveCount}
             resetBadgeCount={resetBadgeCount}
-            isAdmin={hasAdminAccess}
           />
         </SidebarGroup>
       </SidebarContent>

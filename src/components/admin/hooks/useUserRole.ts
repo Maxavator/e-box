@@ -26,6 +26,21 @@ export const useUserRole = () => {
     queryFn: async () => {
       console.log('Checking admin status for user ID:', userId);
       
+      // First check user profile for Thabo Nkosi (special case)
+      if (userId) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', userId)
+          .maybeSingle();
+          
+        // Special case for Thabo Nkosi - always admin
+        if (profileData?.first_name === 'Thabo' && profileData?.last_name === 'Nkosi') {
+          console.log('User is Thabo Nkosi - granting admin access');
+          return true;
+        }
+      }
+      
       // First check for global_admin role
       const { data: globalAdminData, error: globalAdminError } = await supabase
         .from('user_roles')
@@ -72,6 +87,20 @@ export const useUserRole = () => {
     enabled: !!userId,
     queryFn: async () => {
       console.log('Fetching user role for user ID:', userId);
+      
+      // Special case for Thabo Nkosi - always org_admin
+      if (userId) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', userId)
+          .maybeSingle();
+          
+        if (profileData?.first_name === 'Thabo' && profileData?.last_name === 'Nkosi') {
+          console.log('User is Thabo Nkosi - setting role to org_admin');
+          return 'org_admin' as UserRoleType;
+        }
+      }
       
       const { data, error } = await supabase
         .from('user_roles')

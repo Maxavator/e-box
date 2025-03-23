@@ -18,6 +18,7 @@ import {
   SidebarMenuBadge,
 } from "@/components/ui/sidebar";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserRole } from "@/components/admin/hooks/useUserRole";
 
 interface MainNavigationMenuProps {
   chatCount: number;
@@ -26,7 +27,6 @@ interface MainNavigationMenuProps {
   contactsCount: number;
   leaveCount: number;
   resetBadgeCount: (type: 'chat' | 'documents' | 'calendar' | 'contacts' | 'leave') => void;
-  isAdmin?: boolean;
 }
 
 export function MainNavigationMenu({
@@ -36,10 +36,14 @@ export function MainNavigationMenu({
   contactsCount,
   leaveCount,
   resetBadgeCount,
-  isAdmin = false
 }: MainNavigationMenuProps) {
   const navigate = useNavigate();
   const { organizationName } = useUserProfile();
+  const { isAdmin, userRole } = useUserRole();
+  
+  // Consider a user to have admin access if they are either global_admin or org_admin
+  // or if they are Thabo Nkosi (special case handled in useUserRole hook)
+  const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
   const handleNavigation = (path: string) => {
     // Reset the respective badge count when navigating to a section
@@ -99,6 +103,20 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
+      {/* Admin Portal menu item - displayed prominently for admin users */}
+      {hasAdminAccess && (
+        <SidebarMenuItem>
+          <SidebarMenuButton 
+            tooltip="Admin Portal" 
+            onClick={() => handleNavigation("/admin")}
+            isActive={location.pathname === '/admin'}
+          >
+            <Shield className="h-4 w-4" />
+            <span>Admin Portal</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      )}
+      
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="Settings" 
@@ -109,20 +127,7 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* Admin Portal menu item - only displayed for admin users */}
-      {isAdmin && (
-        <SidebarMenuItem>
-          <SidebarMenuButton 
-            tooltip="Admin Portal" 
-            onClick={() => handleNavigation("/admin")}
-          >
-            <Shield className="h-4 w-4" />
-            <span>Admin Portal</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      )}
-      
-      {/* My Desk as a direct button - Moved to the bottom of the list */}
+      {/* My Desk as a direct button */}
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="My Desk"
