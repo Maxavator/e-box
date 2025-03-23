@@ -131,7 +131,7 @@ export function UserProfileSidebarFooter() {
       )}
       
       <div className="flex items-center gap-2 mt-1">
-        <AdminButton isAdmin={isAdmin} />
+        <AdminButton />
       </div>
       
       <VersionInfo />
