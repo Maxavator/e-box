@@ -1,5 +1,7 @@
+
 import { Message, User, Conversation } from "@/types/chat";
 
+// Define users first so they're available for all subsequent functions
 export const demoUsers: User[] = [
   {
     id: 'user1',
@@ -43,8 +45,10 @@ export const demoUsers: User[] = [
   }
 ];
 
+// Helper function to get a user by ID
 export const getUserById = (id: string) => demoUsers.find(user => user.id === id);
 
+// Message creation function that uses getUserById
 const createMessage = (id: string, senderId: string, text: string, timestamp: string): Message => ({
   id,
   conversationId: '', // Will be filled in when added to a conversation
@@ -57,6 +61,7 @@ const createMessage = (id: string, senderId: string, text: string, timestamp: st
   reactions: {},
 });
 
+// Demo messages using the createMessage function
 export const demoMessages: Message[] = [
   createMessage('1', 'user1', 'Good morning! Could you review the latest project updates?', '2024-03-21T09:00:00Z'),
   createMessage('2', 'user2', 'Has anyone seen the new office policy document?', '2024-03-21T09:15:00Z'),
@@ -65,6 +70,7 @@ export const demoMessages: Message[] = [
   createMessage('5', 'user5', 'Just uploaded the Q1 reports to the documents section', '2024-03-21T10:00:00Z'),
 ];
 
+// Demo conversations using previously defined data and functions
 export const demoConversations: Conversation[] = [
   {
     id: '1',
