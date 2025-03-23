@@ -31,6 +31,17 @@ export const useMessages = (
     if (!user) return;
 
     try {
+      // Validate that we have a proper UUID for conversation_id
+      if (!selectedConversation.id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(selectedConversation.id)) {
+        console.error('Invalid conversation ID format:', selectedConversation.id);
+        toast({
+          title: "Error",
+          description: "Invalid conversation format. Please try again or create a new conversation.",
+          variant: "destructive"
+        });
+        return;
+      }
+
       const { data: messageData, error } = await supabase
         .from('messages')
         .insert({
