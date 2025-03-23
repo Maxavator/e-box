@@ -42,7 +42,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <SidebarProvider>
-        <div className="min-h-screen flex flex-col bg-background">
+        <div className="min-h-screen flex flex-col bg-background w-full">
           <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
           <div className="flex flex-1 overflow-hidden">
             <AppSidebar />
