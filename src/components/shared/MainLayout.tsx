@@ -63,8 +63,10 @@ export function MainLayout({ children }: MainLayoutProps) {
             <AppSidebar />
             <main className="flex-1 overflow-auto">
               <ResizablePanelGroup direction="horizontal">
-                <ResizablePanel defaultSize={100} className="pl-4">
-                  {children}
+                <ResizablePanel defaultSize={100} className="pl-4 pr-4">
+                  <div className="h-full w-full max-w-7xl mx-auto">
+                    {children}
+                  </div>
                 </ResizablePanel>
               </ResizablePanelGroup>
             </main>

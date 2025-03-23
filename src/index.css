@@ -100,7 +100,7 @@
   
   /* Main content container - helps limit width */
   .main-container {
-    @apply w-full max-w-6xl mx-auto;
+    @apply w-full max-w-7xl mx-auto px-4;
   }
   
   /* Table adjustments for better left alignment */
@@ -110,6 +110,15 @@
   
   .table-aligned {
     @apply w-full table-auto border-collapse;
+  }
+  
+  /* Content alignment classes */
+  .content-aligned {
+    @apply w-full max-w-7xl mx-auto px-4 py-6;
+  }
+  
+  .content-header {
+    @apply mb-6;
   }
   
   /* Sidebar related styling */
