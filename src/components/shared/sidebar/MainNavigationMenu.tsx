@@ -7,8 +7,8 @@ import {
   Users,
   Clock,
   Settings,
-  Briefcase,
   Shield,
+  Briefcase,
 } from "lucide-react";
 
 import {
@@ -16,7 +16,11 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuBadge,
+  SidebarMenuSub,
+  SidebarMenuSubTrigger,
+  SidebarMenuSubContent,
 } from "@/components/ui/sidebar";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 interface MainNavigationMenuProps {
   chatCount: number;
@@ -38,6 +42,7 @@ export function MainNavigationMenu({
   isAdmin = false
 }: MainNavigationMenuProps) {
   const navigate = useNavigate();
+  const { organizationName } = useUserProfile();
   
   const handleNavigation = (path: string) => {
     // Reset the respective badge count when navigating to a section
@@ -52,8 +57,6 @@ export function MainNavigationMenu({
   
   return (
     <SidebarMenu>
-      {/* Dashboard item removed as requested */}
-      
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="Chats" 
@@ -69,19 +72,62 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
+      {/* My Desk Dropdown Section */}
       <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Documents" 
-          onClick={() => handleNavigation("/documents")}
-        >
-          <FileText className="h-4 w-4" />
-          <span>Documents</span>
-          {documentsCount > 0 && (
-            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {documentsCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
+        <SidebarMenuSub>
+          <SidebarMenuSubTrigger
+            tooltip="My Desk"
+          >
+            <Briefcase className="h-4 w-4" />
+            <span>My Desk {organizationName ? `@${organizationName}` : ''}</span>
+            {(documentsCount > 0 || leaveCount > 0) && (
+              <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+                {documentsCount + leaveCount}
+              </SidebarMenuBadge>
+            )}
+          </SidebarMenuSubTrigger>
+          <SidebarMenuSubContent>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                tooltip="Documents" 
+                onClick={() => handleNavigation("/documents")}
+              >
+                <FileText className="h-4 w-4" />
+                <span>Documents</span>
+                {documentsCount > 0 && (
+                  <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+                    {documentsCount}
+                  </SidebarMenuBadge>
+                )}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                tooltip="Leave Manager" 
+                onClick={() => handleNavigation("/leave")}
+              >
+                <Clock className="h-4 w-4" />
+                <span>Leave Manager</span>
+                {leaveCount > 0 && (
+                  <SidebarMenuBadge className="ml-auto bg-purple-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+                    {leaveCount}
+                  </SidebarMenuBadge>
+                )}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                tooltip="Policies" 
+                onClick={() => handleNavigation("/policies")}
+              >
+                <Briefcase className="h-4 w-4" />
+                <span>Policies</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenuSubContent>
+        </SidebarMenuSub>
       </SidebarMenuItem>
       
       <SidebarMenuItem>
@@ -111,31 +157,6 @@ export function MainNavigationMenu({
               {contactsCount}
             </SidebarMenuBadge>
           )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Leave Manager" 
-          onClick={() => handleNavigation("/leave")}
-        >
-          <Clock className="h-4 w-4" />
-          <span>Leave Manager</span>
-          {leaveCount > 0 && (
-            <SidebarMenuBadge className="ml-auto bg-purple-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {leaveCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Policies" 
-          onClick={() => handleNavigation("/policies")}
-        >
-          <Briefcase className="h-4 w-4" />
-          <span>Policies</span>
         </SidebarMenuButton>
       </SidebarMenuItem>
       

@@ -1,12 +1,16 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Calendar, Users, MessageSquare, Clock, Briefcase } from "lucide-react";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 interface QuickActionsProps {
   onActionClick: (action: string) => void;
 }
 
 export const QuickActions = ({ onActionClick }: QuickActionsProps) => {
+  const { organizationName } = useUserProfile();
+  const myDeskLabel = organizationName ? `My Desk @${organizationName}` : 'My Desk';
+  
   return (
     <Card>
       <CardHeader>
@@ -19,7 +23,7 @@ export const QuickActions = ({ onActionClick }: QuickActionsProps) => {
             onClick={() => onActionClick('documents')}
           >
             <FileText className="w-5 h-5 mb-2 text-blue-600" />
-            <p className="font-medium">Documents</p>
+            <p className="font-medium">{myDeskLabel}</p>
             <p className="text-sm text-muted-foreground">Access files</p>
           </button>
           <button 
@@ -46,24 +50,8 @@ export const QuickActions = ({ onActionClick }: QuickActionsProps) => {
             <p className="font-medium">Contacts</p>
             <p className="text-sm text-muted-foreground">View contacts</p>
           </button>
-          <button 
-            className="p-4 border rounded-lg hover:bg-muted/50 transition-colors text-left dark:hover:bg-muted"
-            onClick={() => onActionClick('leave')}
-          >
-            <Clock className="w-5 h-5 mb-2 text-purple-600" />
-            <p className="font-medium">Leave</p>
-            <p className="text-sm text-muted-foreground">Manage leave</p>
-          </button>
-          <button 
-            className="p-4 border rounded-lg hover:bg-muted/50 transition-colors text-left dark:hover:bg-muted"
-            onClick={() => onActionClick('policies')}
-          >
-            <Briefcase className="w-5 h-5 mb-2 text-cyan-600" />
-            <p className="font-medium">Policies</p>
-            <p className="text-sm text-muted-foreground">View policies</p>
-          </button>
         </div>
       </CardContent>
     </Card>
   );
-};
+}
