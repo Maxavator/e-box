@@ -1,3 +1,4 @@
+
 export type ChangeLogEntry = {
   version: string;
   date: string;
@@ -9,6 +10,16 @@ export type ChangeLogEntry = {
  * Newer versions should be added at the top
  */
 export const CHANGELOG: ChangeLogEntry[] = [
+  {
+    version: 'v2.4.0',
+    date: '2024-07-10',
+    changes: [
+      'Updated copyright information across application',
+      'Improved version tracking system',
+      'Fixed profile image upload guidelines',
+      'General UI improvements and bug fixes'
+    ]
+  },
   {
     version: 'v2.3.0',
     date: '2024-06-28',

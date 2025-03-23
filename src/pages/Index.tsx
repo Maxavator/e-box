@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Building2, LogIn, Loader2 } from "lucide-react";
+import { APP_VERSION } from "@/utils/version";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ const Index = () => {
       </div>
       
       <footer className="fixed bottom-4 text-center text-sm text-muted-foreground animate-fadeIn delay-300">
-        <p>Version 1.91 | © 2024 e-Box. All rights reserved.</p>
+        <p>Version {APP_VERSION.replace('v', '')} | © 2025 Afrovation Technology Solutions (Pty) Ltd. All rights reserved.</p>
       </footer>
     </div>
   );

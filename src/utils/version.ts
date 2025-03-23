@@ -1,5 +1,6 @@
+
 // App version information and utilities
-export const APP_VERSION = 'v2.3.0';
+export const APP_VERSION = 'v2.4.0';
 
 /**
  * Compare two semver version strings
