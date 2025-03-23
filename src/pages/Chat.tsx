@@ -60,22 +60,20 @@ const Chat = () => {
   };
 
   return (
-    <MainLayout>
-      <ResizablePanelGroup direction="horizontal" className="h-full">
+    <div className="h-full flex flex-col">
+      <ResizablePanelGroup direction="horizontal" className="h-full flex-1">
         {/* Chat sidebar */}
-        <ResizablePanel defaultSize={25} minSize={20} maxSize={35} className="h-full">
-          <div className="h-full overflow-auto">
-            <ChatSidebar
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              conversations={filteredConversations}
-              selectedConversation={selectedConversation}
-              onSelectConversation={handleSelectConversation}
-              onCalendarActionClick={handleCalendarActionClick}
-            />
-          </div>
+        <ResizablePanel defaultSize={25} minSize={20} maxSize={30} className="h-full">
+          <ChatSidebar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            conversations={filteredConversations}
+            selectedConversation={selectedConversation}
+            onSelectConversation={handleSelectConversation}
+            onCalendarActionClick={handleCalendarActionClick}
+          />
         </ResizablePanel>
         
         <ResizableHandle withHandle />
@@ -111,7 +109,7 @@ const Chat = () => {
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
-    </MainLayout>
+    </div>
   );
 }
 
