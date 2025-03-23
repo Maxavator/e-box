@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { UserInfo } from "@/components/user/UserInfo";
 import { OnlineStatus } from "@/components/user/OnlineStatus";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import {
   Tooltip,
   TooltipContent,
@@ -132,7 +133,10 @@ export function UserProfileSidebarFooter() {
       </div>
       
       <div className="mt-2 border-t border-muted/20 pt-2">
-        <OnlineStatus />
+        <div className="flex items-center justify-between">
+          <OnlineStatus />
+          <ThemeToggle />
+        </div>
       </div>
       
       <div className="flex items-center justify-between mt-2 pt-2 border-t border-muted/20 text-xs text-muted-foreground">
