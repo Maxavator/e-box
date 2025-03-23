@@ -72,81 +72,83 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
   };
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="w-[100px]">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {isLoading ? (
+    <div className="table-container">
+      <Table className="table-aligned">
+        <TableHeader>
           <TableRow>
-            <TableCell colSpan={4} className="text-center">Loading contacts...</TableCell>
+            <TableHead>Name</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
-        ) : filteredContacts?.length === 0 ? (
-          <TableRow>
-            <TableCell colSpan={4} className="text-center text-muted-foreground">
-              No contacts found. Try a different search term or add some contacts from your organization!
-            </TableCell>
-          </TableRow>
-        ) : (
-          filteredContacts?.map((contact) => (
-            <TableRow key={contact.contact.id}>
-              <TableCell className="font-medium">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <User className="h-4 w-4 text-primary" />
-                  </div>
-                  {contact.contact.first_name} {contact.contact.last_name}
-                </div>
-              </TableCell>
-              <TableCell>
-                {contact.is_colleague ? (
-                  <Badge variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-50">
-                    <Building className="h-3 w-3 mr-1" />
-                    Colleague
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="bg-gray-50 text-gray-700 hover:bg-gray-50">
-                    <UserPlus className="h-3 w-3 mr-1" />
-                    External
-                  </Badge>
-                )}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  Available
-                </div>
-              </TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => 
-                      onToggleFavorite(contact.contact.id, !contact.is_favorite)
-                    }>
-                      <Star className={`mr-2 h-4 w-4 ${contact.is_favorite ? 'fill-yellow-400' : ''}`} />
-                      {contact.is_favorite ? 'Remove from Favorites' : 'Add to Favorites'}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleStartChat(contact.contact.id)}>
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Start Chat
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+        </TableHeader>
+        <TableBody>
+          {isLoading ? (
+            <TableRow>
+              <TableCell colSpan={4} className="text-center">Loading contacts...</TableCell>
+            </TableRow>
+          ) : filteredContacts?.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={4} className="text-center text-muted-foreground">
+                No contacts found. Try a different search term or add some contacts from your organization!
               </TableCell>
             </TableRow>
-          ))
-        )}
-      </TableBody>
-    </Table>
+          ) : (
+            filteredContacts?.map((contact) => (
+              <TableRow key={contact.contact.id}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="h-4 w-4 text-primary" />
+                    </div>
+                    {contact.contact.first_name} {contact.contact.last_name}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {contact.is_colleague ? (
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-50">
+                      <Building className="h-3 w-3 mr-1" />
+                      Colleague
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="bg-gray-50 text-gray-700 hover:bg-gray-50">
+                      <UserPlus className="h-3 w-3 mr-1" />
+                      External
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500" />
+                    Available
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => 
+                        onToggleFavorite(contact.contact.id, !contact.is_favorite)
+                      }>
+                        <Star className={`mr-2 h-4 w-4 ${contact.is_favorite ? 'fill-yellow-400' : ''}`} />
+                        {contact.is_favorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleStartChat(contact.contact.id)}>
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        Start Chat
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
