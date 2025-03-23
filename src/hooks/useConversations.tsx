@@ -24,10 +24,10 @@ export const useConversations = () => {
         let fetchedConversations;
         
         try {
+          // Try to fetch real conversations from the database
           const { data, error } = await supabase
             .from('conversations')
-            .select('*')
-            .eq('is_public', true);
+            .select('*');
             
           if (error) {
             throw error;
@@ -36,8 +36,20 @@ export const useConversations = () => {
           fetchedConversations = data as Conversation[];
         } catch (error) {
           console.error("Error fetching conversations:", error);
-          // Fallback to mock data
-          fetchedConversations = demoConversations.filter(conv => !conv.isAdminGroup);
+          // Fallback to demo data with proper UUID formatting
+          fetchedConversations = demoConversations.map(conv => {
+            // Generate a valid UUID for each demo conversation
+            const validId = crypto.randomUUID();
+            return {
+              ...conv,
+              id: validId,
+              // Also update the conversationId in messages to match the new parent id
+              messages: conv.messages ? conv.messages.map(msg => ({
+                ...msg,
+                conversationId: validId
+              })) : undefined
+            };
+          });
         }
 
         setConversations(fetchedConversations);
