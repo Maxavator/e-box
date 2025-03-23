@@ -1,4 +1,5 @@
 
+import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface UserProfileHeaderProps {
@@ -18,11 +19,19 @@ export function UserProfileHeader({
   jobTitle,
   hasOrganization
 }: UserProfileHeaderProps) {
+  // Add navigation hook
+  const navigate = useNavigate();
+  
   // Format the name as "last_name, first_name"
   const formattedName = `${lastName}, ${firstName}`;
   
   // Display the job title if available, otherwise show appropriate fallback
   const displayedRole = jobTitle || (hasOrganization ? "Private Individual" : "Private Individual");
+
+  // Handle click on user name to navigate to settings
+  const handleNameClick = () => {
+    navigate('/profile');
+  };
 
   return (
     <div className="flex items-center gap-3 mb-3">
@@ -30,7 +39,10 @@ export function UserProfileHeader({
         <AvatarImage src={avatarUrl || ''} alt={formattedName} />
         <AvatarFallback>{initials}</AvatarFallback>
       </Avatar>
-      <div className="flex flex-col">
+      <div 
+        className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity" 
+        onClick={handleNameClick}
+      >
         <span className="text-sm font-medium">{formattedName}</span>
         <span className="text-xs text-muted-foreground">{displayedRole}</span>
       </div>
