@@ -97,21 +97,16 @@ export function UserProfileSidebarFooter() {
   const lastName = profile?.last_name || userName?.lastName || '';
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   
-  // Check if user is specifically Thabo Nkosi and set the title to Chief Information Officer
+  // Special handling for Thabo Nkosi
   let jobTitle = profile?.job_title || '';
+  let isSpecialUser = false;
+  
   if (firstName === 'Thabo' && lastName === 'Nkosi') {
     jobTitle = 'Chief Information Officer';
+    isSpecialUser = true;
   }
   
   const hasOrganization = !!profile?.organization_id;
-
-  // Debug information
-  console.log('UserProfileSidebarFooter - Profile data:', {
-    firstName,
-    lastName,
-    jobTitle,
-    hasOrganization
-  });
 
   return (
     <div className="flex flex-col p-3 w-full">
@@ -122,9 +117,10 @@ export function UserProfileSidebarFooter() {
         avatarUrl={profile?.avatar_url} 
         jobTitle={jobTitle}
         hasOrganization={hasOrganization}
+        isSpecialUser={isSpecialUser}
       />
       
-      <ProfileControls />
+      <ProfileControls isSpecialUser={isSpecialUser} />
       
       {profile?.organization_id && (
         <OrganizationInfo organizationId={profile?.organization_id} />

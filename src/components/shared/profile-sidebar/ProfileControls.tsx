@@ -1,11 +1,15 @@
 
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings } from "lucide-react";
+import { LogOut, Settings, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export function ProfileControls() {
+interface ProfileControlsProps {
+  isSpecialUser?: boolean;
+}
+
+export function ProfileControls({ isSpecialUser = false }: ProfileControlsProps) {
   const navigate = useNavigate();
   
   const handleLogout = async () => {
@@ -14,35 +18,46 @@ export function ProfileControls() {
       toast.success("Logged out successfully");
       navigate('/auth');
     } catch (error) {
-      console.error("Error signing out:", error);
-      toast.error("Failed to log out");
+      console.error('Logout error:', error);
+      toast.error("Failed to logout");
     }
   };
-  
-  const handleSettingsClick = () => {
+
+  const handleSettings = () => {
     navigate('/profile');
   };
-  
+
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
   return (
-    <div className="flex justify-between mt-2 mb-3">
+    <div className="flex items-center justify-between gap-2 my-2">
       <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={handleSettingsClick}
-        className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
+        variant="outline" 
+        size="icon" 
+        onClick={handleSettings}
+        className={`h-9 w-9 ${isSpecialUser ? 'border-amber-300/30 hover:border-amber-300/60' : ''}`}
       >
-        <Settings className="h-3.5 w-3.5" />
-        <span>Settings</span>
+        <Settings className={`h-4 w-4 ${isSpecialUser ? 'text-amber-300' : ''}`} />
       </Button>
       
       <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={handleLogout}
-        className="flex items-center gap-2 text-xs text-muted-foreground hover:text-destructive"
+        variant="outline" 
+        size="icon" 
+        onClick={handleRefresh}
+        className={`h-9 w-9 ${isSpecialUser ? 'border-amber-300/30 hover:border-amber-300/60' : ''}`}
       >
-        <LogOut className="h-3.5 w-3.5" />
-        <span>Log Out</span>
+        <RefreshCw className={`h-4 w-4 ${isSpecialUser ? 'text-amber-300' : ''}`} />
+      </Button>
+      
+      <Button 
+        variant="outline" 
+        size="icon" 
+        onClick={handleLogout}
+        className={`h-9 w-9 ${isSpecialUser ? 'border-amber-300/30 hover:border-amber-300/60 hover:bg-red-50 hover:text-red-500' : 'hover:bg-red-50 hover:text-red-500'}`}
+      >
+        <LogOut className="h-4 w-4" />
       </Button>
     </div>
   );
