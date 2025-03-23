@@ -95,7 +95,7 @@ export function UserProfileSidebarFooter() {
   // Use either the profile data or the fallback from useEffect
   const firstName = profile?.first_name || userName?.firstName || '';
   const lastName = profile?.last_name || userName?.lastName || '';
-  const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
+  const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
   
   // Special handling for Thabo Nkosi
   let jobTitle = profile?.job_title || '';

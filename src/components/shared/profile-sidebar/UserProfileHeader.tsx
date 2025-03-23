@@ -1,6 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface UserProfileHeaderProps {
   firstName: string;
@@ -39,7 +40,7 @@ export function UserProfileHeader({
 
   return (
     <div className="flex items-center gap-3 mb-3">
-      <Avatar className={`h-10 w-10 ${isSpecialUser ? 'ring-2 ring-amber-300' : ''}`}>
+      <Avatar className={cn("h-10 w-10", isSpecialUser ? "ring-2 ring-amber-300" : "")}>
         <AvatarImage src={avatarUrl || ''} alt={formattedName} />
         <AvatarFallback>{initials}</AvatarFallback>
       </Avatar>
@@ -47,7 +48,7 @@ export function UserProfileHeader({
         className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity" 
         onClick={handleNameClick}
       >
-        <span className={`text-sm font-medium ${isSpecialUser ? 'text-amber-300' : ''}`}>{formattedName}</span>
+        <span className={cn("text-sm font-medium", isSpecialUser ? "text-amber-300" : "")}>{formattedName}</span>
         <span className="text-xs text-muted-foreground">{displayedRole}</span>
       </div>
     </div>
