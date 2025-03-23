@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/shared/theme-provider";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { Suspense, lazy } from "react";
+import { MainLayout } from "@/components/shared/MainLayout";
 
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
@@ -26,7 +27,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// Protected Route Component
+// Protected Route Component with MainLayout wrapper
 const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode; requiredRole?: string }) => {
   const { userRole, isLoading } = useUserRole();
 
@@ -53,10 +54,11 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode;
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <>{children}</>;
+  // Wrap all protected content with MainLayout
+  return <MainLayout>{children}</MainLayout>;
 };
 
-// Admin Route Component
+// Admin Route Component (also wrapped in MainLayout)
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { userRole, isLoading } = useUserRole();
 
@@ -76,7 +78,8 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/chat" replace />;
   }
 
-  return <>{children}</>;
+  // Admin routes also use MainLayout
+  return <MainLayout>{children}</MainLayout>;
 };
 
 function App() {

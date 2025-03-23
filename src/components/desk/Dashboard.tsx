@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
-import { MainLayout } from "@/components/shared/MainLayout";
 import { DashboardHeader } from "./dashboard/DashboardHeader";
 import { StatsCards } from "./dashboard/StatsCards";
 import { ActivitySection } from "./dashboard/ActivitySection";
@@ -46,58 +45,50 @@ export const Dashboard = () => {
 
   if (isRoleLoading) {
     return (
-      <MainLayout>
-        <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-muted-foreground">Loading dashboard...</p>
-          </div>
+      <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading dashboard...</p>
         </div>
-      </MainLayout>
+      </div>
     );
   }
 
   if (roleError) {
     console.error('Role error:', roleError);
     return (
-      <MainLayout>
-        <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
-          <div className="text-red-500">Error loading dashboard. Please try again.</div>
-        </div>
-      </MainLayout>
+      <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
+        <div className="text-red-500">Error loading dashboard. Please try again.</div>
+      </div>
     );
   }
 
   // Only render the main dashboard content if we have a valid role
   if (!userRole) {
     return (
-      <MainLayout>
-        <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
-          <div className="text-red-500">Access denied. Please log in again.</div>
-        </div>
-      </MainLayout>
+      <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
+        <div className="text-red-500">Access denied. Please log in again.</div>
+      </div>
     );
   }
 
   return (
-    <MainLayout>
-      <div className="p-6 space-y-6">
-        <DashboardHeader 
-          currentView="dashboard"
-          onBackClick={() => {}}
-          onAdminClick={() => handleCardClick('admin')}
-        />
-        
-        <StatsCards onCardClick={handleCardClick} />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ActivitySection />
-          <AnnouncementsSection />
-        </div>
-
-        <QuickActions onActionClick={handleCardClick} />
+    <div className="p-6 space-y-6">
+      <DashboardHeader 
+        currentView="dashboard"
+        onBackClick={() => {}}
+        onAdminClick={() => handleCardClick('admin')}
+      />
+      
+      <StatsCards onCardClick={handleCardClick} />
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ActivitySection />
+        <AnnouncementsSection />
       </div>
-    </MainLayout>
+
+      <QuickActions onActionClick={handleCardClick} />
+    </div>
   );
 };
 
