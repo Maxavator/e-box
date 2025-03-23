@@ -170,20 +170,18 @@ export const Dashboard = () => {
   return (
     <MainLayout>
       <div className="flex-1 min-h-screen bg-background flex">
-        {userRole !== 'org_admin' && (
-          <div className="w-80 border-r bg-card">
-            <ChatSidebar
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              conversations={filteredConversations}
-              selectedConversation={selectedConversation}
-              onSelectConversation={handleSelectConversation}
-              onCalendarActionClick={handleCalendarActionClick}
-            />
-          </div>
-        )}
+        <div className="w-80 border-r bg-card">
+          <ChatSidebar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            conversations={filteredConversations}
+            selectedConversation={selectedConversation}
+            onSelectConversation={handleSelectConversation}
+            onCalendarActionClick={handleCalendarActionClick}
+          />
+        </div>
         <div className="flex-1">
           <DashboardHeader 
             currentView={currentView}
