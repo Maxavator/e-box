@@ -50,7 +50,7 @@ export function UserProfileSidebarFooter() {
         if (session?.user) {
           const { data } = await supabase
             .from('profiles')
-            .select('first_name, last_name')
+            .select('first_name, last_name, job_title')
             .eq('id', session.user.id)
             .maybeSingle();
 
@@ -98,6 +98,14 @@ export function UserProfileSidebarFooter() {
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   const jobTitle = profile?.job_title || '';
   const hasOrganization = !!profile?.organization_id;
+
+  // Debug information
+  console.log('UserProfileSidebarFooter - Profile data:', {
+    firstName,
+    lastName,
+    jobTitle,
+    hasOrganization
+  });
 
   return (
     <div className="flex flex-col p-3 w-full">

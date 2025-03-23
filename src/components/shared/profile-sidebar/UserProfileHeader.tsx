@@ -22,7 +22,7 @@ export function UserProfileHeader({
   const formattedName = `${lastName}, ${firstName}`;
   
   // Display the job title if available, otherwise show appropriate fallback
-  const displayedRole = jobTitle || (hasOrganization ? "" : "Private Individual");
+  const displayedRole = jobTitle || (hasOrganization ? "Org_Admin" : "Private Individual");
 
   return (
     <div className="flex items-center gap-3 mb-3">
