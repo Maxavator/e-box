@@ -8,10 +8,9 @@ import { ProfileControls } from "./ProfileControls";
 import { OrganizationInfo } from "./OrganizationInfo";
 import { AdminButton } from "./AdminButton";
 import { VersionInfo } from "./VersionInfo";
-import { UserRoleBadge } from "./UserRoleBadge";
 
 export function UserProfileSidebarFooter() {
-  const { isAdmin, userRole } = useUserRole();
+  const { isAdmin } = useUserRole();
   const [userName, setUserName] = useState<{ firstName: string; lastName: string } | null>(null);
 
   // Get current session
@@ -29,7 +28,6 @@ export function UserProfileSidebarFooter() {
     queryKey: ['profile', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
-      console.log('Fetching profile for user ID:', session?.user?.id);
       const { data, error } = await supabase
         .from('profiles')
         .select('first_name, last_name, avatar_url, job_title, organization_id')
@@ -41,7 +39,6 @@ export function UserProfileSidebarFooter() {
         return null;
       }
       
-      console.log('Profile data retrieved:', data);
       return data;
     },
   });
