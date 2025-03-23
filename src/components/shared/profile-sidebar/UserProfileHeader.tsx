@@ -21,8 +21,9 @@ export function UserProfileHeader({
   // Format the name as "last_name, first_name"
   const formattedName = `${lastName}, ${firstName}`;
   
-  // Display job title if present and has organization, otherwise "Private Individual"
-  const displayedRole = hasOrganization && jobTitle ? jobTitle : "Private Individual";
+  // Only display "Private Individual" when there's no organization
+  // If they have an organization but no job title, we'll let the organization name show via OrganizationInfo
+  const displayedRole = hasOrganization ? (jobTitle || "") : "Private Individual";
 
   return (
     <div className="flex items-center gap-3 mb-3">
