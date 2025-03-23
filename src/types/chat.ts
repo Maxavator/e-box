@@ -1,54 +1,43 @@
 
-export interface User {
-  id: string;
-  name: string;
-  status: 'online' | 'offline';
-  lastSeen?: string;
-  avatar?: string;
-  initials?: string;
-}
-
-export interface Reaction {
-  emoji: string;
-  users: string[];
-}
-
 export interface Message {
   id: string;
+  conversationId: string;
   senderId: string;
-  text: string;
+  senderName: string;
+  senderAvatar?: string;
+  content: string;
   timestamp: string;
-  status: 'sending' | 'sent' | 'error';
-  edited?: boolean;
-  editedAt?: string;
-  reactions: Reaction[];
-  sender?: 'me' | 'them';
+  isEdited?: boolean;
+  reactions?: { [emoji: string]: string[] };
+  attachments?: Attachment[];
+  status?: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
 }
 
 export interface Conversation {
   id: string;
-  userId: string;
-  unreadCount: number;
-  messages: Message[];
-  lastMessage: string;
+  name: string;
+  participantIds: string[];
+  lastMessage?: Message;
+  unreadCount?: number;
+  avatar?: string;
   isGroup?: boolean;
-  groupName?: string;
   isAdminGroup?: boolean;
+  isPublic?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface Profile {
+export interface Attachment {
   id: string;
-  first_name: string | null;
-  last_name: string | null;
-  avatar_url: string | null;
-  organization_id: string | null;
+  name: string;
+  type: string;
+  url: string;
+  size?: number;
+  thumbnailUrl?: string;
 }
 
-export interface DatabaseConversation {
+export interface ChatTab {
   id: string;
-  user1_id: string;
-  user2_id: string;
-  created_at: string;
-  updated_at: string;
-  is_admin_group?: boolean;
+  name: string;
+  icon: string;
 }
