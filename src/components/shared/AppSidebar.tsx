@@ -85,7 +85,7 @@ export function AppSidebar() {
               <MessageSquare className="h-4 w-4" />
               <span>Chat</span>
               {chatCount > 0 && (
-                <SidebarMenuBadge className="bg-red-500">
+                <SidebarMenuBadge className="ml-auto bg-red-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
                   {chatCount}
                 </SidebarMenuBadge>
               )}
@@ -100,7 +100,7 @@ export function AppSidebar() {
               <FileText className="h-4 w-4" />
               <span>Documents</span>
               {documentsCount > 0 && (
-                <SidebarMenuBadge className="bg-blue-500">
+                <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
                   {documentsCount}
                 </SidebarMenuBadge>
               )}
@@ -115,7 +115,7 @@ export function AppSidebar() {
               <Calendar className="h-4 w-4" />
               <span>Calendar</span>
               {calendarCount > 0 && (
-                <SidebarMenuBadge className="bg-green-500">
+                <SidebarMenuBadge className="ml-auto bg-green-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
                   {calendarCount}
                 </SidebarMenuBadge>
               )}
@@ -130,7 +130,7 @@ export function AppSidebar() {
               <Users className="h-4 w-4" />
               <span>Contacts</span>
               {contactsCount > 0 && (
-                <SidebarMenuBadge className="bg-amber-500">
+                <SidebarMenuBadge className="ml-auto bg-amber-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
                   {contactsCount}
                 </SidebarMenuBadge>
               )}
@@ -145,7 +145,7 @@ export function AppSidebar() {
               <Clock className="h-4 w-4" />
               <span>Leave Manager</span>
               {leaveCount > 0 && (
-                <SidebarMenuBadge className="bg-purple-500">
+                <SidebarMenuBadge className="ml-auto bg-purple-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
                   {leaveCount}
                 </SidebarMenuBadge>
               )}
