@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Bell, Shield } from "lucide-react";
+import { User, Bell, Shield, Upload } from "lucide-react";
 import type { Profile } from "@/types/database";
 
 type Settings = {
@@ -25,7 +25,9 @@ type Settings = {
 export const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [settings, setSettings] = useState<Settings | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: false,
@@ -67,6 +69,65 @@ export const Settings = () => {
 
     fetchSettings();
   }, []);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingImage(true);
+      
+      if (!file.type.match('image.*')) {
+        toast.error('Please upload an image file');
+        return;
+      }
+
+      if (file.size > 5000000) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      setSettings(prev => prev ? { ...prev, avatarUrl: publicUrl } : null);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      toast.success('Profile picture updated successfully');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Failed to update profile picture');
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleImageUploadClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleSave = async () => {
     if (!settings) return;
@@ -135,25 +196,39 @@ export const Settings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {settings?.avatarUrl && (
-                <div className="flex flex-col items-center sm:items-start sm:flex-row gap-4 pb-4">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src={settings.avatarUrl} alt="Profile picture" />
-                    <AvatarFallback>
-                      {settings.firstName?.[0]}{settings.lastName?.[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col justify-center">
-                    <h3 className="text-lg font-medium">Profile Picture</h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      This is your public profile picture visible to other users
-                    </p>
-                    <Button variant="outline" size="sm" className="self-start">
-                      Change Picture
+              <div className="flex flex-col items-center sm:items-start sm:flex-row gap-4 pb-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={settings?.avatarUrl || ''} alt="Profile picture" />
+                  <AvatarFallback>
+                    {settings?.firstName?.[0]}{settings?.lastName?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col justify-center">
+                  <h3 className="text-lg font-medium">Profile Picture</h3>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    This is your public profile picture visible to other users
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="self-start flex items-center gap-2"
+                      onClick={handleImageUploadClick}
+                      disabled={uploadingImage}
+                    >
+                      <Upload className="h-4 w-4" />
+                      {uploadingImage ? "Uploading..." : "Upload New Picture"}
                     </Button>
                   </div>
                 </div>
-              )}
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -186,7 +261,6 @@ export const Settings = () => {
                 />
               </div>
               
-              {/* New phone number fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="mobilePhone">Mobile Phone Number</Label>
