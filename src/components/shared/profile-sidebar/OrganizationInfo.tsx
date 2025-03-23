@@ -8,10 +8,11 @@ interface OrganizationInfoProps {
 }
 
 export function OrganizationInfo({ organizationId }: OrganizationInfoProps) {
-  const { data: organization } = useQuery({
+  const { data: organization, isLoading } = useQuery({
     queryKey: ['organization', organizationId],
     enabled: !!organizationId,
     queryFn: async () => {
+      console.log('Fetching organization info for ID:', organizationId);
       const { data, error } = await supabase
         .from('organizations')
         .select('name')
@@ -23,16 +24,26 @@ export function OrganizationInfo({ organizationId }: OrganizationInfoProps) {
         return null;
       }
       
+      console.log('Organization data retrieved:', data);
       return data;
     },
   });
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2">
+        <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+        <span className="text-xs text-muted-foreground">Loading organization...</span>
+      </div>
+    );
+  }
+
   if (!organization?.name) return null;
 
   return (
-    <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2">
-      <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-      <span className="text-xs text-muted-foreground truncate">{organization.name}</span>
+    <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2 bg-muted/20 rounded">
+      <Building2 className="h-3.5 w-3.5 text-primary" />
+      <span className="text-xs font-medium">{organization.name}</span>
     </div>
   );
 }
