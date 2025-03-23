@@ -29,12 +29,9 @@ export function ThemeProvider({
   disableTransitionOnChange,
   forcedTheme
 }: ThemeProviderProps) {
-  // Cast attribute to Attribute or Attribute[] to satisfy TypeScript
-  const attributeValue = attribute as Attribute | Attribute[];
-  
   return (
     <NextThemesProvider 
-      attribute={attributeValue}
+      attribute={attribute}
       defaultTheme={defaultTheme}
       storageKey={storageKey}
       value={value}
