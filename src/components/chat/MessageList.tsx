@@ -1,6 +1,6 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import MessageItem from "@/components/chat/MessageItem";
+import { MessageItem } from "@/components/chat/MessageItem";
 import type { Message } from "@/types/chat";
 import { MessageSquare, Shield } from "lucide-react";
 

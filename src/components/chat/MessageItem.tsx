@@ -69,7 +69,7 @@ export function MessageItem({
             {isAdminChat && senderProfile ? (
               <AvatarImage src={senderProfile.avatar_url || ''} />
             ) : (
-              <AvatarImage src={message.avatar} />
+              <AvatarImage src={''} />
             )}
             <AvatarFallback>
               {isAdminChat && senderProfile 
