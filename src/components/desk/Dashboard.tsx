@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -72,7 +71,6 @@ export const Dashboard = () => {
     );
   }
 
-  // Only render the main dashboard content if we have a valid role
   if (!userRole) {
     return (
       <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
