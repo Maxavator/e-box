@@ -60,45 +60,56 @@ const Chat = () => {
 
   return (
     <MainLayout>
-      <div className="flex h-full overflow-hidden">
-        {/* Chat sidebar */}
-        <div className="w-full sm:w-80 border-r h-full overflow-auto">
-          <ChatSidebar
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            conversations={filteredConversations}
-            selectedConversation={selectedConversation}
-            onSelectConversation={handleSelectConversation}
-            onCalendarActionClick={handleCalendarActionClick}
+      <div className="flex flex-col h-full">
+        {/* Logo at the top */}
+        <div className="flex justify-center p-4 border-b">
+          <img 
+            src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
+            alt="e-Box by Afrovation" 
+            className="h-12" 
           />
         </div>
         
-        {/* Chat content */}
-        <div className="flex-1 flex flex-col h-full">
-          {selectedConversation ? (
-            <>
-              <ChatContent
-                conversation={selectedConversation}
-                onEditMessage={handleEditMessage}
-                onDeleteMessage={handleDeleteMessage}
-                onReactToMessage={handleReaction}
-              />
-              <ChatInput
-                value={newMessage}
-                onChange={setNewMessage}
-                onSendMessage={handleSendMessage}
-              />
-            </>
-          ) : (
-            <div className="flex items-center justify-center h-full p-8 text-center text-muted-foreground">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Select a Conversation</h3>
-                <p>Choose a conversation from the sidebar or start a new one</p>
+        <div className="flex flex-1 overflow-hidden">
+          {/* Chat sidebar */}
+          <div className="w-full sm:w-80 border-r h-full overflow-auto">
+            <ChatSidebar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              conversations={filteredConversations}
+              selectedConversation={selectedConversation}
+              onSelectConversation={handleSelectConversation}
+              onCalendarActionClick={handleCalendarActionClick}
+            />
+          </div>
+          
+          {/* Chat content */}
+          <div className="flex-1 flex flex-col h-full">
+            {selectedConversation ? (
+              <>
+                <ChatContent
+                  conversation={selectedConversation}
+                  onEditMessage={handleEditMessage}
+                  onDeleteMessage={handleDeleteMessage}
+                  onReactToMessage={handleReaction}
+                />
+                <ChatInput
+                  value={newMessage}
+                  onChange={setNewMessage}
+                  onSendMessage={handleSendMessage}
+                />
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-full p-8 text-center text-muted-foreground">
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Select a Conversation</h3>
+                  <p>Choose a conversation from the sidebar or start a new one</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </MainLayout>
