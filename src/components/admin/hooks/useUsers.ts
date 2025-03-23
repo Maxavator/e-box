@@ -29,64 +29,84 @@ export const useUsers = (
           profilesQuery = profilesQuery.eq('organization_id', organizationFilter);
           console.log(`Filtering by organization: ${organizationFilter}`);
         } 
-        // If user is org_admin, limit to their organization
+        // If user is org_admin, always filter by their organization
         else if (userRole === 'org_admin' && userProfile?.organization_id) {
           profilesQuery = profilesQuery.eq('organization_id', userProfile.organization_id);
           console.log(`Org admin filtering by their organization: ${userProfile.organization_id}`);
         }
+        // For global admins with no filter, return all profiles
 
         const { data: profiles, error: profilesError } = await profilesQuery;
         if (profilesError) throw profilesError;
 
         console.log(`Found ${profiles.length} profiles`);
 
-        const usersWithDetails = await Promise.all(
-          profiles.map(async (profile) => {
-            try {
-              const { data: userRoles, error: rolesError } = await supabase
-                .from('user_roles')
-                .select('*')
-                .eq('user_id', profile.id);
-              
-              if (rolesError) throw rolesError;
+        // Get organization details for all profiles in a single query to improve performance
+        const organizationIds = profiles
+          .filter(profile => profile.organization_id)
+          .map(profile => profile.organization_id);
+        
+        const uniqueOrgIds = [...new Set(organizationIds)];
+        
+        let organizationsMap = {};
+        if (uniqueOrgIds.length > 0) {
+          const { data: organizations, error: orgsError } = await supabase
+            .from('organizations')
+            .select('id, name')
+            .in('id', uniqueOrgIds);
+          
+          if (!orgsError && organizations) {
+            organizationsMap = organizations.reduce((acc, org) => {
+              acc[org.id] = org.name;
+              return acc;
+            }, {});
+          }
+        }
 
-              let organizationData = [];
-              if (profile.organization_id) {
-                const { data: org, error: orgError } = await supabase
-                  .from('organizations')
-                  .select('name')
-                  .eq('id', profile.organization_id)
-                  .single();
-                
-                if (!orgError && org) {
-                  organizationData = [{ name: org.name }];
-                }
-              }
+        // Fetch all user roles in a single query
+        const { data: allUserRoles, error: rolesError } = await supabase
+          .from('user_roles')
+          .select('*')
+          .in('user_id', profiles.map(profile => profile.id));
+        
+        if (rolesError) throw rolesError;
 
-              // Check if user is active by querying auth.users
-              const { data: authUser, error: authError } = await supabase
-                .from('auth_status') // Using a view or function that can check auth status
-                .select('is_confirmed')
-                .eq('user_id', profile.id)
-                .single();
-              
-              return {
-                ...profile,
-                user_roles: userRoles || [],
-                organizations: organizationData,
-                is_active: authUser?.is_confirmed || false
-              } as UserWithRole;
-            } catch (error) {
-              console.error('Error fetching user details:', error);
-              return {
-                ...profile,
-                user_roles: [],
-                organizations: [],
-                is_active: false
-              } as UserWithRole;
-            }
-          })
-        );
+        // Create a map of user_id to roles for quick lookup
+        const userRolesMap = (allUserRoles || []).reduce((acc, role) => {
+          if (!acc[role.user_id]) {
+            acc[role.user_id] = [];
+          }
+          acc[role.user_id].push(role);
+          return acc;
+        }, {});
+
+        // Get auth status for all users in a single query
+        const { data: authStatuses, error: authError } = await supabase
+          .from('auth_status')
+          .select('user_id, is_confirmed')
+          .in('user_id', profiles.map(profile => profile.id));
+        
+        if (authError) {
+          console.error('Error fetching auth status:', authError);
+          // Continue without auth status rather than failing completely
+        }
+
+        // Create a map of user_id to auth status
+        const authStatusMap = (authStatuses || []).reduce((acc, status) => {
+          acc[status.user_id] = status.is_confirmed;
+          return acc;
+        }, {});
+
+        const usersWithDetails = profiles.map(profile => {
+          const orgName = profile.organization_id && organizationsMap[profile.organization_id];
+          
+          return {
+            ...profile,
+            user_roles: userRolesMap[profile.id] || [],
+            organizations: orgName ? [{ name: orgName }] : [],
+            is_active: authStatusMap[profile.id] || false
+          } as UserWithRole;
+        });
 
         return usersWithDetails;
       } catch (error) {
