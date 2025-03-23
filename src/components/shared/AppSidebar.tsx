@@ -21,14 +21,31 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuBadge,
 } from "@/components/ui/sidebar";
 import { UserProfileSidebarFooter } from "./UserProfileSidebarFooter";
+import { useSidebarBadges } from "@/hooks/useSidebarBadges";
 
 export function AppSidebar() {
   const navigate = useNavigate();
   const { isAdmin, userRole } = useUserRole();
+  const { 
+    chatCount, 
+    documentsCount, 
+    calendarCount, 
+    contactsCount, 
+    leaveCount, 
+    resetBadgeCount 
+  } = useSidebarBadges();
   
   const handleNavigation = (path: string) => {
+    // Reset the respective badge count when navigating to a section
+    if (path === "/chat") resetBadgeCount("chat");
+    if (path === "/documents") resetBadgeCount("documents");
+    if (path === "/calendar") resetBadgeCount("calendar");
+    if (path === "/contacts") resetBadgeCount("contacts");
+    if (path === "/leave") resetBadgeCount("leave");
+    
     navigate(path);
   };
 
@@ -67,6 +84,11 @@ export function AppSidebar() {
             >
               <MessageSquare className="h-4 w-4" />
               <span>Chat</span>
+              {chatCount > 0 && (
+                <SidebarMenuBadge className="bg-red-500">
+                  {chatCount}
+                </SidebarMenuBadge>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
           
@@ -77,6 +99,11 @@ export function AppSidebar() {
             >
               <FileText className="h-4 w-4" />
               <span>Documents</span>
+              {documentsCount > 0 && (
+                <SidebarMenuBadge className="bg-blue-500">
+                  {documentsCount}
+                </SidebarMenuBadge>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
           
@@ -87,6 +114,11 @@ export function AppSidebar() {
             >
               <Calendar className="h-4 w-4" />
               <span>Calendar</span>
+              {calendarCount > 0 && (
+                <SidebarMenuBadge className="bg-green-500">
+                  {calendarCount}
+                </SidebarMenuBadge>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
           
@@ -97,6 +129,11 @@ export function AppSidebar() {
             >
               <Users className="h-4 w-4" />
               <span>Contacts</span>
+              {contactsCount > 0 && (
+                <SidebarMenuBadge className="bg-amber-500">
+                  {contactsCount}
+                </SidebarMenuBadge>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
           
@@ -107,6 +144,11 @@ export function AppSidebar() {
             >
               <Clock className="h-4 w-4" />
               <span>Leave Manager</span>
+              {leaveCount > 0 && (
+                <SidebarMenuBadge className="bg-purple-500">
+                  {leaveCount}
+                </SidebarMenuBadge>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
           
