@@ -2,7 +2,7 @@
 import { AdminMenu } from "@/components/admin/AdminMenu";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface AppHeaderProps {
   onLogout: () => void;
@@ -11,6 +11,12 @@ interface AppHeaderProps {
 
 export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Don't show admin menu on admin-related pages
+  const isAdminPage = location.pathname.includes('/admin') || 
+                       location.pathname.includes('/organization');
+  
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -41,7 +47,8 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
         {/* Removed logo from header since it's already in the sidebar */}
       </div>
       <div className="flex items-center gap-4">
-        {isAdmin && <AdminMenu />}
+        {/* Only show AdminMenu if user is admin and not on an admin page */}
+        {isAdmin && !isAdminPage && <AdminMenu />}
       </div>
     </header>
   );

@@ -45,6 +45,10 @@ export function MainNavigationMenu({
   // Consider a user to have admin access if they are either global_admin or org_admin
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
+  // Check if current route is an admin route
+  const isAdminPage = location.pathname.includes('/admin') || 
+                      location.pathname.includes('/organization');
+  
   const handleNavigation = (path: string) => {
     // Reset the respective badge count when navigating to a section
     if (path === "/chat") resetBadgeCount("chat");
@@ -62,6 +66,7 @@ export function MainNavigationMenu({
         <SidebarMenuButton 
           tooltip="Chats" 
           onClick={() => handleNavigation("/chat")}
+          isActive={location.pathname === "/chat"}
         >
           <MessageSquare className="h-4 w-4" />
           <span>Chats</span>
@@ -77,6 +82,7 @@ export function MainNavigationMenu({
         <SidebarMenuButton 
           tooltip="Calendar" 
           onClick={() => handleNavigation("/calendar")}
+          isActive={location.pathname === "/calendar"}
         >
           <Calendar className="h-4 w-4" />
           <span>Calendar</span>
@@ -92,6 +98,7 @@ export function MainNavigationMenu({
         <SidebarMenuButton 
           tooltip="Contacts" 
           onClick={() => handleNavigation("/contacts")}
+          isActive={location.pathname === "/contacts"}
         >
           <Users className="h-4 w-4" />
           <span>Contacts</span>
@@ -103,13 +110,13 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* Admin Portal menu item - displayed prominently for admin users */}
+      {/* Admin Portal menu item - only show if user has admin access */}
       {hasAdminAccess && (
         <SidebarMenuItem>
           <SidebarMenuButton 
             tooltip="Admin Portal" 
             onClick={() => handleNavigation("/admin")}
-            isActive={location.pathname.startsWith('/admin')}
+            isActive={isAdminPage}
           >
             <Shield className="h-4 w-4" />
             <span>Admin Portal</span>
@@ -121,6 +128,7 @@ export function MainNavigationMenu({
         <SidebarMenuButton 
           tooltip="Settings" 
           onClick={() => handleNavigation("/profile")}
+          isActive={location.pathname === "/profile"}
         >
           <Settings className="h-4 w-4" />
           <span>Settings</span>
@@ -132,6 +140,7 @@ export function MainNavigationMenu({
         <SidebarMenuButton 
           tooltip="My Desk"
           onClick={() => handleNavigation("/mydesk")}
+          isActive={location.pathname === "/mydesk"}
         >
           <Briefcase className="h-4 w-4" />
           <span>My Desk {organizationName ? `@${organizationName}` : ''}</span>

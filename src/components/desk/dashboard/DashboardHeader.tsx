@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { ShieldCheck } from "lucide-react";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
+import { useLocation } from "react-router-dom";
 
 interface DashboardHeaderProps {
   currentView: string;
@@ -11,6 +12,11 @@ interface DashboardHeaderProps {
 
 export const DashboardHeader = ({ currentView, onBackClick, onAdminClick }: DashboardHeaderProps) => {
   const { userRole } = useUserRole();
+  const location = useLocation();
+  
+  // Don't show admin button on admin-related pages
+  const isAdminPage = location.pathname.includes('/admin') || 
+                      location.pathname.includes('/organization');
 
   return (
     <header className="h-16 bg-white border-b px-8 flex items-center justify-between">
@@ -27,7 +33,7 @@ export const DashboardHeader = ({ currentView, onBackClick, onAdminClick }: Dash
             Back to Dashboard
           </button>
         )}
-        {userRole === 'org_admin' && (
+        {userRole === 'org_admin' && !isAdminPage && (
           <Button
             onClick={onAdminClick}
             className="flex items-center gap-2"
