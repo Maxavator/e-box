@@ -46,9 +46,6 @@ export const LoginFormFields = ({
         {saIdError && (
           <p className="text-xs text-red-500 mt-1">{saIdError}</p>
         )}
-        <p className="text-xs text-muted-foreground">
-          Example: 8801015800082
-        </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
@@ -61,9 +58,6 @@ export const LoginFormFields = ({
           className="w-full focus:ring-primary"
           autoComplete="current-password"
         />
-        <p className="text-xs text-muted-foreground">
-          Default: StaffPass123!
-        </p>
       </div>
     </>
   );

@@ -3,8 +3,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginForm from "@/components/auth/LoginForm";
 import HeroSection from "@/components/auth/HeroSection";
-import DemoRequestDialog from "@/components/auth/DemoRequestDialog";
-import { CreateGolderOrgButton } from "@/components/auth/CreateGolderOrgButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { InfoIcon } from "lucide-react";
@@ -58,18 +56,8 @@ const Auth = () => {
             <AlertTitle>Login with SA ID only</AlertTitle>
             <AlertDescription className="text-xs">
               This system only accepts South African ID numbers for login.
-              Use one of the test accounts provided above to sign in.
             </AlertDescription>
           </Alert>
-
-          <div className="mt-4">
-            <DemoRequestDialog />
-          </div>
-
-          <div className="mt-8 border-t pt-4">
-            <h3 className="text-sm font-medium">Developer Tools</h3>
-            <CreateGolderOrgButton />
-          </div>
         </div>
       </div>
     </div>

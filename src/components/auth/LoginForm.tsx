@@ -7,7 +7,6 @@ import { useAuthActions } from "@/hooks/useAuthActions";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { formatSaIdPassword } from "@/utils/saIdValidation";
 
 const LoginForm = () => {
   const [saId, setSaId] = useState("");
@@ -32,11 +31,6 @@ const LoginForm = () => {
     } catch (error: any) {
       setError(error.message || "Login failed. Please try again.");
     }
-  };
-
-  const fillTestAccount = (saId: string) => {
-    setSaId(saId);
-    setPassword("StaffPass123!"); // Set to standard password for consistency
   };
 
   return (
@@ -74,37 +68,6 @@ const LoginForm = () => {
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-2">
-        <div className="w-full pt-4 border-t text-sm text-muted-foreground">
-          <p className="mb-2 font-medium">Test Accounts (Click to fill):</p>
-          <div className="grid grid-cols-1 gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="justify-start text-xs"
-              onClick={() => fillTestAccount("8801015800082")}
-            >
-              Org Admin: Thabo Nkosi (8801015800082)
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="justify-start text-xs"
-              onClick={() => fillTestAccount("9001075800087")}
-            >
-              Staff: Bongani Khumalo (9001075800087)
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="justify-start text-xs"
-              onClick={() => fillTestAccount("8606120800186")}
-            >
-              Staff: Zanele Ndlovu (8606120800186)
-            </Button>
-          </div>
-        </div>
-      </CardFooter>
     </Card>
   );
 };

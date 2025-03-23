@@ -8,7 +8,7 @@ import { validateSaId } from "@/utils/saIdValidation";
 
 export const useAuth = () => {
   const [saId, setSaId] = useState("");
-  const [password, setPassword] = useState("StaffPass123!");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isConnectionChecking, setIsConnectionChecking] = useState(true);
   const [connectionError, setConnectionError] = useState<string | null>(null);
@@ -43,7 +43,7 @@ export const useAuth = () => {
   }, []);
 
   const { handleLogin: handleLoginAction } = useAuthActions({
-    email: saId, // We'll interpret this as saId in useAuthActions
+    email: saId,
     password,
     setIsLoading,
     navigate,
