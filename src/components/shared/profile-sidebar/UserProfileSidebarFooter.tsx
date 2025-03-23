@@ -49,17 +49,21 @@ export function UserProfileSidebarFooter() {
     );
   }
 
-  const initials = profile ? `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}` : 'U';
-  const fullName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'User';
+  const firstName = profile?.first_name || '';
+  const lastName = profile?.last_name || '';
+  const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   const jobTitle = profile?.job_title || 'Employee';
+  const hasOrganization = !!profile?.organization_id;
 
   return (
     <div className="flex flex-col p-3 w-full">
       <UserProfileHeader 
-        fullName={fullName} 
+        firstName={firstName}
+        lastName={lastName}
         initials={initials}
         avatarUrl={profile?.avatar_url} 
         jobTitle={jobTitle}
+        hasOrganization={hasOrganization}
       />
       
       <ProfileControls />

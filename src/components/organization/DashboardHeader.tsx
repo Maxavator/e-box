@@ -17,7 +17,8 @@ export const DashboardHeader = ({
   onLogout, 
   onManageOrg 
 }: DashboardHeaderProps) => {
-  const [userName, setUserName] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -30,13 +31,17 @@ export const DashboardHeader = ({
           .single();
 
         if (profileData) {
-          setUserName(`${profileData.first_name} ${profileData.last_name}`);
+          setFirstName(profileData.first_name || '');
+          setLastName(profileData.last_name || '');
         }
       }
     };
 
     fetchUserName();
   }, []);
+
+  // Format the name as "last_name, first_name"
+  const formattedName = firstName && lastName ? `${lastName}, ${firstName}` : "";
 
   return (
     <header className="space-y-4">
@@ -50,9 +55,9 @@ export const DashboardHeader = ({
             </p>
           )}
           <div className="flex items-center gap-4">
-            {userName && (
+            {formattedName && (
               <span className="text-sm text-muted-foreground">
-                {userName}
+                {formattedName}
               </span>
             )}
             <Button 
@@ -84,4 +89,3 @@ export const DashboardHeader = ({
     </header>
   );
 };
-

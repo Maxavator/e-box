@@ -25,16 +25,16 @@ export function UserInfo({ className }: UserInfoProps) {
     queryFn: async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('first_name, last_name, avatar_url')
+        .select('first_name, last_name, avatar_url, organization_id')
         .eq('id', session!.user.id)
         .single();
       return data;
     },
   });
 
-  // Create a display name from first and last name, or use a generic "User" if not available
+  // Create the display name in the format "last_name, first_name"
   const displayName = profile ? 
-    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
+    `${profile.last_name || ''}, ${profile.first_name || ''}`.trim() : 
     'User';
   const avatarUrl = profile?.avatar_url || '';
 
