@@ -1,5 +1,5 @@
 
-import { Shield, Users, MessageSquare, FileText, Sparkles, Clock, Building } from "lucide-react";
+import { Shield, Users, MessageSquare, FileText, Sparkles, Clock, Building, Mail, Lock } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -79,6 +79,33 @@ const HeroSection = () => {
                 </div>
               </li>
             </ul>
+          </div>
+
+          {/* Two new marketing subsections */}
+          <div className="space-y-6">
+            <div className="bg-white/10 p-6 rounded-xl border border-white/10">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-amber-500/20">
+                  <Mail className="w-6 h-6 text-amber-200" />
+                </div>
+                <h3 className="text-xl font-semibold">Unified Communications</h3>
+              </div>
+              <p className="text-white/90 leading-relaxed">
+                Streamline all your business communications in one secure platform. Integrate email, messaging, and document delivery with automated workflows that save time and reduce errors.
+              </p>
+            </div>
+
+            <div className="bg-white/10 p-6 rounded-xl border border-white/10">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-amber-500/20">
+                  <Lock className="w-6 h-6 text-amber-200" />
+                </div>
+                <h3 className="text-xl font-semibold">Enterprise Security</h3>
+              </div>
+              <p className="text-white/90 leading-relaxed">
+                Bank-grade encryption and South African data sovereignty ensure your sensitive information never leaves the country. Multi-factor authentication and detailed audit trails keep your data protected.
+              </p>
+            </div>
           </div>
 
           <div className="pt-6 border-t border-white/20">

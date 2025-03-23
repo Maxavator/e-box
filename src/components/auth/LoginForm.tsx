@@ -8,6 +8,7 @@ import { AlertCircle, Loader2, Shield } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { APP_VERSION } from "@/utils/version";
 
 const LoginForm = () => {
   const [saId, setSaId] = useState("");
@@ -82,6 +83,13 @@ const LoginForm = () => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          
+          {/* Version information */}
+          <div className="mt-6 pt-4 border-t border-gray-100 text-center">
+            <p className="text-xs text-gray-500">
+              e-Box Enterprise Platform {APP_VERSION}
+            </p>
+          </div>
         </form>
       </CardContent>
     </Card>
