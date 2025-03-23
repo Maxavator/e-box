@@ -1,10 +1,11 @@
 
 import { Button } from "@/components/ui/button";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Users, RefreshCcw } from "lucide-react";
 import { UserTable } from "./UserTable";
 import { UserDialog } from "./UserDialog";
 import { useUserManagement } from "./useUserManagement";
 import type { UserWithRole } from "./types";
+import { Badge } from "@/components/ui/badge";
 
 export const UserManagement = () => {
   const {
@@ -24,6 +25,10 @@ export const UserManagement = () => {
     handleSubmit,
     createUserMutation,
     updateUserMutation,
+    refreshUsersList,
+    showingGolderUsers,
+    toggleGolderUsers,
+    golderOrgId,
   } = useUserManagement();
 
   const handleEditUser = (user: UserWithRole) => {
@@ -59,13 +64,37 @@ export const UserManagement = () => {
             <p className="text-sm text-muted-foreground">Managing users for your organization</p>
           )}
           {isAdmin && (
-            <p className="text-sm text-muted-foreground">Managing all users across organizations</p>
+            <p className="text-sm text-muted-foreground">
+              {showingGolderUsers 
+                ? "Showing all Golder (Pty) Ltd. users only" 
+                : "Managing all users across organizations"}
+            </p>
           )}
         </div>
-        <Button onClick={() => setIsAddUserOpen(true)}>
-          <UserPlus className="w-4 h-4 mr-2" />
-          Add User
-        </Button>
+        <div className="flex gap-2">
+          {isAdmin && golderOrgId && (
+            <Button 
+              variant={showingGolderUsers ? "default" : "outline"} 
+              onClick={toggleGolderUsers}
+              className={showingGolderUsers ? "bg-amber-600 hover:bg-amber-700" : ""}
+            >
+              <Users className="w-4 h-4 mr-2" />
+              {showingGolderUsers ? "Show All Organizations" : "Show Golder Users"}
+              {showingGolderUsers && (
+                <Badge variant="outline" className="ml-2 bg-white text-amber-600">
+                  Filtered
+                </Badge>
+              )}
+            </Button>
+          )}
+          <Button variant="outline" onClick={refreshUsersList} title="Refresh user list">
+            <RefreshCcw className="w-4 h-4" />
+          </Button>
+          <Button onClick={() => setIsAddUserOpen(true)}>
+            <UserPlus className="w-4 h-4 mr-2" />
+            Add User
+          </Button>
+        </div>
       </div>
 
       <UserDialog
@@ -96,6 +125,7 @@ export const UserManagement = () => {
         isLoading={isLoading}
         onEditUser={handleEditUser}
         isAdmin={!!isAdmin}
+        showingGolderUsers={showingGolderUsers}
       />
     </div>
   );

@@ -1,12 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUserRole } from "./hooks/useUserRole";
 import { useOrganizations } from "./hooks/useOrganizations";
 import { useUsers } from "./hooks/useUsers";
 import { useUserMutations } from "./hooks/useUserMutations";
 import type { UserWithRole, UserFormData } from "./types";
 import { toast } from "sonner";
-import { useEffect } from "react";
 
 export const useUserManagement = () => {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -20,14 +19,34 @@ export const useUserManagement = () => {
     organizationId: "",
   });
   const [refreshUsers, setRefreshUsers] = useState(0);
+  const [golderOrgId, setGolderOrgId] = useState<string | null>(null);
+  const [showingGolderUsers, setShowingGolderUsers] = useState(false);
 
   const { isAdmin, userRole, isLoading: isRoleLoading, error: roleError } = useUserRole();
   const { organizations, userProfile, isLoading: isOrgsLoading, error: orgsError } = useOrganizations(isAdmin, userRole);
-  const { users, isLoading: isUsersLoading, error: usersError } = useUsers(isAdmin, userRole, userProfile, refreshUsers);
+  const { users, isLoading: isUsersLoading, error: usersError } = useUsers(
+    isAdmin, 
+    userRole, 
+    userProfile, 
+    refreshUsers,
+    showingGolderUsers ? golderOrgId : null
+  );
   const { createUserMutation, updateUserMutation } = useUserMutations(isAdmin, userRole, userProfile);
 
   const isLoading = isRoleLoading || isOrgsLoading || isUsersLoading;
   const error = roleError || orgsError || usersError;
+
+  // Find the Golder organization ID when organizations are loaded
+  useEffect(() => {
+    if (organizations?.length) {
+      const golderOrg = organizations.find(
+        org => org.name.toLowerCase().includes('golder')
+      );
+      if (golderOrg) {
+        setGolderOrgId(golderOrg.id);
+      }
+    }
+  }, [organizations]);
 
   // Set up a polling interval to refresh the users list every 10 seconds
   useEffect(() => {
@@ -41,6 +60,12 @@ export const useUserManagement = () => {
   // Manual refresh function
   const refreshUsersList = () => {
     setRefreshUsers(prev => prev + 1);
+  };
+
+  // Toggle showing all Golder users
+  const toggleGolderUsers = () => {
+    setShowingGolderUsers(prev => !prev);
+    refreshUsersList();
   };
 
   // Show error toast if there's an error
@@ -102,5 +127,8 @@ export const useUserManagement = () => {
     updateUserMutation,
     userProfile,
     refreshUsersList,
+    showingGolderUsers,
+    toggleGolderUsers,
+    golderOrgId,
   };
 };

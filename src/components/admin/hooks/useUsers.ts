@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -9,10 +8,11 @@ export const useUsers = (
   isAdmin: boolean | undefined, 
   userRole: string | undefined, 
   userProfile: Profile | undefined,
-  refreshTrigger: number = 0
+  refreshTrigger: number = 0,
+  organizationFilter?: string | null
 ) => {
   const { data: users, isLoading, error } = useQuery({
-    queryKey: ['users', refreshTrigger],
+    queryKey: ['users', refreshTrigger, organizationFilter],
     queryFn: async () => {
       if (!isAdmin && userRole !== 'org_admin') {
         throw new Error("Not authorized to view users");
@@ -23,7 +23,9 @@ export const useUsers = (
           .from('profiles')
           .select('*');
 
-        if (userRole === 'org_admin' && userProfile?.organization_id) {
+        if (organizationFilter) {
+          profilesQuery = profilesQuery.eq('organization_id', organizationFilter);
+        } else if (userRole === 'org_admin' && userProfile?.organization_id) {
           profilesQuery = profilesQuery.eq('organization_id', userProfile.organization_id);
         }
 
