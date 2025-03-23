@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import {
@@ -32,7 +33,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar variant="sidebar" collapsible="icon">
+    <Sidebar variant="sidebar" collapsible="icon" className="flex flex-col">
       <SidebarHeader className="flex items-center justify-center p-4 border-none">
         <button 
           onClick={() => handleNavigation("/dashboard")}
@@ -48,7 +49,7 @@ export function AppSidebar() {
       
       <Separator className="mx-2 bg-transparent" />
       
-      <SidebarContent className="border-t-0">
+      <SidebarContent className="border-t-0 flex-1">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton 
@@ -134,7 +135,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       
-      <SidebarFooter className="p-0 border-t-0">
+      <SidebarFooter className="p-0 border-t-0 mt-auto">
         <UserProfileSidebarFooter />
       </SidebarFooter>
     </Sidebar>
