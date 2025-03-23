@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,107 +16,131 @@ export const useMessages = (
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data: messageData, error } = await supabase
-      .from('messages')
-      .insert({
-        conversation_id: selectedConversation.id,
-        sender_id: user.id,
-        content: newMessage,
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single();
+    try {
+      const { data: messageData, error } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: selectedConversation.id,
+          sender_id: user.id,
+          content: newMessage,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
 
-    if (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message",
-        variant: "destructive"
-      });
-      return;
+      if (error) {
+        console.error('Error sending message:', error);
+        toast({
+          title: "Error",
+          description: "Failed to send message",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setNewMessage("");
+
+      const newMessageObj: Message = {
+        id: messageData.id,
+        conversationId: selectedConversation.id,
+        senderId: user.id,
+        senderName: 'You', // Could be improved with actual user name from profile
+        content: messageData.content,
+        text: messageData.content, // For backwards compatibility
+        timestamp: messageData.created_at,
+        status: 'sent',
+        reactions: {},
+        sender: 'me' // For backwards compatibility
+      };
+
+      // Handle updating the conversation with the new message
+      if (selectedConversation.messages) {
+        // For conversations with the messages array
+        setSelectedConversation({
+          ...selectedConversation,
+          messages: [...selectedConversation.messages, newMessageObj],
+          lastMessage: newMessageObj
+        });
+      } else {
+        // For conversations without the messages array
+        setSelectedConversation({
+          ...selectedConversation,
+          lastMessage: newMessageObj
+        });
+      }
+    } catch (error) {
+      console.error('Error in handleSendMessage:', error);
     }
-
-    setNewMessage("");
-
-    const newMessageObj: Message = {
-      id: messageData.id,
-      senderId: user.id,
-      text: messageData.content,
-      timestamp: messageData.created_at,
-      status: 'sent',
-      reactions: [],
-      sender: 'me'
-    };
-
-    const updatedConversation: Conversation = {
-      ...selectedConversation,
-      messages: [...selectedConversation.messages, newMessageObj],
-      lastMessage: newMessage
-    };
-
-    setSelectedConversation(updatedConversation);
   };
 
   const handleEditMessage = (messageId: string, newContent: string) => {
     if (!selectedConversation) return;
 
-    const updatedConversation: Conversation = {
-      ...selectedConversation,
-      messages: selectedConversation.messages.map(m =>
-        m.id === messageId
-          ? { ...m, text: newContent, edited: true }
-          : m
-      ),
-    };
+    // For conversations with the messages array
+    if (selectedConversation.messages) {
+      const updatedConversation: Conversation = {
+        ...selectedConversation,
+        messages: selectedConversation.messages.map(m =>
+          m.id === messageId
+            ? { ...m, content: newContent, text: newContent, isEdited: true, edited: true }
+            : m
+        ),
+      };
 
-    setSelectedConversation(updatedConversation);
+      setSelectedConversation(updatedConversation);
+    }
+    // Otherwise, we'd need to update the message in the database
   };
 
   const handleDeleteMessage = (messageId: string) => {
-    if (!selectedConversation) return;
+    if (!selectedConversation || !selectedConversation.messages) return;
 
     const updatedMessages = selectedConversation.messages.filter(m => m.id !== messageId);
     const updatedConversation: Conversation = {
       ...selectedConversation,
       messages: updatedMessages,
-      lastMessage: updatedMessages[updatedMessages.length - 1]?.text ?? ''
+      lastMessage: updatedMessages.length > 0 
+        ? updatedMessages[updatedMessages.length - 1] 
+        : "No messages"
     };
 
     setSelectedConversation(updatedConversation);
   };
 
   const handleReaction = (messageId: string, emoji: string) => {
-    if (!selectedConversation) return;
+    if (!selectedConversation || !selectedConversation.messages) return;
 
     const updatedConversation: Conversation = {
       ...selectedConversation,
       messages: selectedConversation.messages.map(m => {
         if (m.id !== messageId) return m;
 
-        const reactions = [...m.reactions];
-        const existingReaction = reactions.find(r => r.emoji === emoji);
+        const reactions = m.reactions || {};
+        const users = reactions[emoji] || [];
         
-        if (existingReaction) {
-          if (existingReaction.users.includes('me')) {
-            return {
-              ...m,
-              reactions: reactions
-                .map(r => r.emoji === emoji ? { ...r, users: r.users.filter(u => u !== 'me') } : r)
-                .filter(r => r.users.length > 0)
-            };
+        if (users.includes('me')) {
+          // Remove reaction
+          const newUsers = users.filter(u => u !== 'me');
+          
+          const newReactions = {...reactions};
+          if (newUsers.length === 0) {
+            delete newReactions[emoji];
           } else {
-            return {
-              ...m,
-              reactions: reactions.map(r => 
-                r.emoji === emoji ? { ...r, users: [...r.users, 'me'] } : r
-              )
-            };
+            newReactions[emoji] = newUsers;
           }
-        } else {
+          
           return {
             ...m,
-            reactions: [...reactions, { emoji, users: ['me'] }]
+            reactions: newReactions
+          };
+        } else {
+          // Add reaction
+          return {
+            ...m,
+            reactions: {
+              ...reactions,
+              [emoji]: [...users, 'me']
+            }
           };
         }
       })

@@ -34,22 +34,33 @@ export const useRealtime = (
           // Transform the message to match our Message type
           const messageObj: Message = {
             id: newMessage.id,
+            conversationId: newMessage.conversation_id,
             senderId: newMessage.sender_id,
-            text: newMessage.content,
+            senderName: '', // Will be filled later if needed
+            content: newMessage.content,
+            text: newMessage.content, // For backwards compatibility
             timestamp: new Date(newMessage.created_at).toLocaleString(),
             status: 'sent',
-            reactions: [],
-            sender: newMessage.sender_id === user.id ? 'me' : 'them'
+            reactions: {},
+            sender: newMessage.sender_id === user.id ? 'me' : 'them' // For backwards compatibility
           };
 
           // Update the conversation with the new message
           setSelectedConversation(prev => {
             if (!prev) return null;
-            return {
-              ...prev,
-              messages: [...prev.messages, messageObj],
-              lastMessage: newMessage.content
-            };
+            
+            if (prev.messages) {
+              return {
+                ...prev,
+                messages: [...prev.messages, messageObj],
+                lastMessage: messageObj
+              };
+            } else {
+              return {
+                ...prev,
+                lastMessage: messageObj
+              };
+            }
           });
 
           // Show notification for messages from others

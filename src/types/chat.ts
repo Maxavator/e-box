@@ -11,13 +11,16 @@ export interface Message {
   reactions?: { [emoji: string]: string[] };
   attachments?: Attachment[];
   status?: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
+  text?: string; // Legacy field for compatibility
+  sender?: string; // Legacy field for compatibility
+  edited?: boolean; // Legacy field for compatibility
 }
 
 export interface Conversation {
   id: string;
   name: string;
   participantIds: string[];
-  lastMessage?: Message;
+  lastMessage?: Message | string;
   unreadCount?: number;
   avatar?: string;
   isGroup?: boolean;
@@ -25,6 +28,9 @@ export interface Conversation {
   isPublic?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  userId?: string; // Legacy field for compatibility
+  messages?: Message[]; // Legacy field for compatibility
+  groupName?: string; // Legacy field for compatibility
 }
 
 export interface Attachment {
@@ -40,4 +46,11 @@ export interface ChatTab {
   id: string;
   name: string;
   icon: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  status: 'online' | 'offline';
+  lastSeen?: string;
 }

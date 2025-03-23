@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Conversation } from "@/types/chat";
 import { Message } from "@/types/chat";
-import { conversations as mockConversations } from "@/data/chat";
+import { demoConversations } from "@/data/chat";
 
 export const useConversations = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -37,7 +37,7 @@ export const useConversations = () => {
         } catch (error) {
           console.error("Error fetching conversations:", error);
           // Fallback to mock data
-          fetchedConversations = mockConversations.filter(conv => !conv.isAdminGroup);
+          fetchedConversations = demoConversations.filter(conv => !conv.isAdminGroup);
         }
 
         setConversations(fetchedConversations);
