@@ -1,3 +1,4 @@
+
 import React, { Suspense, useState, useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
@@ -69,8 +70,8 @@ function App() {
     <Suspense fallback={<div>Loading...</div>}>
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
-        enableSystem
+        defaultTheme="light" 
+        enableSystem={false}
         disableTransitionOnChange
       >
         <Routes>

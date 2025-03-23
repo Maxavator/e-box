@@ -23,10 +23,10 @@ interface ThemeProviderProps {
 export function ThemeProvider({ 
   children,
   attribute = "data-theme",
-  defaultTheme,
+  defaultTheme = "light", // Set light as the default theme
   storageKey,
   value,
-  enableSystem,
+  enableSystem = false, // Disable system preference by default
   disableTransitionOnChange,
   forcedTheme
 }: ThemeProviderProps) {

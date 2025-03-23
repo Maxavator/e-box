@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bell, Lock, Moon, User } from "lucide-react";
 import { useState } from "react";
@@ -17,7 +16,7 @@ export const Settings = () => {
   const [timezone, setTimezone] = useState("utc");
   const [language, setLanguage] = useState("en");
 
-  // Appearance Settings
+  // Appearance Settings - set darkMode to false by default
   const [darkMode, setDarkMode] = useState(false);
   const [compactMode, setCompactMode] = useState(false);
   const [fontSize, setFontSize] = useState("medium");

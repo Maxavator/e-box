@@ -4,6 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTheme } from "next-themes";
+import { useEffect } from "react";
 
 interface AppearanceSettingsProps {
   darkMode: boolean;
@@ -28,6 +30,13 @@ export const AppearanceSettings = ({
   setHighContrast,
   onSave,
 }: AppearanceSettingsProps) => {
+  const { setTheme } = useTheme();
+  
+  // Apply theme when dark mode changes
+  useEffect(() => {
+    setTheme(darkMode ? "dark" : "light");
+  }, [darkMode, setTheme]);
+
   return (
     <Card>
       <CardHeader>
