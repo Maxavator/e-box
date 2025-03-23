@@ -1,12 +1,18 @@
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { LogOut, Settings, Mail } from "lucide-react";
+import { LogOut, Settings, Mail, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { UserInfo } from "@/components/user/UserInfo";
+import { OnlineStatus } from "@/components/user/OnlineStatus";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function UserProfileSidebarFooter() {
   const navigate = useNavigate();
@@ -66,6 +72,7 @@ export function UserProfileSidebarFooter() {
   const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`;
   const jobTitle = profile.job_title || 'Employee';
   const isAdmin = userRole === 'org_admin' || userRole === 'global_admin';
+  const eBoxVersion = 'v1.0.4';
 
   return (
     <div className="flex flex-col p-3 border-t border-muted/20 bg-sidebar w-full">
@@ -115,8 +122,24 @@ export function UserProfileSidebarFooter() {
         )}
       </div>
       
-      <div className="mt-2">
-        <UserInfo />
+      <div className="mt-2 border-t border-muted/20 pt-2">
+        <OnlineStatus />
+      </div>
+      
+      <div className="flex items-center justify-between mt-2 pt-2 border-t border-muted/20 text-xs text-muted-foreground">
+        <span>e-Box {eBoxVersion}</span>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-6 w-6">
+                <Info className="h-3 w-3" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>© 2024 Afrovation</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </div>
   );

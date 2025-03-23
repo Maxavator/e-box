@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import {
@@ -22,7 +21,6 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { UserProfileSidebarFooter } from "./UserProfileSidebarFooter";
-import { Separator } from "@/components/ui/separator";
 
 export function AppSidebar() {
   const navigate = useNavigate();
@@ -46,8 +44,6 @@ export function AppSidebar() {
           />
         </button>
       </SidebarHeader>
-      
-      {/* Remove the separator that was causing the line */}
       
       <SidebarContent className="border-t-0 flex-1 bg-sidebar">
         <SidebarMenu>
@@ -135,7 +131,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       
-      <SidebarFooter className="p-0 border-t-0 mt-auto">
+      <SidebarFooter className="p-0 border-t-0">
         <UserProfileSidebarFooter />
       </SidebarFooter>
     </Sidebar>
