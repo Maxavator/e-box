@@ -68,7 +68,7 @@ export function UserProfileSidebarFooter() {
   const isAdmin = userRole === 'org_admin' || userRole === 'global_admin';
 
   return (
-    <div className="flex flex-col p-3 border-t">
+    <div className="flex flex-col p-3 border-t border-muted/20">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">

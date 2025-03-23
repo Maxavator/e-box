@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import {
@@ -42,14 +41,14 @@ export function AppSidebar() {
           <img 
             src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
             alt="e-Box by Afrovation" 
-            className="h-12" // Increased from h-8 to h-12
+            className="h-12" 
           />
         </button>
       </SidebarHeader>
       
-      <Separator className="my-1" />
+      <Separator className="mx-2 bg-transparent" />
       
-      <SidebarContent>
+      <SidebarContent className="border-t-0">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton 
@@ -135,7 +134,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       
-      <SidebarFooter className="p-0">
+      <SidebarFooter className="p-0 border-t-0">
         <UserProfileSidebarFooter />
       </SidebarFooter>
     </Sidebar>
