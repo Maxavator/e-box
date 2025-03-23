@@ -49,6 +49,7 @@ export function AppSidebar() {
       
       <SidebarContent className="border-t-0 flex-1 bg-sidebar">
         <SidebarMenu>
+          {/* Main navigation items */}
           <SidebarMenuItem>
             <SidebarMenuButton 
               tooltip="Dashboard" 
@@ -143,7 +144,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       
-      <SidebarFooter>
+      <SidebarFooter className="p-0 bg-sidebar">
         <UserProfileSidebarFooter />
       </SidebarFooter>
     </Sidebar>
