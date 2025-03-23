@@ -22,6 +22,7 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { UserProfileSidebarFooter } from "./UserProfileSidebarFooter";
+import { Separator } from "@/components/ui/separator";
 
 export function AppSidebar() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarHeader className="flex items-center justify-center p-4">
+      <SidebarHeader className="flex items-center justify-center p-4 border-none">
         <button 
           onClick={() => handleNavigation("/dashboard")}
           className="hover:opacity-90 transition-opacity"
@@ -45,6 +46,8 @@ export function AppSidebar() {
           />
         </button>
       </SidebarHeader>
+      
+      <Separator className="my-1" />
       
       <SidebarContent>
         <SidebarMenu>
