@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginForm from "@/components/auth/LoginForm";
@@ -49,20 +48,17 @@ const Auth = () => {
               className="h-16 mb-4"
             />
             <h2 className="text-2xl font-bold tracking-tight text-center">
-              Sign in to your account
+              Sign in
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground text-center">
-              Enter your SA ID number to access your workspace
-            </p>
           </div>
           
           <LoginForm />
 
           <Alert className="mt-6 bg-blue-50">
             <InfoIcon className="h-4 w-4" />
-            <AlertTitle>Login with SA ID only</AlertTitle>
+            <AlertTitle>Secure Authentication</AlertTitle>
             <AlertDescription className="text-xs">
-              This system only accepts South African ID numbers for login.
+              This system uses secure authentication to protect your data.
             </AlertDescription>
           </Alert>
         </div>

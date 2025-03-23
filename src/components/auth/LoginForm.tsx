@@ -36,7 +36,7 @@ const LoginForm = () => {
   return (
     <Card className="mt-6 w-full shadow-md border-primary/10">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Sign in with your SA ID number</CardTitle>
+        <CardTitle className="text-lg">Welcome back</CardTitle>
       </CardHeader>
       <CardContent>
         {error && (

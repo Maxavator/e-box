@@ -32,11 +32,11 @@ export const LoginFormFields = ({
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor="saId">SA ID Number</Label>
+        <Label htmlFor="saId">ID Number</Label>
         <Input
           id="saId"
           type="text"
-          placeholder="Enter your 13-digit SA ID number"
+          placeholder="Enter your ID number"
           value={saId}
           onChange={handleSaIdChange}
           className="w-full focus:ring-primary"
