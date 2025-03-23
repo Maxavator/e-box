@@ -10,6 +10,19 @@ export const useRealtime = (
 ) => {
   const { toast } = useToast();
 
+  // Helper function to format timestamp without seconds
+  const formatTimestamp = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   useEffect(() => {
     if (!selectedConversation) return;
 
@@ -39,7 +52,7 @@ export const useRealtime = (
             senderName: '', // Will be filled later if needed
             content: newMessage.content,
             text: newMessage.content, // For backwards compatibility
-            timestamp: new Date(newMessage.created_at).toLocaleString(),
+            timestamp: formatTimestamp(newMessage.created_at),
             status: 'sent',
             reactions: {},
             sender: newMessage.sender_id === user.id ? 'me' : 'them' // For backwards compatibility

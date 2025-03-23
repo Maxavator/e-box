@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +10,19 @@ export const useMessages = (
 ) => {
   const { toast } = useToast();
   const [newMessage, setNewMessage] = useState("");
+
+  // Helper function to format timestamp without seconds
+  const formatTimestamp = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
 
   const handleSendMessage = async () => {
     if (!selectedConversation || !newMessage.trim()) return;
@@ -47,7 +61,7 @@ export const useMessages = (
         senderName: 'You', // Could be improved with actual user name from profile
         content: messageData.content,
         text: messageData.content, // For backwards compatibility
-        timestamp: messageData.created_at,
+        timestamp: formatTimestamp(messageData.created_at),
         status: 'sent',
         reactions: {},
         sender: 'me' // For backwards compatibility

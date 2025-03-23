@@ -52,6 +52,9 @@ export function MessageItem({
 
   const isSentByMe = message.sender === 'me';
   
+  // Format the timestamp to remove seconds
+  const formattedTimestamp = formatMessageTimestamp(message.timestamp);
+  
   // Convert reactions object to array for rendering
   const reactionArray = message.reactions ? 
     Object.entries(message.reactions).map(([emoji, users]) => ({
@@ -146,7 +149,7 @@ export function MessageItem({
           )}
           
           <div className="text-xs text-muted-foreground">
-            {message.timestamp}
+            {formattedTimestamp}
             {(message.edited || message.isEdited) && ' (edited)'}
           </div>
         </div>
@@ -181,4 +184,31 @@ export function MessageItem({
       </div>
     </div>
   );
+}
+
+// Helper function to format timestamp without seconds
+function formatMessageTimestamp(timestamp: string): string {
+  if (!timestamp) return '';
+  
+  try {
+    // Check if timestamp is a date string or ISO string
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) {
+      // If it's already a formatted string, just return it
+      return timestamp;
+    }
+    
+    // Format date to show only hours and minutes (no seconds)
+    return date.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  } catch (error) {
+    console.error('Error formatting timestamp:', error);
+    return timestamp; // Return original if there's an error
+  }
 }
