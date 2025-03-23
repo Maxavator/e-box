@@ -52,7 +52,7 @@ export function CreateGolderOrgButton() {
               This will create:
               <div className="mt-2">
                 <ul className="list-disc pl-5 space-y-1">
-                  <li><span className="font-medium">Global Admin:</span> Max Dlamini (m@ramutla.com)</li>
+                  <li><span className="font-medium">Global Admin:</span> Max Ramutla (4001015000080)</li>
                   <li><span className="font-medium">Organization:</span> Golder (Pty) Ltd.</li>
                   <li><span className="font-medium">10 Users:</span> Including 1 Org Admin and 9 Staff</li>
                 </ul>

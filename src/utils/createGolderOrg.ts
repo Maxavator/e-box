@@ -3,13 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface UserToCreate {
-  id: string;
   firstName: string;
   lastName: string;
+  saId: string;
   email: string;
   role: 'global_admin' | 'org_admin' | 'staff' | 'user';
   title: string;
-  saId: string;
 }
 
 export const createGolderOrg = async () => {
@@ -45,7 +44,7 @@ export const createGolderOrg = async () => {
 
     const orgId = orgData.id;
 
-    // Step 2: Create users
+    // Step 2: Create users with updated information
     const usersToCreate: UserToCreate[] = [
       {
         firstName: 'Bongani',
@@ -53,8 +52,7 @@ export const createGolderOrg = async () => {
         saId: '9001075800087',
         email: 'bongani.khumalo@golder.co.za',
         role: 'user',
-        title: 'Staff Member',
-        id: '9001075800087'
+        title: 'Staff Member'
       },
       {
         firstName: 'Lesego',
@@ -62,8 +60,7 @@ export const createGolderOrg = async () => {
         saId: '9209015800084',
         email: 'lesego.motaung@golder.co.za',
         role: 'user',
-        title: 'Staff Member',
-        id: '9209015800084'
+        title: 'Staff Member'
       },
       {
         firstName: 'Lindiwe',
@@ -71,8 +68,7 @@ export const createGolderOrg = async () => {
         saId: '8711120800188',
         email: 'lindiwe.mbatha@golder.co.za',
         role: 'user',
-        title: 'Staff Member',
-        id: '8711120800188'
+        title: 'Staff Member'
       },
       {
         firstName: 'Mandla',
@@ -80,8 +76,7 @@ export const createGolderOrg = async () => {
         saId: '8908075800086',
         email: 'mandla.tshabalala@golder.co.za',
         role: 'user',
-        title: 'Staff Member',
-        id: '8908075800086'
+        title: 'Staff Member'
       },
       {
         firstName: 'Nomvula',
@@ -89,8 +84,7 @@ export const createGolderOrg = async () => {
         saId: '9012120800185',
         email: 'nomvula.dlamini@golder.co.za',
         role: 'user',
-        title: 'Staff Member',
-        id: '9012120800185'
+        title: 'Staff Member'
       },
       {
         firstName: 'Precious',
@@ -98,8 +92,7 @@ export const createGolderOrg = async () => {
         saId: '9105120800187',
         email: 'precious.mokoena@golder.co.za',
         role: 'user',
-        title: 'Staff Member',
-        id: '9105120800187'
+        title: 'Staff Member'
       },
       {
         firstName: 'Sipho',
@@ -107,8 +100,7 @@ export const createGolderOrg = async () => {
         saId: '8703075800083',
         email: 'sipho.mabaso@golder.co.za',
         role: 'user',
-        title: 'Staff Member',
-        id: '8703075800083'
+        title: 'Staff Member'
       },
       {
         firstName: 'Thabo',
@@ -116,8 +108,7 @@ export const createGolderOrg = async () => {
         saId: '8801015800082',
         email: 'thabo.nkosi@golder.co.za',
         role: 'org_admin',
-        title: 'Organization Administrator',
-        id: '8801015800082'
+        title: 'Organization Administrator'
       },
       {
         firstName: 'Themba',
@@ -125,8 +116,7 @@ export const createGolderOrg = async () => {
         saId: '8504075800085',
         email: 'themba.zulu@golder.co.za',
         role: 'user',
-        title: 'Staff Member',
-        id: '8504075800085'
+        title: 'Staff Member'
       },
       {
         firstName: 'Zanele',
@@ -134,8 +124,7 @@ export const createGolderOrg = async () => {
         saId: '8606120800186',
         email: 'zanele.ndlovu@golder.co.za',
         role: 'user',
-        title: 'Staff Member',
-        id: '8606120800186'
+        title: 'Staff Member'
       }
     ];
 
@@ -275,16 +264,24 @@ export const createGolderOrg = async () => {
 // Function to create global admin
 const createGlobalAdmin = async () => {
   try {
-    console.log("Creating global admin: Max Dlamini");
+    // Updated global admin info
+    const firstName = 'Max';
+    const lastName = 'Ramutla';
+    const email = 'm@ramutla.com';
+    const saId = '4001015000080';
+    const password = 'Admin@2025!Security';
     
-    // Create auth user for global admin - Using signUp instead of admin.createUser
+    console.log(`Creating global admin: ${firstName} ${lastName}, email: ${email}, SA ID: ${saId}`);
+    
+    // Create auth user for global admin
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: 'm@ramutla.com',
-      password: 'Admin@2025!Security',
+      email: email,
+      password: password,
       options: {
         data: {
-          first_name: 'Max',
-          last_name: 'Dlamini',
+          first_name: firstName,
+          last_name: lastName,
+          sa_id: saId
         }
       }
     });
@@ -301,6 +298,31 @@ const createGlobalAdmin = async () => {
       return null;
     }
 
+    // Create SA ID login for admin too
+    try {
+      const saIdEmail = `${saId}@said.auth`;
+      const { error: saAuthError } = await supabase.auth.signUp({
+        email: saIdEmail,
+        password: 'StaffPass123!', // Using standard password for SA ID login
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            sa_id: saId,
+            primary_email: email
+          }
+        }
+      });
+      
+      if (saAuthError) {
+        console.log(`Note: Could not create additional SA ID login for admin:`, saAuthError);
+      } else {
+        console.log(`Successfully created SA ID login for admin`);
+      }
+    } catch (saIdError) {
+      console.log(`Error creating SA ID login for admin:`, saIdError);
+    }
+
     // Wait for a moment to ensure the auth user trigger has time to create the profile
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -308,8 +330,8 @@ const createGlobalAdmin = async () => {
     const { error: profileError } = await supabase
       .from('profiles')
       .update({
-        first_name: 'Max',
-        last_name: 'Dlamini'
+        first_name: firstName,
+        last_name: lastName
       })
       .eq('id', authData.user.id);
 
