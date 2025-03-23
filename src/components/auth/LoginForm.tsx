@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -87,6 +88,9 @@ const LoginForm = () => {
           <div className="mt-6 pt-4 border-t border-gray-100 text-center">
             <p className="text-xs text-gray-500">
               e-Box Enterprise Platform {APP_VERSION}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              © 2025 Afrovation Technology Solutions (Pty) Ltd. All rights reserved.
             </p>
           </div>
         </form>

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { getChangelog } from "@/utils/changelog";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { APP_VERSION } from "@/utils/version";
 
 export default function Changelog() {
   const navigate = useNavigate();
@@ -21,6 +22,9 @@ export default function Changelog() {
           Back
         </Button>
         <h1 className="text-3xl font-bold">Changelog</h1>
+        <span className="ml-3 text-sm text-muted-foreground self-end">
+          Current: {APP_VERSION}
+        </span>
       </div>
       
       <div className="space-y-10">
