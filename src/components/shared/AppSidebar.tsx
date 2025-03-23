@@ -39,12 +39,17 @@ export function AppSidebar() {
     console.error('Sidebar - Error fetching user role:', error);
   }
 
+  const handleLogoClick = () => {
+    navigate("/dashboard");
+  };
+
   return (
     <Sidebar>
       <SidebarHeader className="flex items-center justify-center p-4 border-none bg-sidebar">
         <button 
-          onClick={() => navigate("/dashboard")}
-          className="hover:opacity-90 transition-opacity"
+          onClick={handleLogoClick}
+          className="hover:opacity-90 transition-opacity cursor-pointer"
+          aria-label="Go to Dashboard"
         >
           <img 
             src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 

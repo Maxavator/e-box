@@ -8,7 +8,6 @@ import {
   Clock,
   Settings,
   Briefcase,
-  LayoutDashboard,
   Shield,
 } from "lucide-react";
 
@@ -53,15 +52,7 @@ export function MainNavigationMenu({
   
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Dashboard" 
-          onClick={() => handleNavigation("/dashboard")}
-        >
-          <LayoutDashboard className="h-4 w-4" />
-          <span>Dashboard</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
+      {/* Dashboard item removed as requested */}
       
       <SidebarMenuItem>
         <SidebarMenuButton 
