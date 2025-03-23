@@ -123,7 +123,7 @@ export const createGolderOrg = async () => {
         lastName: 'Ndlovu',
         saId: '8606120800186',
         email: 'zanele.ndlovu@golder.co.za',
-        role: 'user',
+        role: 'org_admin',
         title: 'Staff Member'
       }
     ];
