@@ -14,6 +14,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { APP_VERSION } from "@/utils/version";
+import { getLatestChanges } from "@/utils/changelog";
 
 export function UserProfileSidebarFooter() {
   const navigate = useNavigate();
@@ -88,7 +90,7 @@ export function UserProfileSidebarFooter() {
   const fullName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'User';
   const jobTitle = profile?.job_title || 'Employee';
   const isAdmin = userRole === 'org_admin' || userRole === 'global_admin';
-  const eBoxVersion = 'v1.0.4';
+  const latestChanges = getLatestChanges();
 
   return (
     <div className="flex flex-col p-3 w-full">
@@ -134,7 +136,35 @@ export function UserProfileSidebarFooter() {
       </div>
       
       <div className="flex items-center justify-between mt-2 pt-2 border-t border-muted/20 text-xs text-muted-foreground">
-        <span>e-Box {eBoxVersion}</span>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="text-xs hover:underline">
+                e-Box {APP_VERSION}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="w-72 p-3">
+              <div className="space-y-2">
+                <h4 className="font-medium">Latest Changes ({latestChanges?.version})</h4>
+                <p className="text-xs text-muted-foreground">{latestChanges?.date}</p>
+                <ul className="text-xs space-y-1 list-disc pl-4">
+                  {latestChanges?.changes.map((change, i) => (
+                    <li key={i}>{change}</li>
+                  ))}
+                </ul>
+                <p className="text-xs pt-2">
+                  <a 
+                    className="text-primary hover:underline cursor-pointer"
+                    onClick={() => navigate("/changelog")}
+                  >
+                    View full changelog
+                  </a>
+                </p>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

@@ -1,55 +1,88 @@
-
+import React, { Suspense, useState, useEffect } from 'react';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
-import { ThemeProvider } from "@/components/shared/theme-provider"
-import Index from "@/pages/Index";
-import Auth from "@/pages/Auth";
-import Dashboard from "@/pages/Dashboard";
-import NotFound from "@/pages/NotFound";
-import AdminPortal from "@/pages/AdminPortal";
-import OrganizationDashboard from "@/pages/OrganizationDashboard";
-import OrganizationManagementPage from "@/pages/OrganizationManagement";
-import Chat from "@/pages/Chat";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// Create a global QueryClient
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
-    },
-  },
-});
+  Auth,
+  Dashboard,
+  Index,
+  NotFound,
+  Settings,
+} from '@/pages';
+import { Chat } from '@/pages/Chat';
+import { Documents } from '@/pages/Documents';
+import { Calendar } from '@/pages/Calendar';
+import { ContactsList } from '@/pages/ContactsList';
+import { LeaveManager } from '@/pages/LeaveManager';
+import { Policies } from '@/pages/Policies';
+import { AdminPortal } from '@/pages/AdminPortal';
+import { OrganizationDashboard } from '@/pages/OrganizationDashboard';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { ThemeProvider } from "@/components/ui/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
+import { Toaster as Sonner } from "@/components/ui/sonner"
+import Changelog from './pages/Changelog';
 
 function App() {
+  const [isMounted, setIsMounted] = useState(false);
+  const session = useSession();
+  const supabase = useSupabaseClient();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleAuthStateChange = async (_event: any, _session: any) => {
+      if (!session && location.pathname !== '/auth') {
+        navigate('/auth');
+      } else if (session && location.pathname === '/auth') {
+        navigate('/dashboard');
+      }
+    };
+
+    supabase.auth.onAuthStateChange(handleAuthStateChange);
+
+    return () => {
+      supabase.auth.offAuthStateChange(handleAuthStateChange);
+    };
+  }, [session, location, navigate, supabase]);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-react-theme">
-        <Router>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
+    <Suspense fallback={<div>Loading...</div>}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/chat" element={<Chat />} />
-            <Route path="/documents" element={<Dashboard />} />
-            <Route path="/calendar" element={<Dashboard />} />
-            <Route path="/contacts" element={<Dashboard />} />
-            <Route path="/leave" element={<Dashboard />} />
-            <Route path="/policies" element={<Dashboard />} />
-            <Route path="/profile" element={<Dashboard />} />
-            <Route path="/admin" element={<AdminPortal />} />
+            <Route path="/documents" element={<Documents />} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/contacts" element={<ContactsList />} />
+            <Route path="/leave" element={<LeaveManager />} />
+            <Route path="/policies" element={<Policies />} />
+            <Route path="/profile" element={<Settings />} />
             <Route path="/organization" element={<OrganizationDashboard />} />
-            <Route path="/organization/manage" element={<OrganizationManagementPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Router>
+            <Route path="/admin" element={<AdminPortal />} />
+            <Route path="/changelog" element={<Changelog />} />
+          </Route>
+          
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
+        <Sonner />
       </ThemeProvider>
-    </QueryClientProvider>
-  )
+    </Suspense>
+  );
 }
 
-export default App
+export default App;
