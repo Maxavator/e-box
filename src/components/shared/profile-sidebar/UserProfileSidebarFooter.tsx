@@ -26,6 +26,7 @@ export function UserProfileSidebarFooter() {
     queryKey: ['profile', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
+      console.log('Fetching profile for user ID:', session?.user?.id);
       const { data, error } = await supabase
         .from('profiles')
         .select('first_name, last_name, avatar_url, job_title, email, organization_id')
@@ -37,6 +38,7 @@ export function UserProfileSidebarFooter() {
         return null;
       }
       
+      console.log('Profile data retrieved:', data);
       return data;
     },
   });
@@ -62,6 +64,8 @@ export function UserProfileSidebarFooter() {
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   const jobTitle = profile?.job_title || '';
   const hasOrganization = !!profile?.organization_id;
+
+  console.log('Rendering user profile:', { firstName, lastName, jobTitle, hasOrganization });
 
   return (
     <div className="flex flex-col p-3 w-full">

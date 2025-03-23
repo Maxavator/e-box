@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 
@@ -10,7 +9,7 @@ import {
   SidebarGroup,
 } from "@/components/ui/sidebar";
 
-import { UserProfileSidebarFooter } from "./profile-sidebar";
+import { UserProfileSidebarFooter } from "./profile-sidebar/UserProfileSidebarFooter";
 import { useSidebarBadges } from "@/hooks/useSidebarBadges";
 import { MainNavigationMenu } from "./sidebar/MainNavigationMenu";
 
@@ -26,10 +25,8 @@ export function AppSidebar() {
     resetBadgeCount 
   } = useSidebarBadges();
   
-  // Consider a user to have admin access if they are either global_admin or org_admin
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
-  // Add more debug logs to help diagnose the issue
   console.log('Sidebar - User role:', userRole);
   console.log('Sidebar - Is admin:', isAdmin);
   console.log('Sidebar - Has admin access:', hasAdminAccess);
@@ -60,7 +57,6 @@ export function AppSidebar() {
       </SidebarHeader>
       
       <SidebarContent className="border-t-0 flex-1 bg-sidebar">
-        {/* Main navigation menu */}
         <SidebarGroup>
           <MainNavigationMenu 
             chatCount={chatCount}
