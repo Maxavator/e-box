@@ -8,8 +8,6 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
 } from "@/components/ui/sidebar";
 
 import { UserProfileSidebarFooter } from "./UserProfileSidebarFooter";
@@ -28,13 +26,12 @@ export function AppSidebar() {
     resetBadgeCount 
   } = useSidebarBadges();
   
-  console.log('Sidebar - User role:', userRole);
-  console.log('Sidebar - Is admin:', isAdmin);
-  
-  // Improved admin roles check - fix the issue by ensuring all admin roles are properly detected
-  const hasAdminAccess = isAdmin || userRole === 'org_admin' || userRole === 'global_admin';
+  // Consider a user to have admin access if they are either global_admin or org_admin
+  const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
   // Add more debug logs to help diagnose the issue
+  console.log('Sidebar - User role:', userRole);
+  console.log('Sidebar - Is admin:', isAdmin);
   console.log('Sidebar - Has admin access:', hasAdminAccess);
   console.log('Sidebar - Admin check details:', { isAdmin, userRole, hasAdminAccess });
 

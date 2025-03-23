@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AppHeader } from "@/components/shared/AppHeader";
@@ -20,6 +19,8 @@ const AdminPortal = () => {
   const initialView = location.state?.view || 'dashboard';
   const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'organizations' | 'settings'>(initialView);
   const { isAdmin, userRole, isLoading } = useUserRole();
+  
+  const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -32,14 +33,14 @@ const AdminPortal = () => {
       }
 
       // Wait for role check to complete
-      if (!isLoading && !isAdmin && userRole !== 'org_admin') {
+      if (!isLoading && !hasAdminAccess) {
         toast.error("You don't have permission to access the admin portal");
         navigate("/");
       }
     };
 
     checkAccess();
-  }, [navigate, isAdmin, userRole, isLoading]);
+  }, [navigate, isAdmin, userRole, isLoading, hasAdminAccess]);
 
   const handleLogout = async () => {
     try {
@@ -74,7 +75,7 @@ const AdminPortal = () => {
   }
 
   // If not admin or org_admin, this will redirect through the useEffect
-  if (!isAdmin && userRole !== 'org_admin') {
+  if (!hasAdminAccess) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Alert variant="destructive" className="max-w-md">
