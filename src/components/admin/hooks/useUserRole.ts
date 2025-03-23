@@ -21,23 +21,23 @@ export const useUserRole = () => {
     queryFn: async () => {
       console.log('Checking admin status for user ID:', session?.user?.id);
       try {
-        const { data, error } = await supabase
+        // First check for global_admin role
+        const { data: globalAdminData, error: globalAdminError } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', session!.user.id)
           .eq('role', 'global_admin')
           .maybeSingle();
 
-        if (error) {
-          console.error('Error checking admin role:', error);
+        if (globalAdminError) {
+          console.error('Error checking global_admin role:', globalAdminError);
           return false;
         }
         
-        // Check for global_admin role
-        const isGlobalAdmin = !!data;
+        const isGlobalAdmin = !!globalAdminData;
         console.log('Is global admin:', isGlobalAdmin);
         
-        // If not a global admin, check if the user is an org_admin
+        // If not a global admin, check for org_admin role
         if (!isGlobalAdmin) {
           const { data: orgAdminData, error: orgAdminError } = await supabase
             .from('user_roles')

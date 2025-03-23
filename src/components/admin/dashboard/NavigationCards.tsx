@@ -1,5 +1,6 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Building2, Settings } from "lucide-react";
+import { Users, Building2, Settings, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export interface NavigationCardsProps {
@@ -19,7 +20,7 @@ export const NavigationCards = ({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       <NavCard
         title="User Management"
         description="Add, remove, and manage user access and permissions"
@@ -56,18 +57,18 @@ interface NavCardProps {
 const NavCard = ({ title, description, icon, isActive, onClick }: NavCardProps) => (
   <Card 
     className={`hover:shadow-lg transition-shadow cursor-pointer ${
-      isActive ? 'border-primary' : ''
+      isActive ? 'border-primary ring-1 ring-primary/30' : ''
     }`}
     onClick={onClick}
   >
-    <CardHeader>
-      <CardTitle className="flex items-center space-x-2">
+    <CardHeader className="pb-2">
+      <CardTitle className="flex items-center gap-2 text-lg">
         {icon}
         <span>{title}</span>
       </CardTitle>
     </CardHeader>
     <CardContent>
-      <p className="text-gray-500 mb-4">{description}</p>
+      <p className="text-muted-foreground text-sm">{description}</p>
     </CardContent>
   </Card>
 );
