@@ -8,10 +8,11 @@ import type { UserWithRole } from "../types";
 export const useUsers = (
   isAdmin: boolean | undefined, 
   userRole: string | undefined, 
-  userProfile: Profile | undefined
+  userProfile: Profile | undefined,
+  refreshTrigger: number = 0
 ) => {
   const { data: users, isLoading, error } = useQuery({
-    queryKey: ['users'],
+    queryKey: ['users', refreshTrigger],
     queryFn: async () => {
       if (!isAdmin && userRole !== 'org_admin') {
         throw new Error("Not authorized to view users");

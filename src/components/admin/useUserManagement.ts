@@ -6,6 +6,7 @@ import { useUsers } from "./hooks/useUsers";
 import { useUserMutations } from "./hooks/useUserMutations";
 import type { UserWithRole, UserFormData } from "./types";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 export const useUserManagement = () => {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -18,14 +19,29 @@ export const useUserManagement = () => {
     role: "staff",
     organizationId: "",
   });
+  const [refreshUsers, setRefreshUsers] = useState(0);
 
   const { isAdmin, userRole, isLoading: isRoleLoading, error: roleError } = useUserRole();
   const { organizations, userProfile, isLoading: isOrgsLoading, error: orgsError } = useOrganizations(isAdmin, userRole);
-  const { users, isLoading: isUsersLoading, error: usersError } = useUsers(isAdmin, userRole, userProfile);
+  const { users, isLoading: isUsersLoading, error: usersError } = useUsers(isAdmin, userRole, userProfile, refreshUsers);
   const { createUserMutation, updateUserMutation } = useUserMutations(isAdmin, userRole, userProfile);
 
   const isLoading = isRoleLoading || isOrgsLoading || isUsersLoading;
   const error = roleError || orgsError || usersError;
+
+  // Set up a polling interval to refresh the users list every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshUsers(prev => prev + 1);
+    }, 10000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  // Manual refresh function
+  const refreshUsersList = () => {
+    setRefreshUsers(prev => prev + 1);
+  };
 
   // Show error toast if there's an error
   if (error) {
@@ -57,6 +73,9 @@ export const useUserManagement = () => {
         organizationId: "",
       });
       setSelectedUser(null);
+      
+      // Refresh the users list
+      refreshUsersList();
     } catch (error) {
       // Error handling is done in mutation callbacks
       console.error('Form submission error:', error);
@@ -82,5 +101,6 @@ export const useUserManagement = () => {
     createUserMutation,
     updateUserMutation,
     userProfile,
+    refreshUsersList,
   };
 };
