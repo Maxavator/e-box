@@ -2,7 +2,6 @@
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { ChatSidebar } from "./ChatSidebar";
 import { ChatContent } from "./ChatContent";
-import { MainLayout } from "@/components/shared/MainLayout";
 import type { Conversation } from "@/types/chat";
 
 interface ChatLayoutProps {
@@ -45,47 +44,45 @@ export const ChatLayout = ({
   isMobile,
 }: ChatLayoutProps) => {
   return (
-    <MainLayout>
-      <div className="flex-1 h-[calc(100vh-4rem)] bg-background flex overflow-hidden">
-        <ResizablePanelGroup direction="horizontal" className="flex-1">
-          <ResizablePanel 
-            defaultSize={25} 
-            minSize={20} 
-            maxSize={40}
-            className="bg-white"
-          >
-            <ChatSidebar
-              searchQuery={searchQuery}
-              onSearchChange={onSearchChange}
-              activeTab={activeTab}
-              onTabChange={onTabChange}
-              conversations={conversations}
-              selectedConversation={selectedConversation}
-              onSelectConversation={onSelectConversation}
-              onCalendarActionClick={onCalendarActionClick}
-            />
-          </ResizablePanel>
-          
-          <ResizableHandle withHandle className="bg-border" />
-          
-          <ResizablePanel 
-            defaultSize={75}
-            className="bg-white"
-          >
-            <ChatContent
-              activeTab={activeTab}
-              selectedConversation={selectedConversation}
-              newMessage={newMessage}
-              onNewMessageChange={onNewMessageChange}
-              onSendMessage={onSendMessage}
-              onEditMessage={onEditMessage}
-              onDeleteMessage={onDeleteMessage}
-              onReactToMessage={onReactToMessage}
-              calendarView={calendarView}
-            />
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      </div>
-    </MainLayout>
+    <div className="flex-1 h-[calc(100vh-4rem)] bg-background flex overflow-hidden">
+      <ResizablePanelGroup direction="horizontal" className="flex-1">
+        <ResizablePanel 
+          defaultSize={25} 
+          minSize={20} 
+          maxSize={40}
+          className="bg-white"
+        >
+          <ChatSidebar
+            searchQuery={searchQuery}
+            onSearchChange={onSearchChange}
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+            conversations={conversations}
+            selectedConversation={selectedConversation}
+            onSelectConversation={onSelectConversation}
+            onCalendarActionClick={onCalendarActionClick}
+          />
+        </ResizablePanel>
+        
+        <ResizableHandle withHandle className="bg-border" />
+        
+        <ResizablePanel 
+          defaultSize={75}
+          className="bg-white"
+        >
+          <ChatContent
+            activeTab={activeTab}
+            selectedConversation={selectedConversation}
+            newMessage={newMessage}
+            onNewMessageChange={onNewMessageChange}
+            onSendMessage={onSendMessage}
+            onEditMessage={onEditMessage}
+            onDeleteMessage={onDeleteMessage}
+            onReactToMessage={onReactToMessage}
+            calendarView={calendarView}
+          />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 };
