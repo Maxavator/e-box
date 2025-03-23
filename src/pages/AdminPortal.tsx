@@ -9,10 +9,13 @@ import { SystemSettings } from "@/components/admin/SystemSettings";
 import OrganizationManagement from "@/components/admin/OrganizationManagement";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Link2, ShieldAlert } from "lucide-react";
+import { Link2, ShieldAlert, ArrowLeft } from "lucide-react";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { MainLayout } from "@/components/shared/MainLayout";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 const AdminPortal = () => {
   const navigate = useNavigate();
@@ -78,28 +81,33 @@ const AdminPortal = () => {
   return (
     <MainLayout>
       <div className="container mx-auto p-4 md:p-8 space-y-6 md:space-y-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">Admin Portal</h1>
-            <p className="text-muted-foreground">
-              {userRole === 'global_admin' 
-                ? 'Manage all organizations, users, and system settings' 
-                : 'Manage your organization settings and users'}
-            </p>
+        <Card className="p-6 border-l-4 border-l-primary">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold">Admin Portal</h1>
+              <p className="text-muted-foreground">
+                {userRole === 'global_admin' 
+                  ? 'Manage all organizations, users, and system settings' 
+                  : 'Manage your organization settings and users'}
+              </p>
+            </div>
+            {activeView !== 'dashboard' && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setActiveView('dashboard');
+                  navigate('/admin', { state: { view: 'dashboard' } });
+                }}
+                className="flex items-center gap-2 text-sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Dashboard
+              </Button>
+            )}
           </div>
-          {activeView !== 'dashboard' && (
-            <button
-              onClick={() => {
-                setActiveView('dashboard');
-                navigate('/admin', { state: { view: 'dashboard' } });
-              }}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Link2 className="w-4 h-4" />
-              Back to Dashboard
-            </button>
-          )}
-        </div>
+        </Card>
+
+        <Separator className="my-6" />
 
         {activeView === 'dashboard' && (
           <>
@@ -115,9 +123,23 @@ const AdminPortal = () => {
           </>
         )}
 
-        {activeView === 'users' && <UserManagement />}
-        {activeView === 'organizations' && <OrganizationManagement />}
-        {activeView === 'settings' && <SystemSettings />}
+        {activeView === 'users' && (
+          <Card className="p-6">
+            <UserManagement />
+          </Card>
+        )}
+        
+        {activeView === 'organizations' && (
+          <Card className="p-6">
+            <OrganizationManagement />
+          </Card>
+        )}
+        
+        {activeView === 'settings' && (
+          <Card className="p-6">
+            <SystemSettings />
+          </Card>
+        )}
       </div>
     </MainLayout>
   );
