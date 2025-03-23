@@ -56,11 +56,11 @@ export function MainLayout({ children }: MainLayoutProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <SidebarProvider defaultOpen={true}>
-        <div className="flex flex-col min-h-screen w-full bg-background">
+        <div className="flex flex-col h-screen w-full bg-background">
           <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
           <div className="flex flex-1 overflow-hidden">
             <AppSidebar />
-            <main className="flex-1 overflow-auto">
+            <main className="flex-1 overflow-auto w-full max-w-7xl">
               {children}
             </main>
           </div>

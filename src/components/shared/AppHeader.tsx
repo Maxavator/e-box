@@ -46,7 +46,7 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
       <div className="flex items-center gap-4">
         {/* Removed logo from header since it's already in the sidebar */}
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 max-w-7xl mx-auto w-full">
         {/* Only show AdminMenu if user is admin and not on an admin page */}
         {isAdmin && !isAdminPage && <AdminMenu />}
       </div>

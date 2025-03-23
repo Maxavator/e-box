@@ -33,8 +33,8 @@ export function ChatSidebar({
 
   return (
     <div className="h-full flex flex-col bg-background">
-      <div className="p-4 border-b">
-        <div className="flex items-center justify-between mb-4">
+      <div className="p-3 border-b">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
             {isAdminChat ? (
               <>
@@ -67,7 +67,7 @@ export function ChatSidebar({
       </div>
       
       {!isAdminChat && (
-        <div className="px-4 mt-4 mb-4">
+        <div className="px-3 mt-3 mb-3">
           <NewMessageDialog />
         </div>
       )}
