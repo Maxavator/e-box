@@ -36,7 +36,7 @@ const Auth = () => {
   }, [navigate]);
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-white text-foreground">
       <div className="hidden md:flex md:w-1/2 bg-primary/5">
         <HeroSection />
       </div>
@@ -48,7 +48,6 @@ const Auth = () => {
               alt="e-Box Logo" 
               className="h-16 mb-4"
             />
-            {/* Removed the "Sign in" heading */}
           </div>
           
           <LoginForm />
