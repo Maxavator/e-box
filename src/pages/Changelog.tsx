@@ -38,6 +38,10 @@ export default function Changelog() {
           </div>
         ))}
       </div>
+      
+      <footer className="mt-16 pt-4 border-t border-muted/20 text-center text-sm text-muted-foreground">
+        <p>© 2025 Afrovation Technology Solutions (Pty) Ltd. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
