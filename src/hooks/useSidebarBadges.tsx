@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useChat } from "@/hooks/use-chat";
 
 export function useSidebarBadges() {
   const [chatCount, setChatCount] = useState(0);
@@ -18,9 +19,20 @@ export function useSidebarBadges() {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          // For demonstration purposes, we're setting random counts
-          // In a real app, you would fetch these from your database
-          setChatCount(Math.floor(Math.random() * 10));
+          // Get unread messages count from conversations
+          const { data: conversations } = await supabase
+            .from('conversations')
+            .select('unread_count');
+          
+          // Sum up the unread counts
+          if (conversations) {
+            const totalUnread = conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
+            setChatCount(totalUnread);
+          } else {
+            // Fallback to random count for demo purposes
+            setChatCount(Math.floor(Math.random() * 10));
+          }
+          
           setDocumentsCount(Math.floor(Math.random() * 5));
           setCalendarCount(Math.floor(Math.random() * 3));
           

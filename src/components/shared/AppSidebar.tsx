@@ -79,11 +79,11 @@ export function AppSidebar() {
           
           <SidebarMenuItem>
             <SidebarMenuButton 
-              tooltip="Chat" 
+              tooltip="Chats" 
               onClick={() => handleNavigation("/chat")}
             >
               <MessageSquare className="h-4 w-4" />
-              <span>Chat</span>
+              <span>Chats</span>
               {chatCount > 0 && (
                 <SidebarMenuBadge className="ml-auto bg-red-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
                   {chatCount}
