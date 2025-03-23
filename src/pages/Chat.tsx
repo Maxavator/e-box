@@ -1,29 +1,15 @@
 
-import { useNavigate } from "react-router-dom";
 import { useChat } from "@/hooks/use-chat";
-import { ChatLayout } from "@/components/chat/ChatLayout";
+import { ChatContent } from "@/components/chat/ChatContent";
+import { ChatInput } from "@/components/chat/ChatInput";
 import { useEffect } from "react";
 import { startMessageSimulation } from "@/utils/messageSimulator";
 import { useToast } from "@/hooks/use-toast";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { supabase } from "@/integrations/supabase/client";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// Create a client for the Chat page
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
-    },
-  },
-});
+import { MainLayout } from "@/components/shared/MainLayout";
+import { ChatSidebar } from "@/components/chat/ChatSidebar";
 
 const Chat = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
-  const isMobile = useIsMobile();
   const {
     searchQuery,
     setSearchQuery,
@@ -67,38 +53,17 @@ const Chat = () => {
     };
   }, [toast]);
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Success",
-        description: "Logged out successfully",
-      });
-      navigate("/auth");
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to logout",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleLogoClick = () => {
-    navigate("/organization");
-  };
-
   const handleCalendarActionClick = (view: 'calendar' | 'inbox') => {
     setCalendarView(view);
     setActiveTab('calendar');
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <SidebarProvider>
-        <div className="flex flex-col min-h-screen w-full">
-          <ChatLayout
+    <MainLayout>
+      <div className="flex h-full overflow-hidden">
+        {/* Chat sidebar */}
+        <div className="w-full sm:w-80 border-r h-full overflow-auto">
+          <ChatSidebar
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             activeTab={activeTab}
@@ -107,20 +72,36 @@ const Chat = () => {
             selectedConversation={selectedConversation}
             onSelectConversation={handleSelectConversation}
             onCalendarActionClick={handleCalendarActionClick}
-            newMessage={newMessage}
-            onNewMessageChange={setNewMessage}
-            onSendMessage={handleSendMessage}
-            onEditMessage={handleEditMessage}
-            onDeleteMessage={handleDeleteMessage}
-            onReactToMessage={handleReaction}
-            calendarView={calendarView}
-            onLogout={handleLogout}
-            onLogoClick={handleLogoClick}
-            isMobile={isMobile}
           />
         </div>
-      </SidebarProvider>
-    </QueryClientProvider>
+        
+        {/* Chat content */}
+        <div className="flex-1 flex flex-col h-full">
+          {selectedConversation ? (
+            <>
+              <ChatContent
+                conversation={selectedConversation}
+                onEditMessage={handleEditMessage}
+                onDeleteMessage={handleDeleteMessage}
+                onReactToMessage={handleReaction}
+              />
+              <ChatInput
+                value={newMessage}
+                onChange={setNewMessage}
+                onSendMessage={handleSendMessage}
+              />
+            </>
+          ) : (
+            <div className="flex items-center justify-center h-full p-8 text-center text-muted-foreground">
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Select a Conversation</h3>
+                <p>Choose a conversation from the sidebar or start a new one</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </MainLayout>
   );
 }
 

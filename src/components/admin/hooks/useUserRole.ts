@@ -1,7 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 
 type UserRoleType = Database['public']['Enums']['user_role'];
@@ -27,7 +26,7 @@ export const useUserRole = () => {
 
         if (error) {
           console.error('Error checking admin role:', error);
-          throw error;
+          return false;
         }
         
         return !!data;
@@ -45,10 +44,10 @@ export const useUserRole = () => {
     queryFn: async () => {
       console.log('Fetching user role...');
       try {
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        if (authError || !user) {
-          console.log('Authentication error or no user found:', authError);
-          return 'user' as UserRoleType; // Return a default role instead of null
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          console.log('No authenticated user found');
+          return 'user' as UserRoleType;
         }
 
         console.log('User authenticated, fetching role for user ID:', user.id);
@@ -60,7 +59,7 @@ export const useUserRole = () => {
 
         if (error) {
           console.error('Error fetching user role:', error);
-          return 'user' as UserRoleType; // Return a default role instead of throwing
+          return 'user' as UserRoleType;
         }
         
         // If no role is found, return 'user' as default role
@@ -73,7 +72,7 @@ export const useUserRole = () => {
         return data.role as UserRoleType;
       } catch (error) {
         console.error('Failed to fetch user role:', error);
-        return 'user' as UserRoleType; // Return a default role instead of null
+        return 'user' as UserRoleType;
       }
     },
     retry: 2,

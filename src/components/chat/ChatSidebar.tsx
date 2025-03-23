@@ -22,6 +22,8 @@ interface ChatSidebarProps {
 export function ChatSidebar({
   searchQuery,
   onSearchChange,
+  activeTab, 
+  onTabChange,
   conversations,
   selectedConversation,
   onSelectConversation,
