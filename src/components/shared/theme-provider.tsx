@@ -31,7 +31,7 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   return (
     <NextThemesProvider 
-      attribute={attribute}
+      attribute={attribute as Attribute | Attribute[]}
       defaultTheme={defaultTheme}
       storageKey={storageKey}
       value={value}
