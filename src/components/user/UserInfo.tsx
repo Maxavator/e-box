@@ -53,7 +53,7 @@ export function UserInfo({ className }: UserInfoProps) {
           {displayName}
         </span>
         <div className="flex items-center">
-          <span className="text-xs text-muted-foreground">{jobTitle}</span>
+          <span className="text-xs text-muted-foreground mr-2">{jobTitle}</span>
           <OnlineStatus>
             <span className="mx-1">•</span>
             <UserRoleBadge />
