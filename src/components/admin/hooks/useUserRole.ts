@@ -6,7 +6,7 @@ import type { Database } from "@/integrations/supabase/types";
 type UserRoleType = Database['public']['Enums']['user_role'];
 
 export const useUserRole = () => {
-  const { data: session, isLoading: isSessionLoading } = useQuery({
+  const { data: session, isLoading: isSessionLoading, error: sessionError } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
@@ -20,7 +20,7 @@ export const useUserRole = () => {
 
   const userId = session?.user?.id;
 
-  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
+  const { data: isAdmin, isLoading: isAdminLoading, error: adminError } = useQuery({
     queryKey: ['isAdmin', userId],
     enabled: !!userId,
     queryFn: async () => {
@@ -67,7 +67,7 @@ export const useUserRole = () => {
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
-  const { data: userRole, isLoading: isRoleLoading } = useQuery({
+  const { data: userRole, isLoading: isRoleLoading, error: roleError } = useQuery({
     queryKey: ['userRole', userId],
     enabled: !!userId,
     queryFn: async () => {
@@ -99,6 +99,7 @@ export const useUserRole = () => {
   });
 
   const isLoading = isSessionLoading || isAdminLoading || isRoleLoading;
+  const error = sessionError || adminError || roleError;
 
   return {
     // If specifically checking for admin status, we should return the definitive isAdmin value
@@ -106,6 +107,7 @@ export const useUserRole = () => {
     // For the user role, we provide a default 'user' if not loaded yet
     userRole: userRole || 'user',
     isLoading,
+    error,
     // Include session for components that need it
     session
   };

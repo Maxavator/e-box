@@ -19,13 +19,13 @@ export const useUserManagement = () => {
     organizationId: "",
   });
 
-  const { isAdmin, userRole, isLoading: isRoleLoading, error: roleError } = useUserRole();
+  const { isAdmin, userRole, isLoading: isRoleLoading } = useUserRole();
   const { organizations, userProfile, isLoading: isOrgsLoading, error: orgsError } = useOrganizations(isAdmin, userRole);
   const { users, isLoading: isUsersLoading, error: usersError } = useUsers(isAdmin, userRole, userProfile);
   const { createUserMutation, updateUserMutation } = useUserMutations(isAdmin, userRole, userProfile);
 
   const isLoading = isRoleLoading || isOrgsLoading || isUsersLoading;
-  const error = roleError || orgsError || usersError;
+  const error = orgsError || usersError;
 
   // Show error toast if there's an error
   if (error) {
