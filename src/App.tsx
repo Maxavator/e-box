@@ -91,18 +91,18 @@ function App() {
           
           {/* Protected routes - all wrapped with MainLayout */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={withLayout(Dashboard)()} />
-            <Route path="/chat" element={withLayout(Chat)()} />
-            <Route path="/mydesk" element={withLayout(MyDesk)()} />
-            <Route path="/documents" element={withLayout(Documents)()} />
-            <Route path="/calendar" element={withLayout(Calendar)()} />
-            <Route path="/contacts" element={withLayout(ContactsList)()} />
-            <Route path="/leave" element={withLayout(LeaveManager)()} />
-            <Route path="/policies" element={withLayout(Policies)()} />
-            <Route path="/profile" element={withLayout(Settings)()} />
-            <Route path="/organization" element={withLayout(OrganizationDashboard)()} />
-            <Route path="/admin" element={withLayout(AdminPortal)()} />
-            <Route path="/changelog" element={withLayout(Changelog)()} />
+            <Route path="/dashboard" element={withLayout(Dashboard)({})} />
+            <Route path="/chat" element={withLayout(Chat)({})} />
+            <Route path="/mydesk" element={withLayout(MyDesk)({})} />
+            <Route path="/documents" element={withLayout(Documents)({})} />
+            <Route path="/calendar" element={withLayout(Calendar)({})} />
+            <Route path="/contacts" element={withLayout(ContactsList)({})} />
+            <Route path="/leave" element={withLayout(LeaveManager)({})} />
+            <Route path="/policies" element={withLayout(Policies)({})} />
+            <Route path="/profile" element={withLayout(Settings)({})} />
+            <Route path="/organization" element={withLayout(OrganizationDashboard)({})} />
+            <Route path="/admin" element={withLayout(AdminPortal)({})} />
+            <Route path="/changelog" element={withLayout(Changelog)({})} />
           </Route>
           
           <Route path="*" element={<NotFound />} />
