@@ -7,6 +7,7 @@ import { startMessageSimulation } from "@/utils/messageSimulator";
 import { useToast } from "@/hooks/use-toast";
 import { MainLayout } from "@/components/shared/MainLayout";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
+import { AdminStatusIndicator } from "@/components/user/AdminStatusIndicator";
 
 const Chat = () => {
   const { toast } = useToast();
@@ -79,6 +80,10 @@ const Chat = () => {
         <div className="flex-1 flex flex-col h-full">
           {selectedConversation ? (
             <>
+              <div className="bg-muted/20 p-2 border-b flex justify-between items-center">
+                <h2 className="text-sm font-medium">{selectedConversation.name}</h2>
+                <AdminStatusIndicator />
+              </div>
               <ChatContent
                 conversation={selectedConversation}
                 onEditMessage={handleEditMessage}
@@ -96,6 +101,9 @@ const Chat = () => {
               <div>
                 <h3 className="text-xl font-semibold mb-2">Select a Conversation</h3>
                 <p>Choose a conversation from the sidebar or start a new one</p>
+                <div className="mt-4 flex justify-center">
+                  <AdminStatusIndicator />
+                </div>
               </div>
             </div>
           )}
