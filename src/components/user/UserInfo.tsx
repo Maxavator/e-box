@@ -32,7 +32,10 @@ export function UserInfo({ className }: UserInfoProps) {
     },
   });
 
-  const displayName = profile ? `${profile.first_name} ${profile.last_name}` : '';
+  // Create a display name from first and last name, or use a generic "User" if not available
+  const displayName = profile ? 
+    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
+    'User';
   const avatarUrl = profile?.avatar_url || '';
 
   return (
@@ -40,7 +43,7 @@ export function UserInfo({ className }: UserInfoProps) {
       <Avatar className="h-8 w-8">
         <AvatarImage src={avatarUrl} />
         <AvatarFallback>
-          {displayName?.split(' ').map(n => n[0]).join('')}
+          {displayName?.split(' ').map(n => n[0]).join('') || 'U'}
         </AvatarFallback>
       </Avatar>
       <div className="flex flex-col">

@@ -35,7 +35,7 @@ export const UserTable = ({ users, isLoading, onEditUser, isAdmin }: UserTablePr
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
+            <TableHead>Username/ID</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Organization</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -55,7 +55,7 @@ export const UserTable = ({ users, isLoading, onEditUser, isAdmin }: UserTablePr
               <TableCell>
                 {user.first_name} {user.last_name}
               </TableCell>
-              <TableCell>{user.id}</TableCell>
+              <TableCell>User #{user.id.substring(0, 8)}</TableCell>
               <TableCell>{user.user_roles?.[0]?.role || 'N/A'}</TableCell>
               <TableCell>{user.organizations?.[0]?.name || 'N/A'}</TableCell>
               <TableCell className="text-right space-x-2">

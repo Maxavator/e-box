@@ -40,9 +40,16 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
 
         if (profileData) {
           setUserInfo({
-            firstName: profileData.first_name,
-            lastName: profileData.last_name,
+            firstName: profileData.first_name || '',
+            lastName: profileData.last_name || '',
             avatarUrl: profileData.avatar_url,
+          });
+        } else {
+          // Set default values if no profile data
+          setUserInfo({
+            firstName: 'User',
+            lastName: '',
+            avatarUrl: null,
           });
         }
       }
@@ -68,7 +75,7 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
   if (!userInfo) return null;
 
   const initials = `${userInfo.firstName?.[0] || ''}${userInfo.lastName?.[0] || ''}`;
-  const fullName = `${userInfo.firstName} ${userInfo.lastName}`;
+  const fullName = `${userInfo.firstName} ${userInfo.lastName}`.trim() || 'User';
 
   return (
     <div className="flex items-center gap-4">
@@ -87,7 +94,7 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar>
               <AvatarImage src={userInfo.avatarUrl || ''} alt={initials} />
-              <AvatarFallback>{initials}</AvatarFallback>
+              <AvatarFallback>{initials || 'U'}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>

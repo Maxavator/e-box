@@ -87,8 +87,9 @@ export function UserProfileSidebarFooter() {
     );
   }
 
-  const initials = profile ? `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}` : '??';
-  const fullName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}` : session.user.email || 'User';
+  // Get user display name from profile, using "User" as fallback
+  const initials = profile ? `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}` : 'U';
+  const fullName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'User';
   const jobTitle = profile?.job_title || 'Employee';
   const isAdmin = userRole === 'org_admin' || userRole === 'global_admin';
   const eBoxVersion = 'v1.0.4';
