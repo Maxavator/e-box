@@ -28,6 +28,9 @@ import { ThemeProvider } from "@/components/shared/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 
+// Import the MainLayout
+import { MainLayout } from '@/components/shared/MainLayout';
+
 function App() {
   const [isMounted, setIsMounted] = useState(false);
   const session = useSession();
@@ -67,6 +70,13 @@ function App() {
     }
   }, [session, location, navigate, supabase]);
 
+  // Wrap protected route components with MainLayout
+  const withLayout = (Component: React.ComponentType) => (props: any) => (
+    <MainLayout>
+      <Component {...props} />
+    </MainLayout>
+  );
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <ThemeProvider
@@ -79,20 +89,20 @@ function App() {
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           
-          {/* Protected routes */}
+          {/* Protected routes - all wrapped with MainLayout */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/mydesk" element={<MyDesk />} />
-            <Route path="/documents" element={<Documents />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/contacts" element={<ContactsList />} />
-            <Route path="/leave" element={<LeaveManager />} />
-            <Route path="/policies" element={<Policies />} />
-            <Route path="/profile" element={<Settings />} />
-            <Route path="/organization" element={<OrganizationDashboard />} />
-            <Route path="/admin" element={<AdminPortal />} />
-            <Route path="/changelog" element={<Changelog />} />
+            <Route path="/dashboard" element={withLayout(Dashboard)()} />
+            <Route path="/chat" element={withLayout(Chat)()} />
+            <Route path="/mydesk" element={withLayout(MyDesk)()} />
+            <Route path="/documents" element={withLayout(Documents)()} />
+            <Route path="/calendar" element={withLayout(Calendar)()} />
+            <Route path="/contacts" element={withLayout(ContactsList)()} />
+            <Route path="/leave" element={withLayout(LeaveManager)()} />
+            <Route path="/policies" element={withLayout(Policies)()} />
+            <Route path="/profile" element={withLayout(Settings)()} />
+            <Route path="/organization" element={withLayout(OrganizationDashboard)()} />
+            <Route path="/admin" element={withLayout(AdminPortal)()} />
+            <Route path="/changelog" element={withLayout(Changelog)()} />
           </Route>
           
           <Route path="*" element={<NotFound />} />

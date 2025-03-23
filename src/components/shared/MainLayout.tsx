@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactNode, useEffect } from "react";
 
 // Create a client for components using MainLayout
 const queryClient = new QueryClient({
@@ -39,9 +40,22 @@ export function MainLayout({ children }: MainLayoutProps) {
     navigate('/dashboard');
   };
 
+  // Force sidebar to be visible on page load
+  useEffect(() => {
+    // We need to make sure the sidebar is visible when the page loads
+    const sidebarCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('sidebar:state='));
+    
+    // If the sidebar is collapsed, set it to expanded
+    if (sidebarCookie && sidebarCookie.split('=')[1] === 'collapsed') {
+      document.cookie = 'sidebar:state=expanded; path=/; max-age=604800';
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={true}>
         <div className="flex flex-col min-h-screen w-full bg-background">
           <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
           <div className="flex flex-1 overflow-hidden">
@@ -54,4 +68,15 @@ export function MainLayout({ children }: MainLayoutProps) {
       </SidebarProvider>
     </QueryClientProvider>
   );
+}
+
+// This is a higher-order component to wrap any page component with MainLayout
+export function withMainLayout(Component: React.ComponentType<any>) {
+  return function WrappedComponent(props: any) {
+    return (
+      <MainLayout>
+        <Component {...props} />
+      </MainLayout>
+    );
+  };
 }

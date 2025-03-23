@@ -21,7 +21,7 @@ export const createOrganizationUsers = async (users: UserToCreate[], orgId: stri
     try {
       console.log(`Creating user: ${user.firstName} ${user.lastName}`);
       
-      // Create auth user
+      // Create auth user with email_confirm set to true to ensure activation
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: user.email,
         password: 'StaffPass123!',
@@ -30,7 +30,8 @@ export const createOrganizationUsers = async (users: UserToCreate[], orgId: stri
             first_name: user.firstName,
             last_name: user.lastName,
             sa_id: user.saId
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/auth`,
         }
       });
 
@@ -47,6 +48,24 @@ export const createOrganizationUsers = async (users: UserToCreate[], orgId: stri
       }
 
       console.log(`Auth user created with ID: ${authData.user.id} for ${user.email}`);
+
+      // Confirm user email programmatically to ensure activation
+      try {
+        const { error: confirmError } = await supabase.auth.admin.updateUserById(
+          authData.user.id,
+          { email_confirm: true }
+        );
+        
+        if (confirmError) {
+          console.error(`Failed to confirm email for ${user.email}:`, confirmError);
+          // Continue anyway as this is just an additional step
+        } else {
+          console.log(`Successfully confirmed email for ${user.email}`);
+        }
+      } catch (confirmError) {
+        console.error(`Error confirming email for ${user.email}:`, confirmError);
+        // Continue anyway as the user is still created
+      }
 
       // Wait for a moment to ensure the auth user trigger has time to create the profile
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -66,7 +85,8 @@ export const createOrganizationUsers = async (users: UserToCreate[], orgId: stri
               last_name: user.lastName,
               sa_id: user.saId,
               primary_email: user.email
-            }
+            },
+            emailRedirectTo: `${window.location.origin}/auth`,
           }
         });
         
@@ -75,6 +95,22 @@ export const createOrganizationUsers = async (users: UserToCreate[], orgId: stri
           // Continue anyway as this is just an additional login method
         } else {
           console.log(`Successfully created SA ID login for ${user.firstName} ${user.lastName}`);
+          
+          // Confirm SA ID email programmatically
+          if (saAuthData.user) {
+            try {
+              const { error: saConfirmError } = await supabase.auth.admin.updateUserById(
+                saAuthData.user.id,
+                { email_confirm: true }
+              );
+              
+              if (!saConfirmError) {
+                console.log(`Successfully confirmed SA ID login for ${user.saId}`);
+              }
+            } catch (saConfirmError) {
+              console.error(`Error confirming SA ID email:`, saConfirmError);
+            }
+          }
         }
       } catch (saIdError) {
         console.log(`Error creating SA ID login for ${user.email}:`, saIdError);
