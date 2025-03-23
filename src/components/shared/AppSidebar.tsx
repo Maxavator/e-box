@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import {
@@ -22,6 +21,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { UserProfileSidebarFooter } from "./UserProfileSidebarFooter";
 
 export function AppSidebar() {
   const navigate = useNavigate();
@@ -136,10 +136,8 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       
-      <SidebarFooter className="p-4">
-        <div className="text-xs text-center text-muted-foreground">
-          WorkOS v1.0
-        </div>
+      <SidebarFooter className="p-0">
+        <UserProfileSidebarFooter />
       </SidebarFooter>
     </Sidebar>
   );

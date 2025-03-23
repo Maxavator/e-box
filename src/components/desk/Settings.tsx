@@ -15,6 +15,7 @@ type Settings = {
   lastName: string;
   email: string;
   avatarUrl: string | null;
+  jobTitle: string;
   calendarNotificationTime: number | null;
 };
 
@@ -48,6 +49,7 @@ export const Settings = () => {
           lastName: profile?.last_name || '',
           email: user.email || '',
           avatarUrl: profile?.avatar_url || null,
+          jobTitle: profile?.job_title || '',
           calendarNotificationTime: profile?.calendar_notification_time || null,
         });
       } catch (error) {
@@ -75,6 +77,7 @@ export const Settings = () => {
           id: user.id,
           first_name: settings.firstName,
           last_name: settings.lastName,
+          job_title: settings.jobTitle,
           calendar_notification_time: settings.calendarNotificationTime,
         })
         .eq('id', user.id);
@@ -113,6 +116,15 @@ export const Settings = () => {
               value={settings?.lastName || ''}
               onChange={(e) => setSettings(prev => prev ? { ...prev, lastName: e.target.value } : null)}
               placeholder="Your last name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="jobTitle">Job Title</Label>
+            <Input
+              id="jobTitle"
+              value={settings?.jobTitle || ''}
+              onChange={(e) => setSettings(prev => prev ? { ...prev, jobTitle: e.target.value } : null)}
+              placeholder="Your job title"
             />
           </div>
           <div className="space-y-2">
