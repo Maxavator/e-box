@@ -20,13 +20,13 @@ const HeroSection = () => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-5 h-5 text-amber-300" />
-              <span className="text-sm font-medium text-amber-300">South Africa's Trusted Platform</span>
+              <span className="text-sm font-medium text-amber-300">South Africa's Premier Business Platform</span>
             </div>
             <h1 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-              Your Complete Workplace Solution
+              Transform Your Workplace Communication
             </h1>
             <p className="text-lg lg:text-xl opacity-90 leading-relaxed">
-              Connect your entire organization with our all-in-one communication platform. From executives to frontline staff, we keep everyone informed and engaged.
+              Designed specifically for South African businesses, e-Box brings together secure messaging, document management, and HR tools in one integrated platform.
             </p>
           </div>
         </div>
@@ -39,9 +39,9 @@ const HeroSection = () => {
                   <Shield className="w-6 h-6 text-amber-200" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Enterprise Security</h4>
+                  <h4 className="font-medium text-lg">POPIA Compliant</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Bank-level encryption with full POPI Act compliance
+                    Fully compliant with South African data protection regulations
                   </p>
                 </div>
               </li>
@@ -50,9 +50,9 @@ const HeroSection = () => {
                   <Users className="w-6 h-6 text-amber-200" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Leave Management</h4>
+                  <h4 className="font-medium text-lg">Multilingual Support</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Streamlined leave requests in multiple languages
+                    Available in all 11 official South African languages
                   </p>
                 </div>
               </li>
@@ -61,31 +61,20 @@ const HeroSection = () => {
                   <MessageSquare className="w-6 h-6 text-amber-200" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Instant Messaging</h4>
+                  <h4 className="font-medium text-lg">Mobile Integration</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Real-time communication across your entire organization
+                    Works seamlessly on desktop, tablet, and mobile devices
                   </p>
                 </div>
               </li>
               <li className="flex items-start gap-4 group transition-all duration-300 hover:translate-y-[-2px]">
                 <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                  <Scale className="w-6 h-6 text-amber-200" />
-                </div>
-                <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Local Compliance</h4>
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    Built specifically for South African regulations
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start gap-4 group transition-all duration-300 hover:translate-y-[-2px] col-span-2">
-                <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
                   <FileText className="w-6 h-6 text-amber-200" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Digital Documents</h4>
+                  <h4 className="font-medium text-lg">Digital Payslips</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Secure payslip delivery and document management
+                    Secure delivery of payslips and employee documents
                   </p>
                 </div>
               </li>
@@ -94,7 +83,7 @@ const HeroSection = () => {
 
           <div className="pt-6 border-t border-white/20">
             <p className="text-sm leading-relaxed text-white/70">
-              Copyright © 2025 Afrovation (Pty) Ltd. Proudly South African.
+              © 2024 Afrovation Technology Solutions (Pty) Ltd. All rights reserved.
             </p>
           </div>
         </div>
