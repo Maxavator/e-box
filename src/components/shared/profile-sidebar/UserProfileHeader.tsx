@@ -21,7 +21,7 @@ export function UserProfileHeader({
   // Format the name as "last_name, first_name"
   const formattedName = `${lastName}, ${firstName}`;
   
-  // Display the job title if available
+  // Display the job title if available, otherwise show appropriate fallback
   const displayedRole = jobTitle || (hasOrganization ? "" : "Private Individual");
 
   return (
