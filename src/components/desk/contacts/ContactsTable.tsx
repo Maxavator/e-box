@@ -1,7 +1,7 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { User, Star, MoreVertical, MessageSquare } from "lucide-react";
+import { User, Star, MoreVertical, MessageSquare, Building, UserPlus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Contact } from "../types/contacts";
+import { Badge } from "@/components/ui/badge";
 
 interface ContactsTableProps {
   contacts: Contact[];
@@ -75,6 +76,7 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
+          <TableHead>Type</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="w-[100px]">Actions</TableHead>
         </TableRow>
@@ -82,11 +84,11 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
       <TableBody>
         {isLoading ? (
           <TableRow>
-            <TableCell colSpan={3} className="text-center">Loading contacts...</TableCell>
+            <TableCell colSpan={4} className="text-center">Loading contacts...</TableCell>
           </TableRow>
         ) : filteredContacts?.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={3} className="text-center text-muted-foreground">
+            <TableCell colSpan={4} className="text-center text-muted-foreground">
               No contacts found. Try a different search term or add some contacts from your organization!
             </TableCell>
           </TableRow>
@@ -100,6 +102,19 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
                   </div>
                   {contact.contact.first_name} {contact.contact.last_name}
                 </div>
+              </TableCell>
+              <TableCell>
+                {contact.is_colleague ? (
+                  <Badge variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-50">
+                    <Building className="h-3 w-3 mr-1" />
+                    Colleague
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="bg-gray-50 text-gray-700 hover:bg-gray-50">
+                    <UserPlus className="h-3 w-3 mr-1" />
+                    External
+                  </Badge>
+                )}
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">

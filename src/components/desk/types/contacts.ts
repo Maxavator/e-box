@@ -4,6 +4,7 @@ export interface Contact {
   user_id: string;
   contact_id: string;
   is_favorite: boolean;
+  is_colleague: boolean;
   created_at: string;
   contact: {
     id: string;
