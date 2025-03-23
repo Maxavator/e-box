@@ -23,7 +23,6 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { UserProfileSidebarFooter } from "./UserProfileSidebarFooter";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function AppSidebar() {
   const navigate = useNavigate();
