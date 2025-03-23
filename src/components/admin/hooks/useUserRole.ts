@@ -6,21 +6,25 @@ import type { Database } from "@/integrations/supabase/types";
 type UserRoleType = Database['public']['Enums']['user_role'];
 
 export const useUserRole = () => {
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      return session;
+    },
+  });
+
   const { data: isAdmin, isLoading: isAdminLoading, error: adminError } = useQuery({
-    queryKey: ['isGlobalAdmin'],
+    queryKey: ['isGlobalAdmin', session?.user?.id],
+    enabled: !!session?.user?.id,
     queryFn: async () => {
       console.log('Checking admin status...');
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          console.log('No authenticated user found');
-          return false;
-        }
-        
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', user.id)
+          .eq('user_id', session!.user.id)
           .eq('role', 'global_admin')
           .maybeSingle();
 
@@ -40,21 +44,16 @@ export const useUserRole = () => {
   });
 
   const { data: userRole, isLoading: isRoleLoading, error: roleError } = useQuery({
-    queryKey: ['userRole'],
+    queryKey: ['userRole', session?.user?.id],
+    enabled: !!session?.user?.id,
     queryFn: async () => {
       console.log('Fetching user role...');
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          console.log('No authenticated user found');
-          return 'user' as UserRoleType;
-        }
-
-        console.log('User authenticated, fetching role for user ID:', user.id);
+        console.log('User authenticated, fetching role for user ID:', session!.user.id);
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', user.id)
+          .eq('user_id', session!.user.id)
           .maybeSingle();
 
         if (error) {

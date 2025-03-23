@@ -31,11 +31,17 @@ export function UserProfileSidebarFooter() {
     queryKey: ['profile', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('first_name, last_name, avatar_url, job_title, email')
         .eq('id', session!.user.id)
         .single();
+      
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+      }
+      
       return data;
     },
   });
@@ -44,12 +50,18 @@ export function UserProfileSidebarFooter() {
     queryKey: ['userRole', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
-      const { data: roleData } = await supabase
+      const { data: roleData, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', session!.user.id)
         .single();
-      return roleData?.role;
+      
+      if (error) {
+        console.error('Error fetching user role:', error);
+        return 'user';
+      }
+      
+      return roleData?.role || 'user';
     },
   });
 
@@ -67,20 +79,26 @@ export function UserProfileSidebarFooter() {
     navigate("/profile");
   };
 
-  if (!profile) return null;
+  if (!session?.user) {
+    return (
+      <div className="p-3 text-center text-sm text-muted-foreground">
+        Not logged in
+      </div>
+    );
+  }
 
-  const initials = `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}`;
-  const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`;
-  const jobTitle = profile.job_title || 'Employee';
+  const initials = profile ? `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}` : '??';
+  const fullName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}` : session.user.email || 'User';
+  const jobTitle = profile?.job_title || 'Employee';
   const isAdmin = userRole === 'org_admin' || userRole === 'global_admin';
   const eBoxVersion = 'v1.0.4';
 
   return (
-    <div className="flex flex-col p-3 border-t border-muted/20 bg-sidebar w-full">
+    <div className="flex flex-col p-3 w-full">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={profile.avatar_url || ''} alt={fullName} />
+            <AvatarImage src={profile?.avatar_url || ''} alt={fullName} />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
@@ -94,6 +112,7 @@ export function UserProfileSidebarFooter() {
           size="icon" 
           onClick={handleLogout}
           className="h-8 w-8"
+          title="Logout"
         >
           <LogOut className="h-4 w-4" />
         </Button>
