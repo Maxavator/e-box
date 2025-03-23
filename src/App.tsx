@@ -1,26 +1,29 @@
+
 import React, { Suspense, useState, useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Auth,
-  Dashboard,
-  Index,
-  NotFound,
-  Settings,
-} from '@/pages';
-import { Chat } from '@/pages/Chat';
-import { Documents } from '@/pages/Documents';
-import { Calendar } from '@/pages/Calendar';
-import { ContactsList } from '@/pages/ContactsList';
-import { LeaveManager } from '@/pages/LeaveManager';
-import { Policies } from '@/pages/Policies';
-import { AdminPortal } from '@/pages/AdminPortal';
-import { OrganizationDashboard } from '@/pages/OrganizationDashboard';
+
+// Import individual page components
+import Auth from '@/pages/Auth';
+import Dashboard from '@/pages/Dashboard';
+import Index from '@/pages/Index';
+import NotFound from '@/pages/NotFound';
+import Settings from '@/pages/Settings';
+import Chat from '@/pages/Chat';
+import Documents from '@/pages/Documents';
+import Calendar from '@/pages/Calendar';
+import ContactsList from '@/pages/ContactsList';
+import LeaveManager from '@/pages/LeaveManager';
+import Policies from '@/pages/Policies';
+import AdminPortal from '@/pages/AdminPortal';
+import OrganizationDashboard from '@/pages/OrganizationDashboard';
+import Changelog from '@/pages/Changelog';
+
+// Import auth and UI components
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { ThemeProvider } from "@/components/ui/theme-provider"
-import { Toaster } from "@/components/ui/toaster"
-import { Toaster as Sonner } from "@/components/ui/sonner"
-import Changelog from './pages/Changelog';
+import { ThemeProvider } from "@/components/shared/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 
 function App() {
   const [isMounted, setIsMounted] = useState(false);
@@ -42,10 +45,11 @@ function App() {
       }
     };
 
-    supabase.auth.onAuthStateChange(handleAuthStateChange);
+    const { data } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
     return () => {
-      supabase.auth.offAuthStateChange(handleAuthStateChange);
+      // Corrected: use the unsubscribe function returned by onAuthStateChange
+      data?.subscription.unsubscribe();
     };
   }, [session, location, navigate, supabase]);
 
