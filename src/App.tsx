@@ -7,16 +7,18 @@ import Auth from '@/pages/Auth';
 import Dashboard from '@/pages/Dashboard';
 import Index from '@/pages/Index';
 import NotFound from '@/pages/NotFound';
-import Settings from '@/pages/Settings';
 import Chat from '@/pages/Chat';
-import Documents from '@/pages/Documents';
-import Calendar from '@/pages/Calendar';
-import ContactsList from '@/pages/ContactsList';
-import LeaveManager from '@/pages/LeaveManager';
-import Policies from '@/pages/Policies';
+import Changelog from '@/pages/Changelog';
 import AdminPortal from '@/pages/AdminPortal';
 import OrganizationDashboard from '@/pages/OrganizationDashboard';
-import Changelog from '@/pages/Changelog';
+
+// Import from components directory rather than pages for these components
+import { Settings } from '@/components/settings/Settings';
+import { Documents } from '@/components/desk/Documents';
+import { Calendar } from '@/components/desk/Calendar';
+import { ContactsList } from '@/components/desk/ContactsList';
+import { LeaveManager } from '@/components/desk/LeaveManager';
+import { Policies } from '@/components/desk/Policies';
 
 // Import auth and UI components
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
