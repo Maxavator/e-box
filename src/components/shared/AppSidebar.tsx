@@ -36,7 +36,7 @@ import { useSidebarBadges } from "@/hooks/useSidebarBadges";
 
 export function AppSidebar() {
   const navigate = useNavigate();
-  const { isAdmin, userRole } = useUserRole();
+  const { isAdmin, userRole, isLoading } = useUserRole();
   const { 
     chatCount, 
     documentsCount, 
@@ -45,6 +45,9 @@ export function AppSidebar() {
     leaveCount, 
     resetBadgeCount 
   } = useSidebarBadges();
+  
+  console.log('Sidebar - User role:', userRole);
+  console.log('Sidebar - Is admin:', isAdmin);
   
   const handleNavigation = (path: string) => {
     // Reset the respective badge count when navigating to a section
@@ -57,7 +60,9 @@ export function AppSidebar() {
     navigate(path);
   };
 
+  // Admin roles check
   const hasAdminAccess = isAdmin || userRole === 'org_admin' || userRole === 'global_admin';
+  console.log('Sidebar - Has admin access:', hasAdminAccess);
 
   return (
     <Sidebar>

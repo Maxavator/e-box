@@ -19,7 +19,7 @@ export const useUserRole = () => {
     queryKey: ['isGlobalAdmin', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
-      console.log('Checking admin status...');
+      console.log('Checking admin status for user ID:', session?.user?.id);
       try {
         const { data, error } = await supabase
           .from('user_roles')
@@ -33,7 +33,10 @@ export const useUserRole = () => {
           return false;
         }
         
-        return !!data;
+        // Check for global_admin role
+        const isGlobalAdmin = !!data;
+        console.log('Is global admin:', isGlobalAdmin);
+        return isGlobalAdmin;
       } catch (error) {
         console.error('Admin status check failed:', error);
         return false;
@@ -47,9 +50,8 @@ export const useUserRole = () => {
     queryKey: ['userRole', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
-      console.log('Fetching user role...');
+      console.log('Fetching user role for user ID:', session?.user?.id);
       try {
-        console.log('User authenticated, fetching role for user ID:', session!.user.id);
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
