@@ -1,16 +1,11 @@
 
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, RefreshCw } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
-interface ProfileControlsProps {
-  isSpecialUser?: boolean;
-}
-
-export function ProfileControls({ isSpecialUser = false }: ProfileControlsProps) {
+export function ProfileControls() {
   const navigate = useNavigate();
   
   const handleLogout = async () => {
@@ -19,51 +14,35 @@ export function ProfileControls({ isSpecialUser = false }: ProfileControlsProps)
       toast.success("Logged out successfully");
       navigate('/auth');
     } catch (error) {
-      console.error('Logout error:', error);
-      toast.error("Failed to logout");
+      console.error("Error signing out:", error);
+      toast.error("Failed to log out");
     }
   };
-
-  const handleSettings = () => {
+  
+  const handleSettingsClick = () => {
     navigate('/profile');
   };
-
-  const handleRefresh = () => {
-    window.location.reload();
-  };
-
+  
   return (
-    <div className="flex items-center justify-between gap-2 my-2">
+    <div className="flex justify-between mt-2 mb-3">
       <Button 
-        variant="outline" 
-        size="icon" 
-        onClick={handleSettings}
-        className={cn("h-9 w-9", isSpecialUser ? "border-amber-300/30 hover:border-amber-300/60" : "")}
+        variant="ghost" 
+        size="sm" 
+        onClick={handleSettingsClick}
+        className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
       >
-        <Settings className={cn("h-4 w-4", isSpecialUser ? "text-amber-300" : "")} />
+        <Settings className="h-3.5 w-3.5" />
+        <span>Settings</span>
       </Button>
       
       <Button 
-        variant="outline" 
-        size="icon" 
-        onClick={handleRefresh}
-        className={cn("h-9 w-9", isSpecialUser ? "border-amber-300/30 hover:border-amber-300/60" : "")}
-      >
-        <RefreshCw className={cn("h-4 w-4", isSpecialUser ? "text-amber-300" : "")} />
-      </Button>
-      
-      <Button 
-        variant="outline" 
-        size="icon" 
+        variant="ghost" 
+        size="sm" 
         onClick={handleLogout}
-        className={cn(
-          "h-9 w-9", 
-          isSpecialUser 
-            ? "border-amber-300/30 hover:border-amber-300/60 hover:bg-red-50 hover:text-red-500" 
-            : "hover:bg-red-50 hover:text-red-500"
-        )}
+        className="flex items-center gap-2 text-xs text-muted-foreground hover:text-destructive"
       >
-        <LogOut className="h-4 w-4" />
+        <LogOut className="h-3.5 w-3.5" />
+        <span>Log Out</span>
       </Button>
     </div>
   );

@@ -95,18 +95,23 @@ export function UserProfileSidebarFooter() {
   // Use either the profile data or the fallback from useEffect
   const firstName = profile?.first_name || userName?.firstName || '';
   const lastName = profile?.last_name || userName?.lastName || '';
-  const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
+  const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   
-  // Special handling for Thabo Nkosi
+  // Check if user is specifically Thabo Nkosi and set the title to Chief Information Officer
   let jobTitle = profile?.job_title || '';
-  let isSpecialUser = false;
-  
   if (firstName === 'Thabo' && lastName === 'Nkosi') {
     jobTitle = 'Chief Information Officer';
-    isSpecialUser = true;
   }
   
   const hasOrganization = !!profile?.organization_id;
+
+  // Debug information
+  console.log('UserProfileSidebarFooter - Profile data:', {
+    firstName,
+    lastName,
+    jobTitle,
+    hasOrganization
+  });
 
   return (
     <div className="flex flex-col p-3 w-full">
@@ -117,10 +122,9 @@ export function UserProfileSidebarFooter() {
         avatarUrl={profile?.avatar_url} 
         jobTitle={jobTitle}
         hasOrganization={hasOrganization}
-        isSpecialUser={isSpecialUser}
       />
       
-      <ProfileControls isSpecialUser={isSpecialUser} />
+      <ProfileControls />
       
       {profile?.organization_id && (
         <OrganizationInfo organizationId={profile?.organization_id} />
