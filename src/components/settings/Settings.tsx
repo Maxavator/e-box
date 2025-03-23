@@ -7,14 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
 import { MainLayout } from "@/components/shared/MainLayout";
 import type { Profile } from "@/types/database";
 
 type Settings = {
   firstName: string;
   lastName: string;
-  email: string;
   avatarUrl: string | null;
   jobTitle: string;
   calendarNotificationTime: number | null;
@@ -48,7 +46,6 @@ export const Settings = () => {
         setSettings({
           firstName: profile?.first_name || '',
           lastName: profile?.last_name || '',
-          email: user.email || '',
           avatarUrl: profile?.avatar_url || null,
           jobTitle: profile?.job_title || '',
           calendarNotificationTime: profile?.calendar_notification_time || null,
@@ -128,16 +125,6 @@ export const Settings = () => {
                 value={settings?.jobTitle || ''}
                 onChange={(e) => setSettings(prev => prev ? { ...prev, jobTitle: e.target.value } : null)}
                 placeholder="Your job title"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                value={settings?.email || ''}
-                disabled
-                className="bg-gray-50"
               />
             </div>
             <Button onClick={handleSave} disabled={saving}>
