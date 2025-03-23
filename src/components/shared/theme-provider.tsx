@@ -5,7 +5,7 @@ import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 // Define the Attribute type
-type Attribute = "class" | "data-theme" | string;
+type Attribute = "class" | "data-theme";
 
 // Define the ThemeProviderProps interface manually since we can't import from next-themes/dist/types
 interface ThemeProviderProps {
@@ -29,12 +29,9 @@ export function ThemeProvider({
   disableTransitionOnChange,
   forcedTheme
 }: ThemeProviderProps) {
-  // Use a type assertion to ensure TypeScript recognizes attribute as the correct type
-  const attributeValue = attribute as Attribute | Attribute[];
-  
   return (
     <NextThemesProvider 
-      attribute={attributeValue}
+      attribute={attribute}
       defaultTheme={defaultTheme}
       storageKey={storageKey}
       value={value}
