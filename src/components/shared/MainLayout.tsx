@@ -52,7 +52,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <SidebarProvider defaultOpen={true}>
         <div className="flex h-screen bg-background">
           <AppSidebar />
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto w-full">
             {children}
           </main>
         </div>

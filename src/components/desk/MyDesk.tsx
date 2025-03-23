@@ -12,7 +12,7 @@ export function MyDesk() {
   const { organizationName } = useUserProfile();
   
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-4 md:p-6">
       <div className="flex items-center gap-2 mb-6">
         <Briefcase className="h-6 w-6 text-primary" />
         <h1 className="text-3xl font-bold">My Desk {organizationName ? `@${organizationName}` : ''}</h1>

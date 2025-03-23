@@ -44,7 +44,7 @@ export const ContactsList = () => {
 
   return (
     <MainLayout>
-      <div className="p-6 max-w-[1200px] mx-auto">
+      <div className="p-4 md:p-6">
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle className="text-2xl font-bold">Organization Contacts</CardTitle>
