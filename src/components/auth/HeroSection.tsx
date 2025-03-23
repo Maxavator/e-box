@@ -4,7 +4,7 @@ import { Shield, Users, MessageSquare, Scale, FileText, Sparkles } from "lucide-
 const HeroSection = () => {
   return (
     <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
-      {/* Background with gradient overlay */}
+      {/* Background with gradient overlay and people working image */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/85 to-primary/70 before:content-[''] before:absolute before:inset-0 before:bg-[url('/lovable-uploads/23758d75-6a83-4a79-bba6-ba0d82eec4cf.png')] before:bg-cover before:bg-center before:opacity-40 before:mix-blend-overlay"></div>
       
       {/* Animated gradient blobs for modern design */}
@@ -20,13 +20,13 @@ const HeroSection = () => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-5 h-5 text-amber-300" />
-              <span className="text-sm font-medium text-amber-300">South Africa's Premier Platform</span>
+              <span className="text-sm font-medium text-amber-300">South Africa's Trusted Platform</span>
             </div>
             <h1 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-              Transform Your Stakeholder Engagement
+              Your Complete Workplace Solution
             </h1>
             <p className="text-lg lg:text-xl opacity-90 leading-relaxed">
-              South Africa's premier enterprise communication platform. Built for businesses, designed for growth... Executives to Desk-less Staff, All Staff.
+              Connect your entire organization with our all-in-one communication platform. From executives to frontline staff, we keep everyone informed and engaged.
             </p>
           </div>
         </div>
@@ -41,7 +41,7 @@ const HeroSection = () => {
                 <div className="space-y-1">
                   <h4 className="font-medium text-lg">Enterprise Security</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Secure encryption with SA POPI Act compliance
+                    Bank-level encryption with full POPI Act compliance
                   </p>
                 </div>
               </li>
@@ -50,9 +50,9 @@ const HeroSection = () => {
                   <Users className="w-6 h-6 text-amber-200" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Leave Manager</h4>
+                  <h4 className="font-medium text-lg">Leave Management</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Comprehensive leave management with multi-language support
+                    Streamlined leave requests in multiple languages
                   </p>
                 </div>
               </li>
@@ -61,9 +61,9 @@ const HeroSection = () => {
                   <MessageSquare className="w-6 h-6 text-amber-200" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Messaging</h4>
+                  <h4 className="font-medium text-lg">Instant Messaging</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Real-time messaging for all staff throughout the organization
+                    Real-time communication across your entire organization
                   </p>
                 </div>
               </li>
@@ -74,7 +74,7 @@ const HeroSection = () => {
                 <div className="space-y-1">
                   <h4 className="font-medium text-lg">Local Compliance</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Built for South African business regulations
+                    Built specifically for South African regulations
                   </p>
                 </div>
               </li>
@@ -83,9 +83,9 @@ const HeroSection = () => {
                   <FileText className="w-6 h-6 text-amber-200" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Payslip Distribution</h4>
+                  <h4 className="font-medium text-lg">Digital Documents</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Secure electronic payslip delivery and management
+                    Secure payslip delivery and document management
                   </p>
                 </div>
               </li>
@@ -94,7 +94,7 @@ const HeroSection = () => {
 
           <div className="pt-6 border-t border-white/20">
             <p className="text-sm leading-relaxed text-white/70">
-              Copyright Afrovation 2025. Another Innovation by Afrovation.com
+              Copyright Afrovation 2025. Proudly South African.
             </p>
           </div>
         </div>
