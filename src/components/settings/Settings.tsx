@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Bell, Shield, Upload } from "lucide-react";
+import { User, Bell, Shield, Upload, Info } from "lucide-react";
 import type { Profile } from "@/types/database";
 
 type Settings = {
@@ -227,6 +226,12 @@ export const Settings = () => {
                       <Upload className="h-4 w-4" />
                       {uploadingImage ? "Uploading..." : "Upload New Picture"}
                     </Button>
+                  </div>
+                  <div className="mt-2 text-sm text-muted-foreground flex items-start gap-1.5">
+                    <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span>
+                      Accepted formats: JPG, PNG, GIF. Maximum file size: 5MB.
+                    </span>
                   </div>
                 </div>
               </div>
