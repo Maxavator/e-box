@@ -94,7 +94,7 @@ const HeroSection = () => {
 
           <div className="pt-6 border-t border-white/20">
             <p className="text-sm leading-relaxed text-white/70">
-              Copyright Afrovation 2025. Proudly South African.
+              Copyright © 2025 Afrovation (Pty) Ltd. Proudly South African.
             </p>
           </div>
         </div>

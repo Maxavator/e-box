@@ -58,7 +58,7 @@ export function VersionInfo() {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>© 2024 Afrovation</p>
+              <p>© 2025 Afrovation (Pty) Ltd.</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
