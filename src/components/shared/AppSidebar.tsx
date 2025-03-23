@@ -144,7 +144,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       
-      <SidebarFooter className="p-0 bg-sidebar">
+      <SidebarFooter className="p-0 bg-sidebar border-t border-border/30">
         <UserProfileSidebarFooter />
       </SidebarFooter>
     </Sidebar>
