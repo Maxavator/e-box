@@ -38,7 +38,12 @@ export function UserInfo({ className }: UserInfoProps) {
     `${profile.last_name || ''}, ${profile.first_name || ''}`.trim() : 
     'User';
   const avatarUrl = profile?.avatar_url || '';
-  const jobTitle = profile?.job_title || '';
+  
+  // Check if user is specifically Thabo Nkosi and set the title to Chief Information Officer
+  let jobTitle = profile?.job_title || '';
+  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
+    jobTitle = 'Chief Information Officer';
+  }
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
