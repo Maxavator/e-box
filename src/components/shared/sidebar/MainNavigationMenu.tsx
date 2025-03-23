@@ -57,22 +57,7 @@ export function MainNavigationMenu({
   
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Chats" 
-          onClick={() => handleNavigation("/chat")}
-        >
-          <MessageSquare className="h-4 w-4" />
-          <span>Chats</span>
-          {chatCount > 0 && (
-            <SidebarMenuBadge className="ml-auto bg-red-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {chatCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      {/* My Desk Dropdown Section */}
+      {/* My Desk Dropdown Section - Moved above Chats */}
       <SidebarMenuItem>
         <SidebarMenuSub>
           <SidebarMenuSubTrigger
@@ -128,6 +113,21 @@ export function MainNavigationMenu({
             </SidebarMenuItem>
           </SidebarMenuSubContent>
         </SidebarMenuSub>
+      </SidebarMenuItem>
+      
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Chats" 
+          onClick={() => handleNavigation("/chat")}
+        >
+          <MessageSquare className="h-4 w-4" />
+          <span>Chats</span>
+          {chatCount > 0 && (
+            <SidebarMenuBadge className="ml-auto bg-red-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {chatCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
       </SidebarMenuItem>
       
       <SidebarMenuItem>
