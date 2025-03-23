@@ -1,7 +1,7 @@
+
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import {
-  LayoutDashboard,
   MessageSquare,
   FileText,
   Calendar,
@@ -34,21 +34,20 @@ export function AppSidebar() {
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="flex items-center justify-center p-4">
-        {/* Empty header for a cleaner look */}
+        <button 
+          onClick={() => handleNavigation("/dashboard")}
+          className="hover:opacity-90 transition-opacity"
+        >
+          <img 
+            src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
+            alt="e-Box by Afrovation" 
+            className="h-8"
+          />
+        </button>
       </SidebarHeader>
       
       <SidebarContent>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              tooltip="Dashboard" 
-              onClick={() => handleNavigation("/dashboard")}
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              <span>Dashboard</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          
           <SidebarMenuItem>
             <SidebarMenuButton 
               tooltip="Chat" 
