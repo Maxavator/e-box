@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginForm from "@/components/auth/LoginForm";
 import HeroSection from "@/components/auth/HeroSection";
@@ -7,9 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { InfoIcon } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { createGlobalAdmin } from "@/utils/admin/createGlobalAdmin";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
 
   // Check if user is already logged in
   useEffect(() => {
@@ -35,6 +38,21 @@ const Auth = () => {
     checkSession();
   }, [navigate]);
 
+  const handleCreateAdmin = async () => {
+    try {
+      setIsCreatingAdmin(true);
+      const adminUser = await createGlobalAdmin();
+      if (adminUser) {
+        toast.success(`Global admin created: ${adminUser.email}`);
+      }
+    } catch (error) {
+      console.error("Error creating admin:", error);
+      toast.error("Failed to create global admin");
+    } finally {
+      setIsCreatingAdmin(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-white text-foreground">
       <div className="hidden md:flex md:w-1/2 bg-primary/5">
@@ -59,6 +77,20 @@ const Auth = () => {
               This system uses secure authentication to protect your data.
             </AlertDescription>
           </Alert>
+
+          <div className="mt-8 border-t pt-6">
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={handleCreateAdmin}
+              disabled={isCreatingAdmin}
+            >
+              {isCreatingAdmin ? "Creating Admin..." : "Create Global Admin"}
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              This will create a default global admin account
+            </p>
+          </div>
         </div>
       </div>
     </div>
