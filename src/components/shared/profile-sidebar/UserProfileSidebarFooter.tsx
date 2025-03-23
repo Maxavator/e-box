@@ -22,7 +22,7 @@ export function UserProfileSidebarFooter() {
   });
 
   // Get user profile
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['profile', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
@@ -49,10 +49,18 @@ export function UserProfileSidebarFooter() {
     );
   }
 
+  if (isProfileLoading) {
+    return (
+      <div className="p-3 text-center text-sm text-muted-foreground">
+        Loading profile...
+      </div>
+    );
+  }
+
   const firstName = profile?.first_name || '';
   const lastName = profile?.last_name || '';
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
-  const jobTitle = profile?.job_title || 'Employee';
+  const jobTitle = profile?.job_title || '';
   const hasOrganization = !!profile?.organization_id;
 
   return (
