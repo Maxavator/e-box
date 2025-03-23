@@ -1,5 +1,4 @@
 
-import { AppHeader } from "@/components/shared/AppHeader";
 import { AppSidebar } from "@/components/shared/AppSidebar";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,13 +35,8 @@ export function MainLayout({ children }: MainLayoutProps) {
     }
   };
 
-  const handleLogoClick = () => {
-    navigate('/dashboard');
-  };
-
   // Force sidebar to be visible on page load
   useEffect(() => {
-    // We need to make sure the sidebar is visible when the page loads
     const sidebarCookie = document.cookie
       .split('; ')
       .find(row => row.startsWith('sidebar:state='));
@@ -57,7 +51,6 @@ export function MainLayout({ children }: MainLayoutProps) {
     <QueryClientProvider client={queryClient}>
       <SidebarProvider defaultOpen={true}>
         <div className="flex flex-col h-screen w-full bg-background">
-          <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
           <div className="flex flex-1 overflow-hidden">
             <AppSidebar />
             <main className="flex-1 overflow-auto">
