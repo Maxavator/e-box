@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { NavigationCards } from "@/components/admin/dashboard/NavigationCards";
@@ -80,7 +79,7 @@ const AdminPortal = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto p-4 md:p-8 space-y-6 md:space-y-8">
+      <div className="p-4 md:p-6 space-y-6 md:space-y-8">
         <Card className="p-6 border-l-4 border-l-primary">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
