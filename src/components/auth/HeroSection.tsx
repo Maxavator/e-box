@@ -1,5 +1,5 @@
 
-import { Shield, Users, MessageSquare, Scale, FileText, Sparkles } from "lucide-react";
+import { Shield, Users, MessageSquare, FileText, Sparkles, Clock, Building } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -20,13 +20,13 @@ const HeroSection = () => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-5 h-5 text-amber-300" />
-              <span className="text-sm font-medium text-amber-300">South Africa's Leading Enterprise Solution</span>
+              <span className="text-sm font-medium text-amber-300">Trusted by 500+ South African Enterprises</span>
             </div>
             <h1 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-              Elevate Your Business Communications
+              The All-In-One Enterprise Communication Hub
             </h1>
             <p className="text-lg lg:text-xl opacity-90 leading-relaxed">
-              Built for South African enterprises, e-Box seamlessly integrates secure messaging, document management, and comprehensive HR tools in one powerful platform.
+              e-Box unifies your business communications, document delivery, and HR processes in a secure, compliant platform designed specifically for South African enterprises.
             </p>
           </div>
         </div>
@@ -41,7 +41,7 @@ const HeroSection = () => {
                 <div className="space-y-1">
                   <h4 className="font-medium text-lg">POPIA Compliant</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Advanced security with full South African regulatory compliance
+                    End-to-end encryption with full South African regulatory compliance
                   </p>
                 </div>
               </li>
@@ -58,23 +58,23 @@ const HeroSection = () => {
               </li>
               <li className="flex items-start gap-4 group transition-all duration-300 hover:translate-y-[-2px]">
                 <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                  <MessageSquare className="w-6 h-6 text-amber-200" />
+                  <Clock className="w-6 h-6 text-amber-200" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Mobile Integration</h4>
+                  <h4 className="font-medium text-lg">99.9% Uptime</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Seamless experience across all devices with real-time sync
+                    Enterprise-grade reliability with local data centers and 24/7 support
                   </p>
                 </div>
               </li>
               <li className="flex items-start gap-4 group transition-all duration-300 hover:translate-y-[-2px]">
                 <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                  <FileText className="w-6 h-6 text-amber-200" />
+                  <Building className="w-6 h-6 text-amber-200" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Digital Payslips</h4>
+                  <h4 className="font-medium text-lg">B-BBEE Level 1</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Encrypted delivery of payslips with automated notifications
+                    Proudly South African with highest B-BBEE contributor status
                   </p>
                 </div>
               </li>
