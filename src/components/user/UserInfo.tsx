@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { OnlineStatus } from "./OnlineStatus";
+import { UserRoleBadge } from "@/components/shared/profile-sidebar/UserRoleBadge";
 import { useQuery } from "@tanstack/react-query";
 
 interface UserInfoProps {
@@ -25,7 +26,7 @@ export function UserInfo({ className }: UserInfoProps) {
     queryFn: async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('first_name, last_name, avatar_url, organization_id')
+        .select('first_name, last_name, avatar_url, job_title, organization_id')
         .eq('id', session!.user.id)
         .single();
       return data;
@@ -37,6 +38,7 @@ export function UserInfo({ className }: UserInfoProps) {
     `${profile.last_name || ''}, ${profile.first_name || ''}`.trim() : 
     'User';
   const avatarUrl = profile?.avatar_url || '';
+  const jobTitle = profile?.job_title || '';
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
@@ -50,7 +52,13 @@ export function UserInfo({ className }: UserInfoProps) {
         <span className="text-sm font-medium">
           {displayName}
         </span>
-        <OnlineStatus />
+        <div className="flex items-center">
+          <span className="text-xs text-muted-foreground mr-2">{jobTitle}</span>
+          <OnlineStatus>
+            <span className="mx-1">•</span>
+            <UserRoleBadge />
+          </OnlineStatus>
+        </div>
       </div>
     </div>
   );

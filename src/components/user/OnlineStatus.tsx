@@ -13,9 +13,10 @@ export type OnlineStatus = 'online' | 'away' | 'offline' | 'busy';
 
 interface OnlineStatusProps {
   initialStatus?: OnlineStatus;
+  children?: React.ReactNode;
 }
 
-export function OnlineStatus({ initialStatus = 'online' }: OnlineStatusProps) {
+export function OnlineStatus({ initialStatus = 'online', children }: OnlineStatusProps) {
   const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(initialStatus);
   const [lastActivity, setLastActivity] = useState<Date>(new Date());
 
@@ -76,29 +77,33 @@ export function OnlineStatus({ initialStatus = 'online' }: OnlineStatusProps) {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
-        <Circle className={`h-2 w-2 ${getStatusColor(onlineStatus)}`} />
-        <span className="capitalize">{onlineStatus}</span>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-[200px]">
-        <DropdownMenuItem onClick={() => handleStatusChange('online')}>
-          <Circle className="h-2 w-2 text-green-500 mr-2" />
-          Online
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleStatusChange('away')}>
-          <Circle className="h-2 w-2 text-yellow-500 mr-2" />
-          Away
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleStatusChange('busy')}>
-          <Circle className="h-2 w-2 text-red-500 mr-2" />
-          Busy
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleStatusChange('offline')}>
-          <Circle className="h-2 w-2 text-gray-500 mr-2" />
-          Appear Offline
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex items-center gap-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+          <Circle className={`h-2 w-2 ${getStatusColor(onlineStatus)}`} />
+          <span className="capitalize">{onlineStatus}</span>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-[200px]">
+          <DropdownMenuItem onClick={() => handleStatusChange('online')}>
+            <Circle className="h-2 w-2 text-green-500 mr-2" />
+            Online
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleStatusChange('away')}>
+            <Circle className="h-2 w-2 text-yellow-500 mr-2" />
+            Away
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleStatusChange('busy')}>
+            <Circle className="h-2 w-2 text-red-500 mr-2" />
+            Busy
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleStatusChange('offline')}>
+            <Circle className="h-2 w-2 text-gray-500 mr-2" />
+            Appear Offline
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      
+      {children}
+    </div>
   );
 }
