@@ -8,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ContactsTable } from "./contacts/ContactsTable";
 import { AddContactDialog } from "./contacts/AddContactDialog";
 import { useContacts } from "./contacts/useContacts";
+import { MainLayout } from "@/components/shared/MainLayout";
 
 export const ContactsList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,35 +37,37 @@ export const ContactsList = () => {
   }, [queryClient]);
 
   return (
-    <div className="p-6 max-w-[1200px] mx-auto">
-      <Card>
-        <CardHeader className="flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-2xl font-bold">Organization Contacts</CardTitle>
-          <AddContactDialog />
-        </CardHeader>
-        <CardContent>
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search contacts..."
-              className="pl-9"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
-          <div className="rounded-md border">
-            <ContactsTable
-              contacts={contacts || []}
-              isLoading={isLoading}
-              searchQuery={searchQuery}
-              onToggleFavorite={(contactId, isFavorite) => 
-                toggleFavoriteMutation.mutate({ contactId, isFavorite })
-              }
-            />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <MainLayout>
+      <div className="p-6 max-w-[1200px] mx-auto">
+        <Card>
+          <CardHeader className="flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-2xl font-bold">Organization Contacts</CardTitle>
+            <AddContactDialog />
+          </CardHeader>
+          <CardContent>
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search contacts..."
+                className="pl-9"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            <div className="rounded-md border">
+              <ContactsTable
+                contacts={contacts || []}
+                isLoading={isLoading}
+                searchQuery={searchQuery}
+                onToggleFavorite={(contactId, isFavorite) => 
+                  toggleFavoriteMutation.mutate({ contactId, isFavorite })
+                }
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </MainLayout>
   );
 };

@@ -394,7 +394,10 @@ export type Database = {
           job_title: string | null
           last_activity: string | null
           last_name: string | null
+          mobile_phone_number: string | null
+          office_phone_number: string | null
           organization_id: string | null
+          phone_extension: string | null
           updated_at: string
         }
         Insert: {
@@ -406,7 +409,10 @@ export type Database = {
           job_title?: string | null
           last_activity?: string | null
           last_name?: string | null
+          mobile_phone_number?: string | null
+          office_phone_number?: string | null
           organization_id?: string | null
+          phone_extension?: string | null
           updated_at?: string
         }
         Update: {
@@ -418,7 +424,10 @@ export type Database = {
           job_title?: string | null
           last_activity?: string | null
           last_name?: string | null
+          mobile_phone_number?: string | null
+          office_phone_number?: string | null
           organization_id?: string | null
+          phone_extension?: string | null
           updated_at?: string
         }
         Relationships: [
