@@ -9,4 +9,7 @@ export * from './menu/sidebar-menu';
 export * from './menu/sidebar-menu-button';
 export * from './menu/sidebar-menu-badge';
 export * from './menu/sidebar-menu-sub';
+export * from './menu/sidebar-menu-sub-trigger';
+export * from './menu/sidebar-menu-sub-content';
 export * from './menu/sidebar-menu-skeleton';
+
