@@ -50,9 +50,9 @@ export function MessageList({
           <MessageItem
             key={message.id}
             message={message}
-            onEdit={onEditMessage}
-            onDelete={onDeleteMessage}
-            onReact={onReactToMessage}
+            onEditMessage={onEditMessage}
+            onDeleteMessage={onDeleteMessage}
+            onReactToMessage={onReactToMessage}
             isAdminChat={isAdminChat}
           />
         ))}
