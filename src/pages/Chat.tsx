@@ -64,7 +64,7 @@ const Chat = () => {
       <ResizablePanelGroup direction="horizontal" className="h-full">
         {/* Chat sidebar */}
         <ResizablePanel defaultSize={25} minSize={20} maxSize={35} className="h-full">
-          <div className="h-full overflow-auto border-r">
+          <div className="h-full overflow-auto">
             <ChatSidebar
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useEffect } from "react";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { ResizablePanelGroup, ResizablePanel } from "@/components/ui/resizable";
 
 // Create a client for components using MainLayout
 const queryClient = new QueryClient({
@@ -63,7 +63,7 @@ export function MainLayout({ children }: MainLayoutProps) {
             <AppSidebar />
             <main className="flex-1 overflow-auto">
               <ResizablePanelGroup direction="horizontal">
-                <ResizablePanel defaultSize={100} className="pl-4 pr-4">
+                <ResizablePanel defaultSize={100} className="px-4">
                   <div className="h-full w-full max-w-7xl mx-auto">
                     {children}
                   </div>
