@@ -10,6 +10,7 @@ import {
   Clock,
   Settings,
   Shield,
+  Briefcase,
 } from "lucide-react";
 
 import {
@@ -98,6 +99,16 @@ export function AppSidebar() {
             >
               <Clock className="h-4 w-4" />
               <span>Leave Manager</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              tooltip="Policies" 
+              onClick={() => handleNavigation("/policies")}
+            >
+              <Briefcase className="h-4 w-4" />
+              <span>Policies</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           

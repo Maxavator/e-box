@@ -1,13 +1,7 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import MessageItem from "./MessageItem";
 import { ChatInput } from "./ChatInput";
-import { Documents } from "@/components/desk/Documents";
-import { Dashboard } from "@/components/desk/Dashboard";
-import { Policies } from "@/components/desk/Policies";
-import { Settings } from "@/components/settings/Settings";
-import { LeaveManager } from "@/components/desk/LeaveManager";
-import { Calendar } from "@/components/desk/Calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Calendar as CalendarIcon, MessageCircle, User } from "lucide-react";
 import type { Conversation } from "@/types/chat";
@@ -25,7 +19,6 @@ interface ChatContentProps {
 }
 
 export const ChatContent = ({
-  activeTab,
   selectedConversation,
   newMessage,
   onNewMessageChange,
@@ -33,45 +26,12 @@ export const ChatContent = ({
   onEditMessage,
   onDeleteMessage,
   onReactToMessage,
-  calendarView,
 }: ChatContentProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [selectedDeskFeature, setSelectedDeskFeature] = useState<string | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [selectedConversation?.messages]);
-
-  useEffect(() => {
-    const handleDeskFeatureSelected = (event: CustomEvent<string>) => {
-      setSelectedDeskFeature(event.detail);
-    };
-
-    window.addEventListener('desk-feature-selected', handleDeskFeatureSelected as EventListener);
-
-    return () => {
-      window.removeEventListener('desk-feature-selected', handleDeskFeatureSelected as EventListener);
-    };
-  }, []);
-
-  if (activeTab === 'desk') {
-    switch (selectedDeskFeature) {
-      case 'documents':
-        return <Documents />;
-      case 'dashboard':
-        return <Dashboard />;
-      case 'leave-manager':
-        return <LeaveManager />;
-      case 'policies':
-        return <Policies />;
-      case 'settings':
-        return <Settings />;
-      case 'calendar':
-        return <Calendar />;
-      default:
-        return <Dashboard />;
-    }
-  }
 
   if (!selectedConversation) {
     return (

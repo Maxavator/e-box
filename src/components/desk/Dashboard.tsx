@@ -38,6 +38,15 @@ export const Dashboard = () => {
       case 'profile':
         navigate('/profile');
         break;
+      case 'contacts':
+        navigate('/contacts');
+        break;
+      case 'leave':
+        navigate('/leave');
+        break;
+      case 'policies':
+        navigate('/policies');
+        break;
       default:
         break;
     }

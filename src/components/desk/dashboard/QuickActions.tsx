@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Calendar, Users, Building2, MessageSquare } from "lucide-react";
+import { FileText, Calendar, Users, MessageSquare, Clock, Briefcase } from "lucide-react";
 
 interface QuickActionsProps {
   onActionClick: (action: string) => void;
@@ -13,7 +13,7 @@ export const QuickActions = ({ onActionClick }: QuickActionsProps) => {
         <CardTitle>Quick Actions</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <button 
             className="p-4 border rounded-lg hover:bg-muted/50 transition-colors text-left dark:hover:bg-muted"
             onClick={() => onActionClick('documents')}
@@ -40,11 +40,27 @@ export const QuickActions = ({ onActionClick }: QuickActionsProps) => {
           </button>
           <button 
             className="p-4 border rounded-lg hover:bg-muted/50 transition-colors text-left dark:hover:bg-muted"
-            onClick={() => onActionClick('profile')}
+            onClick={() => onActionClick('contacts')}
           >
             <Users className="w-5 h-5 mb-2 text-orange-600" />
-            <p className="font-medium">Profile</p>
-            <p className="text-sm text-muted-foreground">View settings</p>
+            <p className="font-medium">Contacts</p>
+            <p className="text-sm text-muted-foreground">View contacts</p>
+          </button>
+          <button 
+            className="p-4 border rounded-lg hover:bg-muted/50 transition-colors text-left dark:hover:bg-muted"
+            onClick={() => onActionClick('leave')}
+          >
+            <Clock className="w-5 h-5 mb-2 text-purple-600" />
+            <p className="font-medium">Leave</p>
+            <p className="text-sm text-muted-foreground">Manage leave</p>
+          </button>
+          <button 
+            className="p-4 border rounded-lg hover:bg-muted/50 transition-colors text-left dark:hover:bg-muted"
+            onClick={() => onActionClick('policies')}
+          >
+            <Briefcase className="w-5 h-5 mb-2 text-cyan-600" />
+            <p className="font-medium">Policies</p>
+            <p className="text-sm text-muted-foreground">View policies</p>
           </button>
         </div>
       </CardContent>

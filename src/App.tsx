@@ -17,6 +17,9 @@ import OrganizationManagementPage from "@/pages/OrganizationManagement";
 import { Documents } from "@/components/desk/Documents";
 import { Calendar } from "@/components/desk/Calendar";
 import { Settings } from "@/components/desk/Settings";
+import { LeaveManager } from "@/components/desk/LeaveManager";
+import { ContactsList } from "@/components/desk/ContactsList";
+import { Policies } from "@/components/desk/Policies";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -119,6 +122,21 @@ function App() {
               <Route path="/calendar" element={
                 <ProtectedRoute>
                   <Calendar />
+                </ProtectedRoute>
+              } />
+              <Route path="/contacts" element={
+                <ProtectedRoute>
+                  <ContactsList />
+                </ProtectedRoute>
+              } />
+              <Route path="/leave" element={
+                <ProtectedRoute>
+                  <LeaveManager />
+                </ProtectedRoute>
+              } />
+              <Route path="/policies" element={
+                <ProtectedRoute>
+                  <Policies />
                 </ProtectedRoute>
               } />
               <Route path="/profile" element={
