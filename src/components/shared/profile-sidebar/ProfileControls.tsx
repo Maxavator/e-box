@@ -21,13 +21,12 @@ export function ProfileControls() {
   };
 
   return (
-    <div className="flex items-center gap-2">      
-      <OnlineStatus>
-        <span className="mx-1">•</span>
+    <div className="flex items-center justify-between mb-3 border border-border/30 rounded-md p-2">
+      <div className="flex items-center gap-1">
         <UserRoleBadge />
-      </OnlineStatus>
-      
-      <span className="text-muted-foreground ml-auto">|</span>
+        <span className="mx-1">|</span>
+        <OnlineStatus />
+      </div>
       
       <Button 
         variant="ghost" 

@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -61,7 +62,6 @@ export function UserProfileSidebarFooter() {
               firstName: data.first_name || '',
               lastName: data.last_name || ''
             });
-            console.log('User name set from fetchUserData:', data.first_name, data.last_name);
           }
         }
       } catch (error) {
@@ -70,14 +70,12 @@ export function UserProfileSidebarFooter() {
     };
 
     if (session?.user?.id && (!profile || !profile.first_name)) {
-      console.log('Fetching user data in useEffect');
       fetchUserData();
     } else if (profile) {
       setUserName({
         firstName: profile.first_name || '',
         lastName: profile.last_name || ''
       });
-      console.log('User name set from profile:', profile.first_name, profile.last_name);
     }
   }, [session, profile]);
 
@@ -104,8 +102,6 @@ export function UserProfileSidebarFooter() {
   const jobTitle = profile?.job_title || '';
   const hasOrganization = !!profile?.organization_id;
 
-  console.log('Rendering user profile:', { firstName, lastName, jobTitle, hasOrganization, organizationId: profile?.organization_id });
-
   return (
     <div className="flex flex-col p-3 w-full">
       <UserProfileHeader 
@@ -117,12 +113,11 @@ export function UserProfileSidebarFooter() {
         hasOrganization={hasOrganization}
       />
       
-      <div className="flex items-center justify-between mb-3 border border-border/30 rounded-md p-2">
-        <UserRoleBadge />
-        <ProfileControls />
-      </div>
+      <ProfileControls />
       
-      <OrganizationInfo organizationId={profile?.organization_id} />
+      {profile?.organization_id && (
+        <OrganizationInfo organizationId={profile?.organization_id} />
+      )}
       
       <div className="flex items-center gap-2 mt-1">
         <AdminButton isAdmin={isAdmin} />

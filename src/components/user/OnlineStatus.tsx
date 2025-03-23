@@ -77,7 +77,7 @@ export function OnlineStatus({ initialStatus = 'online', children }: OnlineStatu
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center">
       <DropdownMenu>
         <DropdownMenuTrigger className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
           <Circle className={`h-2 w-2 ${getStatusColor(onlineStatus)}`} />
