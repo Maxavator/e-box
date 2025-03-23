@@ -42,12 +42,19 @@ const Auth = () => {
       </div>
       <div className="flex flex-col justify-center w-full md:w-1/2 px-4 py-12 sm:px-6 lg:px-20 xl:px-24">
         <div className="w-full max-w-sm mx-auto">
-          <h2 className="mt-6 text-3xl font-bold tracking-tight">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Enter your SA ID number to access your workspace
-          </p>
+          <div className="flex flex-col items-center mb-8">
+            <img 
+              src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
+              alt="e-Box Logo" 
+              className="h-16 mb-4"
+            />
+            <h2 className="text-2xl font-bold tracking-tight text-center">
+              Sign in to your account
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground text-center">
+              Enter your SA ID number to access your workspace
+            </p>
+          </div>
           
           <LoginForm />
 

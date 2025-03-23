@@ -5,19 +5,19 @@ import { Button } from "@/components/ui/button";
 import { LoginFormFields } from "./LoginFormFields";
 import { useAuthActions } from "@/hooks/useAuthActions";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const LoginForm = () => {
   const [saId, setSaId] = useState("");
-  const [password, setPassword] = useState("StaffPass123!"); // Default password is always set here, but not used
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const authActions = useAuthActions({
     email: saId, // This will be treated as saId in useAuthActions
-    password, // This password is actually ignored in useAuthActions
+    password,
     setIsLoading,
     navigate,
   });
@@ -34,8 +34,8 @@ const LoginForm = () => {
   };
 
   return (
-    <Card className="mt-6 w-full">
-      <CardHeader>
+    <Card className="mt-6 w-full shadow-md border-primary/10">
+      <CardHeader className="pb-2">
         <CardTitle className="text-lg">Sign in with your SA ID number</CardTitle>
       </CardHeader>
       <CardContent>
@@ -54,7 +54,7 @@ const LoginForm = () => {
           />
           <Button
             type="submit"
-            className="w-full"
+            className="w-full bg-primary hover:bg-primary/90"
             disabled={isLoading}
           >
             {isLoading ? (
