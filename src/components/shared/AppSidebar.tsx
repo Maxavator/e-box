@@ -10,7 +10,7 @@ import {
   SidebarGroup,
 } from "@/components/ui/sidebar";
 
-import { UserProfileSidebarFooter } from "./UserProfileSidebarFooter";
+import { UserProfileSidebarFooter } from "./profile-sidebar";
 import { useSidebarBadges } from "@/hooks/useSidebarBadges";
 import { MainNavigationMenu } from "./sidebar/MainNavigationMenu";
 
