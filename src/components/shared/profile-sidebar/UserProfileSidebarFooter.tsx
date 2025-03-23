@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -120,7 +119,6 @@ export function UserProfileSidebarFooter() {
       
       <div className="flex items-center justify-between mb-3 border border-border/30 rounded-md p-2">
         <UserRoleBadge />
-        <span className="text-muted-foreground">|</span>
         <ProfileControls />
       </div>
       

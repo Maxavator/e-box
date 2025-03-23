@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { OnlineStatus } from "@/components/user/OnlineStatus";
-import { UserRoleBadge } from "./UserRoleBadge";
 
 export function ProfileControls() {
   const navigate = useNavigate();
@@ -21,11 +20,7 @@ export function ProfileControls() {
   };
 
   return (
-    <div className="flex items-center justify-between mb-3 border border-border/30 rounded-md p-2">
-      <UserRoleBadge />
-      
-      <span className="text-muted-foreground">|</span>
-      
+    <div className="flex items-center gap-2">      
       <OnlineStatus />
       
       <span className="text-muted-foreground">|</span>
