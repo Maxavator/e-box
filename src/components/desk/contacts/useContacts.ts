@@ -26,14 +26,16 @@ export const useContacts = () => {
         return []; // Return empty array if user has no organization
       }
 
-      // First, fetch all organization members to ensure we have all colleagues
-      const { data: orgMembers, error: orgMembersError } = await supabase
+      // First, fetch ALL organization members including the current user
+      const { data: allOrgMembers, error: orgMembersError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, organization_id')
-        .eq('organization_id', userProfile.organization_id)
-        .neq('id', userData.user.id); // Exclude current user
+        .eq('organization_id', userProfile.organization_id);
 
       if (orgMembersError) throw orgMembersError;
+      
+      // Filter out the current user
+      const orgMembers = allOrgMembers.filter(member => member.id !== userData.user.id);
 
       // Then fetch user's explicit contacts
       const { data: userContacts, error: contactsError } = await supabase
