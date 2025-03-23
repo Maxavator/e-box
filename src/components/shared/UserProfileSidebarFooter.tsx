@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { UserInfo } from "@/components/user/UserInfo";
 import { OnlineStatus } from "@/components/user/OnlineStatus";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
+import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import {
   Tooltip,
   TooltipContent,
@@ -17,9 +18,11 @@ import {
 } from "@/components/ui/tooltip";
 import { APP_VERSION } from "@/utils/version";
 import { getLatestChanges } from "@/utils/changelog";
+import { Badge } from "@/components/ui/badge";
 
 export function UserProfileSidebarFooter() {
   const navigate = useNavigate();
+  const { userRole, isAdmin } = useUserRole();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -136,6 +139,20 @@ export function UserProfileSidebarFooter() {
         >
           <LogOut className="h-4 w-4" />
         </Button>
+      </div>
+      
+      {/* Display user role with a badge */}
+      <div className="mb-2">
+        {userRole && (
+          <Badge 
+            variant={userRole === 'global_admin' || userRole === 'org_admin' ? "default" : "outline"}
+            className={`text-xs ${userRole === 'global_admin' || userRole === 'org_admin' ? 'bg-green-600 hover:bg-green-700' : ''}`}
+          >
+            {userRole === 'global_admin' ? 'Global Admin' : 
+             userRole === 'org_admin' ? 'Organization Admin' : 
+             userRole === 'staff' ? 'Staff' : 'Regular User'}
+          </Badge>
+        )}
       </div>
       
       {orgName && (
