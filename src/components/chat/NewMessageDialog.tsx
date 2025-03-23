@@ -1,8 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Pen } from "lucide-react";
+import { Pen, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,11 +10,14 @@ import type { User, Profile } from "@/types/chat";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useUserRole } from "@/components/admin/hooks/useUserRole";
 
 export function NewMessageDialog() {
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const { isAdmin, userRole, isLoading: roleLoading } = useUserRole();
+  const isAdminUser = isAdmin || userRole === 'org_admin' || userRole === 'global_admin';
 
   const { data: contacts = [], isLoading } = useQuery({
     queryKey: ['organization-contacts'],
@@ -41,6 +44,22 @@ export function NewMessageDialog() {
       if (error) throw error;
       return orgContacts || [];
     }
+  });
+
+  const { data: adminConversation, isLoading: adminConvLoading } = useQuery({
+    queryKey: ['admin-group-conversation'],
+    queryFn: async () => {
+      if (!isAdminUser) return null;
+      
+      const { data: existingConv, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('is_admin_group', true)
+        .maybeSingle();
+      
+      return existingConv;
+    },
+    enabled: isAdminUser && !roleLoading
   });
 
   const filteredContacts = contacts.filter(contact => {
@@ -97,6 +116,45 @@ export function NewMessageDialog() {
     }
   };
 
+  const handleSelectAdminGroup = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+      
+      // If we don't have an admin group conversation yet, create one
+      if (!adminConversation) {
+        const { data: newConv, error: createError } = await supabase
+          .from('conversations')
+          .insert({
+            user1_id: user.id,
+            user2_id: user.id, // Temporary, will be updated with proper group chat implementation
+            is_admin_group: true,
+          })
+          .select()
+          .single();
+        
+        if (createError) throw createError;
+      }
+      
+      toast({
+        title: "Admin Group Chat",
+        description: "Opened e-Box Admin Group Chat"
+      });
+      
+      // Navigate to the admin chat
+      window.location.href = "/admin-chat";
+    } catch (error) {
+      console.error('Error accessing admin group:', error);
+      toast({
+        title: "Error",
+        description: "Failed to access admin group",
+        variant: "destructive" 
+      });
+    } finally {
+      setOpen(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -118,6 +176,25 @@ export function NewMessageDialog() {
           />
           <ScrollArea className="h-[300px] pr-4">
             <div className="space-y-2">
+              {/* Admin Group Option - Only visible for admins */}
+              {isAdminUser && !roleLoading && (
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start mb-2 bg-primary/5 hover:bg-primary/10"
+                  onClick={handleSelectAdminGroup}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
+                      <Shield className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">e-Box Admin Group</span>
+                      <span className="text-xs text-muted-foreground">Secure admin communication channel</span>
+                    </div>
+                  </div>
+                </Button>
+              )}
+            
               {isLoading ? (
                 <div className="text-center text-muted-foreground py-4">
                   Loading contacts...

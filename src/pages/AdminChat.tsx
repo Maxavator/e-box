@@ -75,6 +75,10 @@ const AdminChat = () => {
         
         if (msgError) throw msgError;
         
+        // Get current user
+        const userResponse = await supabase.auth.getUser();
+        const currentUserId = userResponse.data.user?.id;
+        
         // Format messages
         const formattedMessages: Message[] = (messages || []).map(msg => ({
           id: msg.id,
@@ -83,7 +87,7 @@ const AdminChat = () => {
           timestamp: new Date(msg.created_at).toLocaleString(),
           status: 'sent',
           reactions: [],
-          sender: msg.sender_id === (supabase.auth.getUser())?.data?.user?.id ? 'me' : 'them'
+          sender: msg.sender_id === currentUserId ? 'me' : 'them'
         }));
         
         setMessages(formattedMessages);
@@ -95,12 +99,14 @@ const AdminChat = () => {
           messages: formattedMessages,
           lastMessage: formattedMessages.length > 0 ? formattedMessages[formattedMessages.length - 1].text : '',
           isGroup: true,
-          groupName: 'e-Box Admin Group'
+          groupName: 'e-Box Admin Group',
+          isAdminGroup: true
         } as Conversation;
       }
       
       // Create admin group conversation if it doesn't exist
-      const { data: { user } } = await supabase.auth.getUser();
+      const userResponse = await supabase.auth.getUser();
+      const user = userResponse.data.user;
       if (!user) throw new Error('User not authenticated');
       
       const { data: newConv, error: createError } = await supabase
@@ -123,7 +129,8 @@ const AdminChat = () => {
         messages: [],
         lastMessage: '',
         isGroup: true,
-        groupName: 'e-Box Admin Group'
+        groupName: 'e-Box Admin Group',
+        isAdminGroup: true
       } as Conversation;
     },
     enabled: !!isAdmin || userRole === 'org_admin' || userRole === 'global_admin',
@@ -132,7 +139,8 @@ const AdminChat = () => {
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !adminConversation) return;
     
-    const { data: { user } } = await supabase.auth.getUser();
+    const userResponse = await supabase.auth.getUser();
+    const user = userResponse.data.user;
     if (!user) return;
     
     try {
@@ -184,7 +192,8 @@ const AdminChat = () => {
           filter: `conversation_id=eq.${adminConversation.id}`
         },
         async (payload) => {
-          const { data: { user } } = await supabase.auth.getUser();
+          const userResponse = await supabase.auth.getUser();
+          const user = userResponse.data.user;
           if (!user) return;
           
           const newMessage = payload.new;

@@ -1,15 +1,16 @@
+
 import {
   BrowserRouter as Router,
   Routes,
   Route,
 } from "react-router-dom";
-import { ThemeProvider } from "@/components/ui/theme-provider"
-import { Index } from "@/pages/Index";
-import { Auth } from "@/pages/Auth";
-import { Dashboard } from "@/pages/Dashboard";
-import { NotFound } from "@/pages/NotFound";
-import { AdminPortal } from "@/pages/AdminPortal";
-import { OrganizationDashboard } from "@/pages/OrganizationDashboard";
+import { ThemeProvider } from "@/components/shared/theme-provider"
+import Index from "@/pages/Index";
+import Auth from "@/pages/Auth";
+import Dashboard from "@/pages/Dashboard";
+import NotFound from "@/pages/NotFound";
+import AdminPortal from "@/pages/AdminPortal";
+import OrganizationDashboard from "@/pages/OrganizationDashboard";
 import OrganizationManagementPage from "@/pages/OrganizationManagement";
 import Chat from "@/pages/Chat";
 import AdminChat from "@/pages/AdminChat";

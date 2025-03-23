@@ -1,8 +1,7 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getUserById } from "@/data/chat";
 import type { Conversation } from "@/types/chat";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { Check, MoreVertical, Pen, Shield, Trash2, X } from "lucide-react";
 
 interface ConversationListProps {
@@ -27,7 +26,7 @@ export function ConversationList({
       ) : (
         conversations.map((conversation) => {
           // For admin group chat, use special rendering
-          if (isAdminChat || conversation.isGroup) {
+          if (isAdminChat || conversation.isGroup || conversation.isAdminGroup) {
             return (
               <button
                 key={conversation.id}

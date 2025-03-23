@@ -1,8 +1,11 @@
+
 export interface User {
   id: string;
   name: string;
   status: 'online' | 'offline';
   lastSeen?: string;
+  avatar?: string;
+  initials?: string;
 }
 
 export interface Reaction {
@@ -30,6 +33,7 @@ export interface Conversation {
   lastMessage: string;
   isGroup?: boolean;
   groupName?: string;
+  isAdminGroup?: boolean;
 }
 
 export interface Profile {
@@ -46,4 +50,5 @@ export interface DatabaseConversation {
   user2_id: string;
   created_at: string;
   updated_at: string;
+  is_admin_group?: boolean;
 }
