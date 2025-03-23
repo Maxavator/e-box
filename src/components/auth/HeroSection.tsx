@@ -20,13 +20,13 @@ const HeroSection = () => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-5 h-5 text-amber-300" />
-              <span className="text-sm font-medium text-amber-300">South Africa's Premier Business Platform</span>
+              <span className="text-sm font-medium text-amber-300">South Africa's Leading Enterprise Solution</span>
             </div>
             <h1 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-              Transform Your Workplace Communication
+              Elevate Your Business Communications
             </h1>
             <p className="text-lg lg:text-xl opacity-90 leading-relaxed">
-              Designed specifically for South African businesses, e-Box brings together secure messaging, document management, and HR tools in one integrated platform.
+              Built for South African enterprises, e-Box seamlessly integrates secure messaging, document management, and comprehensive HR tools in one powerful platform.
             </p>
           </div>
         </div>
@@ -41,7 +41,7 @@ const HeroSection = () => {
                 <div className="space-y-1">
                   <h4 className="font-medium text-lg">POPIA Compliant</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Fully compliant with South African data protection regulations
+                    Advanced security with full South African regulatory compliance
                   </p>
                 </div>
               </li>
@@ -52,7 +52,7 @@ const HeroSection = () => {
                 <div className="space-y-1">
                   <h4 className="font-medium text-lg">Multilingual Support</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Available in all 11 official South African languages
+                    Full support for all 11 official South African languages
                   </p>
                 </div>
               </li>
@@ -63,7 +63,7 @@ const HeroSection = () => {
                 <div className="space-y-1">
                   <h4 className="font-medium text-lg">Mobile Integration</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Works seamlessly on desktop, tablet, and mobile devices
+                    Seamless experience across all devices with real-time sync
                   </p>
                 </div>
               </li>
@@ -74,7 +74,7 @@ const HeroSection = () => {
                 <div className="space-y-1">
                   <h4 className="font-medium text-lg">Digital Payslips</h4>
                   <p className="text-white/80 text-sm leading-relaxed">
-                    Secure delivery of payslips and employee documents
+                    Encrypted delivery of payslips with automated notifications
                   </p>
                 </div>
               </li>
@@ -83,7 +83,7 @@ const HeroSection = () => {
 
           <div className="pt-6 border-t border-white/20">
             <p className="text-sm leading-relaxed text-white/70">
-              © 2024 Afrovation Technology Solutions (Pty) Ltd. All rights reserved.
+              © 2025 Afrovation Technology Solutions (Pty) Ltd. All rights reserved.
             </p>
           </div>
         </div>

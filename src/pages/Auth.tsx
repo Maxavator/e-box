@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import LoginForm from "@/components/auth/LoginForm";
 import HeroSection from "@/components/auth/HeroSection";
 import { supabase } from "@/integrations/supabase/client";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { InfoIcon } from "lucide-react";
 import { toast } from "sonner";
 
 const Auth = () => {
@@ -51,14 +49,6 @@ const Auth = () => {
           </div>
           
           <LoginForm />
-
-          <Alert className="mt-6 bg-blue-50">
-            <InfoIcon className="h-4 w-4" />
-            <AlertTitle>Secure Authentication</AlertTitle>
-            <AlertDescription className="text-xs">
-              This system uses secure authentication to protect your data.
-            </AlertDescription>
-          </Alert>
         </div>
       </div>
     </div>

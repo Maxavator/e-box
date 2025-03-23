@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LoginFormFields } from "./LoginFormFields";
 import { useAuthActions } from "@/hooks/useAuthActions";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, Shield } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const LoginForm = () => {
   const [saId, setSaId] = useState("");
@@ -52,20 +53,35 @@ const LoginForm = () => {
             password={password}
             setPassword={setPassword}
           />
-          <Button
-            type="submit"
-            className="w-full bg-primary hover:bg-primary/90"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              "Sign in"
-            )}
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="submit"
+                  className="w-full bg-primary hover:bg-primary/90"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    "Sign in"
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-blue-50 border-blue-200">
+                <div className="flex items-center gap-1.5">
+                  <Shield className="h-3.5 w-3.5 text-blue-500" />
+                  <span className="font-medium text-blue-700">Secure Authentication</span>
+                </div>
+                <p className="text-xs text-blue-600 mt-1">
+                  This system uses secure authentication to protect your data.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </form>
       </CardContent>
     </Card>
