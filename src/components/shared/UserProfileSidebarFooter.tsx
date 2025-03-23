@@ -1,7 +1,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { LogOut, Settings, Mail, Info } from "lucide-react";
+import { LogOut, Mail, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -75,10 +75,6 @@ export function UserProfileSidebarFooter() {
     }
   };
 
-  const handleProfileClick = () => {
-    navigate("/profile");
-  };
-
   if (!session?.user) {
     return (
       <div className="p-3 text-center text-sm text-muted-foreground">
@@ -120,16 +116,6 @@ export function UserProfileSidebarFooter() {
       </div>
       
       <div className="flex items-center gap-2 mt-1">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleProfileClick}
-          className="flex items-center gap-1 text-xs flex-1 h-8"
-        >
-          <Settings className="h-3 w-3" />
-          <span>Settings</span>
-        </Button>
-        
         {isAdmin && (
           <Button 
             variant="outline" 
