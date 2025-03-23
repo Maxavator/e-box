@@ -17,3 +17,5 @@ export { Calendar } from '@/components/desk/Calendar';
 export { ContactsList } from '@/components/desk/ContactsList';
 export { LeaveManager } from '@/components/desk/LeaveManager';
 export { Policies } from '@/components/desk/Policies';
+export { MyDesk } from '@/components/desk/MyDesk';
+

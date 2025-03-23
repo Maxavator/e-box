@@ -62,6 +62,7 @@ export function MainNavigationMenu({
         <SidebarMenuSub>
           <SidebarMenuSubTrigger
             tooltip="My Desk"
+            onClick={() => handleNavigation("/mydesk")}
           >
             <Briefcase className="h-4 w-4" />
             <span>My Desk {organizationName ? `@${organizationName}` : ''}</span>

@@ -19,6 +19,7 @@ import { Calendar } from '@/components/desk/Calendar';
 import { ContactsList } from '@/components/desk/ContactsList';
 import { LeaveManager } from '@/components/desk/LeaveManager';
 import { Policies } from '@/components/desk/Policies';
+import { MyDesk } from '@/components/desk/MyDesk';
 
 // Import auth and UI components
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
@@ -82,6 +83,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/chat" element={<Chat />} />
+            <Route path="/mydesk" element={<MyDesk />} />
             <Route path="/documents" element={<Documents />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/contacts" element={<ContactsList />} />
