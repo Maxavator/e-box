@@ -1,4 +1,3 @@
-
 import React, { Suspense, useState, useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
@@ -39,6 +38,11 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!supabase || !supabase.auth) {
+      console.error("Supabase client is not properly initialized");
+      return () => {};
+    }
+
     const handleAuthStateChange = async (_event: any, _session: any) => {
       if (!session && location.pathname !== '/auth') {
         navigate('/auth');
@@ -47,12 +51,18 @@ function App() {
       }
     };
 
-    const { data } = supabase.auth.onAuthStateChange(handleAuthStateChange);
-
-    return () => {
-      // Corrected: use the unsubscribe function returned by onAuthStateChange
-      data?.subscription.unsubscribe();
-    };
+    try {
+      const { data } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+      
+      return () => {
+        if (data?.subscription?.unsubscribe) {
+          data.subscription.unsubscribe();
+        }
+      };
+    } catch (error) {
+      console.error("Error setting up auth state change listener:", error);
+      return () => {};
+    }
   }, [session, location, navigate, supabase]);
 
   return (
