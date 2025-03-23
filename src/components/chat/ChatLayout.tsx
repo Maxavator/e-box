@@ -38,7 +38,6 @@ interface ChatLayoutProps {
   onLogout: () => void;
   onLogoClick: () => void;
   isMobile: boolean;
-  isAdminChat?: boolean;
 }
 
 export function ChatLayout({
@@ -60,7 +59,6 @@ export function ChatLayout({
   onLogout,
   onLogoClick,
   isMobile,
-  isAdminChat = false,
 }: ChatLayoutProps) {
   const [activeContent, setActiveContent] = useState<'chat' | 'sidebar'>('chat');
 
@@ -83,7 +81,6 @@ export function ChatLayout({
                 selectedConversation={selectedConversation}
                 onSelectConversation={onSelectConversation}
                 onCalendarActionClick={onCalendarActionClick}
-                isAdminChat={isAdminChat}
               />
             </div>
             
@@ -96,7 +93,6 @@ export function ChatLayout({
                     onEditMessage={onEditMessage}
                     onDeleteMessage={onDeleteMessage}
                     onReactToMessage={onReactToMessage}
-                    isAdminChat={isAdminChat}
                   />
                   <ChatInput
                     value={newMessage}
@@ -106,17 +102,10 @@ export function ChatLayout({
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-full p-8 text-center text-muted-foreground">
-                  {isAdminChat ? (
-                    <div>
-                      <h3 className="text-xl font-semibold mb-2">Welcome to Admin Group Chat</h3>
-                      <p>This is a private channel for e-Box administrators to communicate</p>
-                    </div>
-                  ) : (
-                    <div>
-                      <h3 className="text-xl font-semibold mb-2">Select a Conversation</h3>
-                      <p>Choose a conversation from the sidebar or start a new one</p>
-                    </div>
-                  )}
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">Select a Conversation</h3>
+                    <p>Choose a conversation from the sidebar or start a new one</p>
+                  </div>
                 </div>
               )}
             </div>

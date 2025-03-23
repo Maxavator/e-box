@@ -13,7 +13,6 @@ import AdminPortal from "@/pages/AdminPortal";
 import OrganizationDashboard from "@/pages/OrganizationDashboard";
 import OrganizationManagementPage from "@/pages/OrganizationManagement";
 import Chat from "@/pages/Chat";
-import AdminChat from "@/pages/AdminChat";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Create a global QueryClient
@@ -36,7 +35,6 @@ function App() {
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/chat" element={<Chat />} />
-            <Route path="/admin-chat" element={<AdminChat />} />
             <Route path="/documents" element={<Dashboard />} />
             <Route path="/calendar" element={<Dashboard />} />
             <Route path="/contacts" element={<Dashboard />} />

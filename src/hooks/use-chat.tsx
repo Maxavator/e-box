@@ -4,7 +4,7 @@ import { useConversations } from "./useConversations";
 import { useMessages } from "./useMessages";
 import { useRealtime } from "./useRealtime";
 
-export const useChat = (type?: 'admin' | undefined) => {
+export const useChat = () => {
   const [activeTab, setActiveTab] = useState("chats");
   const [calendarView, setCalendarView] = useState<"calendar" | "inbox">("calendar");
   const [selectedFeature, setSelectedFeature] = useState("");
@@ -17,7 +17,7 @@ export const useChat = (type?: 'admin' | undefined) => {
     setSearchQuery,
     filteredConversations,
     handleSelectConversation,
-  } = useConversations(type);
+  } = useConversations();
 
   const {
     newMessage,

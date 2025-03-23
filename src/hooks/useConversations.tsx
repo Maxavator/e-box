@@ -5,7 +5,7 @@ import { Conversation } from "@/types/chat";
 import { Message } from "@/types/chat";
 import { conversations as mockConversations } from "@/data/chat";
 
-export const useConversations = (type?: 'admin' | undefined) => {
+export const useConversations = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,15 +21,13 @@ export const useConversations = (type?: 'admin' | undefined) => {
       if (user) {
         console.info("Fetching conversations for user:", user.id);
         
-        // In a real app, we would filter by isAdminGroup for admin chats
-        // For now, we'll use mock data depending on the type
         let fetchedConversations;
         
         try {
           const { data, error } = await supabase
             .from('conversations')
             .select('*')
-            .eq(type === 'admin' ? 'is_admin_group' : 'is_public', true);
+            .eq('is_public', true);
             
           if (error) {
             throw error;
@@ -39,9 +37,7 @@ export const useConversations = (type?: 'admin' | undefined) => {
         } catch (error) {
           console.error("Error fetching conversations:", error);
           // Fallback to mock data
-          fetchedConversations = mockConversations.filter(conv => 
-            type === 'admin' ? conv.isAdminGroup : !conv.isAdminGroup
-          );
+          fetchedConversations = mockConversations.filter(conv => !conv.isAdminGroup);
         }
 
         setConversations(fetchedConversations);
