@@ -36,6 +36,26 @@ export const useUserRole = () => {
         // Check for global_admin role
         const isGlobalAdmin = !!data;
         console.log('Is global admin:', isGlobalAdmin);
+        
+        // If not a global admin, check if the user is an org_admin
+        if (!isGlobalAdmin) {
+          const { data: orgAdminData, error: orgAdminError } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session!.user.id)
+            .eq('role', 'org_admin')
+            .maybeSingle();
+            
+          if (orgAdminError) {
+            console.error('Error checking org_admin role:', orgAdminError);
+            return false;
+          }
+          
+          const isOrgAdmin = !!orgAdminData;
+          console.log('Is org admin:', isOrgAdmin);
+          return isGlobalAdmin || isOrgAdmin;
+        }
+        
         return isGlobalAdmin;
       } catch (error) {
         console.error('Admin status check failed:', error);

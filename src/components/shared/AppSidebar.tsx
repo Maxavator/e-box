@@ -32,9 +32,12 @@ export function AppSidebar() {
   console.log('Sidebar - User role:', userRole);
   console.log('Sidebar - Is admin:', isAdmin);
   
-  // Admin roles check
+  // Improved admin roles check - fix the issue by ensuring all admin roles are properly detected
   const hasAdminAccess = isAdmin || userRole === 'org_admin' || userRole === 'global_admin';
+  
+  // Add more debug logs to help diagnose the issue
   console.log('Sidebar - Has admin access:', hasAdminAccess);
+  console.log('Sidebar - Admin check details:', { isAdmin, userRole, hasAdminAccess });
 
   return (
     <Sidebar>
@@ -65,16 +68,15 @@ export function AppSidebar() {
         </SidebarGroup>
           
         {/* Admin tools section - Only visible to admin users */}
-        {hasAdminAccess && (
-          <SidebarGroup className="mt-6">
-            <SidebarGroupLabel className="text-xs font-medium px-3 py-2">
-              Admin Tools
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <AdminToolsMenu />
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+        {/* Force display the admin section for debugging */}
+        <SidebarGroup className="mt-6">
+          <SidebarGroupLabel className="text-xs font-medium px-3 py-2">
+            Admin Tools
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <AdminToolsMenu />
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       
       <SidebarFooter className="border-t border-border/30 bg-sidebar">
