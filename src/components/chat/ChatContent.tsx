@@ -1,3 +1,4 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageList } from "./MessageList";
 import type { Conversation } from "@/types/chat";
@@ -19,7 +20,7 @@ export function ChatContent({
   onReactToMessage,
   isAdminChat = false,
 }: ChatContentProps) {
-  const user = getUserById(conversation.userId);
+  const user = getUserById(conversation.userId || '');
 
   return (
     <div className="flex-1 overflow-y-auto bg-white p-4">
@@ -39,7 +40,7 @@ export function ChatContent({
             <>
               <Avatar className="h-10 w-10">
                 <AvatarImage src={user?.avatar} alt={user?.name} />
-                <AvatarFallback>{user?.initials}</AvatarFallback>
+                <AvatarFallback>{user?.initials || (user?.name ? user.name.substring(0, 2) : 'UN')}</AvatarFallback>
               </Avatar>
               <div>
                 <h3 className="font-semibold">{user?.name}</h3>

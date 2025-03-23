@@ -1,4 +1,3 @@
-
 import { Message, User, Conversation } from "@/types/chat";
 
 export const demoUsers: User[] = [
@@ -6,33 +5,45 @@ export const demoUsers: User[] = [
     id: 'user1',
     name: 'Alice Johnson',
     status: 'online',
-    lastSeen: 'Just now'
+    lastSeen: 'Just now',
+    avatar: '/placeholder.svg',
+    initials: 'AJ'
   },
   {
     id: 'user2',
     name: 'Bob Smith',
     status: 'offline',
-    lastSeen: '5 minutes ago'
+    lastSeen: '5 minutes ago',
+    avatar: '/placeholder.svg',
+    initials: 'BS'
   },
   {
     id: 'user3',
     name: 'Charlie Brown',
     status: 'online',
-    lastSeen: '10 minutes ago'
+    lastSeen: '10 minutes ago',
+    avatar: '/placeholder.svg',
+    initials: 'CB'
   },
   {
     id: 'user4',
     name: 'Diana Miller',
     status: 'offline',
-    lastSeen: '30 minutes ago'
+    lastSeen: '30 minutes ago',
+    avatar: '/placeholder.svg',
+    initials: 'DM'
   },
   {
     id: 'user5',
     name: 'Ethan Davis',
     status: 'online',
-    lastSeen: '1 hour ago'
+    lastSeen: '1 hour ago',
+    avatar: '/placeholder.svg',
+    initials: 'ED'
   }
 ];
+
+export const getUserById = (id: string) => demoUsers.find(user => user.id === id);
 
 const createMessage = (id: string, senderId: string, text: string, timestamp: string): Message => ({
   id,
@@ -67,7 +78,7 @@ export const demoConversations: Conversation[] = [
       { ...createMessage('3', 'user1', 'Great! Should we schedule a meeting to discuss the implementation?', '2024-03-21T09:10:00Z'), conversationId: '1', sender: 'them' },
       { ...createMessage('4', 'user1', 'I\'ve also shared some additional notes in the project documents.', '2024-03-21T09:15:00Z'), conversationId: '1', sender: 'them' },
     ],
-    lastMessage: 'I\'ve also shared some additional notes in the project documents.'
+    lastMessage: "I've also shared some additional notes in the project documents."
   },
   {
     id: '2',
@@ -126,5 +137,3 @@ export const demoConversations: Conversation[] = [
     lastMessage: 'I\'ve just uploaded the latest version to the documents section'
   },
 ];
-
-export const getUserById = (id: string) => demoUsers.find(user => user.id === id);

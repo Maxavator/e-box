@@ -53,4 +53,6 @@ export interface User {
   name: string;
   status: 'online' | 'offline';
   lastSeen?: string;
+  avatar?: string;
+  initials?: string;
 }

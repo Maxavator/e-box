@@ -52,7 +52,9 @@ export function ConversationList({
                     </span>
                   </div>
                   <div className="truncate text-xs text-muted-foreground">
-                    {conversation.lastMessage || "No messages yet"}
+                    {typeof conversation.lastMessage === 'string' 
+                      ? conversation.lastMessage 
+                      : conversation.lastMessage?.content || "No messages yet"}
                   </div>
                 </div>
               </button>
@@ -60,7 +62,7 @@ export function ConversationList({
           }
 
           // Regular conversation rendering
-          const user = getUserById(conversation.userId);
+          const user = getUserById(conversation.userId || '');
           if (!user) return null;
 
           return (
@@ -89,7 +91,9 @@ export function ConversationList({
                   <span className="font-medium truncate">{user.name}</span>
                 </div>
                 <div className="truncate text-xs text-muted-foreground">
-                  {conversation.lastMessage}
+                  {typeof conversation.lastMessage === 'string' 
+                    ? conversation.lastMessage 
+                    : conversation.lastMessage?.content || "No messages yet"}
                 </div>
               </div>
             </button>

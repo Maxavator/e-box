@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,7 @@ export function MessageItem({
   isAdminChat = false,
 }: MessageItemProps) {
   const [editMode, setEditMode] = useState(false);
-  const [editText, setEditText] = useState(message.text);
+  const [editText, setEditText] = useState(message.text || message.content);
   
   // If this is admin chat, get the sender's profile
   const { data: senderProfile } = useQuery({
@@ -50,6 +51,13 @@ export function MessageItem({
   });
 
   const isSentByMe = message.sender === 'me';
+  
+  // Convert reactions object to array for rendering
+  const reactionArray = message.reactions ? 
+    Object.entries(message.reactions).map(([emoji, users]) => ({
+      emoji,
+      users: Array.isArray(users) ? users : []
+    })) : [];
   
   return (
     <div
@@ -115,13 +123,13 @@ export function MessageItem({
                 </Button>
               </div>
             ) : (
-              <div>{message.text}</div>
+              <div>{message.text || message.content}</div>
             )}
           </div>
           
-          {message.reactions.length > 0 && (
+          {reactionArray.length > 0 && (
             <div className="flex gap-1">
-              {message.reactions.map((reaction) => (
+              {reactionArray.map((reaction) => (
                 <Button
                   key={reaction.emoji}
                   variant="ghost"
@@ -139,7 +147,7 @@ export function MessageItem({
           
           <div className="text-xs text-muted-foreground">
             {message.timestamp}
-            {message.edited && ' (edited)'}
+            {(message.edited || message.isEdited) && ' (edited)'}
           </div>
         </div>
         
@@ -153,7 +161,7 @@ export function MessageItem({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => {
-                  setEditText(message.text);
+                  setEditText(message.text || message.content);
                   setEditMode(true);
                 }}>
                   <Pen className="h-4 w-4 mr-2" />
