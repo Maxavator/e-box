@@ -12,11 +12,22 @@ interface UserTableProps {
   isLoading: boolean;
   onEditUser: (user: UserWithRole) => void;
   isAdmin: boolean;
+  userRole?: string;
   showingGolderUsers?: boolean;
+  userOrganizationId?: string;
 }
 
-export const UserTable = ({ users, isLoading, onEditUser, isAdmin, showingGolderUsers = false }: UserTableProps) => {
+export const UserTable = ({ 
+  users, 
+  isLoading, 
+  onEditUser, 
+  isAdmin, 
+  userRole, 
+  showingGolderUsers = false,
+  userOrganizationId,
+}: UserTableProps) => {
   const [updatingUser, setUpdatingUser] = useState<string | null>(null);
+  const isOrgAdmin = !isAdmin && userRole === 'org_admin';
 
   const handlePasswordReset = async (email: string) => {
     try {
@@ -56,6 +67,11 @@ export const UserTable = ({ users, isLoading, onEditUser, isAdmin, showingGolder
     }
   };
 
+  // Check if a user belongs to the org admin's organization
+  const isSameOrganization = (user: UserWithRole) => {
+    return userOrganizationId && user.organization_id === userOrganizationId;
+  };
+
   return (
     <div className="border rounded-lg">
       <Table>
@@ -88,6 +104,9 @@ export const UserTable = ({ users, isLoading, onEditUser, isAdmin, showingGolder
             const isThabo = user.first_name === 'Thabo' && user.last_name === 'Nkosi';
             const isGolderUser = user.organizations?.[0]?.name?.toLowerCase().includes('golder');
             
+            // For organizational admins, highlight users in their organization
+            const isUserInMyOrg = isOrgAdmin && isSameOrganization(user);
+            
             return (
               <TableRow 
                 key={user.id} 
@@ -95,11 +114,14 @@ export const UserTable = ({ users, isLoading, onEditUser, isAdmin, showingGolder
                   ? "bg-green-50 dark:bg-green-900/10" 
                   : isGolderUser && showingGolderUsers 
                     ? "bg-amber-50 dark:bg-amber-900/10" 
-                    : ""}
+                    : isUserInMyOrg
+                      ? "bg-blue-50 dark:bg-blue-900/10"
+                      : ""}
               >
                 <TableCell>
                   {user.first_name} {user.last_name}
                   {isThabo && <span className="ml-2 text-green-600 dark:text-green-400 text-xs">(Target User)</span>}
+                  {isUserInMyOrg && <span className="ml-2 text-blue-600 dark:text-blue-400 text-xs">(Your Organization)</span>}
                 </TableCell>
                 <TableCell>User #{user.id.substring(0, 8)}</TableCell>
                 <TableCell>
@@ -112,7 +134,7 @@ export const UserTable = ({ users, isLoading, onEditUser, isAdmin, showingGolder
                   }
                 </TableCell>
                 <TableCell className="text-right space-x-2">
-                  {isAdmin && (
+                  {(isAdmin || (isOrgAdmin && isSameOrganization(user))) && (
                     <>
                       <Button variant="ghost" size="sm" onClick={() => onEditUser(user)}>
                         <Pencil className="h-4 w-4 mr-2" />
@@ -126,13 +148,28 @@ export const UserTable = ({ users, isLoading, onEditUser, isAdmin, showingGolder
                         <KeyRound className="h-4 w-4 mr-2" />
                         Reset Password
                       </Button>
-                      {!isGlobalAdmin && !isOrgAdmin && (
+                      {!isGlobalAdmin && !isOrgAdmin && isAdmin && (
                         <Button 
                           variant={isThabo ? "default" : "ghost"}
                           size="sm" 
                           onClick={() => handleMakeOrgAdmin(user.id)}
                           disabled={updatingUser === user.id}
                           className={isThabo ? "bg-green-600 hover:bg-green-700" : ""}
+                        >
+                          {updatingUser === user.id ? (
+                            <span className="animate-spin mr-2">⚪</span>
+                          ) : (
+                            <Shield className="h-4 w-4 mr-2" />
+                          )}
+                          Make Org Admin
+                        </Button>
+                      )}
+                      {!isGlobalAdmin && !isOrgAdmin && isOrgAdmin && isSameOrganization(user) && (
+                        <Button 
+                          variant="ghost"
+                          size="sm" 
+                          onClick={() => handleMakeOrgAdmin(user.id)}
+                          disabled={updatingUser === user.id}
                         >
                           {updatingUser === user.id ? (
                             <span className="animate-spin mr-2">⚪</span>

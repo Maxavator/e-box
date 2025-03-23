@@ -16,6 +16,7 @@ interface UserDialogProps {
   onFormChange: (field: keyof UserFormData, value: string) => void;
   isEdit?: boolean;
   isSubmitting?: boolean;
+  isOrgAdmin?: boolean;
 }
 
 export const UserDialog = ({
@@ -28,7 +29,13 @@ export const UserDialog = ({
   onFormChange,
   isEdit = false,
   isSubmitting = false,
+  isOrgAdmin = false,
 }: UserDialogProps) => {
+  // Find current organization name for org admins
+  const currentOrgName = isOrgAdmin && organizations 
+    ? organizations.find(org => org.id === formData.organizationId)?.name 
+    : null;
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -81,27 +88,44 @@ export const UserDialog = ({
               <SelectContent>
                 <SelectItem value="staff">Staff</SelectItem>
                 <SelectItem value="org_admin">Organization Admin</SelectItem>
-                <SelectItem value="global_admin">Global Admin</SelectItem>
+                {!isOrgAdmin && (
+                  <SelectItem value="global_admin">Global Admin</SelectItem>
+                )}
               </SelectContent>
             </Select>
+            {isOrgAdmin && formData.role === "global_admin" && (
+              <p className="text-xs text-amber-600 mt-1">
+                Note: As an organization admin, you cannot create global admins. 
+                The user will be assigned the organization admin role.
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="organization">Organization</Label>
-            <Select
-              value={formData.organizationId}
-              onValueChange={(value) => onFormChange('organizationId', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select organization" />
-              </SelectTrigger>
-              <SelectContent>
-                {organizations?.map((org) => (
-                  <SelectItem key={org.id} value={org.id}>
-                    {org.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {isOrgAdmin ? (
+              <div className="border rounded-md px-3 py-2 bg-muted text-muted-foreground">
+                {currentOrgName || "Your organization"}
+                <p className="text-xs mt-1">
+                  As an organization admin, you can only manage users in your organization.
+                </p>
+              </div>
+            ) : (
+              <Select
+                value={formData.organizationId}
+                onValueChange={(value) => onFormChange('organizationId', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select organization" />
+                </SelectTrigger>
+                <SelectContent>
+                  {organizations?.map((org) => (
+                    <SelectItem key={org.id} value={org.id}>
+                      {org.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
           <Button 
             type="submit" 

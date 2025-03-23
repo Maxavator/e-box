@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -23,9 +24,12 @@ export const useUsers = (
           .from('profiles')
           .select('*');
 
+        // If filtering by organization_id is specified, use that
         if (organizationFilter) {
           profilesQuery = profilesQuery.eq('organization_id', organizationFilter);
-        } else if (userRole === 'org_admin' && userProfile?.organization_id) {
+        } 
+        // If user is org_admin, limit to their organization
+        else if (userRole === 'org_admin' && userProfile?.organization_id) {
           profilesQuery = profilesQuery.eq('organization_id', userProfile.organization_id);
         }
 

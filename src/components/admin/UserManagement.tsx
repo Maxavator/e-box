@@ -29,6 +29,7 @@ export const UserManagement = () => {
     showingGolderUsers,
     toggleGolderUsers,
     golderOrgId,
+    userProfile,
   } = useUserManagement();
 
   const handleEditUser = (user: UserWithRole) => {
@@ -55,13 +56,20 @@ export const UserManagement = () => {
     );
   }
 
+  const isOrgAdmin = !isAdmin && userRole === 'org_admin';
+  const orgName = userProfile?.organization_id 
+    ? organizations?.find(org => org.id === userProfile.organization_id)?.name 
+    : '';
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-xl font-bold">User Management</h2>
-          {userRole === 'org_admin' && (
-            <p className="text-sm text-muted-foreground">Managing users for your organization</p>
+          {isOrgAdmin && (
+            <p className="text-sm text-muted-foreground">
+              Managing users for {orgName || 'your organization'}
+            </p>
           )}
           {isAdmin && (
             <p className="text-sm text-muted-foreground">
@@ -106,6 +114,7 @@ export const UserManagement = () => {
         onSubmit={handleSubmit}
         onFormChange={handleFormChange}
         isSubmitting={createUserMutation.isPending}
+        isOrgAdmin={isOrgAdmin}
       />
 
       <UserDialog
@@ -118,6 +127,7 @@ export const UserManagement = () => {
         onFormChange={handleFormChange}
         isEdit
         isSubmitting={updateUserMutation.isPending}
+        isOrgAdmin={isOrgAdmin}
       />
 
       <UserTable
@@ -125,7 +135,9 @@ export const UserManagement = () => {
         isLoading={isLoading}
         onEditUser={handleEditUser}
         isAdmin={!!isAdmin}
+        userRole={userRole}
         showingGolderUsers={showingGolderUsers}
+        userOrganizationId={userProfile?.organization_id}
       />
     </div>
   );
