@@ -4,8 +4,8 @@
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-// Define the Attribute type that was missing
-type Attribute = string;
+// Define the Attribute type
+type Attribute = "class" | "data-theme" | string;
 
 // Define the ThemeProviderProps interface manually since we can't import from next-themes/dist/types
 interface ThemeProviderProps {

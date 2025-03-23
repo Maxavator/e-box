@@ -1,7 +1,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { LogOut, Mail, Info } from "lucide-react";
+import { LogOut, Mail, Info, Building2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -36,12 +36,31 @@ export function UserProfileSidebarFooter() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name, avatar_url, job_title, email')
+        .select('first_name, last_name, avatar_url, job_title, email, organization_id')
         .eq('id', session!.user.id)
         .single();
       
       if (error) {
         console.error('Error fetching profile:', error);
+        return null;
+      }
+      
+      return data;
+    },
+  });
+
+  const { data: organization } = useQuery({
+    queryKey: ['organization', profile?.organization_id],
+    enabled: !!profile?.organization_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('name')
+        .eq('id', profile!.organization_id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching organization:', error);
         return null;
       }
       
@@ -92,6 +111,7 @@ export function UserProfileSidebarFooter() {
   const jobTitle = profile?.job_title || 'Employee';
   const isAdmin = userRole === 'org_admin' || userRole === 'global_admin';
   const latestChanges = getLatestChanges();
+  const orgName = organization?.name;
 
   return (
     <div className="flex flex-col p-3 w-full">
@@ -117,6 +137,13 @@ export function UserProfileSidebarFooter() {
           <LogOut className="h-4 w-4" />
         </Button>
       </div>
+      
+      {orgName && (
+        <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2">
+          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+          <span className="text-xs text-muted-foreground truncate">{orgName}</span>
+        </div>
+      )}
       
       <div className="flex items-center gap-2 mt-1">
         {isAdmin && (
