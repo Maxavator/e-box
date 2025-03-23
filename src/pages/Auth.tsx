@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginForm from "@/components/auth/LoginForm";
@@ -47,9 +48,7 @@ const Auth = () => {
               alt="e-Box Logo" 
               className="h-16 mb-4"
             />
-            <h2 className="text-2xl font-bold tracking-tight text-center">
-              Sign in
-            </h2>
+            {/* Removed the "Sign in" heading */}
           </div>
           
           <LoginForm />
