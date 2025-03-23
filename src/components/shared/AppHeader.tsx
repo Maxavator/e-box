@@ -2,6 +2,7 @@
 import { AdminMenu } from "@/components/admin/AdminMenu";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface AppHeaderProps {
   onLogout: () => void;
@@ -9,6 +10,7 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
+  const navigate = useNavigate();
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -36,16 +38,7 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
   return (
     <header className="border-b bg-white p-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <button 
-          onClick={onLogoClick}
-          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
-        >
-          <img 
-            src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
-            alt="e-Box by Afrovation" 
-            className="h-8"
-          />
-        </button>
+        {/* Removed logo from header since it's already in the sidebar */}
       </div>
       <div className="flex items-center gap-4">
         {isAdmin && <AdminMenu />}
