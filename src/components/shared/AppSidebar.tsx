@@ -33,8 +33,8 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar variant="sidebar" collapsible="icon" className="flex flex-col">
-      <SidebarHeader className="flex items-center justify-center p-4 border-none">
+    <Sidebar variant="sidebar" collapsible="icon" className="flex flex-col h-full">
+      <SidebarHeader className="flex items-center justify-center p-4 border-none bg-sidebar">
         <button 
           onClick={() => handleNavigation("/dashboard")}
           className="hover:opacity-90 transition-opacity"
@@ -47,9 +47,9 @@ export function AppSidebar() {
         </button>
       </SidebarHeader>
       
-      <Separator className="mx-2 bg-transparent" />
+      {/* Remove the separator that was causing the line */}
       
-      <SidebarContent className="border-t-0 flex-1">
+      <SidebarContent className="border-t-0 flex-1 bg-sidebar">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton 

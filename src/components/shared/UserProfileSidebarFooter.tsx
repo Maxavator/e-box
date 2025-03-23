@@ -1,3 +1,4 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { LogOut, Settings, Mail } from "lucide-react";
@@ -67,7 +68,7 @@ export function UserProfileSidebarFooter() {
   const isAdmin = userRole === 'org_admin' || userRole === 'global_admin';
 
   return (
-    <div className="flex flex-col p-3 border-t border-muted/20 bg-sidebar mt-auto">
+    <div className="flex flex-col p-3 border-t border-muted/20 bg-sidebar w-full">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
