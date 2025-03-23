@@ -7,8 +7,8 @@ export function UserRoleBadge() {
   
   const roleDisplayText = 
     userRole === 'global_admin' ? 'Global Admin' : 
-    userRole === 'org_admin' ? 'Chief Information Officer' : 
-    userRole === 'staff' ? 'Staff' : 'Org_Admin';
+    userRole === 'org_admin' ? 'Org Admin' : 
+    userRole === 'staff' ? 'Staff' : 'User';
 
   return (
     <Badge 
