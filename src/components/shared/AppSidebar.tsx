@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import {
@@ -11,7 +10,6 @@ import {
   Settings,
   Shield,
   Briefcase,
-  Inbox,
 } from "lucide-react";
 
 import {
@@ -36,9 +34,7 @@ export function AppSidebar() {
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="flex items-center justify-center p-4">
-        <div className="flex items-center justify-center">
-          <Inbox className="h-6 w-6 text-primary" />
-        </div>
+        {/* Empty header for a cleaner look */}
       </SidebarHeader>
       
       <SidebarContent>

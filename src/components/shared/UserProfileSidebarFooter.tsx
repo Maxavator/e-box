@@ -1,11 +1,10 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { LogOut, User } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { OnlineStatus } from "@/components/user/OnlineStatus";
 import { useQuery } from "@tanstack/react-query";
 
 export function UserProfileSidebarFooter() {
@@ -50,7 +49,7 @@ export function UserProfileSidebarFooter() {
   const jobTitle = profile.job_title || 'Employee';
 
   return (
-    <div className="flex flex-col gap-3 p-3 border-t">
+    <div className="flex items-center justify-between p-3 border-t">
       <div className="flex items-center gap-3">
         <Avatar className="h-10 w-10">
           <AvatarImage src={profile.avatar_url || ''} alt={fullName} />
@@ -62,18 +61,14 @@ export function UserProfileSidebarFooter() {
         </div>
       </div>
       
-      <div className="flex items-center justify-between">
-        <OnlineStatus />
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleLogout}
-          className="flex items-center gap-1"
-        >
-          <LogOut className="h-3.5 w-3.5" />
-          <span>Logout</span>
-        </Button>
-      </div>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={handleLogout}
+        className="h-8 w-8"
+      >
+        <LogOut className="h-4 w-4" />
+      </Button>
     </div>
   );
 }
