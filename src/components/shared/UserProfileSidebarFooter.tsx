@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { UserInfo } from "@/components/user/UserInfo";
 import { OnlineStatus } from "@/components/user/OnlineStatus";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -22,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 
 export function UserProfileSidebarFooter() {
   const navigate = useNavigate();
+  // Use the useUserRole hook to get role information
   const { userRole, isAdmin } = useUserRole();
 
   const { data: session } = useQuery({
@@ -71,25 +71,6 @@ export function UserProfileSidebarFooter() {
     },
   });
 
-  const { data: userRole } = useQuery({
-    queryKey: ['userRole', session?.user?.id],
-    enabled: !!session?.user?.id,
-    queryFn: async () => {
-      const { data: roleData, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', session!.user.id)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching user role:', error);
-        return 'user';
-      }
-      
-      return roleData?.role || 'user';
-    },
-  });
-
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -112,47 +93,59 @@ export function UserProfileSidebarFooter() {
   const initials = profile ? `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}` : 'U';
   const fullName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'User';
   const jobTitle = profile?.job_title || 'Employee';
-  const isAdmin = userRole === 'org_admin' || userRole === 'global_admin';
-  const latestChanges = getLatestChanges();
   const orgName = organization?.name;
+
+  // User role display text
+  const roleDisplayText = 
+    userRole === 'global_admin' ? 'Global Admin' : 
+    userRole === 'org_admin' ? 'Organization Admin' : 
+    userRole === 'staff' ? 'Staff' : 'Regular User';
+
+  const latestChanges = getLatestChanges();
 
   return (
     <div className="flex flex-col p-3 w-full">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={profile?.avatar_url || ''} alt={fullName} />
-            <AvatarFallback>{initials}</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">{fullName}</span>
-            <span className="text-xs text-muted-foreground">{jobTitle}</span>
-          </div>
+      {/* User profile info */}
+      <div className="flex items-center gap-3 mb-3">
+        <Avatar className="h-10 w-10">
+          <AvatarImage src={profile?.avatar_url || ''} alt={fullName} />
+          <AvatarFallback>{initials}</AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">{fullName}</span>
+          <span className="text-xs text-muted-foreground">{jobTitle}</span>
         </div>
-        
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={handleLogout}
-          className="h-8 w-8"
-          title="Logout"
-        >
-          <LogOut className="h-4 w-4" />
-        </Button>
       </div>
       
-      {/* Display user role with a badge */}
-      <div className="mb-2">
-        {userRole && (
-          <Badge 
-            variant={userRole === 'global_admin' || userRole === 'org_admin' ? "default" : "outline"}
-            className={`text-xs ${userRole === 'global_admin' || userRole === 'org_admin' ? 'bg-green-600 hover:bg-green-700' : ''}`}
-          >
-            {userRole === 'global_admin' ? 'Global Admin' : 
-             userRole === 'org_admin' ? 'Organization Admin' : 
-             userRole === 'staff' ? 'Staff' : 'Regular User'}
-          </Badge>
-        )}
+      {/* Requested Format: System Role | Online Status | Logout */}
+      <div className="flex items-center justify-between mb-3 border border-border/30 rounded-md p-2">
+        {/* System Role */}
+        <Badge 
+          variant={userRole === 'global_admin' || userRole === 'org_admin' ? "default" : "outline"}
+          className={`text-xs ${userRole === 'global_admin' || userRole === 'org_admin' ? 'bg-green-600 hover:bg-green-700' : ''}`}
+        >
+          {roleDisplayText}
+        </Badge>
+        
+        {/* Separator */}
+        <span className="text-muted-foreground">|</span>
+        
+        {/* Online Status */}
+        <OnlineStatus />
+        
+        {/* Separator */}
+        <span className="text-muted-foreground">|</span>
+        
+        {/* Logout Button */}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleLogout}
+          className="h-7 px-2"
+          title="Logout"
+        >
+          <LogOut className="h-3.5 w-3.5" />
+        </Button>
       </div>
       
       {orgName && (
@@ -177,8 +170,7 @@ export function UserProfileSidebarFooter() {
       </div>
       
       <div className="mt-2 border-t border-muted/20 pt-2">
-        <div className="flex items-center justify-between">
-          <OnlineStatus />
+        <div className="flex items-center justify-end">
           <ThemeToggle />
         </div>
       </div>
