@@ -1,137 +1,187 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Lock, Moon, User } from "lucide-react";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { AccountSettings } from "./AccountSettings";
-import { AppearanceSettings } from "./AppearanceSettings";
-import { NotificationSettings } from "./NotificationSettings";
-import { SecuritySettings } from "./SecuritySettings";
+
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MainLayout } from "@/components/shared/MainLayout";
+import type { Profile } from "@/types/database";
+
+type Settings = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  avatarUrl: string | null;
+  jobTitle: string;
+  calendarNotificationTime: number | null;
+};
 
 export const Settings = () => {
-  // User Information
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("john.doe@example.com");
-  const [phone, setPhone] = useState("+1 234 567 8900");
-  const [bio, setBio] = useState("Software Engineer passionate about building great products.");
-  const [timezone, setTimezone] = useState("utc");
-  const [language, setLanguage] = useState("en");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [settings, setSettings] = useState<Settings | null>(null);
 
-  // Appearance Settings - set darkMode to false by default
-  const [darkMode, setDarkMode] = useState(false);
-  const [compactMode, setCompactMode] = useState(false);
-  const [fontSize, setFontSize] = useState("medium");
-  const [highContrast, setHighContrast] = useState(false);
+  const [notificationSettings, setNotificationSettings] = useState({
+    emailNotifications: false,
+    desktopNotifications: false,
+    darkMode: false,
+  });
 
-  // Notification Settings
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [emailUpdates, setEmailUpdates] = useState(true);
-  const [weeklyDigest, setWeeklyDigest] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [desktopAlerts, setDesktopAlerts] = useState(true);
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-  // Security Settings
-  const [twoFactorAuth, setTwoFactorAuth] = useState(false);
-  const [sessionTimeout, setSessionTimeout] = useState(false);
-  const [loginAlerts, setLoginAlerts] = useState(true);
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
 
-  const { toast } = useToast();
+        if (error) throw error;
 
-  const handleSave = (section: string) => {
-    toast({
-      title: `${section} settings saved`,
-      description: "Your preferences have been updated successfully.",
-    });
+        setSettings({
+          firstName: profile?.first_name || '',
+          lastName: profile?.last_name || '',
+          email: user.email || '',
+          avatarUrl: profile?.avatar_url || null,
+          jobTitle: profile?.job_title || '',
+          calendarNotificationTime: profile?.calendar_notification_time || null,
+        });
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+        toast.error("Failed to load settings");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  const handleSave = async () => {
+    if (!settings) return;
+
+    try {
+      setSaving(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          first_name: settings.firstName,
+          last_name: settings.lastName,
+          job_title: settings.jobTitle,
+          calendar_notification_time: settings.calendarNotificationTime,
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      toast.success("Settings updated successfully");
+    } catch (error) {
+      console.error('Error updating settings:', error);
+      toast.error("Failed to update settings");
+    } finally {
+      setSaving(false);
+    }
   };
 
+  // Wrap the content with MainLayout to include the sidebar
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <div className="space-y-0.5">
-        <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
-        <p className="text-muted-foreground">
-          Manage your account settings and set your preferences.
-        </p>
+    <MainLayout>
+      <div className="space-y-6 p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Profile Settings</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                value={settings?.firstName || ''}
+                onChange={(e) => setSettings(prev => prev ? { ...prev, firstName: e.target.value } : null)}
+                placeholder="Your first name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                value={settings?.lastName || ''}
+                onChange={(e) => setSettings(prev => prev ? { ...prev, lastName: e.target.value } : null)}
+                placeholder="Your last name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="jobTitle">Job Title</Label>
+              <Input
+                id="jobTitle"
+                value={settings?.jobTitle || ''}
+                onChange={(e) => setSettings(prev => prev ? { ...prev, jobTitle: e.target.value } : null)}
+                placeholder="Your job title"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                value={settings?.email || ''}
+                disabled
+                className="bg-gray-50"
+              />
+            </div>
+            <Button onClick={handleSave} disabled={saving}>
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Notification Settings</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Email Notifications</Label>
+                <div className="text-sm text-muted-foreground">
+                  Receive email notifications for important updates
+                </div>
+              </div>
+              <Switch
+                checked={notificationSettings.emailNotifications}
+                onCheckedChange={(checked) =>
+                  setNotificationSettings(prev => ({ ...prev, emailNotifications: checked }))
+                }
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Desktop Notifications</Label>
+                <div className="text-sm text-muted-foreground">
+                  Show desktop notifications when you receive new messages
+                </div>
+              </div>
+              <Switch
+                checked={notificationSettings.desktopNotifications}
+                onCheckedChange={(checked) =>
+                  setNotificationSettings(prev => ({ ...prev, desktopNotifications: checked }))
+                }
+              />
+            </div>
+          </CardContent>
+        </Card>
       </div>
-
-      <Tabs defaultValue="account" className="w-full">
-        <TabsList className="w-full justify-start">
-          <TabsTrigger value="account" className="flex items-center gap-2">
-            <User className="w-4 h-4" />
-            Account
-          </TabsTrigger>
-          <TabsTrigger value="appearance" className="flex items-center gap-2">
-            <Moon className="w-4 h-4" />
-            Appearance
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
-            <Bell className="w-4 h-4" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Lock className="w-4 h-4" />
-            Security
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="account">
-          <AccountSettings
-            name={name}
-            setName={setName}
-            email={email}
-            setEmail={setEmail}
-            phone={phone}
-            setPhone={setPhone}
-            bio={bio}
-            setBio={setBio}
-            timezone={timezone}
-            setTimezone={setTimezone}
-            language={language}
-            setLanguage={setLanguage}
-            onSave={() => handleSave('Account')}
-          />
-        </TabsContent>
-
-        <TabsContent value="appearance">
-          <AppearanceSettings
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-            compactMode={compactMode}
-            setCompactMode={setCompactMode}
-            fontSize={fontSize}
-            setFontSize={setFontSize}
-            highContrast={highContrast}
-            setHighContrast={setHighContrast}
-            onSave={() => handleSave('Appearance')}
-          />
-        </TabsContent>
-
-        <TabsContent value="notifications">
-          <NotificationSettings
-            pushNotifications={pushNotifications}
-            setPushNotifications={setPushNotifications}
-            emailUpdates={emailUpdates}
-            setEmailUpdates={setEmailUpdates}
-            weeklyDigest={weeklyDigest}
-            setWeeklyDigest={setWeeklyDigest}
-            soundEnabled={soundEnabled}
-            setSoundEnabled={setSoundEnabled}
-            desktopAlerts={desktopAlerts}
-            setDesktopAlerts={setDesktopAlerts}
-            onSave={() => handleSave('Notification')}
-          />
-        </TabsContent>
-
-        <TabsContent value="security">
-          <SecuritySettings
-            twoFactorAuth={twoFactorAuth}
-            setTwoFactorAuth={setTwoFactorAuth}
-            sessionTimeout={sessionTimeout}
-            setSessionTimeout={setSessionTimeout}
-            loginAlerts={loginAlerts}
-            setLoginAlerts={setLoginAlerts}
-            onSave={() => handleSave('Security')}
-          />
-        </TabsContent>
-      </Tabs>
-    </div>
+    </MainLayout>
   );
 };
