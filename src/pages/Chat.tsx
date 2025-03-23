@@ -7,6 +7,7 @@ import { startMessageSimulation } from "@/utils/messageSimulator";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -83,26 +84,30 @@ const Chat = () => {
   };
 
   return (
-    <ChatLayout
-      searchQuery={searchQuery}
-      onSearchChange={setSearchQuery}
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-      conversations={filteredConversations}
-      selectedConversation={selectedConversation}
-      onSelectConversation={handleSelectConversation}
-      onCalendarActionClick={handleCalendarActionClick}
-      newMessage={newMessage}
-      onNewMessageChange={setNewMessage}
-      onSendMessage={handleSendMessage}
-      onEditMessage={handleEditMessage}
-      onDeleteMessage={handleDeleteMessage}
-      onReactToMessage={handleReaction}
-      calendarView={calendarView}
-      onLogout={handleLogout}
-      onLogoClick={handleLogoClick}
-      isMobile={isMobile}
-    />
+    <SidebarProvider>
+      <div className="min-h-screen flex flex-col w-full bg-background">
+        <ChatLayout
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          conversations={filteredConversations}
+          selectedConversation={selectedConversation}
+          onSelectConversation={handleSelectConversation}
+          onCalendarActionClick={handleCalendarActionClick}
+          newMessage={newMessage}
+          onNewMessageChange={setNewMessage}
+          onSendMessage={handleSendMessage}
+          onEditMessage={handleEditMessage}
+          onDeleteMessage={handleDeleteMessage}
+          onReactToMessage={handleReaction}
+          calendarView={calendarView}
+          onLogout={handleLogout}
+          onLogoClick={handleLogoClick}
+          isMobile={isMobile}
+        />
+      </div>
+    </SidebarProvider>
   );
 };
 

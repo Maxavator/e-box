@@ -16,7 +16,7 @@ import Chat from "@/pages/Chat";
 import AdminChat from "@/pages/AdminChat";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Create a client for routes that don't use MainLayout or ChatLayout
+// Create a global QueryClient
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
