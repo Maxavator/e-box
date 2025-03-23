@@ -129,7 +129,7 @@ export function AppSidebar() {
                       tooltip="Admin Portal" 
                       onClick={() => handleNavigation("/admin")}
                     >
-                      <LayoutDashboard className="h-4 w-4" />
+                      <Shield className="h-4 w-4" />
                       <span>Admin Portal</span>
                     </SidebarMenuButton>
                   </TooltipTrigger>
