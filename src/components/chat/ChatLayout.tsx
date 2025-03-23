@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Conversation } from "@/types/chat";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppSidebar } from "@/components/shared/AppSidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 // Create a client for components using ChatLayout
 const queryClient = new QueryClient({
