@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import {
   MessageSquare,
@@ -16,9 +15,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuBadge,
-  SidebarMenuSub,
-  SidebarMenuSubTrigger,
-  SidebarMenuSubContent,
 } from "@/components/ui/sidebar";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
@@ -57,63 +53,20 @@ export function MainNavigationMenu({
   
   return (
     <SidebarMenu>
-      {/* My Desk Dropdown Section - Moved above Chats */}
+      {/* My Desk as a direct button - No longer a dropdown */}
       <SidebarMenuItem>
-        <SidebarMenuSub>
-          <SidebarMenuSubTrigger
-            tooltip="My Desk"
-            onClick={() => handleNavigation("/mydesk")}
-          >
-            <Briefcase className="h-4 w-4" />
-            <span>My Desk {organizationName ? `@${organizationName}` : ''}</span>
-            {(documentsCount > 0 || leaveCount > 0) && (
-              <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-                {documentsCount + leaveCount}
-              </SidebarMenuBadge>
-            )}
-          </SidebarMenuSubTrigger>
-          <SidebarMenuSubContent>
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                tooltip="Documents" 
-                onClick={() => handleNavigation("/documents")}
-              >
-                <FileText className="h-4 w-4" />
-                <span>Documents</span>
-                {documentsCount > 0 && (
-                  <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-                    {documentsCount}
-                  </SidebarMenuBadge>
-                )}
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                tooltip="Leave Manager" 
-                onClick={() => handleNavigation("/leave")}
-              >
-                <Clock className="h-4 w-4" />
-                <span>Leave Manager</span>
-                {leaveCount > 0 && (
-                  <SidebarMenuBadge className="ml-auto bg-purple-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-                    {leaveCount}
-                  </SidebarMenuBadge>
-                )}
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                tooltip="Policies" 
-                onClick={() => handleNavigation("/policies")}
-              >
-                <Briefcase className="h-4 w-4" />
-                <span>Policies</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenuSubContent>
-        </SidebarMenuSub>
+        <SidebarMenuButton 
+          tooltip="My Desk"
+          onClick={() => handleNavigation("/mydesk")}
+        >
+          <Briefcase className="h-4 w-4" />
+          <span>My Desk {organizationName ? `@${organizationName}` : ''}</span>
+          {(documentsCount > 0 || leaveCount > 0) && (
+            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {documentsCount + leaveCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
       </SidebarMenuItem>
       
       <SidebarMenuItem>
