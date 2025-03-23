@@ -29,14 +29,14 @@ export function AdminStatusIndicator() {
   if (hasAdminAccess) {
     return (
       <Badge variant="default" className="bg-green-600 hover:bg-green-700">
-        Admin {userRole === 'global_admin' ? '(Global)' : userRole === 'org_admin' ? '(Chief Information Officer)' : ''}
+        {userRole === 'global_admin' ? 'Global Admin' : userRole === 'org_admin' ? 'Organization Admin' : 'Admin'}
       </Badge>
     );
   }
   
   return (
     <Badge variant="outline">
-      Org_Admin
+      User
     </Badge>
   );
 }

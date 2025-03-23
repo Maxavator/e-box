@@ -1,5 +1,5 @@
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   MessageSquare,
   FileText,
@@ -38,11 +38,11 @@ export function MainNavigationMenu({
   resetBadgeCount,
 }: MainNavigationMenuProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { organizationName } = useUserProfile();
   const { isAdmin, userRole } = useUserRole();
   
   // Consider a user to have admin access if they are either global_admin or org_admin
-  // or if they are Thabo Nkosi (special case handled in useUserRole hook)
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
   const handleNavigation = (path: string) => {
@@ -109,7 +109,7 @@ export function MainNavigationMenu({
           <SidebarMenuButton 
             tooltip="Admin Portal" 
             onClick={() => handleNavigation("/admin")}
-            isActive={location.pathname === '/admin'}
+            isActive={location.pathname.startsWith('/admin')}
           >
             <Shield className="h-4 w-4" />
             <span>Admin Portal</span>
