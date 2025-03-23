@@ -8,6 +8,17 @@ import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// Create a client for the Chat page
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -84,30 +95,32 @@ const Chat = () => {
   };
 
   return (
-    <SidebarProvider>
-      <div className="flex flex-col min-h-screen w-full">
-        <ChatLayout
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          conversations={filteredConversations}
-          selectedConversation={selectedConversation}
-          onSelectConversation={handleSelectConversation}
-          onCalendarActionClick={handleCalendarActionClick}
-          newMessage={newMessage}
-          onNewMessageChange={setNewMessage}
-          onSendMessage={handleSendMessage}
-          onEditMessage={handleEditMessage}
-          onDeleteMessage={handleDeleteMessage}
-          onReactToMessage={handleReaction}
-          calendarView={calendarView}
-          onLogout={handleLogout}
-          onLogoClick={handleLogoClick}
-          isMobile={isMobile}
-        />
-      </div>
-    </SidebarProvider>
+    <QueryClientProvider client={queryClient}>
+      <SidebarProvider>
+        <div className="flex flex-col min-h-screen w-full">
+          <ChatLayout
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            conversations={filteredConversations}
+            selectedConversation={selectedConversation}
+            onSelectConversation={handleSelectConversation}
+            onCalendarActionClick={handleCalendarActionClick}
+            newMessage={newMessage}
+            onNewMessageChange={setNewMessage}
+            onSendMessage={handleSendMessage}
+            onEditMessage={handleEditMessage}
+            onDeleteMessage={handleDeleteMessage}
+            onReactToMessage={handleReaction}
+            calendarView={calendarView}
+            onLogout={handleLogout}
+            onLogoClick={handleLogoClick}
+            isMobile={isMobile}
+          />
+        </div>
+      </SidebarProvider>
+    </QueryClientProvider>
   );
 }
 

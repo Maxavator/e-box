@@ -48,7 +48,7 @@ export const useUserRole = () => {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
         if (authError || !user) {
           console.log('Authentication error or no user found:', authError);
-          return null;
+          return 'user' as UserRoleType; // Return a default role instead of null
         }
 
         console.log('User authenticated, fetching role for user ID:', user.id);
@@ -60,7 +60,7 @@ export const useUserRole = () => {
 
         if (error) {
           console.error('Error fetching user role:', error);
-          throw error;
+          return 'user' as UserRoleType; // Return a default role instead of throwing
         }
         
         // If no role is found, return 'user' as default role
@@ -73,7 +73,7 @@ export const useUserRole = () => {
         return data.role as UserRoleType;
       } catch (error) {
         console.error('Failed to fetch user role:', error);
-        return null;
+        return 'user' as UserRoleType; // Return a default role instead of null
       }
     },
     retry: 2,
@@ -88,8 +88,8 @@ export const useUserRole = () => {
   }
 
   return { 
-    isAdmin, 
-    userRole, 
+    isAdmin: isAdmin || false, 
+    userRole: userRole || 'user', 
     isLoading, 
     error 
   };
