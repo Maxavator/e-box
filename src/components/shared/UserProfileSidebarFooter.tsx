@@ -1,11 +1,12 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import { UserInfo } from "@/components/user/UserInfo";
 
 export function UserProfileSidebarFooter() {
   const navigate = useNavigate();
@@ -25,10 +26,23 @@ export function UserProfileSidebarFooter() {
     queryFn: async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('first_name, last_name, avatar_url, job_title')
+        .select('first_name, last_name, avatar_url, job_title, email')
         .eq('id', session!.user.id)
         .single();
       return data;
+    },
+  });
+
+  const { data: userRole } = useQuery({
+    queryKey: ['userRole', session?.user?.id],
+    enabled: !!session?.user?.id,
+    queryFn: async () => {
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session!.user.id)
+        .single();
+      return roleData?.role;
     },
   });
 
@@ -42,33 +56,68 @@ export function UserProfileSidebarFooter() {
     }
   };
 
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
+
   if (!profile) return null;
 
   const initials = `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}`;
   const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`;
   const jobTitle = profile.job_title || 'Employee';
+  const isAdmin = userRole === 'org_admin' || userRole === 'global_admin';
 
   return (
-    <div className="flex items-center justify-between p-3 border-t">
-      <div className="flex items-center gap-3">
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={profile.avatar_url || ''} alt={fullName} />
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col">
-          <span className="text-sm font-medium">{fullName}</span>
-          <span className="text-xs text-muted-foreground">{jobTitle}</span>
+    <div className="flex flex-col p-3 border-t">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={profile.avatar_url || ''} alt={fullName} />
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">{fullName}</span>
+            <span className="text-xs text-muted-foreground">{jobTitle}</span>
+          </div>
         </div>
+        
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={handleLogout}
+          className="h-8 w-8"
+        >
+          <LogOut className="h-4 w-4" />
+        </Button>
       </div>
       
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        onClick={handleLogout}
-        className="h-8 w-8"
-      >
-        <LogOut className="h-4 w-4" />
-      </Button>
+      <div className="flex items-center gap-2 mt-1">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleProfileClick}
+          className="flex items-center gap-1 text-xs flex-1 h-8"
+        >
+          <Settings className="h-3 w-3" />
+          <span>Settings</span>
+        </Button>
+        
+        {isAdmin && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate("/admin")}
+            className="flex items-center gap-1 text-xs flex-1 h-8"
+          >
+            <Mail className="h-3 w-3" />
+            <span>Admin</span>
+          </Button>
+        )}
+      </div>
+      
+      <div className="mt-2">
+        <UserInfo />
+      </div>
     </div>
   );
 }

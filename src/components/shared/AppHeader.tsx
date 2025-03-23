@@ -1,10 +1,7 @@
 
-import { useEffect, useState } from "react";
-import { UserProfile } from "@/components/user/UserProfile";
-import { supabase } from "@/integrations/supabase/client";
-import { UserInfo } from "@/components/user/UserInfo";
 import { AdminMenu } from "@/components/admin/AdminMenu";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AppHeaderProps {
   onLogout: () => void;
@@ -49,11 +46,9 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
             className="h-8"
           />
         </button>
-        {session && <UserInfo />}
       </div>
       <div className="flex items-center gap-4">
         {isAdmin && <AdminMenu />}
-        {session && <UserProfile onLogout={onLogout} />}
       </div>
     </header>
   );
