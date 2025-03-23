@@ -1,4 +1,3 @@
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { LogOut, Mail, Info, Building2 } from "lucide-react";
@@ -21,7 +20,6 @@ import { Badge } from "@/components/ui/badge";
 
 export function UserProfileSidebarFooter() {
   const navigate = useNavigate();
-  // Use the useUserRole hook to get role information
   const { userRole, isAdmin } = useUserRole();
 
   const { data: session } = useQuery({
@@ -89,13 +87,11 @@ export function UserProfileSidebarFooter() {
     );
   }
 
-  // Get user display name from profile, using "User" as fallback
   const initials = profile ? `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}` : 'U';
   const fullName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'User';
   const jobTitle = profile?.job_title || 'Employee';
   const orgName = organization?.name;
 
-  // User role display text
   const roleDisplayText = 
     userRole === 'global_admin' ? 'Global Admin' : 
     userRole === 'org_admin' ? 'Organization Admin' : 
@@ -105,7 +101,6 @@ export function UserProfileSidebarFooter() {
 
   return (
     <div className="flex flex-col p-3 w-full">
-      {/* User profile info */}
       <div className="flex items-center gap-3 mb-3">
         <Avatar className="h-10 w-10">
           <AvatarImage src={profile?.avatar_url || ''} alt={fullName} />
@@ -117,9 +112,7 @@ export function UserProfileSidebarFooter() {
         </div>
       </div>
       
-      {/* Requested Format: System Role | Online Status | Logout */}
       <div className="flex items-center justify-between mb-3 border border-border/30 rounded-md p-2">
-        {/* System Role */}
         <Badge 
           variant={userRole === 'global_admin' || userRole === 'org_admin' ? "default" : "outline"}
           className={`text-xs ${userRole === 'global_admin' || userRole === 'org_admin' ? 'bg-green-600 hover:bg-green-700' : ''}`}
@@ -127,16 +120,12 @@ export function UserProfileSidebarFooter() {
           {roleDisplayText}
         </Badge>
         
-        {/* Separator */}
         <span className="text-muted-foreground">|</span>
         
-        {/* Online Status */}
         <OnlineStatus />
         
-        {/* Separator */}
         <span className="text-muted-foreground">|</span>
         
-        {/* Logout Button */}
         <Button 
           variant="ghost" 
           size="sm" 
@@ -169,13 +158,7 @@ export function UserProfileSidebarFooter() {
         )}
       </div>
       
-      <div className="mt-2 border-t border-muted/20 pt-2">
-        <div className="flex items-center justify-end">
-          <ThemeToggle />
-        </div>
-      </div>
-      
-      <div className="flex items-center justify-between mt-2 pt-2 border-t border-muted/20 text-xs text-muted-foreground">
+      <div className="flex items-center justify-between mt-auto pt-2 border-t border-muted/20 text-xs text-muted-foreground">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -205,18 +188,22 @@ export function UserProfileSidebarFooter() {
           </Tooltip>
         </TooltipProvider>
         
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
-                <Info className="h-3 w-3" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>© 2024 Afrovation</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <Info className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>© 2024 Afrovation</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
     </div>
   );
