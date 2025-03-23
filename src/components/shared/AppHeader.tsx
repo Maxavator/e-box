@@ -1,5 +1,4 @@
 
-import { AdminMenu } from "@/components/admin/AdminMenu";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -12,10 +11,6 @@ interface AppHeaderProps {
 export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Don't show admin menu on admin-related pages
-  const isAdminPage = location.pathname.includes('/admin') || 
-                       location.pathname.includes('/organization');
   
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -39,16 +34,13 @@ export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps) {
     },
   });
 
-  const isAdmin = userRole === 'org_admin' || userRole === 'global_admin';
-
   return (
     <header className="border-b bg-white p-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
         {/* Removed logo from header since it's already in the sidebar */}
       </div>
       <div className="flex items-center gap-4 max-w-7xl mx-auto w-full">
-        {/* Only show AdminMenu if user is admin and not on an admin page */}
-        {isAdmin && !isAdminPage && <AdminMenu />}
+        {/* Admin menu has been removed as requested */}
       </div>
     </header>
   );
