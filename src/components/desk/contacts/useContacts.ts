@@ -22,7 +22,21 @@ export const useContacts = () => {
         .eq('id', userData.user.id)
         .single();
 
-      const { data, error } = await supabase
+      if (!userProfile?.organization_id) {
+        return []; // Return empty array if user has no organization
+      }
+
+      // First, fetch all organization members to ensure we have all colleagues
+      const { data: orgMembers, error: orgMembersError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, organization_id')
+        .eq('organization_id', userProfile.organization_id)
+        .neq('id', userData.user.id); // Exclude current user
+
+      if (orgMembersError) throw orgMembersError;
+
+      // Then fetch user's explicit contacts
+      const { data: userContacts, error: contactsError } = await supabase
         .from('contacts')
         .select(`
           id,
@@ -39,24 +53,45 @@ export const useContacts = () => {
         `)
         .eq('user_id', userData.user.id);
 
-      if (error) throw error;
+      if (contactsError) throw contactsError;
       
-      return (data as any[]).map(item => {
-        // Check if contact belongs to the same organization
-        const isColleague = item.contact?.organization_id === userProfile?.organization_id && 
-                            userProfile?.organization_id !== null;
-        
-        return {
-          ...item,
-          is_colleague: isColleague,
-          contact: item.contact || {
-            id: item.contact_id,
+      // Convert to map for easy lookup
+      const contactsMap = new Map();
+      (userContacts as any[]).forEach(contact => {
+        contactsMap.set(contact.contact_id, {
+          ...contact,
+          is_colleague: contact.contact?.organization_id === userProfile.organization_id,
+          contact: contact.contact || {
+            id: contact.contact_id,
             first_name: null,
             last_name: null,
             organization_id: null
           }
-        };
-      }) as Contact[];
+        });
+      });
+      
+      // Add all organization members as colleagues if they're not already in contacts
+      orgMembers.forEach(member => {
+        if (!contactsMap.has(member.id)) {
+          // Create virtual contact entry for organization member
+          contactsMap.set(member.id, {
+            id: `org-${member.id}`, // Use prefix to create unique id
+            user_id: userData.user.id,
+            contact_id: member.id,
+            is_favorite: false,
+            is_colleague: true,
+            created_at: new Date().toISOString(),
+            contact: {
+              id: member.id,
+              first_name: member.first_name,
+              last_name: member.last_name,
+              organization_id: member.organization_id
+            }
+          });
+        }
+      });
+      
+      return Array.from(contactsMap.values()) as Contact[];
     },
     enabled: !loadingOrg
   });
@@ -66,13 +101,33 @@ export const useContacts = () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("Not authenticated");
 
-      const { error } = await supabase
+      // Check if contact exists
+      const { data: existingContact } = await supabase
         .from('contacts')
-        .update({ is_favorite: isFavorite })
+        .select('id')
         .eq('user_id', userData.user.id)
-        .eq('contact_id', contactId);
+        .eq('contact_id', contactId)
+        .single();
 
-      if (error) throw error;
+      if (existingContact) {
+        // Update existing contact
+        const { error } = await supabase
+          .from('contacts')
+          .update({ is_favorite: isFavorite })
+          .eq('user_id', userData.user.id)
+          .eq('contact_id', contactId);
+
+        if (error) throw error;
+      } else {
+        // Create new contact with favorite status
+        const { error } = await supabase
+          .from('contacts')
+          .insert([
+            { user_id: userData.user.id, contact_id: contactId, is_favorite: isFavorite }
+          ]);
+
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
