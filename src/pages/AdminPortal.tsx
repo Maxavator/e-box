@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { NavigationCards } from "@/components/admin/dashboard/NavigationCards";
@@ -11,7 +12,6 @@ import { toast } from "sonner";
 import { Link2, ShieldAlert, ArrowLeft } from "lucide-react";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { MainLayout } from "@/components/shared/MainLayout";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -78,69 +78,67 @@ const AdminPortal = () => {
   }
 
   return (
-    <MainLayout>
-      <div className="p-4 md:p-6 space-y-6 md:space-y-8">
-        <Card className="p-6 border-l-4 border-l-primary">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold">Admin Portal</h1>
-              <p className="text-muted-foreground">
-                {userRole === 'global_admin' 
-                  ? 'Manage all organizations, users, and system settings' 
-                  : 'Manage your organization settings and users'}
-              </p>
-            </div>
-            {activeView !== 'dashboard' && (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setActiveView('dashboard');
-                  navigate('/admin', { state: { view: 'dashboard' } });
-                }}
-                className="flex items-center gap-2 text-sm"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to Dashboard
-              </Button>
-            )}
+    <div className="p-4 md:p-6 space-y-6 md:space-y-8">
+      <Card className="p-6 border-l-4 border-l-primary">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Admin Portal</h1>
+            <p className="text-muted-foreground">
+              {userRole === 'global_admin' 
+                ? 'Manage all organizations, users, and system settings' 
+                : 'Manage your organization settings and users'}
+            </p>
           </div>
+          {activeView !== 'dashboard' && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setActiveView('dashboard');
+                navigate('/admin', { state: { view: 'dashboard' } });
+              }}
+              className="flex items-center gap-2 text-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Dashboard
+            </Button>
+          )}
+        </div>
+      </Card>
+
+      <Separator className="my-6" />
+
+      {activeView === 'dashboard' && (
+        <>
+          <NavigationCards 
+            activeView={activeView}
+            onViewChange={handleViewChange}
+          />
+          
+          <div className="grid gap-8 lg:grid-cols-2">
+            <StatsCards />
+            <LookupTools />
+          </div>
+        </>
+      )}
+
+      {activeView === 'users' && (
+        <Card className="p-6">
+          <UserManagement />
         </Card>
-
-        <Separator className="my-6" />
-
-        {activeView === 'dashboard' && (
-          <>
-            <NavigationCards 
-              activeView={activeView}
-              onViewChange={handleViewChange}
-            />
-            
-            <div className="grid gap-8 lg:grid-cols-2">
-              <StatsCards />
-              <LookupTools />
-            </div>
-          </>
-        )}
-
-        {activeView === 'users' && (
-          <Card className="p-6">
-            <UserManagement />
-          </Card>
-        )}
-        
-        {activeView === 'organizations' && (
-          <Card className="p-6">
-            <OrganizationManagement />
-          </Card>
-        )}
-        
-        {activeView === 'settings' && (
-          <Card className="p-6">
-            <SystemSettings />
-          </Card>
-        )}
-      </div>
-    </MainLayout>
+      )}
+      
+      {activeView === 'organizations' && (
+        <Card className="p-6">
+          <OrganizationManagement />
+        </Card>
+      )}
+      
+      {activeView === 'settings' && (
+        <Card className="p-6">
+          <SystemSettings />
+        </Card>
+      )}
+    </div>
   );
 };
 
