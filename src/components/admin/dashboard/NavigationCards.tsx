@@ -1,36 +1,52 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Users, Building2, Settings, Shield } from "lucide-react";
 
-interface NavigationCardsProps {
-  activeView: string;
-  onViewChange: (view: any) => void;
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Users, Building2, Settings, Shield, FileText, Server } from "lucide-react";
+
+// Define the possible views type to match AdminPortal.tsx
+export type AdminView = 'dashboard' | 'users' | 'organizations' | 'settings' | 'system' | 'reporting' | 'documentation';
+
+export interface NavigationCardsProps {
+  activeView: AdminView;
+  onNavigate: (view: AdminView) => void;
 }
 
-export const NavigationCards = ({ activeView, onViewChange }: NavigationCardsProps) => {
+export const NavigationCards = ({ activeView, onNavigate }: NavigationCardsProps) => {
   const cards = [
     {
       title: "User Management",
       description: "Manage users, roles, and permissions",
       icon: <Users className="h-6 w-6 text-primary" />,
-      view: "users",
+      view: "users" as AdminView,
     },
     {
       title: "Organizations",
       description: "Manage organizations and departments",
       icon: <Building2 className="h-6 w-6 text-primary" />,
-      view: "organizations",
+      view: "organizations" as AdminView,
     },
     {
       title: "System Settings",
       description: "Configure system-wide settings",
       icon: <Settings className="h-6 w-6 text-primary" />,
-      view: "settings",
+      view: "system" as AdminView,
     },
+    {
+      title: "Reporting",
+      description: "View system reports and analytics",
+      icon: <FileText className="h-6 w-6 text-primary" />,
+      view: "reporting" as AdminView,
+    },
+    {
+      title: "Documentation",
+      description: "Access system documentation",
+      icon: <Server className="h-6 w-6 text-primary" />,
+      view: "documentation" as AdminView,
+    }
   ];
 
   return (
-    <>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {cards.map((card) => (
         <Card
           key={card.title}
@@ -39,7 +55,7 @@ export const NavigationCards = ({ activeView, onViewChange }: NavigationCardsPro
               ? "border-2 border-primary"
               : "border-2 border-transparent"
           }`}
-          onClick={() => onViewChange(card.view)}
+          onClick={() => onNavigate(card.view)}
         >
           <div className="flex flex-col h-full">
             <div className="rounded-full w-12 h-12 flex items-center justify-center bg-primary/10 mb-4">
@@ -55,6 +71,6 @@ export const NavigationCards = ({ activeView, onViewChange }: NavigationCardsPro
           </div>
         </Card>
       ))}
-    </>
+    </div>
   );
 };

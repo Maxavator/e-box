@@ -1,10 +1,14 @@
 
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useSession } from "@supabase/auth-helpers-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { AuthenticationDialog } from "./AuthenticationDialog";
 
-export const ProtectedRoute = () => {
+interface ProtectedRouteProps {
+  children: ReactNode;
+}
+
+export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const session = useSession();
   const location = useLocation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -18,9 +22,9 @@ export const ProtectedRoute = () => {
     }
   }, [session]);
 
-  // If the user is authenticated, render the child routes
+  // If the user is authenticated, render the children
   if (session) {
-    return <Outlet />;
+    return <>{children}</>;
   }
 
   // If not authenticated, render the auth dialog along with a blank outlet

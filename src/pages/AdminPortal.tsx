@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { NavigationCards } from '@/components/admin/dashboard/NavigationCards';
+import { NavigationCards, AdminView } from '@/components/admin/dashboard/NavigationCards';
 import { StatsCards } from '@/components/admin/dashboard/StatsCards';
 import { AdminMenu } from '@/components/admin/AdminMenu';
 import { UserTable } from '@/components/admin/UserTable';
@@ -14,11 +14,8 @@ import { SystemInfo } from '@/components/admin/SystemInfo';
 import { DocumentationPortal } from '@/components/admin/documentation/DocumentationPortal';
 import { SalesKit } from '@/components/admin/documentation/SalesKit';
 
-// Define all possible view types for type safety
-type ActiveView = 'dashboard' | 'users' | 'organizations' | 'settings' | 'system' | 'reporting' | 'documentation';
-
 export default function AdminPortal() {
-  const [activeView, setActiveView] = useState<ActiveView>('dashboard');
+  const [activeView, setActiveView] = useState<AdminView>('dashboard');
   const [activeTab, setActiveTab] = useState('overview');
   const [docTab, setDocTab] = useState<'documentation' | 'saleskit'>('documentation');
 
@@ -41,7 +38,7 @@ export default function AdminPortal() {
 
         <TabsContent value="overview" className="space-y-6">
           <StatsCards />
-          <NavigationCards onNavigate={setActiveView} />
+          <NavigationCards activeView={activeView} onNavigate={setActiveView} />
         </TabsContent>
 
         <TabsContent value="tools" className="space-y-6">
@@ -70,7 +67,13 @@ export default function AdminPortal() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          <UserTable />
+          {/* Mock props for UserTable until we connect to real data */}
+          <UserTable 
+            users={[]} 
+            isLoading={false} 
+            onEditUser={() => {}} 
+            isAdmin={true} 
+          />
         </CardContent>
       </Card>
     </div>
@@ -175,7 +178,7 @@ export default function AdminPortal() {
     <div className="container max-w-7xl mx-auto p-4 md:p-8 pb-16">
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-64 flex-shrink-0">
-          <AdminMenu activeView={activeView} setActiveView={setActiveView} />
+          <AdminMenu activeView={activeView as string} setActiveView={setActiveView} />
         </div>
         <div className="flex-1 min-w-0">
           {renderContent()}
