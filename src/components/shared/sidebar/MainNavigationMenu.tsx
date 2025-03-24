@@ -18,18 +18,13 @@ import {
   Users
 } from "lucide-react";
 import { useSidebarBadges } from "@/hooks/useSidebarBadges";
-import { SidebarMenu } from "@/components/ui/sidebar/menu/sidebar-menu";
-import { SidebarMenuButton } from "@/components/ui/sidebar/menu/sidebar-menu-button";
-import { SidebarMenuBadge } from "@/components/ui/sidebar/menu/sidebar-menu-badge";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuBadge } from "@/components/ui/sidebar/menu/sidebar-menu";
 
 export default function MainNavigationMenu() {
   const location = useLocation();
   const pathname = location.pathname;
   const { isAdmin, userRole } = useUserRole();
-  const { chatCount, documentsCount } = useSidebarBadges();
-  
-  // Mock flaggedItems if it doesn't exist in the hook
-  const flaggedItems = 0;
+  const { chatCount, documentsCount, flaggedItems } = useSidebarBadges();
   
   const isModerator = 
     userRole === 'hr_moderator' || 
