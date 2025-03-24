@@ -40,8 +40,8 @@ const Index = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background animate-fadeIn">
         <img 
-          src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
-          alt="Logo" 
+          src="/lovable-uploads/dbb30299-d801-4939-9dd4-ef26c4cc55cd.png" 
+          alt="e-Box Logo" 
           className="h-16 mb-8 animate-pulse"
         />
         <div className="flex items-center gap-3">
@@ -56,9 +56,9 @@ const Index = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-background animate-fadeIn">
       <div className="text-center space-y-6 p-8">
         <img 
-          src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
-          alt="Logo" 
-          className="h-16 mx-auto mb-8 hover:scale-105 transition-transform"
+          src="/lovable-uploads/dbb30299-d801-4939-9dd4-ef26c4cc55cd.png" 
+          alt="e-Box Logo" 
+          className="h-20 mx-auto mb-8 hover:scale-105 transition-transform"
         />
         <h1 className="text-4xl font-bold mb-4 animate-fadeIn">Welcome to e-Box</h1>
         <p className="text-xl text-muted-foreground max-w-md mx-auto animate-fadeIn delay-100">

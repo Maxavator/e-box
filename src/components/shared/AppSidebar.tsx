@@ -38,9 +38,9 @@ export function AppSidebar() {
           aria-label="Go to Dashboard"
         >
           <img 
-            src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
-            alt="e-Box by Afrovation" 
-            className="h-16 w-auto max-w-[90%]" 
+            src="/lovable-uploads/dbb30299-d801-4939-9dd4-ef26c4cc55cd.png" 
+            alt="e-Box" 
+            className="h-12 w-auto max-w-[90%]" 
           />
         </button>
       </SidebarHeader>

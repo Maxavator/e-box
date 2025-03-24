@@ -42,7 +42,7 @@ const Auth = () => {
         <div className="w-full max-w-sm mx-auto">
           <div className="flex flex-col items-center mb-8">
             <img 
-              src="/lovable-uploads/81af9ad8-b07d-41cb-b800-92cebc70e699.png" 
+              src="/lovable-uploads/dbb30299-d801-4939-9dd4-ef26c4cc55cd.png" 
               alt="e-Box Logo" 
               className="h-16 mb-4"
             />
