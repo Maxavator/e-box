@@ -1,184 +1,174 @@
 
-import { useState } from 'react';
-import { Group } from '@/types/chat';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAdminStatus } from './useAdminStatus';
-import { useAuthSession } from './useAuthSession';
+import { useAdminStatus } from "./useAdminStatus";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Group } from "../types";
+import { Session } from "@supabase/supabase-js";
 
-export function useGroupManagement() {
-  const { isAdmin } = useAdminStatus();
-  const { session } = useAuthSession();
-  
+export interface GroupMember {
+  id: string;
+  user_id: string;
+  group_id: string;
+  role: string;
+  profiles: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    avatar_url: string;
+  }[];
+}
+
+export const useGroupManagement = () => {
+  const { isAdmin, session } = useAdminStatus();
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
-  const [isEditingGroup, setIsEditingGroup] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-  
+  const [isEditingGroup, setIsEditingGroup] = useState<string | null>(null);
   const queryClient = useQueryClient();
-  
-  // Fetch groups
-  const { 
-    data: groups = [], 
-    isLoading: isLoadingGroups 
+
+  // Get organization id from user profile
+  const organizationId = session?.user?.user_metadata?.organization_id;
+
+  // Fetch all groups for the organization
+  const {
+    data: groups = [],
+    isLoading: isLoadingGroups,
+    error: groupsError,
   } = useQuery({
-    queryKey: ['groups'],
+    queryKey: ["groups", organizationId],
     queryFn: async () => {
+      if (!organizationId) return [];
+
       const { data, error } = await supabase
-        .from('groups')
-        .select('*')
-        .order('name');
-      
+        .from("groups")
+        .select("*")
+        .eq("organization_id", organizationId);
+
       if (error) throw error;
+
       return data as Group[];
     },
+    enabled: !!organizationId && isAdmin,
   });
-  
-  // Fetch group members
-  const { 
+
+  // Fetch all group members
+  const {
     data: members = [],
-    isLoading: isLoadingMembers
+    isLoading: isLoadingMembers,
+    error: membersError,
   } = useQuery({
-    queryKey: ['groupMembers'],
+    queryKey: ["group_members", organizationId],
     queryFn: async () => {
+      if (!organizationId) return [];
+
       const { data, error } = await supabase
-        .from('group_members')
-        .select(`
-          id,
-          user_id,
-          group_id,
-          role,
-          profiles:user_id (
-            id,
-            first_name,
-            last_name,
-            avatar_url
-          )
-        `);
-      
+        .from("group_members")
+        .select(
+          "*, profiles:user_id(id, first_name, last_name, avatar_url)"
+        )
+        .eq("organizations.id", organizationId);
+
       if (error) throw error;
-      return data;
+
+      return data as GroupMember[];
     },
+    enabled: !!organizationId && isAdmin,
   });
-  
-  // Create group mutation
-  const createMutation = useMutation({
-    mutationFn: async (newGroup: Omit<Group, 'id' | 'memberCount'>) => {
-      const groupWithDates = {
-        ...newGroup,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      
+
+  // Create a new group
+  const createGroupMutation = useMutation({
+    mutationFn: async (newGroup: Omit<Group, "id" | "memberCount" | "createdAt" | "updatedAt">) => {
       const { data, error } = await supabase
-        .from('groups')
-        .insert(groupWithDates)
+        .from("groups")
+        .insert({
+          name: newGroup.name,
+          description: newGroup.description,
+          is_public: newGroup.isPublic,
+          organization_id: newGroup.organizationId,
+          created_by: newGroup.createdBy,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      toast.success("Group created successfully");
+      setIsCreatingGroup(false);
     },
-    onError: (error: any) => {
-      toast.error(`Failed to create group: ${error.message}`);
-    }
+    onError: (error) => {
+      console.error("Error creating group:", error);
+      toast.error("Failed to create group");
+    },
   });
-  
-  // Update group mutation
-  const updateMutation = useMutation({
+
+  // Update an existing group
+  const updateGroupMutation = useMutation({
     mutationFn: async (updatedGroup: Partial<Group> & { id: string }) => {
-      const { id, ...rest } = updatedGroup;
-      
-      // Add updated timestamp
-      const updateData = {
-        ...rest,
-        updatedAt: new Date().toISOString()
-      };
-      
       const { data, error } = await supabase
-        .from('groups')
-        .update(updateData)
-        .eq('id', id)
+        .from("groups")
+        .update({
+          name: updatedGroup.name,
+          description: updatedGroup.description,
+          is_public: updatedGroup.isPublic,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", updatedGroup.id)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      toast.success("Group updated successfully");
+      setIsEditingGroup(null);
     },
-    onError: (error: any) => {
-      toast.error(`Failed to update group: ${error.message}`);
-    }
+    onError: (error) => {
+      console.error("Error updating group:", error);
+      toast.error("Failed to update group");
+    },
   });
-  
-  // Delete group mutation
-  const deleteMutation = useMutation({
+
+  // Delete a group
+  const deleteGroupMutation = useMutation({
     mutationFn: async (groupId: string) => {
-      setIsDeleting(true);
       const { error } = await supabase
-        .from('groups')
+        .from("groups")
         .delete()
-        .eq('id', groupId);
-      
+        .eq("id", groupId);
+
       if (error) throw error;
       return groupId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
-      setIsDeleting(false);
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      toast.success("Group deleted successfully");
     },
-    onError: (error: any) => {
-      setIsDeleting(false);
-      toast.error(`Failed to delete group: ${error.message}`);
-    }
+    onError: (error) => {
+      console.error("Error deleting group:", error);
+      toast.error("Failed to delete group");
+    },
   });
-  
-  const createGroup = async (newGroup: Omit<Group, 'id' | 'memberCount'>) => {
-    return createMutation.mutateAsync(newGroup);
-  };
-  
-  const updateGroup = async (updatedGroup: Partial<Group> & { id: string }) => {
-    return updateMutation.mutateAsync(updatedGroup);
-  };
-  
-  const deleteGroup = async (groupId: string) => {
-    return deleteMutation.mutateAsync(groupId);
-  };
-  
-  // Create helper functions for the component to use
-  const handleCreateGroup = (groupData: {
-    name: string;
-    description: string;
-    isPublic: boolean;
-    organizationId: string;
-    createdBy: string;
-  }) => {
-    return createGroup({
-      name: groupData.name,
-      description: groupData.description,
-      isPublic: groupData.isPublic,
-      organizationId: groupData.organizationId,
-      createdBy: groupData.createdBy,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    });
+
+  // Handler functions
+  const handleCreateGroup = (newGroup: Omit<Group, "id" | "memberCount" | "createdAt" | "updatedAt">) => {
+    return createGroupMutation.mutateAsync(newGroup);
   };
 
-  const handleUpdateGroup = (groupData: Partial<Group> & { id: string }) => {
-    return updateGroup(groupData);
+  const handleUpdateGroup = (updatedGroup: Partial<Group> & { id: string }) => {
+    return updateGroupMutation.mutateAsync(updatedGroup);
   };
 
   const handleDeleteGroup = (groupId: string) => {
-    return deleteGroup(groupId);
+    return deleteGroupMutation.mutateAsync(groupId);
   };
-  
+
   return {
     isAdmin,
     session,
@@ -190,16 +180,11 @@ export function useGroupManagement() {
     setIsCreatingGroup,
     isEditingGroup,
     setIsEditingGroup,
-    selectedGroup,
-    setSelectedGroup,
-    confirmDelete,
-    setConfirmDelete,
-    createGroup,
-    updateGroup,
-    deleteGroup,
-    isDeleting,
+    isCreating: createGroupMutation.isPending,
+    isUpdating: updateGroupMutation.isPending,
+    isDeleting: deleteGroupMutation.isPending,
     handleCreateGroup,
     handleUpdateGroup,
     handleDeleteGroup
   };
-}
+};
