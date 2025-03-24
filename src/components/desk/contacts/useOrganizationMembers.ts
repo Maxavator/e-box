@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-type OrganizationMember = {
+export type OrganizationMember = {
   id: string;
   first_name: string | null;
   last_name: string | null;
@@ -13,14 +13,23 @@ export const useOrganizationMembers = () => {
   const { data: organizationMembers = [], isLoading: isLoadingMembers } = useQuery({
     queryKey: ['organization-members'],
     queryFn: async () => {
+      console.log("Fetching organization members...");
+      
       const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) throw new Error("Not authenticated");
+      if (!userData.user) {
+        console.error("Not authenticated");
+        throw new Error("Not authenticated");
+      }
 
-      const { data: userProfile } = await supabase
+      const { data: userProfile, error: profileError } = await supabase
         .from('profiles')
         .select('organization_id')
         .eq('id', userData.user.id)
         .maybeSingle();
+      
+      if (profileError) {
+        console.error("Error fetching user profile:", profileError);
+      }
 
       if (!userProfile?.organization_id) {
         console.log("No organization found for user");
@@ -29,7 +38,7 @@ export const useOrganizationMembers = () => {
 
       console.log("Fetching members for organization:", userProfile.organization_id);
       
-      // Include the current user in the results
+      // Fetch all members in the organization
       const { data, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, organization_id')
@@ -41,12 +50,14 @@ export const useOrganizationMembers = () => {
       }
       
       console.log("Found organization members:", data?.length);
+      console.log("Organization members:", data);
+      
       return data as OrganizationMember[];
     }
   });
 
   return {
-    organizationMembers,
+    organizationMembers: organizationMembers || [],
     isLoadingMembers
   };
 };
