@@ -77,16 +77,18 @@ export function useOrganizationMembers() {
         }
         
         // Create a map of user IDs to roles
-        const rolesMap = {};
+        const rolesMap: Record<string, string> = {};
         rolesData?.forEach(roleData => {
           rolesMap[roleData.user_id] = roleData.role;
         });
         
         // Create a map of user IDs to emails
-        const emailsMap = {};
-        usersData?.users?.forEach(userData => {
-          emailsMap[userData.id] = userData.email;
-        });
+        const emailsMap: Record<string, string> = {};
+        if (usersData?.users) {
+          usersData.users.forEach(userData => {
+            emailsMap[userData.id] = userData.email;
+          });
+        }
         
         // Combine the data
         const organizationMembers = profilesData.map(profile => ({

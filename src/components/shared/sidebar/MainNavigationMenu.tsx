@@ -1,6 +1,8 @@
 
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
-import { SidebarMenu, SidebarMenuBadge, SidebarMenuButton } from "@/components/ui/sidebar/menu/sidebar-menu";
+import { SidebarMenu } from "@/components/ui/sidebar/menu/sidebar-menu";
+import { SidebarMenuButton } from "@/components/ui/sidebar/menu/sidebar-menu-button";
+import { SidebarMenuBadge } from "@/components/ui/sidebar/menu/sidebar-menu-badge";
 import {
   BookOpen,
   BookText,
@@ -24,7 +26,15 @@ export default function MainNavigationMenu() {
   const location = useLocation();
   const pathname = location.pathname;
   const { isAdmin, userRole } = useUserRole();
-  const { unreadCount, flaggedItems } = useSidebarBadges();
+  const { 
+    chatCount, 
+    documentsCount, 
+    calendarCount, 
+    contactsCount, 
+    leaveCount, 
+    resetBadgeCount,
+    flaggedItems 
+  } = useSidebarBadges();
   
   const isModerator = 
     userRole === 'hr_moderator' || 
@@ -54,6 +64,11 @@ export default function MainNavigationMenu() {
         <Link to="/documents" className={pathname === "/documents" ? "active" : ""}>
           <FileText className="h-4 w-4 mr-2" />
           Documents
+          {documentsCount > 0 && (
+            <SidebarMenuBadge>
+              {documentsCount}
+            </SidebarMenuBadge>
+          )}
         </Link>
       </SidebarMenuButton>
       
@@ -61,6 +76,11 @@ export default function MainNavigationMenu() {
         <Link to="/calendar" className={pathname === "/calendar" ? "active" : ""}>
           <Calendar className="h-4 w-4 mr-2" />
           Calendar
+          {calendarCount > 0 && (
+            <SidebarMenuBadge>
+              {calendarCount}
+            </SidebarMenuBadge>
+          )}
         </Link>
       </SidebarMenuButton>
       
@@ -68,6 +88,11 @@ export default function MainNavigationMenu() {
         <Link to="/contacts" className={pathname === "/contacts" ? "active" : ""}>
           <Users className="h-4 w-4 mr-2" />
           Contacts
+          {contactsCount > 0 && (
+            <SidebarMenuBadge>
+              {contactsCount}
+            </SidebarMenuBadge>
+          )}
         </Link>
       </SidebarMenuButton>
       
@@ -123,9 +148,9 @@ export default function MainNavigationMenu() {
         <Link to="/chat" className={pathname === "/chat" ? "active" : ""}>
           <MessageSquare className="h-4 w-4 mr-2" />
           Messages
-          {unreadCount > 0 && (
+          {chatCount > 0 && (
             <SidebarMenuBadge>
-              {unreadCount}
+              {chatCount}
             </SidebarMenuBadge>
           )}
         </Link>

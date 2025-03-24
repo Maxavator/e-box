@@ -9,6 +9,7 @@ export function useSidebarBadges() {
   const [calendarCount, setCalendarCount] = useState(0);
   const [contactsCount, setContactsCount] = useState(0);
   const [leaveCount, setLeaveCount] = useState(0);
+  const [flaggedItems, setFlaggedItems] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,6 +37,7 @@ export function useSidebarBadges() {
           setCalendarCount(Math.floor(Math.random() * 3));
           setContactsCount(Math.floor(Math.random() * 4));
           setLeaveCount(Math.floor(Math.random() * 2));
+          setFlaggedItems(Math.floor(Math.random() * 3)); // Set random flagged items
           
           // Set up realtime subscriptions for new messages
           const channel = supabase
@@ -58,6 +60,9 @@ export function useSidebarBadges() {
             })
             .on('broadcast', { event: 'new-leave' }, payload => {
               setLeaveCount(prev => prev + 1);
+            })
+            .on('broadcast', { event: 'new-flagged-item' }, payload => {
+              setFlaggedItems(prev => prev + 1);
             })
             .subscribe();
             
@@ -100,6 +105,7 @@ export function useSidebarBadges() {
     calendarCount,
     contactsCount,
     leaveCount,
+    flaggedItems,
     resetBadgeCount
   };
 }
