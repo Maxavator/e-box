@@ -108,46 +108,16 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* GovZA section with submenu */}
+      {/* GovZA as a root item instead of submenu */}
       <SidebarMenuItem>
-        <SidebarMenuSub>
-          <SidebarMenuSubTrigger
-            tooltip="GovZA"
-            isActive={location.pathname.includes('/govza')}
-          >
-            <Building2 className="h-4 w-4" />
-            <span>GovZA</span>
-          </SidebarMenuSubTrigger>
-          <SidebarMenuSubContent>
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                onClick={() => handleNavigation("/govza/post-office")}
-                isActive={location.pathname === "/govza/post-office"}
-              >
-                <Mail className="h-4 w-4" />
-                <span>Post Office</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                onClick={() => handleNavigation("/govza/sassa")}
-                isActive={location.pathname === "/govza/sassa"}
-              >
-                <HelpCircle className="h-4 w-4" />
-                <span>SASSA</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                onClick={() => handleNavigation("/govza/eskom")}
-                isActive={location.pathname === "/govza/eskom"}
-              >
-                <Zap className="h-4 w-4" />
-                <span>Eskom</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenuSubContent>
-        </SidebarMenuSub>
+        <SidebarMenuButton 
+          tooltip="GovZA" 
+          onClick={() => handleNavigation("/govza")}
+          isActive={location.pathname.includes('/govza')}
+        >
+          <Building2 className="h-4 w-4" />
+          <span>GovZA</span>
+        </SidebarMenuButton>
       </SidebarMenuItem>
       
       <SidebarMenuItem>
