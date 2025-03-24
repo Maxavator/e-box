@@ -27,7 +27,7 @@ export const DocumentTabs = ({
     legal: filterDocuments('Legal').length,
     other: documents.filter(doc => !['Financial', 'Legal'].includes(doc.category || '')).length,
     secured: documents.filter(doc => doc.requires_otp).length,
-    verified: documents.filter(doc => doc.is_verified).length
+    verified: documents.filter(doc => doc.isVerified).length
   };
 
   const renderDocumentSummary = (category: string, count: number, icon: React.ReactNode, description: string) => (
