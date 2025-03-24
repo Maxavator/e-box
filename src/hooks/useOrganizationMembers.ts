@@ -69,7 +69,7 @@ export function useOrganizationMembers() {
         }
         
         // Get email addresses
-        const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers();
+        const { data: authData, error: usersError } = await supabase.auth.admin.listUsers();
         
         if (usersError) {
           // This might fail if the user doesn't have admin access
@@ -84,9 +84,13 @@ export function useOrganizationMembers() {
         
         // Create a map of user IDs to emails
         const emailsMap: Record<string, string> = {};
-        if (usersData?.users) {
-          usersData.users.forEach(userData => {
-            emailsMap[userData.id] = userData.email;
+        
+        // Properly type and handle the authData
+        if (authData && 'users' in authData && Array.isArray(authData.users)) {
+          authData.users.forEach((userData: any) => {
+            if (userData && typeof userData === 'object' && 'id' in userData && 'email' in userData) {
+              emailsMap[userData.id] = userData.email;
+            }
           });
         }
         
