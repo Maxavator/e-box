@@ -11,6 +11,7 @@ import Chat from '@/pages/Chat';
 import Changelog from '@/pages/Changelog';
 import AdminPortal from '@/pages/AdminPortal';
 import OrganizationDashboard from '@/pages/OrganizationDashboard';
+import Notes from '@/pages/Notes'; // Add this import
 
 // Import from components directory rather than pages for these components
 import { Settings } from '@/components/settings/Settings';
@@ -114,6 +115,7 @@ function App() {
             <Route path="/contacts" element={withLayout(ContactsList)({})} />
             <Route path="/leave" element={withLayout(LeaveManager)({})} />
             <Route path="/policies" element={withLayout(Policies)({})} />
+            <Route path="/notes" element={withLayout(Notes)({})} /> {/* Add this route */}
             <Route path="/profile" element={withLayout(Settings)({})} />
             <Route path="/organization" element={withLayout(OrganizationDashboard)({})} />
             <Route path="/admin" element={withLayout(AdminPortal)({})} />

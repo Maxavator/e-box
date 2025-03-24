@@ -1,4 +1,3 @@
-
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   MessageSquare,
@@ -9,6 +8,7 @@ import {
   Settings,
   Shield,
   Briefcase,
+  StickyNote,
 } from "lucide-react";
 
 import {
@@ -110,6 +110,17 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Notes" 
+          onClick={() => handleNavigation("/notes")}
+          isActive={location.pathname === "/notes"}
+        >
+          <StickyNote className="h-4 w-4" />
+          <span>Notes</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      
       {/* Admin Portal menu item - only show if user has admin access */}
       {hasAdminAccess && (
         <SidebarMenuItem>
@@ -135,7 +146,6 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* Renamed from "My Desk" to "Desk" */}
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="Desk"
