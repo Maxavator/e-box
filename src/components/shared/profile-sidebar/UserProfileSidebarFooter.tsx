@@ -1,10 +1,8 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { useState, useEffect } from "react";
 import { UserProfileHeader } from "./UserProfileHeader";
-import { ProfileControls } from "./ProfileControls";
 import { OrganizationInfo } from "./OrganizationInfo";
 import { AdminButton } from "./AdminButton";
 import { VersionInfo } from "./VersionInfo";
@@ -123,8 +121,6 @@ export function UserProfileSidebarFooter() {
         jobTitle={jobTitle}
         hasOrganization={hasOrganization}
       />
-      
-      <ProfileControls />
       
       {profile?.organization_id && (
         <OrganizationInfo organizationId={profile?.organization_id} />
