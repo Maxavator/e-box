@@ -46,6 +46,14 @@ const Auth = () => {
               alt="e-Box Logo" 
               className="h-16 mb-4"
             />
+            <div className="text-center text-sm text-muted-foreground">
+              <p>by</p>
+              <img 
+                src="/lovable-uploads/7366015f-cd77-4ca3-94bb-3848e07b8868.png" 
+                alt="Afrovation Logo" 
+                className="h-7 mt-2" 
+              />
+            </div>
           </div>
           
           <LoginForm />

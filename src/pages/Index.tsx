@@ -58,8 +58,17 @@ const Index = () => {
         <img 
           src="/lovable-uploads/dbb30299-d801-4939-9dd4-ef26c4cc55cd.png" 
           alt="e-Box Logo" 
-          className="h-20 mx-auto mb-8 hover:scale-105 transition-transform"
+          className="h-20 mx-auto mb-4 hover:scale-105 transition-transform"
         />
+        <div className="flex flex-col items-center mb-8">
+          <p className="text-sm text-muted-foreground">by</p>
+          <img 
+            src="/lovable-uploads/7366015f-cd77-4ca3-94bb-3848e07b8868.png" 
+            alt="Afrovation" 
+            className="h-9 mt-2"
+          />
+        </div>
+        
         <h1 className="text-4xl font-bold mb-4 animate-fadeIn">Welcome to e-Box</h1>
         <p className="text-xl text-muted-foreground max-w-md mx-auto animate-fadeIn delay-100">
           Your centralized platform for organizational management and collaboration
