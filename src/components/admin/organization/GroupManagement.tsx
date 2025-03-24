@@ -1,280 +1,299 @@
-
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { UserPlus, Users, Trash2, PenLine } from "lucide-react";
-import { useUserRole } from "@/components/admin/hooks/useUserRole";
-import { useGroupManagement } from "@/components/admin/organization/hooks/useGroupManagement";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { toast } from "sonner";
+import { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableRow,
+} from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { useToast } from "@/components/ui/use-toast"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { useGroupManagement } from './hooks/useGroupManagement';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Group } from '@/types/chat';
 
 export function GroupManagement() {
-  const { isAdmin, userRole, userProfile } = useUserRole();
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [groupName, setGroupName] = useState("");
-  const [description, setDescription] = useState("");
-  const [isPublic, setIsPublic] = useState(false);
-  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
-  
-  const { groups, isLoading, createGroup, updateGroup, deleteGroup } = useGroupManagement();
-  
-  // Check if user has admin access
-  const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
-  
-  if (!hasAdminAccess) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Organization Groups</CardTitle>
-          <CardDescription>Create and manage groups within your organization</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="p-8 text-center">
-            <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">Permission Denied</h3>
-            <p className="text-muted-foreground">
-              Only Global Admins and Organization Admins can manage organization groups.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-  
-  const handleCreateGroup = async () => {
-    try {
-      if (!groupName.trim()) {
-        toast.error("Group name is required");
-        return;
-      }
-      
-      await createGroup({
-        name: groupName,
-        description,
-        is_public: isPublic,
-        organization_id: userProfile?.organization_id || null
+  const { 
+    isAdmin, userRole, isLoading, error, session,
+    groups, members, 
+    isCreatingGroup, isEditingGroup, selectedGroup, confirmDelete,
+    setIsCreatingGroup, setIsEditingGroup, setSelectedGroup, setConfirmDelete,
+    handleCreateGroup, handleUpdateGroup, handleDeleteGroup
+  } = useGroupManagement();
+
+  const [newGroupName, setNewGroupName] = useState('');
+  const [newGroupDescription, setNewGroupDescription] = useState('');
+  const [editGroupName, setEditGroupName] = useState('');
+  const [editGroupDescription, setEditGroupDescription] = useState('');
+  const { toast } = useToast();
+
+  const handleOpenCreateGroup = () => {
+    setIsCreatingGroup(true);
+    setNewGroupName('');
+    setNewGroupDescription('');
+  };
+
+  const handleCloseCreateGroup = () => {
+    setIsCreatingGroup(false);
+  };
+
+  const handleCreate = async () => {
+    if (!newGroupName.trim()) {
+      toast({
+        title: "Error",
+        description: "Group name cannot be empty.",
+        variant: "destructive",
       });
-      
-      setGroupName("");
-      setDescription("");
-      setIsPublic(false);
-      setIsCreateOpen(false);
-      toast.success("Group created successfully");
-    } catch (error) {
-      console.error("Failed to create group:", error);
-      toast.error("Failed to create group");
+      return;
     }
-  };
-  
-  const handleUpdateGroup = async () => {
+
     try {
-      if (!selectedGroupId || !groupName.trim()) {
-        toast.error("Group name is required");
-        return;
-      }
-      
-      await updateGroup(selectedGroupId, {
-        name: groupName,
-        description,
-        is_public: isPublic
+      await handleCreateGroup({
+        name: newGroupName,
+        description: newGroupDescription,
+        isPublic: true, // Default value
+        organizationId: session?.user.id, // Assuming organizationId is the user ID
+        createdBy: session?.user.id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       });
-      
-      setGroupName("");
-      setDescription("");
-      setIsPublic(false);
-      setSelectedGroupId(null);
-      setIsEditOpen(false);
-      toast.success("Group updated successfully");
-    } catch (error) {
-      console.error("Failed to update group:", error);
-      toast.error("Failed to update group");
+      toast({
+        title: "Success",
+        description: "Group created successfully.",
+      });
+      handleCloseCreateGroup();
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Failed to create group.",
+        variant: "destructive",
+      });
     }
   };
-  
-  const handleDeleteGroup = async (groupId: string) => {
+
+  const handleOpenEditGroup = (group: Group) => {
+    setIsEditingGroup(true);
+    setSelectedGroup(group);
+    setEditGroupName(group.name);
+    setEditGroupDescription(group.description || '');
+  };
+
+  const handleCloseEditGroup = () => {
+    setIsEditingGroup(false);
+    setSelectedGroup(null);
+  };
+
+  const handleEdit = async () => {
+    if (!editGroupName.trim()) {
+      toast({
+        title: "Error",
+        description: "Group name cannot be empty.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedGroup) return;
+
     try {
-      if (confirm("Are you sure you want to delete this group?")) {
-        await deleteGroup(groupId);
-        toast.success("Group deleted successfully");
-      }
-    } catch (error) {
-      console.error("Failed to delete group:", error);
-      toast.error("Failed to delete group");
+      await handleUpdateGroup({
+        id: selectedGroup.id,
+        name: editGroupName,
+        description: editGroupDescription,
+        updatedAt: new Date().toISOString(),
+      });
+      toast({
+        title: "Success",
+        description: "Group updated successfully.",
+      });
+      handleCloseEditGroup();
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Failed to update group.",
+        variant: "destructive",
+      });
     }
   };
-  
-  const openEditDialog = (group: any) => {
-    setSelectedGroupId(group.id);
-    setGroupName(group.name);
-    setDescription(group.description || "");
-    setIsPublic(group.is_public);
-    setIsEditOpen(true);
+
+  const handleOpenDeleteConfirmation = (groupId: string) => {
+    setConfirmDelete(groupId);
   };
-  
+
+  const handleCloseDeleteConfirmation = () => {
+    setConfirmDelete(null);
+  };
+
+  const handleDelete = async () => {
+    if (!confirmDelete) return;
+
+    try {
+      await handleDeleteGroup(confirmDelete);
+      toast({
+        title: "Success",
+        description: "Group deleted successfully.",
+      });
+      handleCloseDeleteConfirmation();
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Failed to delete group.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Organization Groups</CardTitle>
-          <CardDescription>Create and manage groups within your organization</CardDescription>
-        </div>
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <UserPlus className="h-4 w-4 mr-2" />
-              Create Group
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Group</DialogTitle>
-              <DialogDescription>
-                Create a new group for your organization. Groups can be used for team communication and organization.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Group Name</Label>
-                <Input 
-                  id="name" 
-                  value={groupName} 
-                  onChange={(e) => setGroupName(e.target.value)} 
-                  placeholder="Enter group name"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea 
-                  id="description" 
-                  value={description} 
-                  onChange={(e) => setDescription(e.target.value)} 
-                  placeholder="Enter group description"
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="isPublic"
-                  checked={isPublic}
-                  onChange={(e) => setIsPublic(e.target.checked)}
-                  className="rounded border-gray-300"
-                />
-                <Label htmlFor="isPublic">Public Group</Label>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
-              <Button onClick={handleCreateGroup}>Create Group</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="text-center py-8">
-            <p>Loading groups...</p>
-          </div>
-        ) : groups.length === 0 ? (
-          <div className="text-center py-8">
-            <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No Groups Found</h3>
-            <p className="text-muted-foreground mb-4">
-              Get started by creating your first organization group.
-            </p>
-            <Button onClick={() => setIsCreateOpen(true)}>
-              <UserPlus className="h-4 w-4 mr-2" />
-              Create Group
-            </Button>
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Visibility</TableHead>
-                <TableHead>Members</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Group Management</h2>
+        <Button onClick={handleOpenCreateGroup}>
+          <Plus className="h-4 w-4 mr-2" />
+          Create Group
+        </Button>
+      </div>
+
+      <ScrollArea className="rounded-md border">
+        <Table>
+          <TableCaption>A list of your organization groups.</TableCaption>
+          <TableHead>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {groups.map((group) => (
+              <TableRow key={group.id}>
+                <TableCell className="font-medium">{group.name}</TableCell>
+                <TableCell>{group.description}</TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="sm" onClick={() => handleOpenEditGroup(group)}>
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleOpenDeleteConfirmation(group.id)}>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {groups.map((group) => (
-                <TableRow key={group.id}>
-                  <TableCell className="font-medium">{group.name}</TableCell>
-                  <TableCell>{group.description || "—"}</TableCell>
-                  <TableCell>
-                    <Badge variant={group.is_public ? "default" : "outline"}>
-                      {group.is_public ? "Public" : "Private"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{group.member_count || 0}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="sm" onClick={() => openEditDialog(group)}>
-                        <PenLine className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10" onClick={() => handleDeleteGroup(group.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-        
-        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Group</DialogTitle>
-              <DialogDescription>
-                Update group details and settings.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-name">Group Name</Label>
-                <Input 
-                  id="edit-name" 
-                  value={groupName} 
-                  onChange={(e) => setGroupName(e.target.value)} 
-                  placeholder="Enter group name"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-description">Description</Label>
-                <Textarea 
-                  id="edit-description" 
-                  value={description} 
-                  onChange={(e) => setDescription(e.target.value)} 
-                  placeholder="Enter group description"
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="edit-isPublic"
-                  checked={isPublic}
-                  onChange={(e) => setIsPublic(e.target.checked)}
-                  className="rounded border-gray-300"
-                />
-                <Label htmlFor="edit-isPublic">Public Group</Label>
-              </div>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={3}>
+                {groups.length} Total Group(s)
+              </TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </ScrollArea>
+
+      {/* Create Group Dialog */}
+      <Dialog open={isCreatingGroup} onOpenChange={setIsCreatingGroup}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create Group</DialogTitle>
+            <DialogDescription>
+              Create a new group for your organization.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="name" className="text-right">
+                Name
+              </label>
+              <Input id="name" value={newGroupName} onChange={(e) => setNewGroupName(e.target.value)} className="col-span-3" />
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-              <Button onClick={handleUpdateGroup}>Update Group</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </CardContent>
-    </Card>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="description" className="text-right">
+                Description
+              </label>
+              <Input id="description" value={newGroupDescription} onChange={(e) => setNewGroupDescription(e.target.value)} className="col-span-3" />
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <Button type="button" variant="secondary" onClick={handleCloseCreateGroup}>
+              Cancel
+            </Button>
+            <Button type="submit" onClick={handleCreate}>Create</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Group Dialog */}
+      <Dialog open={isEditingGroup} onOpenChange={setIsEditingGroup}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Group</DialogTitle>
+            <DialogDescription>
+              Edit the details of the selected group.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="name" className="text-right">
+                Name
+              </label>
+              <Input id="edit-name" value={editGroupName} onChange={(e) => setEditGroupName(e.target.value)} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="description" className="text-right">
+                Description
+              </label>
+              <Input id="edit-description" value={editGroupDescription} onChange={(e) => setEditGroupDescription(e.target.value)} className="col-span-3" />
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <Button type="button" variant="secondary" onClick={handleCloseEditGroup}>
+              Cancel
+            </Button>
+            <Button type="submit" onClick={handleEdit}>Save</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!confirmDelete} onOpenChange={() => setConfirmDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the group
+              and remove all its data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCloseDeleteConfirmation}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction className="bg-red-500 hover:bg-red-600" onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 }

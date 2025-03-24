@@ -291,6 +291,9 @@ export type Database = {
           content: string | null
           created_at: string
           id: string
+          is_journal: boolean | null
+          is_shared: boolean | null
+          shared_with: string[] | null
           title: string
           updated_at: string
           user_id: string
@@ -299,6 +302,9 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          is_journal?: boolean | null
+          is_shared?: boolean | null
+          shared_with?: string[] | null
           title: string
           updated_at?: string
           user_id: string
@@ -307,6 +313,9 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          is_journal?: boolean | null
+          is_shared?: boolean | null
+          shared_with?: string[] | null
           title?: string
           updated_at?: string
           user_id?: string
@@ -419,6 +428,9 @@ export type Database = {
           first_name: string | null
           id: string
           job_title: string | null
+          journal_reminder_day: number | null
+          journal_reminder_enabled: boolean | null
+          journal_reminder_time: string | null
           last_activity: string | null
           last_name: string | null
           mobile_phone_number: string | null
@@ -434,6 +446,9 @@ export type Database = {
           first_name?: string | null
           id: string
           job_title?: string | null
+          journal_reminder_day?: number | null
+          journal_reminder_enabled?: boolean | null
+          journal_reminder_time?: string | null
           last_activity?: string | null
           last_name?: string | null
           mobile_phone_number?: string | null
@@ -449,6 +464,9 @@ export type Database = {
           first_name?: string | null
           id?: string
           job_title?: string | null
+          journal_reminder_day?: number | null
+          journal_reminder_enabled?: boolean | null
+          journal_reminder_time?: string | null
           last_activity?: string | null
           last_name?: string | null
           mobile_phone_number?: string | null
