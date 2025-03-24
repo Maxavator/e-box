@@ -12,6 +12,7 @@ import Changelog from '@/pages/Changelog';
 import AdminPortal from '@/pages/AdminPortal';
 import OrganizationDashboard from '@/pages/OrganizationDashboard';
 import Notes from '@/pages/Notes'; 
+import Moderation from '@/pages/Moderation';
 
 // Import from components directory rather than pages for these components
 import { Settings } from '@/components/settings/Settings';
@@ -119,6 +120,7 @@ const App: React.FC = () => {
             <Route path="/profile" element={withLayout(Settings)({})} />
             <Route path="/organization" element={withLayout(OrganizationDashboard)({})} />
             <Route path="/admin" element={withLayout(AdminPortal)({})} />
+            <Route path="/moderation" element={withLayout(Moderation)({})} />
             <Route path="/changelog" element={withLayout(Changelog)({})} />
           </Route>
           

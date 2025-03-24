@@ -1,3 +1,4 @@
+
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   MessageSquare,
@@ -9,6 +10,7 @@ import {
   Shield,
   Briefcase,
   StickyNote,
+  Flag,
 } from "lucide-react";
 
 import {
@@ -45,9 +47,21 @@ export function MainNavigationMenu({
   // Consider a user to have admin access if they are either global_admin or org_admin
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
+  // Check if user has moderation privileges
+  const isModerator = 
+    userRole === 'hr_moderator' || 
+    userRole === 'comm_moderator' || 
+    userRole === 'stakeholder_moderator';
+  
   // Check if current route is an admin route
   const isAdminPage = location.pathname.includes('/admin') || 
                       location.pathname.includes('/organization');
+                      
+  // Check if current route is the moderation page
+  const isModerationPage = location.pathname === '/moderation';
+  
+  // Moderation items count - in a real app, this would come from your backend
+  const moderationCount = 5;
   
   const handleNavigation = (path: string) => {
     // Reset the respective badge count when navigating to a section
@@ -120,6 +134,25 @@ export function MainNavigationMenu({
           <span>Notes</span>
         </SidebarMenuButton>
       </SidebarMenuItem>
+      
+      {/* Moderation menu item - only show if user has moderation access */}
+      {(hasAdminAccess || isModerator) && (
+        <SidebarMenuItem>
+          <SidebarMenuButton 
+            tooltip="Moderation" 
+            onClick={() => handleNavigation("/moderation")}
+            isActive={isModerationPage}
+          >
+            <Flag className="h-4 w-4" />
+            <span>Moderation</span>
+            {moderationCount > 0 && (
+              <SidebarMenuBadge className="ml-auto bg-red-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+                {moderationCount}
+              </SidebarMenuBadge>
+            )}
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      )}
       
       {/* Admin Portal menu item - only show if user has admin access */}
       {hasAdminAccess && (
