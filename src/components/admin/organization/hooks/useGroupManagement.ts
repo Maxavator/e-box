@@ -16,173 +16,130 @@ export function useGroupManagement() {
   const [isEditingGroup, setIsEditingGroup] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const queryClient = useQueryClient();
-
+  
   // Fetch groups
-  const { data: groups = [], isLoading: isLoadingGroups } = useQuery({
+  const { 
+    data: groups = [], 
+    isLoading: isLoadingGroups 
+  } = useQuery({
     queryKey: ['groups'],
     queryFn: async () => {
-      if (!session) {
-        return [];
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('groups')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        return data as Group[];
-      } catch (error) {
-        console.error('Error fetching groups:', error);
-        return [];
-      }
+      const { data, error } = await supabase
+        .from('groups')
+        .select('*')
+        .order('name');
+      
+      if (error) throw error;
+      return data as Group[];
     },
-    enabled: !!session,
   });
-
-  // Fetch members
-  const { data: members = [], isLoading: isLoadingMembers } = useQuery({
-    queryKey: ['members'],
+  
+  // Fetch group members
+  const { 
+    data: members = [],
+    isLoading: isLoadingMembers
+  } = useQuery({
+    queryKey: ['groupMembers'],
     queryFn: async () => {
-      if (!session) {
-        return [];
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id, first_name, last_name, avatar_url')
-          .order('first_name', { ascending: true });
-
-        if (error) throw error;
-
-        return data as any[];
-      } catch (error) {
-        console.error('Error fetching members:', error);
-        return [];
-      }
+      const { data, error } = await supabase
+        .from('group_members')
+        .select(`
+          id,
+          user_id,
+          group_id,
+          role,
+          profiles:user_id (
+            id,
+            first_name,
+            last_name,
+            avatar_url
+          )
+        `);
+      
+      if (error) throw error;
+      return data;
     },
-    enabled: !!session,
   });
-
+  
   // Create group mutation
-  const createGroupMutation = useMutation({
-    mutationFn: async (newGroup: Omit<Group, 'id' | 'createdAt' | 'updatedAt' | 'memberCount'>) => {
-      if (!session) {
-        throw new Error('User not authenticated');
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('groups')
-          .insert({
-            ...newGroup,
-            createdBy: session.user.id,
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-
-        return data as Group;
-      } catch (error) {
-        console.error('Error creating group:', error);
-        throw error;
-      }
+  const createMutation = useMutation({
+    mutationFn: async (newGroup: Omit<Group, 'id' | 'memberCount'>) => {
+      const { data, error } = await supabase
+        .from('groups')
+        .insert(newGroup)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
-      toast.success('Group created successfully');
     },
-    onError: (error) => {
-      console.error('Error creating group:', error);
-      toast.error('Failed to create group');
+    onError: (error: any) => {
+      toast.error(`Failed to create group: ${error.message}`);
     }
   });
-
+  
   // Update group mutation
-  const updateGroupMutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: async (updatedGroup: Partial<Group> & { id: string }) => {
-      if (!session) {
-        throw new Error('User not authenticated');
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('groups')
-          .update(updatedGroup)
-          .eq('id', updatedGroup.id)
-          .select()
-          .single();
-
-        if (error) throw error;
-
-        return data as Group;
-      } catch (error) {
-        console.error('Error updating group:', error);
-        throw error;
-      }
+      const { id, ...rest } = updatedGroup;
+      const { data, error } = await supabase
+        .from('groups')
+        .update(rest)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
-      toast.success('Group updated successfully');
     },
-    onError: (error) => {
-      console.error('Error updating group:', error);
-      toast.error('Failed to update group');
+    onError: (error: any) => {
+      toast.error(`Failed to update group: ${error.message}`);
     }
   });
-
+  
   // Delete group mutation
-  const deleteGroupMutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: async (groupId: string) => {
-      if (!session) {
-        throw new Error('User not authenticated');
-      }
-
-      try {
-        const { error } = await supabase
-          .from('groups')
-          .delete()
-          .eq('id', groupId);
-
-        if (error) throw error;
-
-        return groupId;
-      } catch (error) {
-        console.error('Error deleting group:', error);
-        throw error;
-      }
+      setIsDeleting(true);
+      const { error } = await supabase
+        .from('groups')
+        .delete()
+        .eq('id', groupId);
+      
+      if (error) throw error;
+      return groupId;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
-      toast.success('Group deleted successfully');
+      setIsDeleting(false);
     },
-    onError: (error) => {
-      console.error('Error deleting group:', error);
-      toast.error('Failed to delete group');
+    onError: (error: any) => {
+      setIsDeleting(false);
+      toast.error(`Failed to delete group: ${error.message}`);
     }
   });
-
-  // Create a new group
-  const createGroup = (group: Omit<Group, 'id' | 'createdAt' | 'updatedAt' | 'memberCount'>) => {
-    return createGroupMutation.mutateAsync(group);
+  
+  const createGroup = async (newGroup: Omit<Group, 'id' | 'memberCount'>) => {
+    return createMutation.mutateAsync(newGroup);
   };
-
-  // Update a group
-  const updateGroup = (group: Partial<Group> & { id: string }) => {
-    return updateGroupMutation.mutateAsync(group);
+  
+  const updateGroup = async (updatedGroup: Partial<Group> & { id: string }) => {
+    return updateMutation.mutateAsync(updatedGroup);
   };
-
-  // Delete a group
-  const deleteGroup = (groupId: string) => {
-    return deleteGroupMutation.mutateAsync(groupId);
+  
+  const deleteGroup = async (groupId: string) => {
+    return deleteMutation.mutateAsync(groupId);
   };
-
+  
   return {
     isAdmin,
     userRole,
@@ -204,8 +161,6 @@ export function useGroupManagement() {
     createGroup,
     updateGroup,
     deleteGroup,
-    isCreating: createGroupMutation.isPending,
-    isUpdating: updateGroupMutation.isPending,
-    isDeleting: deleteGroupMutation.isPending
+    isDeleting
   };
 }

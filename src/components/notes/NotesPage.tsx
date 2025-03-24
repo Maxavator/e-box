@@ -146,9 +146,9 @@ export function NotesPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Notes list sidebar */}
-      <div className="w-full sm:w-80 md:w-96 h-full flex-shrink-0">
+    <div className="flex h-full">
+      {/* Left sidebar for notes list */}
+      <div className="w-72 border-r h-full">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
           <div className="p-4 border-b">
             <TabsList className="w-full mb-4">

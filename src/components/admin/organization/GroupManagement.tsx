@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import {
   Table,
@@ -74,10 +73,8 @@ export function GroupManagement() {
         name: newGroupName,
         description: newGroupDescription,
         isPublic: true, // Default value
-        organizationId: session?.user.id, // Assuming organizationId is the user ID
-        createdBy: session?.user.id,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        organizationId: session?.user?.id, // Assuming organizationId is the user ID
+        createdBy: session?.user?.id,
       });
       toast({
         title: "Success",
@@ -122,7 +119,6 @@ export function GroupManagement() {
         id: selectedGroup.id,
         name: editGroupName,
         description: editGroupDescription,
-        updatedAt: new Date().toISOString(),
       });
       toast({
         title: "Success",
