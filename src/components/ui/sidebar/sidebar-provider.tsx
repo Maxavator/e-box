@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
@@ -6,11 +5,8 @@ import { useIsMobile } from "@/hooks/use-mobile"
 
 // Constants
 export const SIDEBAR_COOKIE_NAME = "sidebar:state"
-export const SIDEBAR_WIDTH_COOKIE_NAME = "sidebar:width"
 export const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 export const SIDEBAR_WIDTH = "14rem"
-export const SIDEBAR_MIN_WIDTH = "10rem"
-export const SIDEBAR_MAX_WIDTH = "20rem"
 export const SIDEBAR_WIDTH_MOBILE = "16rem"
 export const SIDEBAR_WIDTH_ICON = "3rem"
 export const SIDEBAR_KEYBOARD_SHORTCUT = "b"
@@ -24,8 +20,6 @@ export type SidebarContext = {
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
-  width: string
-  setWidth: (width: string) => void
 }
 
 const SidebarContext = React.createContext<SidebarContext | null>(null)
@@ -61,28 +55,6 @@ export const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
-    
-    // Get width from cookie or use default
-    const getCookieWidth = () => {
-      const cookies = document.cookie.split(';')
-      const widthCookie = cookies.find(cookie => cookie.trim().startsWith(`${SIDEBAR_WIDTH_COOKIE_NAME}=`))
-      return widthCookie ? widthCookie.split('=')[1] : SIDEBAR_WIDTH
-    }
-    
-    const [width, setInternalWidth] = React.useState(SIDEBAR_WIDTH)
-    
-    // Set width and save to cookie
-    const setWidth = React.useCallback((newWidth: string) => {
-      setInternalWidth(newWidth)
-      document.cookie = `${SIDEBAR_WIDTH_COOKIE_NAME}=${newWidth}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
-    }, [])
-    
-    // Initialize width from cookie on mount
-    React.useEffect(() => {
-      if (!isMobile) {
-        setInternalWidth(getCookieWidth())
-      }
-    }, [isMobile])
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
@@ -139,10 +111,8 @@ export const SidebarProvider = React.forwardRef<
         openMobile,
         setOpenMobile,
         toggleSidebar,
-        width,
-        setWidth,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, width, setWidth]
+      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
     )
 
     return (
@@ -151,9 +121,7 @@ export const SidebarProvider = React.forwardRef<
           <div
             style={
               {
-                "--sidebar-width": width,
-                "--sidebar-min-width": SIDEBAR_MIN_WIDTH,
-                "--sidebar-max-width": SIDEBAR_MAX_WIDTH,
+                "--sidebar-width": SIDEBAR_WIDTH,
                 "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
                 ...style,
               } as React.CSSProperties

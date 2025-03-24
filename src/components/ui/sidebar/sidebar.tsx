@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { useSidebar, SIDEBAR_WIDTH_MOBILE } from "./sidebar-provider"
-import { ResizableHandle } from "../resizable"
 
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
@@ -27,48 +26,7 @@ export const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile, width, setWidth } = useSidebar()
-    const resizeRef = React.useRef<HTMLDivElement>(null)
-    const [isResizing, setIsResizing] = React.useState(false)
-
-    // Handle resizing for desktop view
-    React.useEffect(() => {
-      if (isMobile) return
-
-      const handleMouseDown = (e: MouseEvent) => {
-        if (!resizeRef.current) return
-        if (!resizeRef.current.contains(e.target as Node)) return
-        
-        e.preventDefault()
-        setIsResizing(true)
-        
-        const initialX = e.clientX
-        const sidebarWidth = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width'))
-        const minWidth = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-min-width'))
-        const maxWidth = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-max-width'))
-        
-        const handleMouseMove = (e: MouseEvent) => {
-          let newWidth = sidebarWidth + (side === "left" ? (e.clientX - initialX) : (initialX - e.clientX))
-          
-          // Constrain to min/max
-          newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth))
-          
-          setWidth(`${newWidth}px`)
-        }
-        
-        const handleMouseUp = () => {
-          setIsResizing(false)
-          document.removeEventListener('mousemove', handleMouseMove)
-          document.removeEventListener('mouseup', handleMouseUp)
-        }
-        
-        document.addEventListener('mousemove', handleMouseMove)
-        document.addEventListener('mouseup', handleMouseUp)
-      }
-      
-      document.addEventListener('mousedown', handleMouseDown)
-      return () => document.removeEventListener('mousedown', handleMouseDown)
-    }, [isMobile, side, setWidth])
+    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
 
     if (collapsible === "none") {
       return (
@@ -145,16 +103,6 @@ export const Sidebar = React.forwardRef<
           >
             {children}
           </div>
-          
-          {/* Resize handle */}
-          <div 
-            ref={resizeRef}
-            className={cn(
-              "absolute top-0 bottom-0 w-1 cursor-ew-resize",
-              side === "left" ? "right-0" : "left-0",
-              isResizing ? "bg-primary/20" : "hover:bg-primary/10"
-            )}
-          />
         </div>
       </div>
     )
