@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Note } from '@/types/chat';
-import { Save, X, Trash2, Pin, PinOff } from 'lucide-react';
+import { Save, X, Trash2, Pin, PinOff, Share } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -19,10 +19,11 @@ interface NoteEditorProps {
   onSave: (note: Partial<Note> & { id?: string }) => void;
   onCancel: () => void;
   onDelete?: (noteId: string) => void;
+  onShare?: (note: Note) => void;
   isNew?: boolean;
 }
 
-export function NoteEditor({ note, onSave, onCancel, onDelete, isNew = false }: NoteEditorProps) {
+export function NoteEditor({ note, onSave, onCancel, onDelete, onShare, isNew = false }: NoteEditorProps) {
   const [title, setTitle] = useState(note?.title || '');
   const [content, setContent] = useState(note?.content || '');
   const [color, setColor] = useState(note?.color || '');
@@ -59,6 +60,12 @@ export function NoteEditor({ note, onSave, onCancel, onDelete, isNew = false }: 
   const handleDelete = () => {
     if (note?.id && onDelete) {
       onDelete(note.id);
+    }
+  };
+
+  const handleShare = () => {
+    if (note && onShare) {
+      onShare(note);
     }
   };
 
@@ -131,6 +138,17 @@ export function NoteEditor({ note, onSave, onCancel, onDelete, isNew = false }: 
               title="Delete note"
             >
               <Trash2 size={16} />
+            </Button>
+          )}
+          
+          {!isNew && onShare && note && !note.isJournal && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleShare}
+              title="Share note"
+            >
+              <Share size={16} />
             </Button>
           )}
         </div>

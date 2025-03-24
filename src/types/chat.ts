@@ -94,4 +94,7 @@ export interface Note {
   tags?: string[];
   color?: string;
   isPinned?: boolean;
+  isJournal?: boolean;
+  isShared?: boolean;
+  sharedWith?: string[];
 }

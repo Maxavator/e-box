@@ -1,6 +1,6 @@
 
 import { Note } from '@/types/chat';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -13,6 +13,7 @@ interface NotesListProps {
   onNewNote: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  newButtonText?: string;
 }
 
 export function NotesList({
@@ -21,7 +22,8 @@ export function NotesList({
   onNoteSelect,
   onNewNote,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  newButtonText = "New Note"
 }: NotesListProps) {
   // Sort notes with pinned ones first, then by updatedAt date
   const sortedNotes = [...notes].sort((a, b) => {
@@ -46,7 +48,10 @@ export function NotesList({
               className="pl-8"
             />
           </div>
-          <Button onClick={onNewNote}>New Note</Button>
+          <Button onClick={onNewNote}>
+            <Plus className="h-4 w-4 mr-2" />
+            {newButtonText}
+          </Button>
         </div>
       </div>
       
@@ -65,7 +70,10 @@ export function NotesList({
         ) : (
           <div className="flex flex-col items-center justify-center h-full p-4 text-center">
             <p className="text-muted-foreground mb-2">No notes found</p>
-            <Button variant="outline" onClick={onNewNote}>Create your first note</Button>
+            <Button variant="outline" onClick={onNewNote}>
+              <Plus className="h-4 w-4 mr-2" />
+              {newButtonText}
+            </Button>
           </div>
         )}
       </ScrollArea>
@@ -98,6 +106,8 @@ function NoteItem({ note, isActive, onClick }: NoteItemProps) {
       <div className="flex justify-between items-start mb-1">
         <h3 className="font-medium line-clamp-1 flex-1">
           {note.isPinned && <span className="mr-1">📌</span>}
+          {note.isJournal && <span className="mr-1">📓</span>}
+          {note.isShared && <span className="mr-1">🔗</span>}
           {note.title}
         </h3>
       </div>
