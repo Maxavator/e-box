@@ -29,6 +29,7 @@ export const useOrganizationMembers = () => {
 
       console.log("Fetching members for organization:", userProfile.organization_id);
       
+      // Include the current user in the results
       const { data, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, organization_id')

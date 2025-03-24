@@ -43,9 +43,9 @@ export const useContacts = () => {
       
       console.log("Found organization members:", allOrgMembers?.length);
       
-      // Filter out the current user
-      const orgMembers = allOrgMembers.filter(member => member.id !== userData.user.id);
-      console.log("Organization members (excluding current user):", orgMembers.length);
+      // We're not filtering out the current user anymore
+      const orgMembers = allOrgMembers || [];
+      console.log("All organization members to include:", orgMembers.length);
 
       // Then fetch user's explicit contacts
       const { data: userContacts, error: contactsError } = await supabase
@@ -89,6 +89,11 @@ export const useContacts = () => {
       // Add all organization members as colleagues if they're not already in contacts
       orgMembers.forEach(member => {
         if (!contactsMap.has(member.id)) {
+          // Skip adding yourself as a contact
+          if (member.id === userData.user.id) {
+            return;
+          }
+          
           // Create virtual contact entry for organization member
           contactsMap.set(member.id, {
             id: `org-${member.id}`, // Use prefix to create unique id
