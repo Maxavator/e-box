@@ -127,33 +127,8 @@ export const useUserRole = () => {
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
-  // Fetch user profile
-  const { data: userProfile, isLoading: isProfileLoading, error: profileError } = useQuery({
-    queryKey: ['userProfile', userId],
-    enabled: !!userId,
-    queryFn: async () => {
-      console.log('Fetching user profile for user ID:', userId);
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, organization_id')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        return null;
-      }
-      
-      return data;
-    },
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * (attemptIndex + 1), 3000),
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-  });
-
-  const isLoading = isSessionLoading || isAdminLoading || isRoleLoading || isProfileLoading;
-  const error = sessionError || adminError || roleError || profileError;
+  const isLoading = isSessionLoading || isAdminLoading || isRoleLoading;
+  const error = sessionError || adminError || roleError;
 
   return {
     // If specifically checking for admin status, we should return the definitive isAdmin value
@@ -163,8 +138,6 @@ export const useUserRole = () => {
     isLoading,
     error,
     // Include session for components that need it
-    session,
-    // Include user profile data
-    userProfile
+    session
   };
 };

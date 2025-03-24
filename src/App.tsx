@@ -1,80 +1,171 @@
 
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-  Outlet,
-} from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Toaster } from "sonner";
-
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import OrganizationDashboard from "./pages/OrganizationDashboard";
-import AdminPortal from "./pages/AdminPortal";
-import OrganizationManagement from "./pages/OrganizationManagement";
+import React, { useState, useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from '@/components/shared/theme-provider';
+import { Toaster } from '@/components/ui/toaster';
+import { MainLayout } from '@/layouts/MainLayout';
+import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
+import { Index, Auth, Dashboard, NotFound, Chat, AdminPortal, OrganizationDashboard, Changelog, Settings, Documents, Calendar, ContactsList, LeaveManager, Policies, Desk } from './pages';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import GovZA from "./pages/GovZA";
-import Chat from "./pages/Chat";
-import Changelog from "./pages/Changelog";
-import NotFound from "./pages/NotFound";
-import MessagingPage from "./pages/Messaging";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+    },
+  },
+});
+
+// Create a layout route component that doesn't add another Router
+const ProtectedLayoutRoute = () => {
+  return (
+    <ProtectedRoute>
+      <MainLayout>
+        <Outlet />
+      </MainLayout>
+    </ProtectedRoute>
+  );
+};
+
+// Wrapper component that can access route information
+const ThemeWrapper = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === "/auth";
+  
+  return (
+    <ThemeProvider 
+      defaultTheme="light" 
+      storageKey="e-box-theme"
+      forcedTheme={isAuthPage ? "light" : undefined}
+    >
+      {children}
+    </ThemeProvider>
+  );
+};
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-  const session = useSession();
-  const supabase = useSupabaseClient();
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    const checkSession = async () => {
-      setIsLoading(true);
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          console.info("Session found:", session);
-        } else {
-          console.warn("No session found");
-        }
-      } catch (error) {
-        console.error("Error checking session:", error);
-      } finally {
-        setIsLoading(false);
-      }
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
+  }, []);
 
-    checkSession();
-  }, [supabase]);
-
-  // Using Outlet from react-router-dom for the protected routes
-  const ProtectedRoute = () => {
-    if (!session && !isLoading) {
-      return <Navigate to="/auth" replace />;
-    }
-
-    return <Outlet />;
-  };
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <ThemeWrapper><Outlet /></ThemeWrapper>,
+      errorElement: <NotFound />,
+      children: [
+        {
+          index: true,
+          element: <Index />,
+        },
+        {
+          path: '/auth',
+          element: <Auth />,
+        },
+        {
+          path: '/changelog',
+          element: <Changelog />,
+        },
+        // Protected routes using the layout route pattern
+        {
+          element: <ProtectedLayoutRoute />,
+          children: [
+            {
+              path: '/dashboard',
+              element: <Dashboard />,
+            },
+            {
+              path: '/chat',
+              element: <Chat />,
+            },
+            {
+              path: '/calendar',
+              element: <Calendar />,
+            },
+            {
+              path: '/contacts',
+              element: <ContactsList />,
+            },
+            {
+              path: '/documents',
+              element: <Documents />,
+            },
+            {
+              path: '/notes',
+              element: <div>Notes</div>,
+            },
+            {
+              path: '/surveys',
+              element: <div>Surveys</div>,
+            },
+            {
+              path: '/admin',
+              element: <AdminPortal />,
+            },
+            {
+              path: '/organization',
+              element: <OrganizationDashboard />,
+            },
+            {
+              path: '/admin/users',
+              element: <AdminPortal />,
+            },
+            {
+              path: '/profile',
+              element: <Settings />,
+            },
+            {
+              path: '/leave',
+              element: <LeaveManager />,
+            },
+            {
+              path: '/policies',
+              element: <Policies />,
+            },
+            {
+              path: '/mydesk',
+              element: <Desk />,
+            },
+            {
+              path: '/desk/:page',
+              element: <Desk />,
+            },
+          ]
+        },
+        {
+          path: '/govza/*',
+          element: (
+            <MainLayout>
+              <GovZA />
+            </MainLayout>
+          ),
+        },
+        {
+          path: '*',
+          element: <NotFound />,
+        },
+      ]
+    },
+  ]);
 
   return (
-    <Router>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
       <Toaster />
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/organization" element={<OrganizationDashboard />} />
-          <Route path="/admin" element={<AdminPortal />} />
-          <Route path="/organization-management" element={<OrganizationManagement />} />
-          <Route path="/govza" element={<GovZA />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/messaging" element={<MessagingPage />} />
-          <Route path="/changelog" element={<Changelog />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-    </Router>
+    </QueryClientProvider>
   );
 }
 
