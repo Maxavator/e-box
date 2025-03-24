@@ -49,7 +49,7 @@ export const useOrganizationMembers = () => {
       console.log("User's organization ID:", userProfile.organization_id);
       
       // Fetch all members in the organization
-      const { data, error: membersError } = await supabase
+      const { data: members, error: membersError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, organization_id')
         .eq('organization_id', userProfile.organization_id);
@@ -60,7 +60,7 @@ export const useOrganizationMembers = () => {
       }
       
       // Filter out the current user from the list
-      const filteredMembers = data?.filter(member => member.id !== userData.user.id) || [];
+      const filteredMembers = members?.filter(member => member.id !== userData.user.id) || [];
       
       console.log("Found organization members:", filteredMembers.length);
       console.log("Organization members:", filteredMembers);

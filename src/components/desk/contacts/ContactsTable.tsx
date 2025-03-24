@@ -25,8 +25,8 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
   const navigate = useNavigate();
 
   const filteredContacts = contacts?.filter(contact => {
-    if (!contact.contact) {
-      console.log("Missing contact data for:", contact);
+    if (!contact || !contact.contact) {
+      console.log("Missing contact data:", contact);
       return false;
     }
     

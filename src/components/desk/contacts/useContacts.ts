@@ -30,6 +30,18 @@ export const useContacts = () => {
       
       console.log("Current user ID:", userData.user.id);
 
+      // Get user's organization ID for colleague check
+      const { data: userProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', userData.user.id)
+        .maybeSingle();
+      
+      if (profileError) {
+        console.error("Error fetching user profile:", profileError);
+        throw profileError;
+      }
+
       // Fetch user's explicit contacts
       const { data: userContacts, error: contactsError } = await supabase
         .from('contacts')
@@ -76,19 +88,7 @@ export const useContacts = () => {
         }
       });
       
-      // Get user's organization ID for colleague check
-      const { data: userProfile, error: profileError } = await supabase
-        .from('profiles')
-        .select('organization_id')
-        .eq('id', userData.user.id)
-        .maybeSingle();
-      
-      if (profileError) {
-        console.error("Error fetching user profile:", profileError);
-        throw profileError;
-      }
-      
-      // Add all organization members as colleagues if they're not already contacts
+      // Add all organization members as contacts if they're not already contacts
       if (organizationMembers && organizationMembers.length > 0) {
         console.log("Adding organization members to contacts...");
         
