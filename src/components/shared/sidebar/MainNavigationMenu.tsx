@@ -1,187 +1,79 @@
 
-import { useUserRole } from "@/components/admin/hooks/useUserRole";
-import { SidebarMenu } from "@/components/ui/sidebar/menu/sidebar-menu";
-import { SidebarMenuButton } from "@/components/ui/sidebar/menu/sidebar-menu-button";
-import { SidebarMenuBadge } from "@/components/ui/sidebar/menu/sidebar-menu-badge";
-import {
-  BookOpen,
-  BookText,
-  Building2,
-  Calendar,
-  ClipboardList,
-  Cog,
-  FileText,
-  Flag,
-  FolderClosed,
-  Home,
-  LifeBuoy,
-  MessageSquare,
-  ShieldCheck,
-  Users
-} from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSidebarBadges } from "@/hooks/useSidebarBadges";
+import { useUserRole } from "@/components/admin/hooks/useUserRole";
+import { 
+  SidebarMenu 
+} from "@/components/ui/sidebar/menu/sidebar-menu";
+import { 
+  SidebarMenuButton 
+} from "@/components/ui/sidebar/menu/sidebar-menu-button";
+import { 
+  SidebarMenuBadge 
+} from "@/components/ui/sidebar/menu/sidebar-menu-badge";
+import { Building2, CalendarDays, FileText, Grid3X3, LayoutDashboard, Mail, Users } from "lucide-react";
 
 export default function MainNavigationMenu() {
+  const navigate = useNavigate();
   const location = useLocation();
-  const pathname = location.pathname;
-  const { isAdmin, userRole } = useUserRole();
-  const { 
-    chatCount, 
-    documentsCount, 
-    calendarCount, 
-    contactsCount, 
-    leaveCount, 
-    resetBadgeCount,
-    flaggedItems 
-  } = useSidebarBadges();
+  const { chatCount, documentsCount, calendarCount, contactsCount, leaveCount, flaggedItems } = useSidebarBadges();
+  const { userRole } = useUserRole();
   
-  const isModerator = 
-    userRole === 'hr_moderator' || 
-    userRole === 'comm_moderator' || 
-    userRole === 'stakeholder_moderator';
-  
-  const isOrgAdmin = userRole === 'org_admin';
+  const isActive = (path: string) => location.pathname.includes(path);
+  const isAdmin = ['global_admin', 'org_admin'].includes(userRole || '');
+  const isModerator = ['hr_moderator', 'comm_moderator', 'stakeholder_moderator'].includes(userRole || '');
 
   return (
     <SidebarMenu>
-      <SidebarMenuButton asChild>
-        <Link to="/dashboard" className={pathname === "/dashboard" ? "active" : ""}>
-          <Home className="h-4 w-4 mr-2" />
-          Dashboard
-        </Link>
-      </SidebarMenuButton>
-      
-      {/* Desk Group */}
-      <SidebarMenuButton asChild>
-        <Link to="/mydesk" className={pathname === "/mydesk" ? "active" : ""}>
-          <FolderClosed className="h-4 w-4 mr-2" />
-          My Desk
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/documents" className={pathname === "/documents" ? "active" : ""}>
-          <FileText className="h-4 w-4 mr-2" />
-          Documents
-          {documentsCount > 0 && (
-            <SidebarMenuBadge>
-              {documentsCount}
-            </SidebarMenuBadge>
-          )}
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/calendar" className={pathname === "/calendar" ? "active" : ""}>
-          <Calendar className="h-4 w-4 mr-2" />
-          Calendar
-          {calendarCount > 0 && (
-            <SidebarMenuBadge>
-              {calendarCount}
-            </SidebarMenuBadge>
-          )}
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/contacts" className={pathname === "/contacts" ? "active" : ""}>
-          <Users className="h-4 w-4 mr-2" />
-          Contacts
-          {contactsCount > 0 && (
-            <SidebarMenuBadge>
-              {contactsCount}
-            </SidebarMenuBadge>
-          )}
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/notes" className={pathname === "/notes" ? "active" : ""}>
-          <ClipboardList className="h-4 w-4 mr-2" />
-          Notes
-        </Link>
-      </SidebarMenuButton>
-      
-      {/* Organization */}
-      <SidebarMenuButton asChild>
-        <Link to="/organization" className={pathname === "/organization" ? "active" : ""}>
-          <Building2 className="h-4 w-4 mr-2" />
-          Organization
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/members" className={pathname === "/members" ? "active" : ""}>
-          <Users className="h-4 w-4 mr-2" />
-          Organization Members
-        </Link>
-      </SidebarMenuButton>
-      
-      {/* Admin */}
-      {(isAdmin || isOrgAdmin) && (
-        <SidebarMenuButton asChild>
-          <Link to="/admin" className={pathname === "/admin" ? "active" : ""}>
-            <ShieldCheck className="h-4 w-4 mr-2" />
-            Admin Portal
-          </Link>
-        </SidebarMenuButton>
-      )}
-      
-      {/* Moderation */}
+      <SidebarMenuButton 
+        icon={<LayoutDashboard size={18} />}
+        label="Dashboard"
+        isActive={isActive('/dashboard')} 
+        onClick={() => navigate('/dashboard')}
+      />
       {(isAdmin || isModerator) && (
-        <SidebarMenuButton asChild>
-          <Link to="/moderation" className={pathname === "/moderation" ? "active" : ""}>
-            <Flag className="h-4 w-4 mr-2" />
-            Moderation
-            {flaggedItems > 0 && (
-              <SidebarMenuBadge>
-                {flaggedItems}
-              </SidebarMenuBadge>
-            )}
-          </Link>
-        </SidebarMenuButton>
+        <SidebarMenuButton 
+          icon={<Building2 size={18} />}
+          label="Organization"
+          isActive={isActive('/organization')}
+          onClick={() => navigate('/organization')}
+          badge={flaggedItems > 0 ? <SidebarMenuBadge>{flaggedItems}</SidebarMenuBadge> : undefined}
+        />
       )}
-      
-      {/* Communication */}
-      <SidebarMenuButton asChild>
-        <Link to="/chat" className={pathname === "/chat" ? "active" : ""}>
-          <MessageSquare className="h-4 w-4 mr-2" />
-          Messages
-          {chatCount > 0 && (
-            <SidebarMenuBadge>
-              {chatCount}
-            </SidebarMenuBadge>
-          )}
-        </Link>
-      </SidebarMenuButton>
-      
-      {/* Settings & Help */}
-      <SidebarMenuButton asChild>
-        <Link to="/policies" className={pathname === "/policies" ? "active" : ""}>
-          <BookOpen className="h-4 w-4 mr-2" />
-          Policies
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/profile" className={pathname === "/profile" ? "active" : ""}>
-          <Cog className="h-4 w-4 mr-2" />
-          Settings
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/changelog" className={pathname === "/changelog" ? "active" : ""}>
-          <BookText className="h-4 w-4 mr-2" />
-          Changelog
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton className="cursor-not-allowed">
-        <LifeBuoy className="h-4 w-4 mr-2" />
-        Help & Support
-      </SidebarMenuButton>
+      <SidebarMenuButton 
+        icon={<Grid3X3 size={18} />}
+        label="My Desk"
+        isActive={isActive('/desk')} 
+        onClick={() => navigate('/desk')}
+      />
+      <SidebarMenuButton 
+        icon={<Mail size={18} />}
+        label="Chat"
+        isActive={isActive('/chat')} 
+        onClick={() => navigate('/chat')}
+        badge={chatCount > 0 ? <SidebarMenuBadge>{chatCount}</SidebarMenuBadge> : undefined}
+      />
+      <SidebarMenuButton 
+        icon={<FileText size={18} />}
+        label="Documents"
+        isActive={isActive('/documents')} 
+        onClick={() => navigate('/documents')}
+        badge={documentsCount > 0 ? <SidebarMenuBadge>{documentsCount}</SidebarMenuBadge> : undefined}
+      />
+      <SidebarMenuButton 
+        icon={<CalendarDays size={18} />}
+        label="Calendar"
+        isActive={isActive('/calendar')} 
+        onClick={() => navigate('/calendar')}
+        badge={calendarCount > 0 ? <SidebarMenuBadge>{calendarCount}</SidebarMenuBadge> : undefined}
+      />
+      <SidebarMenuButton 
+        icon={<Users size={18} />}
+        label="Contacts"
+        isActive={isActive('/contacts')} 
+        onClick={() => navigate('/contacts')}
+        badge={contactsCount > 0 ? <SidebarMenuBadge>{contactsCount}</SidebarMenuBadge> : undefined}
+      />
     </SidebarMenu>
   );
 }

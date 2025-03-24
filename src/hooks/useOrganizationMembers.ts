@@ -58,7 +58,7 @@ export function useOrganizationMembers() {
         }
         
         // Get roles for all users
-        const userIds = profilesData.map(profile => profile.id);
+        const userIds = profilesData?.map(profile => profile.id) || [];
         const { data: rolesData, error: rolesError } = await supabase
           .from('user_roles')
           .select('user_id, role')
@@ -77,9 +77,9 @@ export function useOrganizationMembers() {
         }
         
         // Create a map of user IDs to roles
-        const rolesMap: Record<string, string> = {};
+        const rolesMap: Record<string, UserRole> = {};
         rolesData?.forEach(roleData => {
-          rolesMap[roleData.user_id] = roleData.role;
+          rolesMap[roleData.user_id] = roleData.role as UserRole;
         });
         
         // Create a map of user IDs to emails
@@ -91,15 +91,15 @@ export function useOrganizationMembers() {
         }
         
         // Combine the data
-        const organizationMembers = profilesData.map(profile => ({
+        const organizationMembers: OrganizationMember[] = profilesData?.map(profile => ({
           id: profile.id,
           first_name: profile.first_name,
           last_name: profile.last_name,
           email: emailsMap[profile.id] || `user-${profile.id.substring(0, 8)}@example.com`,
-          role: rolesMap[profile.id] || 'user',
+          role: (rolesMap[profile.id] as UserRole) || 'user',
           created_at: profile.created_at,
           last_activity: profile.last_activity
-        }));
+        })) || [];
         
         setMembers(organizationMembers);
       } catch (err) {
