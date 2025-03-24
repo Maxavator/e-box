@@ -83,7 +83,7 @@ export const useGroupManagement = () => {
     }
     
     // For org admins, ensure they can only modify groups in their organization
-    if (!isAdmin && userRole === 'org_admin') {
+    if (!isAdmin && userRole === 'org_admin' && userProfile?.organization_id) {
       const { data, error } = await supabase
         .from('conversations')
         .select('organization_id')
@@ -94,7 +94,7 @@ export const useGroupManagement = () => {
         throw error;
       }
       
-      if (data.organization_id !== userProfile?.organization_id) {
+      if (data.organization_id !== userProfile.organization_id) {
         throw new Error("Permission denied: You can only update groups in your organization");
       }
     }
@@ -124,7 +124,7 @@ export const useGroupManagement = () => {
     }
     
     // For org admins, ensure they can only delete groups in their organization
-    if (!isAdmin && userRole === 'org_admin') {
+    if (!isAdmin && userRole === 'org_admin' && userProfile?.organization_id) {
       const { data, error } = await supabase
         .from('conversations')
         .select('organization_id')
@@ -135,7 +135,7 @@ export const useGroupManagement = () => {
         throw error;
       }
       
-      if (data.organization_id !== userProfile?.organization_id) {
+      if (data.organization_id !== userProfile.organization_id) {
         throw new Error("Permission denied: You can only delete groups in your organization");
       }
     }
