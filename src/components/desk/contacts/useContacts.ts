@@ -12,6 +12,7 @@ export const useContacts = () => {
   const { data: contacts, isLoading } = useQuery({
     queryKey: ['contacts'],
     queryFn: async () => {
+      console.log("Fetching contacts...");
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("Not authenticated");
 
@@ -23,8 +24,11 @@ export const useContacts = () => {
         .single();
 
       if (!userProfile?.organization_id) {
+        console.log("User has no organization, returning empty contacts list");
         return []; // Return empty array if user has no organization
       }
+
+      console.log("User organization ID:", userProfile.organization_id);
 
       // First, fetch ALL organization members including the current user
       const { data: allOrgMembers, error: orgMembersError } = await supabase
@@ -32,10 +36,16 @@ export const useContacts = () => {
         .select('id, first_name, last_name, organization_id')
         .eq('organization_id', userProfile.organization_id);
 
-      if (orgMembersError) throw orgMembersError;
+      if (orgMembersError) {
+        console.error("Error fetching organization members:", orgMembersError);
+        throw orgMembersError;
+      }
+      
+      console.log("Found organization members:", allOrgMembers?.length);
       
       // Filter out the current user
       const orgMembers = allOrgMembers.filter(member => member.id !== userData.user.id);
+      console.log("Organization members (excluding current user):", orgMembers.length);
 
       // Then fetch user's explicit contacts
       const { data: userContacts, error: contactsError } = await supabase
@@ -43,7 +53,12 @@ export const useContacts = () => {
         .select('id, user_id, contact_id, is_favorite, created_at')
         .eq('user_id', userData.user.id);
 
-      if (contactsError) throw contactsError;
+      if (contactsError) {
+        console.error("Error fetching user contacts:", contactsError);
+        throw contactsError;
+      }
+
+      console.log("User explicit contacts:", userContacts?.length || 0);
 
       // For each contact, fetch the profile details separately
       const contactsWithProfiles = await Promise.all((userContacts || []).map(async (contact) => {
@@ -51,7 +66,7 @@ export const useContacts = () => {
           .from('profiles')
           .select('id, first_name, last_name, organization_id')
           .eq('id', contact.contact_id)
-          .single();
+          .maybeSingle(); // Use maybeSingle to handle contact profiles that might not exist
           
         return {
           ...contact,
@@ -89,10 +104,17 @@ export const useContacts = () => {
               organization_id: member.organization_id
             }
           });
+        } else {
+          // Update existing contact to mark as colleague if needed
+          const existingContact = contactsMap.get(member.id);
+          existingContact.is_colleague = true;
+          contactsMap.set(member.id, existingContact);
         }
       });
       
-      return Array.from(contactsMap.values()) as Contact[];
+      const result = Array.from(contactsMap.values()) as Contact[];
+      console.log("Final contacts list:", result.length);
+      return result;
     },
     enabled: !loadingOrg
   });

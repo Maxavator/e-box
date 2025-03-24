@@ -68,6 +68,7 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
       navigate(`/chat?conversation=${newConversation.id}`);
     } catch (error) {
       toast.error("Failed to start conversation");
+      console.error("Start chat error:", error);
     }
   };
 

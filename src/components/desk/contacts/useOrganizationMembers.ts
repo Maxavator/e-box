@@ -22,15 +22,24 @@ export const useOrganizationMembers = () => {
         .eq('id', userData.user.id)
         .single();
 
-      if (!userProfile?.organization_id) throw new Error("No organization found");
+      if (!userProfile?.organization_id) {
+        console.log("No organization found for user");
+        return [];
+      }
 
+      console.log("Fetching members for organization:", userProfile.organization_id);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, organization_id')
-        .eq('organization_id', userProfile.organization_id)
-        .neq('id', userData.user.id);
+        .eq('organization_id', userProfile.organization_id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching organization members:", error);
+        throw error;
+      }
+      
+      console.log("Found organization members:", data?.length);
       return data as OrganizationMember[];
     }
   });
