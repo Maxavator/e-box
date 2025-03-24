@@ -1,15 +1,17 @@
+
 import { useState } from 'react';
 import { Group } from '@/types/chat';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAdminStatus } from './useAdminStatus';
+import { useAuthSession } from './useAuthSession';
 
 export function useGroupManagement() {
-  const { isAdmin, userRole, isLoading, error, session } = useAdminStatus();
+  const authStatus = useAdminStatus();
+  const { isAdmin, userRole, isLoading, error } = authStatus;
+  const { session } = useAuthSession();
   
-  // The userProfile property doesn't exist, so we'll remove it
-
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
   const [isEditingGroup, setIsEditingGroup] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);

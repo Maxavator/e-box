@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import {
   Table,
@@ -39,7 +40,7 @@ export function GroupManagement() {
     groups, members, 
     isCreatingGroup, isEditingGroup, selectedGroup, confirmDelete,
     setIsCreatingGroup, setIsEditingGroup, setSelectedGroup, setConfirmDelete,
-    handleCreateGroup, handleUpdateGroup, handleDeleteGroup
+    createGroup, updateGroup, deleteGroup
   } = useGroupManagement();
 
   const [newGroupName, setNewGroupName] = useState('');
@@ -69,7 +70,7 @@ export function GroupManagement() {
     }
 
     try {
-      await handleCreateGroup({
+      await createGroup({
         name: newGroupName,
         description: newGroupDescription,
         isPublic: true, // Default value
@@ -117,7 +118,7 @@ export function GroupManagement() {
     if (!selectedGroup) return;
 
     try {
-      await handleUpdateGroup({
+      await updateGroup({
         id: selectedGroup.id,
         name: editGroupName,
         description: editGroupDescription,
@@ -149,7 +150,7 @@ export function GroupManagement() {
     if (!confirmDelete) return;
 
     try {
-      await handleDeleteGroup(confirmDelete);
+      await deleteGroup(confirmDelete);
       toast({
         title: "Success",
         description: "Group deleted successfully.",
