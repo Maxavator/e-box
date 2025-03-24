@@ -1,6 +1,6 @@
 
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
-import { Link, useLocation } from "react-router-dom";
+import { SidebarMenu, SidebarMenuBadge, SidebarMenuButton } from "@/components/ui/sidebar/menu/sidebar-menu";
 import {
   BookOpen,
   BookText,
@@ -17,16 +17,14 @@ import {
   ShieldCheck,
   Users
 } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { useSidebarBadges } from "@/hooks/useSidebarBadges";
-import { SidebarMenu } from "@/components/ui/sidebar/menu/sidebar-menu";
-import { SidebarMenuButton } from "@/components/ui/sidebar/menu/sidebar-menu-button";
-import { SidebarMenuBadge } from "@/components/ui/sidebar/menu/sidebar-menu-badge";
 
 export default function MainNavigationMenu() {
   const location = useLocation();
   const pathname = location.pathname;
   const { isAdmin, userRole } = useUserRole();
-  const { chatCount, documentsCount, calendarCount, contactsCount, leaveCount } = useSidebarBadges();
+  const { unreadCount, flaggedItems } = useSidebarBadges();
   
   const isModerator = 
     userRole === 'hr_moderator' || 
@@ -44,7 +42,7 @@ export default function MainNavigationMenu() {
         </Link>
       </SidebarMenuButton>
       
-      {/* Desk Group - Moved before Moderation */}
+      {/* Desk Group */}
       <SidebarMenuButton asChild>
         <Link to="/mydesk" className={pathname === "/mydesk" ? "active" : ""}>
           <FolderClosed className="h-4 w-4 mr-2" />
@@ -56,11 +54,6 @@ export default function MainNavigationMenu() {
         <Link to="/documents" className={pathname === "/documents" ? "active" : ""}>
           <FileText className="h-4 w-4 mr-2" />
           Documents
-          {documentsCount > 0 && (
-            <SidebarMenuBadge>
-              {documentsCount}
-            </SidebarMenuBadge>
-          )}
         </Link>
       </SidebarMenuButton>
       
@@ -68,11 +61,6 @@ export default function MainNavigationMenu() {
         <Link to="/calendar" className={pathname === "/calendar" ? "active" : ""}>
           <Calendar className="h-4 w-4 mr-2" />
           Calendar
-          {calendarCount > 0 && (
-            <SidebarMenuBadge>
-              {calendarCount}
-            </SidebarMenuBadge>
-          )}
         </Link>
       </SidebarMenuButton>
       
@@ -80,11 +68,6 @@ export default function MainNavigationMenu() {
         <Link to="/contacts" className={pathname === "/contacts" ? "active" : ""}>
           <Users className="h-4 w-4 mr-2" />
           Contacts
-          {contactsCount > 0 && (
-            <SidebarMenuBadge>
-              {contactsCount}
-            </SidebarMenuBadge>
-          )}
         </Link>
       </SidebarMenuButton>
       
@@ -110,16 +93,6 @@ export default function MainNavigationMenu() {
         </Link>
       </SidebarMenuButton>
       
-      {/* Moderation - Moved after Desk */}
-      {(isAdmin || isModerator) && (
-        <SidebarMenuButton asChild>
-          <Link to="/moderation" className={pathname === "/moderation" ? "active" : ""}>
-            <Flag className="h-4 w-4 mr-2" />
-            Moderation
-          </Link>
-        </SidebarMenuButton>
-      )}
-
       {/* Admin */}
       {(isAdmin || isOrgAdmin) && (
         <SidebarMenuButton asChild>
@@ -130,14 +103,29 @@ export default function MainNavigationMenu() {
         </SidebarMenuButton>
       )}
       
+      {/* Moderation */}
+      {(isAdmin || isModerator) && (
+        <SidebarMenuButton asChild>
+          <Link to="/moderation" className={pathname === "/moderation" ? "active" : ""}>
+            <Flag className="h-4 w-4 mr-2" />
+            Moderation
+            {flaggedItems > 0 && (
+              <SidebarMenuBadge>
+                {flaggedItems}
+              </SidebarMenuBadge>
+            )}
+          </Link>
+        </SidebarMenuButton>
+      )}
+      
       {/* Communication */}
       <SidebarMenuButton asChild>
         <Link to="/chat" className={pathname === "/chat" ? "active" : ""}>
           <MessageSquare className="h-4 w-4 mr-2" />
           Messages
-          {chatCount > 0 && (
+          {unreadCount > 0 && (
             <SidebarMenuBadge>
-              {chatCount}
+              {unreadCount}
             </SidebarMenuBadge>
           )}
         </Link>

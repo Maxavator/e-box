@@ -12,7 +12,7 @@ import {
 
 import { UserProfileSidebarFooter } from "./profile-sidebar/UserProfileSidebarFooter";
 import { useSidebarBadges } from "@/hooks/useSidebarBadges";
-import MainNavigationMenu from "./sidebar/MainNavigationMenu";
+import { MainNavigationMenu } from "./sidebar/MainNavigationMenu";
 
 export function AppSidebar() {
   const navigate = useNavigate();
