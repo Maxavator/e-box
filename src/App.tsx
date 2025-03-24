@@ -1,138 +1,216 @@
-
-import React, { Suspense, useState, useEffect } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-
-// Import individual page components
-import Auth from '@/pages/Auth';
-import Dashboard from '@/pages/Dashboard';
-import Index from '@/pages/Index';
-import NotFound from '@/pages/NotFound';
-import Chat from '@/pages/Chat';
-import Changelog from '@/pages/Changelog';
-import AdminPortal from '@/pages/AdminPortal';
-import OrganizationDashboard from '@/pages/OrganizationDashboard';
-
-// Import from components directory rather than pages for these components
-import { Settings } from '@/components/settings/Settings';
-import { Documents } from '@/components/desk/Documents';
-import { Calendar } from '@/components/desk/Calendar';
-import { ContactsList } from '@/components/desk/ContactsList';
-import { LeaveManager } from '@/components/desk/LeaveManager';
-import { Policies } from '@/components/desk/Policies';
-import { MyDesk } from '@/components/desk/MyDesk';
-
-// Import auth and UI components
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import React, { useState, useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ThemeProvider } from './components/ui/theme-provider';
+import { Toaster } from '@/components/ui/toaster';
+import { MainLayout } from '@/layouts/MainLayout';
+import { createBrowserRouter, RouterProvider, useLocation } from 'react-router-dom';
+import { Index, Auth, Dashboard, NotFound, Chat, AdminPortal, OrganizationDashboard, Changelog, Settings, Documents, Calendar, ContactsList, LeaveManager, Policies, Desk } from './pages';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { ThemeProvider } from "@/components/shared/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import GovZA from "./pages/GovZA";
 
-// Import the MainLayout
-import { MainLayout } from '@/components/shared/MainLayout';
-import { AuthenticationDialog } from '@/components/auth/AuthenticationDialog';
+const queryClient = new QueryClient();
 
 function App() {
-  const [isMounted, setIsMounted] = useState(false);
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const session = useSession();
-  const supabase = useSupabaseClient();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    setIsMounted(true);
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
-  useEffect(() => {
-    if (!supabase || !supabase.auth) {
-      console.error("Supabase client is not properly initialized");
-      return () => {};
-    }
-
-    const handleAuthStateChange = async (event: string, newSession: any) => {
-      console.log("Auth state changed:", event);
-      
-      if (event === 'SIGNED_OUT') {
-        // Show auth dialog instead of redirecting if on a protected route
-        if (location.pathname !== '/' && location.pathname !== '/auth') {
-          setShowAuthDialog(true);
-        } else {
-          navigate('/auth');
-        }
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        // Close auth dialog and stay on current page if dialog was shown
-        setShowAuthDialog(false);
-        
-        // If on auth page, redirect to dashboard
-        if (location.pathname === '/auth') {
-          navigate('/dashboard');
-        }
-      }
-    };
-
-    try {
-      const { data } = supabase.auth.onAuthStateChange(handleAuthStateChange);
-      
-      return () => {
-        if (data?.subscription?.unsubscribe) {
-          data.subscription.unsubscribe();
-        }
-      };
-    } catch (error) {
-      console.error("Error setting up auth state change listener:", error);
-      return () => {};
-    }
-  }, [location, navigate, supabase]);
-
-  // Wrap protected route components with MainLayout
-  const withLayout = (Component: React.ComponentType) => (props: any) => (
-    <MainLayout>
-      <Component {...props} />
-    </MainLayout>
-  );
-
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="light" 
-        enableSystem={false}
-        disableTransitionOnChange
-      >
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          
-          {/* Protected routes - all wrapped with MainLayout */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={withLayout(Dashboard)({})} />
-            <Route path="/chat" element={withLayout(Chat)({})} />
-            <Route path="/mydesk" element={withLayout(MyDesk)({})} />
-            <Route path="/documents" element={withLayout(Documents)({})} />
-            <Route path="/calendar" element={withLayout(Calendar)({})} />
-            <Route path="/contacts" element={withLayout(ContactsList)({})} />
-            <Route path="/leave" element={withLayout(LeaveManager)({})} />
-            <Route path="/policies" element={withLayout(Policies)({})} />
-            <Route path="/profile" element={withLayout(Settings)({})} />
-            <Route path="/organization" element={withLayout(OrganizationDashboard)({})} />
-            <Route path="/admin" element={withLayout(AdminPortal)({})} />
-            <Route path="/changelog" element={withLayout(Changelog)({})} />
-          </Route>
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        
-        {/* Global auth dialog */}
-        <AuthenticationDialog 
-          isOpen={showAuthDialog}
-          onClose={() => setShowAuthDialog(false)}
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="light" storageKey="e-box-theme">
+        <RouterProvider
+          router={createBrowserRouter([
+            {
+              path: '/',
+              element: <Index />,
+              errorElement: <NotFound />,
+            },
+            {
+              path: '/auth',
+              element: <Auth />,
+            },
+            {
+              path: '/changelog',
+              element: <Changelog />,
+            },
+            {
+              path: '/dashboard',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Dashboard />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/chat',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Chat />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/calendar',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Calendar />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/contacts',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <ContactsList />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/documents',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Documents />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/notes',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <div>Notes</div>
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/surveys',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <div>Surveys</div>
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/admin',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <AdminPortal />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/organization',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <OrganizationDashboard />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/admin/users',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <AdminPortal />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/profile',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Settings />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/leave',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <LeaveManager />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/policies',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Policies />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/mydesk',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Desk />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/desk/:page',
+              element: (
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Desk />
+                  </MainLayout>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: '/govza/*',
+              element: (
+                <MainLayout>
+                  <GovZA />
+                </MainLayout>
+              ),
+            },
+            {
+              path: '*',
+              element: <NotFound />,
+            },
+          ])}
         />
-        
         <Toaster />
-        <Sonner />
       </ThemeProvider>
-    </Suspense>
+    </QueryClientProvider>
   );
 }
 

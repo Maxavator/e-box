@@ -1,4 +1,3 @@
-
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   MessageSquare,
@@ -18,6 +17,7 @@ import {
   Mail,
   Zap,
   HelpCircle,
+  Flag,
 } from "lucide-react";
 
 import {
@@ -193,15 +193,18 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* GovZA as a root item - moved just above Settings */}
+      {/* GovZA as a root item with improved styling */}
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="GovZA" 
           onClick={() => handleNavigation("/govza")}
           isActive={location.pathname.includes('/govza')}
         >
-          <Building2 className="h-4 w-4" />
+          <Flag className="h-4 w-4" />
           <span>GovZA</span>
+          <SidebarMenuBadge className="ml-auto bg-green-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+            New
+          </SidebarMenuBadge>
         </SidebarMenuButton>
       </SidebarMenuItem>
       
