@@ -43,18 +43,23 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("Not authenticated");
 
-      const { data: existingConversation } = await supabase
+      const { data: existingConversation, error: existingError } = await supabase
         .from('conversations')
         .select('id')
         .or(`and(user1_id.eq.${userData.user.id},user2_id.eq.${contactId}),and(user1_id.eq.${contactId},user2_id.eq.${userData.user.id})`)
         .maybeSingle();
+
+      if (existingError) {
+        console.error("Error checking existing conversation:", existingError);
+        throw existingError;
+      }
 
       if (existingConversation) {
         navigate(`/chat?conversation=${existingConversation.id}`);
         return;
       }
 
-      const { data: newConversation, error } = await supabase
+      const { data: newConversation, error: newConvError } = await supabase
         .from('conversations')
         .insert({
           user1_id: userData.user.id,
@@ -63,7 +68,10 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
         .select('id')
         .single();
 
-      if (error) throw error;
+      if (newConvError) {
+        console.error("Error creating new conversation:", newConvError);
+        throw newConvError;
+      }
       
       navigate(`/chat?conversation=${newConversation.id}`);
     } catch (error) {
@@ -96,13 +104,13 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
             </TableRow>
           ) : (
             filteredContacts?.map((contact) => (
-              <TableRow key={contact.contact.id}>
+              <TableRow key={contact.id}>
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-2">
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                       <User className="h-4 w-4 text-primary" />
                     </div>
-                    {contact.contact.first_name} {contact.contact.last_name}
+                    {contact.contact.first_name || 'Unknown'} {contact.contact.last_name || ''}
                   </div>
                 </TableCell>
                 <TableCell>

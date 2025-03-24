@@ -10,17 +10,24 @@ export type OrganizationMember = {
 };
 
 export const useOrganizationMembers = () => {
-  const { data: organizationMembers = [], isLoading: isLoadingMembers } = useQuery({
+  const { data: organizationMembers = [], isLoading: isLoadingMembers, error } = useQuery({
     queryKey: ['organization-members'],
     queryFn: async () => {
       console.log("Fetching organization members...");
       
-      const { data: userData } = await supabase.auth.getUser();
+      // Get current user
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        console.error("Error fetching user data:", userError);
+        throw userError;
+      }
+
       if (!userData.user) {
         console.error("Not authenticated");
         throw new Error("Not authenticated");
       }
 
+      // Get user's organization ID
       const { data: userProfile, error: profileError } = await supabase
         .from('profiles')
         .select('organization_id')
@@ -29,6 +36,7 @@ export const useOrganizationMembers = () => {
       
       if (profileError) {
         console.error("Error fetching user profile:", profileError);
+        throw profileError;
       }
 
       if (!userProfile?.organization_id) {
@@ -49,7 +57,7 @@ export const useOrganizationMembers = () => {
         throw error;
       }
       
-      console.log("Found organization members:", data?.length);
+      console.log("Found organization members:", data?.length || 0);
       console.log("Organization members:", data);
       
       return data as OrganizationMember[];
@@ -58,6 +66,7 @@ export const useOrganizationMembers = () => {
 
   return {
     organizationMembers: organizationMembers || [],
-    isLoadingMembers
+    isLoadingMembers,
+    error
   };
 };

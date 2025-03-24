@@ -4,20 +4,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Contact } from "../types/contacts";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { useOrganizationMembers, type OrganizationMember } from "./useOrganizationMembers";
+import { useOrganizationMembers } from "./useOrganizationMembers";
 
 export const useContacts = () => {
   const queryClient = useQueryClient();
   const { organizationName, loading: loadingOrg } = useUserProfile();
-  const { organizationMembers, isLoadingMembers } = useOrganizationMembers();
+  const { organizationMembers, isLoadingMembers, error: membersError } = useOrganizationMembers();
 
-  const { data: contacts, isLoading: isLoadingContacts } = useQuery({
+  const { data: contacts, isLoading: isLoadingContacts, error: contactsError } = useQuery({
     queryKey: ['contacts'],
     queryFn: async () => {
       console.log("Fetching contacts...");
       
       // Get current user
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        console.error("Error fetching user data:", userError);
+        throw userError;
+      }
+      
       if (!userData.user) {
         console.error("Not authenticated");
         throw new Error("Not authenticated");
@@ -34,6 +39,7 @@ export const useContacts = () => {
 
       if (profileError) {
         console.error("Error fetching user profile:", profileError);
+        throw profileError;
       }
 
       if (!userProfile?.organization_id) {
@@ -58,11 +64,16 @@ export const useContacts = () => {
 
       // For each contact, fetch the profile details
       const contactsWithProfiles = await Promise.all((userContacts || []).map(async (contact) => {
-        const { data: contactProfile } = await supabase
+        const { data: contactProfile, error: profileError } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, organization_id')
           .eq('id', contact.contact_id)
           .maybeSingle();
+          
+        if (profileError) {
+          console.error(`Error fetching profile for contact ID ${contact.contact_id}:`, profileError);
+          return null;
+        }
           
         return {
           ...contact,
@@ -74,12 +85,14 @@ export const useContacts = () => {
             organization_id: null
           }
         };
-      }));
+      })).then(results => results.filter(Boolean));
       
       // Convert to map for easy lookup
       const contactsMap = new Map();
       contactsWithProfiles.forEach(contact => {
-        contactsMap.set(contact.contact_id, contact);
+        if (contact) {
+          contactsMap.set(contact.contact_id, contact);
+        }
       });
       
       // Add all organization members as colleagues
@@ -119,7 +132,7 @@ export const useContacts = () => {
           }
         });
       } else {
-        console.log("No organization members to add to contacts");
+        console.log("No organization members to add to contacts or error fetching members:", membersError);
       }
       
       const result = Array.from(contactsMap.values()) as Contact[];
@@ -127,7 +140,7 @@ export const useContacts = () => {
       console.log("Final contacts:", result);
       return result;
     },
-    enabled: !loadingOrg && !isLoadingMembers // Only run when org data and members are loaded
+    enabled: !loadingOrg // Allow this query to run even if members are still loading
   });
 
   const toggleFavoriteMutation = useMutation({
@@ -174,7 +187,8 @@ export const useContacts = () => {
 
   return {
     contacts: contacts || [],
-    isLoading: isLoadingContacts || loadingOrg || isLoadingMembers,
+    isLoading: isLoadingContacts || loadingOrg,
+    error: contactsError || membersError,
     toggleFavoriteMutation
   };
 };
