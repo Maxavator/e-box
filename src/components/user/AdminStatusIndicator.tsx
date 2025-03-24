@@ -2,13 +2,14 @@
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
+import { UserRoleType } from "@/types/supabase-types";
 
 export function AdminStatusIndicator() {
   const { isAdmin, userRole, isLoading, error } = useUserRole();
   
   // Consider a user to have admin access if they are either global_admin or org_admin
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
-  const isModerator = ['hr_moderator', 'comm_moderator', 'stakeholder_moderator'].includes(userRole || '');
+  const isModerator = userRole === 'hr_moderator' || userRole === 'comm_moderator' || userRole === 'stakeholder_moderator';
   
   if (isLoading) {
     return (
