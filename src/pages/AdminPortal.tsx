@@ -17,6 +17,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 const AdminPortal = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const AdminPortal = () => {
   const initialView = location.state?.view || 'dashboard';
   const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'organizations' | 'settings' | 'system' | 'reporting'>(initialView);
   const { isAdmin, userRole, isLoading } = useUserRole();
+  const { organizationName } = useUserProfile();
   
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
 
@@ -79,12 +81,15 @@ const AdminPortal = () => {
     );
   }
 
+  const fullOrgName = organizationName || "System Administration";
+  const pageTitle = `Administration Portal - ${fullOrgName}`;
+
   return (
     <div className="p-4 md:p-6 space-y-6 md:space-y-8 max-w-7xl mx-auto">
       <Card className="p-6 border-l-4 border-l-primary">
         <div className="flex flex-col gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Admin Portal</h1>
+            <h1 className="text-2xl font-bold">{pageTitle}</h1>
             <p className="text-muted-foreground">
               {userRole === 'global_admin' 
                 ? 'Manage all organizations, users, and system settings' 
