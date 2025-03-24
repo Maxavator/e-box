@@ -1,8 +1,7 @@
-
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Award, FileText, Calendar, User, Users, Wheelchair } from "lucide-react";
+import { Award, FileText, Calendar, User, Users, Accessibility } from "lucide-react";
 
 interface GrantCardProps {
   icon: React.ReactNode;
@@ -99,7 +98,7 @@ export const SassaSection = () => {
         
         <Card className="p-4 hover:shadow-md transition-shadow">
           <div className="flex items-start mb-3">
-            <Wheelchair className="h-6 w-6 text-primary mr-3" />
+            <Accessibility className="h-6 w-6 text-primary mr-3" />
             <div>
               <h4 className="font-semibold">Disability Grant</h4>
               <p className="text-sm text-muted-foreground">Apply for grant for persons with disabilities</p>
