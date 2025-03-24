@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -30,7 +29,7 @@ export const Dashboard = () => {
         navigate('/calendar');
         break;
       case 'documents':
-        navigate('/documents');
+        navigate('/mydesk');
         break;
       case 'organization':
         navigate('/organization');

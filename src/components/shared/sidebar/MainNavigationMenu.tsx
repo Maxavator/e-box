@@ -135,15 +135,15 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* My Desk as a direct button */}
+      {/* Renamed from "My Desk" to "Desk" */}
       <SidebarMenuItem>
         <SidebarMenuButton 
-          tooltip="My Desk"
+          tooltip="Desk"
           onClick={() => handleNavigation("/mydesk")}
           isActive={location.pathname === "/mydesk"}
         >
           <Briefcase className="h-4 w-4" />
-          <span>My Desk {organizationName ? `@${organizationName}` : ''}</span>
+          <span>Desk {organizationName ? `@${organizationName}` : ''}</span>
           {(documentsCount > 0 || leaveCount > 0) && (
             <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
               {documentsCount + leaveCount}

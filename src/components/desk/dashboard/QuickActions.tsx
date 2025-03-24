@@ -9,7 +9,7 @@ interface QuickActionsProps {
 
 export const QuickActions = ({ onActionClick }: QuickActionsProps) => {
   const { organizationName } = useUserProfile();
-  const myDeskLabel = organizationName ? `My Desk @${organizationName}` : 'My Desk';
+  const deskLabel = organizationName ? `Desk @${organizationName}` : 'Desk';
   
   return (
     <Card>
@@ -23,7 +23,7 @@ export const QuickActions = ({ onActionClick }: QuickActionsProps) => {
             onClick={() => onActionClick('documents')}
           >
             <FileText className="w-5 h-5 mb-2 text-blue-600" />
-            <p className="font-medium">{myDeskLabel}</p>
+            <p className="font-medium">{deskLabel}</p>
             <p className="text-sm text-muted-foreground">Access files</p>
           </button>
           <button 
