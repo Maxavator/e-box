@@ -20,11 +20,14 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
+// Define the type for active view to include 'documentation'
+type ActiveView = 'dashboard' | 'users' | 'organizations' | 'settings' | 'system' | 'reporting' | 'documentation';
+
 const AdminPortal = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const initialView = location.state?.view || 'dashboard';
-  const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'organizations' | 'settings' | 'system' | 'reporting' | 'documentation'>(initialView);
+  const [activeView, setActiveView] = useState<ActiveView>(initialView as ActiveView);
   const { isAdmin, userRole, isLoading } = useUserRole();
   const { organizationName } = useUserProfile();
   
@@ -50,7 +53,7 @@ const AdminPortal = () => {
     checkAccess();
   }, [navigate, isAdmin, userRole, isLoading, hasAdminAccess]);
 
-  const handleViewChange = (view: 'dashboard' | 'users' | 'organizations' | 'settings' | 'system' | 'reporting') => {
+  const handleViewChange = (view: ActiveView) => {
     setActiveView(view);
   };
 

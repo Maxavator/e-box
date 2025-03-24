@@ -1,4 +1,6 @@
 
+import { APP_VERSION, incrementVersion, compareVersions } from './version';
+
 export type ChangeLogEntry = {
   version: string;
   date: string;
@@ -82,9 +84,6 @@ export function getLatestChanges(): ChangeLogEntry | undefined {
  * @returns The new version string
  */
 export function addChangelogEntry(changes: string[], versionType: 'major' | 'minor' | 'patch' = 'minor'): string {
-  // Import from version.ts
-  import { APP_VERSION, incrementVersion } from './version';
-  
   const newVersion = incrementVersion(APP_VERSION, versionType);
   const today = new Date().toISOString().split('T')[0];
   
@@ -99,5 +98,3 @@ export function addChangelogEntry(changes: string[], versionType: 'major' | 'min
   
   return newVersion;
 }
-
-import { compareVersions } from './version';
