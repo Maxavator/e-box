@@ -1,37 +1,10 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import {
-  MessageSquare,
-  FileText,
-  Calendar,
-  Users,
-  Clock,
-  Settings,
-  Shield,
-  Briefcase,
-  Inbox,
-  Building2,
-  FileStack,
-  ScrollText,
-  Lightbulb,
-  ClipboardList,
-  Mail,
-  Zap,
-  HelpCircle,
-  Flag,
-  StickyNote,
-} from "lucide-react";
 
-import {
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarMenuBadge,
-  SidebarMenuSub,
-  SidebarMenuSubTrigger,
-  SidebarMenuSubContent,
-} from "@/components/ui/sidebar";
+import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { SidebarMenu } from "@/components/ui/sidebar";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
+import { MainNavigationGroup, DeskNavigationGroup } from "./menu-items/NavigationGroups";
 
 interface MainNavigationMenuProps {
   chatCount: number;
@@ -72,146 +45,26 @@ export function MainNavigationMenu({
   
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Chats" 
-          onClick={() => handleNavigation("/chat")}
-          isActive={location.pathname === "/chat"}
-        >
-          <MessageSquare className="h-4 w-4" />
-          <span>Chats</span>
-          {chatCount > 0 && (
-            <SidebarMenuBadge className="ml-auto bg-red-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {chatCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
+      <MainNavigationGroup 
+        chatCount={chatCount}
+        documentsCount={documentsCount}
+        calendarCount={calendarCount}
+        contactsCount={contactsCount}
+        leaveCount={leaveCount}
+        organizationName={organizationName}
+        loading={loading}
+        hasAdminAccess={hasAdminAccess}
+        isAdminPage={isAdminPage}
+        handleNavigation={handleNavigation}
+      />
       
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Calendar" 
-          onClick={() => handleNavigation("/calendar")}
-          isActive={location.pathname === "/calendar"}
-        >
-          <Calendar className="h-4 w-4" />
-          <span>Calendar</span>
-          {calendarCount > 0 && (
-            <SidebarMenuBadge className="ml-auto bg-green-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {calendarCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Contacts" 
-          onClick={() => handleNavigation("/contacts")}
-          isActive={location.pathname === "/contacts"}
-        >
-          <Users className="h-4 w-4" />
-          <span>Contacts</span>
-          {contactsCount > 0 && (
-            <SidebarMenuBadge className="ml-auto bg-amber-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {contactsCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Documents" 
-          onClick={() => handleNavigation("/documents")}
-          isActive={location.pathname === "/documents"}
-        >
-          <FileText className="h-4 w-4" />
-          <span>Documents</span>
-          {documentsCount > 0 && (
-            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {documentsCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Notes" 
-          onClick={() => handleNavigation("/notes")}
-          isActive={location.pathname === "/notes"}
-        >
-          <StickyNote className="h-4 w-4" />
-          <span>Notes</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Surveys" 
-          onClick={() => handleNavigation("/surveys")}
-          isActive={location.pathname === "/surveys"}
-        >
-          <ClipboardList className="h-4 w-4" />
-          <span>Surveys</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      {hasAdminAccess && (
-        <SidebarMenuItem>
-          <SidebarMenuButton 
-            tooltip="Admin Portal" 
-            onClick={() => handleNavigation("/admin")}
-            isActive={isAdminPage}
-          >
-            <Shield className="h-4 w-4" />
-            <span>Admin Portal</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      )}
-      
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Desk" 
-          onClick={() => handleNavigation("/mydesk")}
-          isActive={location.pathname === "/mydesk" || location.pathname.startsWith("/desk/")}
-          className="font-medium"
-        >
-          <Briefcase className="h-4 w-4 text-primary" />
-          <span>Desk {!loading && organizationName ? `@${organizationName}` : ''}</span>
-          {(documentsCount > 0 || leaveCount > 0) && (
-            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {documentsCount + leaveCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="GovZA" 
-          onClick={() => handleNavigation("/govza")}
-          isActive={location.pathname.includes('/govza')}
-        >
-          <Flag className="h-4 w-4" />
-          <span>GovZA</span>
-          <SidebarMenuBadge className="ml-auto bg-green-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-            New
-          </SidebarMenuBadge>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Settings" 
-          onClick={() => handleNavigation("/profile")}
-          isActive={location.pathname === "/profile"}
-        >
-          <Settings className="h-4 w-4" />
-          <span>Settings</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
+      <DeskNavigationGroup 
+        documentsCount={documentsCount}
+        leaveCount={leaveCount}
+        organizationName={organizationName}
+        loading={loading}
+        handleNavigation={handleNavigation}
+      />
     </SidebarMenu>
   );
 }

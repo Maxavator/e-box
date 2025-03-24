@@ -8,8 +8,7 @@ import { useAdminStatus } from './useAdminStatus';
 import { useAuthSession } from './useAuthSession';
 
 export function useGroupManagement() {
-  const authStatus = useAdminStatus();
-  const { isAdmin, userRole, isLoading, error } = authStatus;
+  const { isAdmin } = useAdminStatus();
   const { session } = useAuthSession();
   
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
@@ -67,9 +66,15 @@ export function useGroupManagement() {
   // Create group mutation
   const createMutation = useMutation({
     mutationFn: async (newGroup: Omit<Group, 'id' | 'memberCount'>) => {
+      const groupWithDates = {
+        ...newGroup,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
       const { data, error } = await supabase
         .from('groups')
-        .insert(newGroup)
+        .insert(groupWithDates)
         .select()
         .single();
       
@@ -88,9 +93,16 @@ export function useGroupManagement() {
   const updateMutation = useMutation({
     mutationFn: async (updatedGroup: Partial<Group> & { id: string }) => {
       const { id, ...rest } = updatedGroup;
+      
+      // Add updated timestamp
+      const updateData = {
+        ...rest,
+        updatedAt: new Date().toISOString()
+      };
+      
       const { data, error } = await supabase
         .from('groups')
-        .update(rest)
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
@@ -140,11 +152,35 @@ export function useGroupManagement() {
     return deleteMutation.mutateAsync(groupId);
   };
   
+  // Create helper functions for the component to use
+  const handleCreateGroup = (groupData: {
+    name: string;
+    description: string;
+    isPublic: boolean;
+    organizationId: string;
+    createdBy: string;
+  }) => {
+    return createGroup({
+      name: groupData.name,
+      description: groupData.description,
+      isPublic: groupData.isPublic,
+      organizationId: groupData.organizationId,
+      createdBy: groupData.createdBy,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+  };
+
+  const handleUpdateGroup = (groupData: Partial<Group> & { id: string }) => {
+    return updateGroup(groupData);
+  };
+
+  const handleDeleteGroup = (groupId: string) => {
+    return deleteGroup(groupId);
+  };
+  
   return {
     isAdmin,
-    userRole,
-    isLoading,
-    error,
     session,
     groups,
     members,
@@ -161,6 +197,9 @@ export function useGroupManagement() {
     createGroup,
     updateGroup,
     deleteGroup,
-    isDeleting
+    isDeleting,
+    handleCreateGroup,
+    handleUpdateGroup,
+    handleDeleteGroup
   };
 }
