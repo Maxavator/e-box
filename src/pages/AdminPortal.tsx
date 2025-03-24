@@ -20,7 +20,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
-// Define the type for active view to include 'documentation'
+// Define the type for active view to include all possible values
 type ActiveView = 'dashboard' | 'users' | 'organizations' | 'settings' | 'system' | 'reporting' | 'documentation';
 
 const AdminPortal = () => {
