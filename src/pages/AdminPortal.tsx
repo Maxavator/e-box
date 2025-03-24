@@ -79,7 +79,7 @@ const AdminPortal = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-6 md:space-y-8 max-w-4xl mx-auto">
+    <div className="p-4 md:p-6 space-y-6 md:space-y-8 max-w-7xl mx-auto">
       <Card className="p-6 border-l-4 border-l-primary">
         <div className="flex flex-col gap-4">
           <div>
@@ -110,15 +110,27 @@ const AdminPortal = () => {
 
       {activeView === 'dashboard' && (
         <div className="space-y-8">
-          {/* Stats Cards moved to the top */}
+          {/* Stats Cards in a grid layout */}
           <StatsCards />
           
-          <NavigationCards 
-            activeView={activeView}
-            onViewChange={handleViewChange}
-          />
+          {/* Navigation cards in a tile grid */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Management Tools</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <NavigationCards 
+                activeView={activeView}
+                onViewChange={handleViewChange}
+              />
+            </div>
+          </div>
           
-          <LookupTools />
+          {/* Lookup tools in a tile grid */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Lookup Tools</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <LookupTools />
+            </div>
+          </div>
         </div>
       )}
 

@@ -20,7 +20,7 @@ export const NavigationCards = ({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <>
       <NavCard
         title="User Management"
         description="Add, remove, and manage user access and permissions"
@@ -30,7 +30,7 @@ export const NavigationCards = ({
         color="blue"
       />
       <NavCard
-        title="Organizations Management"
+        title="Organizations"
         description="Manage organization settings and administrators"
         icon={<Building2 className="w-5 h-5" />}
         isActive={activeView === 'organizations'}
@@ -46,14 +46,14 @@ export const NavigationCards = ({
         color="amber"
       />
       <NavCard
-        title="System Information"
+        title="System Info"
         description="Monitor server status, database metrics, and system health"
         icon={<Server className="w-5 h-5" />}
         isActive={activeView === 'system'}
         onClick={() => handleCardClick('system')}
         color="green"
       />
-    </div>
+    </>
   );
 };
 
@@ -106,7 +106,7 @@ const NavCard = ({ title, description, icon, isActive, onClick, color }: NavCard
 
   return (
     <Card 
-      className={`hover:shadow-md transition-all cursor-pointer border ${
+      className={`hover:shadow-md transition-all cursor-pointer border h-full ${
         isActive ? `border-2 ${colorClasses.border} ring-1 ring-primary/30` : 'border-border'
       } ${colorClasses.bg}`}
       onClick={onClick}

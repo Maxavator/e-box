@@ -1,174 +1,124 @@
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  Search, Users, Building2, FileText, 
+  Calendar, MessageSquare, Clock, Link2
+} from "lucide-react";
 import { useState } from "react";
-import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import type { UserWithRole } from "@/components/admin/types";
-import type { Organization } from "@/types/database";
 
 export const LookupTools = () => {
-  const [userQuery, setUserQuery] = useState("");
-  const [orgQuery, setOrgQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleUserLookup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!userQuery.trim()) return;
-
-    setIsLoading(true);
-    try {
-      // First get the profiles - only search string fields
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select(`
-          *,
-          organizations:organization_id (
-            name
-          )
-        `)
-        .or(`first_name.ilike.%${userQuery}%,last_name.ilike.%${userQuery}%`)
-        .limit(5);
-
-      if (profilesError) throw profilesError;
-
-      if (!profilesData || profilesData.length === 0) {
-        toast.info("No users found matching your search");
-        return;
-      }
-
-      // Then get user roles for the found profiles
-      const { data: userRolesData, error: userRolesError } = await supabase
-        .from('user_roles')
-        .select('*')
-        .in('user_id', profilesData.map(profile => profile.id));
-
-      if (userRolesError) throw userRolesError;
-
-      const formattedResults = profilesData.map(user => {
-        const userRole = userRolesData?.find(role => role.user_id === user.id);
-        return {
-          name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
-          email: user.id,
-          role: userRole?.role || 'N/A',
-          organization: user.organizations?.name || 'N/A'
-        };
-      });
-      
-      toast.success(`Found ${profilesData.length} user(s)`, {
-        description: (
-          <div className="mt-2 space-y-2">
-            {formattedResults.map((result, i) => (
-              <div key={i} className="text-sm border-b pb-2">
-                <div className="font-semibold">{result.name}</div>
-                <div className="text-xs text-gray-500">
-                  {result.email} | {result.role} | {result.organization}
-                </div>
-              </div>
-            ))}
-          </div>
-        )
-      });
-    } catch (error: any) {
-      toast.error("Error looking up user: " + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleOrgLookup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!orgQuery.trim()) return;
-
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('organizations')
-        .select(`
-          id,
-          name,
-          domain,
-          profiles!organization_id (
-            id
-          )
-        `)
-        .ilike('name', `%${orgQuery}%`)
-        .limit(5);
-
-      if (error) throw error;
-
-      if (!data || data.length === 0) {
-        toast.info("No organizations found matching your search");
-      } else {
-        const formattedResults = data.map(org => ({
-          name: org.name || 'N/A',
-          domain: org.domain || 'N/A',
-          memberCount: Array.isArray(org.profiles) ? org.profiles.length : 0
-        }));
-
-        toast.success(`Found ${data.length} organization(s)`, {
-          description: (
-            <div className="mt-2 space-y-2">
-              {formattedResults.map((result, i) => (
-                <div key={i} className="text-sm border-b pb-2">
-                  <div className="font-semibold">{result.name}</div>
-                  <div className="text-xs text-gray-500">
-                    Domain: {result.domain} | Members: {result.memberCount}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )
-        });
-      }
-    } catch (error: any) {
-      toast.error("Error looking up organization: " + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Quick User Lookup</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleUserLookup} className="flex gap-2">
-            <Input
-              placeholder="Search by name or email..."
-              value={userQuery}
-              onChange={(e) => setUserQuery(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="submit" disabled={isLoading}>
-              <Search className="h-4 w-4" />
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+    <>
+      <LookupCard 
+        title="Find User"
+        description="Search for users by name, email, or ID"
+        icon={<Users className="w-5 h-5" />}
+        color="blue"
+      >
+        <div className="flex gap-2">
+          <Input 
+            placeholder="Enter user email or name" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1"
+          />
+          <Button variant="outline" size="sm">
+            <Search className="w-4 h-4 mr-2" />
+            Search
+          </Button>
+        </div>
+      </LookupCard>
+      
+      <LookupCard 
+        title="Organization Lookup"
+        description="Find organization details and members"
+        icon={<Building2 className="w-5 h-5" />}
+        color="purple"
+      >
+        <div className="flex gap-2">
+          <Input placeholder="Enter organization name or ID" className="flex-1" />
+          <Button variant="outline" size="sm">
+            <Search className="w-4 h-4 mr-2" />
+            Search
+          </Button>
+        </div>
+      </LookupCard>
+      
+      <LookupCard 
+        title="Document Search"
+        description="Find documents by title or content"
+        icon={<FileText className="w-5 h-5" />}
+        color="amber"
+      >
+        <div className="flex gap-2">
+          <Input placeholder="Enter document title or keyword" className="flex-1" />
+          <Button variant="outline" size="sm">
+            <Search className="w-4 h-4 mr-2" />
+            Search
+          </Button>
+        </div>
+      </LookupCard>
+    </>
+  );
+};
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Quick Organization Lookup</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleOrgLookup} className="flex gap-2">
-            <Input
-              placeholder="Search by organization name..."
-              value={orgQuery}
-              onChange={(e) => setOrgQuery(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="submit" disabled={isLoading}>
-              <Search className="h-4 w-4" />
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+interface LookupCardProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: "blue" | "purple" | "amber" | "green";
+  children: React.ReactNode;
+}
+
+const LookupCard = ({ title, description, icon, color, children }: LookupCardProps) => {
+  const getColorClasses = () => {
+    switch (color) {
+      case "blue":
+        return {
+          bg: "bg-blue-50",
+          icon: "text-blue-600 bg-blue-100",
+        };
+      case "purple":
+        return {
+          bg: "bg-purple-50",
+          icon: "text-purple-600 bg-purple-100",
+        };
+      case "amber":
+        return {
+          bg: "bg-amber-50",
+          icon: "text-amber-600 bg-amber-100",
+        };
+      case "green":
+        return {
+          bg: "bg-green-50",
+          icon: "text-green-600 bg-green-100",
+        };
+      default:
+        return {
+          bg: "bg-gray-50",
+          icon: "text-gray-600 bg-gray-100",
+        };
+    }
+  };
+
+  const colorClasses = getColorClasses();
+
+  return (
+    <Card className={`hover:shadow-sm transition-all border ${colorClasses.bg}`}>
+      <CardHeader className="pb-2">
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-lg ${colorClasses.icon}`}>
+            {icon}
+          </div>
+          <CardTitle className="text-lg">{title}</CardTitle>
+        </div>
+        <p className="text-muted-foreground text-sm mt-1">{description}</p>
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
   );
 };
