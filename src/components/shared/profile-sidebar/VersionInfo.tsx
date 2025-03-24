@@ -1,5 +1,5 @@
 
-import { Info } from "lucide-react";
+import { Info, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,10 +11,23 @@ import {
 import { APP_VERSION } from "@/utils/version";
 import { getLatestChanges } from "@/utils/changelog";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export function VersionInfo() {
   const navigate = useNavigate();
   const latestChanges = getLatestChanges();
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Logged out successfully");
+      navigate('/auth');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error("Failed to logout");
+    }
+  };
 
   return (
     <div className="flex items-center justify-between mt-auto pt-2 border-t border-muted/20 text-xs text-muted-foreground">
@@ -59,6 +72,24 @@ export function VersionInfo() {
             </TooltipTrigger>
             <TooltipContent>
               <p>© 2025 Afrovation Technology Solutions (Pty) Ltd. All rights reserved.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-3 w-3" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Logout from e-Box</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
