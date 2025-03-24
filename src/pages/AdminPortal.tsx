@@ -79,9 +79,9 @@ const AdminPortal = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-6 md:space-y-8">
+    <div className="p-4 md:p-6 space-y-6 md:space-y-8 max-w-4xl mx-auto">
       <Card className="p-6 border-l-4 border-l-primary">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col gap-4">
           <div>
             <h1 className="text-2xl font-bold">Admin Portal</h1>
             <p className="text-muted-foreground">
@@ -97,7 +97,7 @@ const AdminPortal = () => {
                 setActiveView('dashboard');
                 navigate('/admin', { state: { view: 'dashboard' } });
               }}
-              className="flex items-center gap-2 text-sm"
+              className="flex items-center gap-2 text-sm w-full sm:w-auto"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
@@ -109,17 +109,15 @@ const AdminPortal = () => {
       <Separator className="my-6" />
 
       {activeView === 'dashboard' && (
-        <>
+        <div className="space-y-8">
           <NavigationCards 
             activeView={activeView}
             onViewChange={handleViewChange}
           />
           
-          <div className="grid gap-8 lg:grid-cols-2">
-            <StatsCards />
-            <LookupTools />
-          </div>
-        </>
+          <StatsCards />
+          <LookupTools />
+        </div>
       )}
 
       {activeView === 'users' && (
