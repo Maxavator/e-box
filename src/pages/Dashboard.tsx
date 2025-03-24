@@ -1,11 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Users, Building2, MessageSquare, ArrowUpRight, 
   Activity, LineChart, Clock, CheckCircle2,
   FileText, Calendar, User, Settings,
-  MessageCircle, Loader2
+  MessageCircle, Loader2, Shield
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -63,7 +62,6 @@ const Dashboard = () => {
   const handleQuickAction = (action: string) => {
     console.log(`Quick action: ${action}`);
     
-    // Use checkAuth to verify authentication before navigation
     checkAuth(() => {
       switch (action) {
         case 'documents':
@@ -175,7 +173,36 @@ const Dashboard = () => {
         {isAdmin && (
           <div className="border-t pt-8">
             <h2 className="text-lg font-semibold mb-6">Admin Tools</h2>
-            <NavigationCards />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <AdminTile
+                title="User Management"
+                description="Manage users and permissions"
+                icon={<Users className="w-5 h-5 text-blue-600" />}
+                color="blue"
+                onClick={() => navigate('/admin', { state: { view: 'users' } })}
+              />
+              <AdminTile
+                title="Organizations"
+                description="Manage organization settings"
+                icon={<Building2 className="w-5 h-5 text-purple-600" />}
+                color="purple"
+                onClick={() => navigate('/admin', { state: { view: 'organizations' } })}
+              />
+              <AdminTile
+                title="System Settings"
+                description="Configure system settings"
+                icon={<Settings className="w-5 h-5 text-amber-600" />}
+                color="amber"
+                onClick={() => navigate('/admin', { state: { view: 'settings' } })}
+              />
+              <AdminTile
+                title="System Info"
+                description="Monitor system health"
+                icon={<Shield className="w-5 h-5 text-green-600" />}
+                color="green"
+                onClick={() => navigate('/admin', { state: { view: 'system' } })}
+              />
+            </div>
           </div>
         )}
 
@@ -294,6 +321,70 @@ const StatsCard = ({ title, value, change, period, icon, trend }: StatsCardProps
     </CardContent>
   </Card>
 );
+
+interface AdminTileProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: "blue" | "purple" | "amber" | "green";
+  onClick: () => void;
+}
+
+const AdminTile = ({ title, description, icon, color, onClick }: AdminTileProps) => {
+  const getColorClasses = () => {
+    switch (color) {
+      case "blue":
+        return {
+          bg: "bg-blue-50 hover:bg-blue-100",
+          border: "border-blue-200",
+          iconBg: "bg-blue-100"
+        };
+      case "purple":
+        return {
+          bg: "bg-purple-50 hover:bg-purple-100",
+          border: "border-purple-200",
+          iconBg: "bg-purple-100"
+        };
+      case "amber":
+        return {
+          bg: "bg-amber-50 hover:bg-amber-100",
+          border: "border-amber-200",
+          iconBg: "bg-amber-100"
+        };
+      case "green":
+        return {
+          bg: "bg-green-50 hover:bg-green-100",
+          border: "border-green-200",
+          iconBg: "bg-green-100"
+        };
+      default:
+        return {
+          bg: "bg-gray-50 hover:bg-gray-100",
+          border: "border-gray-200",
+          iconBg: "bg-gray-100"
+        };
+    }
+  };
+
+  const colorClasses = getColorClasses();
+
+  return (
+    <div 
+      className={`${colorClasses.bg} border ${colorClasses.border} rounded-lg p-6 cursor-pointer transition-all hover:shadow-md`}
+      onClick={onClick}
+    >
+      <div className="flex items-start gap-4">
+        <div className={`p-3 rounded-lg ${colorClasses.iconBg}`}>
+          {icon}
+        </div>
+        <div>
+          <h3 className="font-medium text-lg">{title}</h3>
+          <p className="text-sm text-muted-foreground mt-1">{description}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface QuickActionCardProps {
   title: string;
