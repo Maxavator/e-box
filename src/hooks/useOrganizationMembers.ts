@@ -58,7 +58,7 @@ export function useOrganizationMembers() {
         }
         
         // Get roles for all users
-        const userIds = profilesData?.map(profile => profile.id) || [];
+        const userIds = profilesData.map(profile => profile.id);
         const { data: rolesData, error: rolesError } = await supabase
           .from('user_roles')
           .select('user_id, role')
@@ -69,7 +69,7 @@ export function useOrganizationMembers() {
         }
         
         // Get email addresses
-        const { data: authData, error: usersError } = await supabase.auth.admin.listUsers();
+        const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers();
         
         if (usersError) {
           // This might fail if the user doesn't have admin access
@@ -77,33 +77,27 @@ export function useOrganizationMembers() {
         }
         
         // Create a map of user IDs to roles
-        const rolesMap: Record<string, UserRole> = {};
+        const rolesMap = {};
         rolesData?.forEach(roleData => {
-          rolesMap[roleData.user_id] = roleData.role as UserRole;
+          rolesMap[roleData.user_id] = roleData.role;
         });
         
         // Create a map of user IDs to emails
-        const emailsMap: Record<string, string> = {};
-        
-        // Properly type and handle the authData
-        if (authData && 'users' in authData && Array.isArray(authData.users)) {
-          authData.users.forEach((userData: any) => {
-            if (userData && typeof userData === 'object' && 'id' in userData && 'email' in userData) {
-              emailsMap[userData.id] = userData.email;
-            }
-          });
-        }
+        const emailsMap = {};
+        usersData?.users?.forEach(userData => {
+          emailsMap[userData.id] = userData.email;
+        });
         
         // Combine the data
-        const organizationMembers: OrganizationMember[] = profilesData?.map(profile => ({
+        const organizationMembers = profilesData.map(profile => ({
           id: profile.id,
           first_name: profile.first_name,
           last_name: profile.last_name,
           email: emailsMap[profile.id] || `user-${profile.id.substring(0, 8)}@example.com`,
-          role: (rolesMap[profile.id] as UserRole) || 'user',
+          role: rolesMap[profile.id] || 'user',
           created_at: profile.created_at,
           last_activity: profile.last_activity
-        })) || [];
+        }));
         
         setMembers(organizationMembers);
       } catch (err) {

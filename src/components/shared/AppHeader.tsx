@@ -11,32 +11,15 @@ import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { ThemeToggle } from "./ThemeToggle";
 import { ModerationIcon } from "@/components/moderation/ModerationIcon";
 
-interface AppHeaderProps {
-  onLogout?: () => void;
-  onLogoClick?: () => void;
-}
-
-export function AppHeader({ onLogout, onLogoClick }: AppHeaderProps = {}) {
+export function AppHeader() {
   const { firstName, lastName } = useUserProfile();
   const { isAdmin } = useUserRole();
   const navigate = useNavigate();
   const supabase = useSupabaseClient();
 
   const handleLogout = async () => {
-    if (onLogout) {
-      onLogout();
-    } else {
-      await supabase.auth.signOut();
-      navigate('/auth');
-    }
-  };
-
-  const handleLogoClick = () => {
-    if (onLogoClick) {
-      onLogoClick();
-    } else {
-      navigate('/dashboard');
-    }
+    await supabase.auth.signOut();
+    navigate('/auth');
   };
 
   return (

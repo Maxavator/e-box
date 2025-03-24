@@ -12,7 +12,7 @@ import {
 
 import { UserProfileSidebarFooter } from "./profile-sidebar/UserProfileSidebarFooter";
 import { useSidebarBadges } from "@/hooks/useSidebarBadges";
-import MainNavigationMenu from "./sidebar/MainNavigationMenu";
+import { MainNavigationMenu } from "./sidebar/MainNavigationMenu";
 
 export function AppSidebar() {
   const navigate = useNavigate();
@@ -47,7 +47,14 @@ export function AppSidebar() {
       
       <SidebarContent className="border-t-0 flex-1 bg-sidebar">
         <SidebarGroup>
-          <MainNavigationMenu />
+          <MainNavigationMenu 
+            chatCount={chatCount}
+            documentsCount={documentsCount}
+            calendarCount={calendarCount}
+            contactsCount={contactsCount}
+            leaveCount={leaveCount}
+            resetBadgeCount={resetBadgeCount}
+          />
         </SidebarGroup>
       </SidebarContent>
       
