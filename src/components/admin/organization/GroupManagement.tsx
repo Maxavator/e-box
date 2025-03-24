@@ -51,11 +51,9 @@ export const GroupManagement = () => {
       await handleCreateGroup({
         name: newGroupName,
         description: newGroupDescription,
-        isPublic: true,
-        organizationId,
-        createdBy: userId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        is_public: true,
+        organization_id: organizationId,
+        created_by: userId
       });
       
       // Reset form

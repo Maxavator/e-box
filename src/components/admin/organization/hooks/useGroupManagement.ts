@@ -77,15 +77,15 @@ export const useGroupManagement = () => {
 
   // Create a new group
   const createGroupMutation = useMutation({
-    mutationFn: async (newGroup: Omit<Group, "id" | "memberCount" | "createdAt" | "updatedAt">) => {
+    mutationFn: async (newGroup: Omit<Group, "id" | "member_count" | "created_at" | "updated_at">) => {
       const { data, error } = await supabase
         .from("groups")
         .insert({
           name: newGroup.name,
           description: newGroup.description,
-          is_public: newGroup.isPublic,
-          organization_id: newGroup.organizationId,
-          created_by: newGroup.createdBy,
+          is_public: newGroup.is_public,
+          organization_id: newGroup.organization_id,
+          created_by: newGroup.created_by,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
@@ -114,7 +114,7 @@ export const useGroupManagement = () => {
         .update({
           name: updatedGroup.name,
           description: updatedGroup.description,
-          is_public: updatedGroup.isPublic,
+          is_public: updatedGroup.is_public,
           updated_at: new Date().toISOString(),
         })
         .eq("id", updatedGroup.id)
@@ -157,7 +157,7 @@ export const useGroupManagement = () => {
   });
 
   // Handler functions
-  const handleCreateGroup = (newGroup: Omit<Group, "id" | "memberCount" | "createdAt" | "updatedAt">) => {
+  const handleCreateGroup = (newGroup: Omit<Group, "id" | "member_count" | "created_at" | "updated_at">) => {
     return createGroupMutation.mutateAsync(newGroup);
   };
 

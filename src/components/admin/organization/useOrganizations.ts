@@ -18,7 +18,7 @@ export const useOrganizations = () => {
   });
 
   const { session } = useAuthSession();
-  const { isAdmin } = useAdminStatus(session);
+  const { isAdmin } = useAdminStatus();
   const { organizations, isLoading } = useOrganizationData(session, isAdmin);
   const { createMutation, updateMutation, deleteMutation } = useOrganizationMutations(session, isAdmin);
 

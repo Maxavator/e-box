@@ -1,3 +1,4 @@
+
 export interface OrganizationFormData {
   name: string;
   domain: string;
@@ -12,4 +13,6 @@ export interface Group {
   created_at?: string;
   updated_at?: string;
   member_count?: number;
+  is_public?: boolean;
+  created_by?: string;
 }
