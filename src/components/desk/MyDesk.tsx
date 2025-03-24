@@ -4,18 +4,63 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Documents } from "./Documents";
 import { LeaveManager } from "./LeaveManager";
 import { Policies } from "./Policies";
-import { Briefcase, FileText, Clock, Scroll } from "lucide-react";
+import { Briefcase, FileText, Clock, Scroll, Inbox, Calendar, Users, FileStack } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export function MyDesk() {
   const [activeTab, setActiveTab] = useState("documents");
   const { organizationName } = useUserProfile();
+  const navigate = useNavigate();
+  
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
   
   return (
     <div className="p-4 md:p-6">
       <div className="flex items-center gap-2 mb-6">
         <Briefcase className="h-6 w-6 text-primary" />
         <h1 className="text-3xl font-bold">Desk {organizationName ? `@${organizationName}` : ''}</h1>
+      </div>
+      
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+        <Button 
+          variant="outline" 
+          className="flex flex-col items-center justify-center h-28 p-4" 
+          onClick={() => handleNavigation("/desk/inbox")}
+        >
+          <Inbox className="h-8 w-8 mb-2" />
+          <span>Inbox</span>
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          className="flex flex-col items-center justify-center h-28 p-4" 
+          onClick={() => handleNavigation("/desk/calendar")}
+        >
+          <Calendar className="h-8 w-8 mb-2" />
+          <span>Calendar</span>
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          className="flex flex-col items-center justify-center h-28 p-4" 
+          onClick={() => handleNavigation("/desk/colleagues")}
+        >
+          <Users className="h-8 w-8 mb-2" />
+          <span>Colleagues</span>
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          className="flex flex-col items-center justify-center h-28 p-4" 
+          onClick={() => handleNavigation("/desk/payslip")}
+        >
+          <FileStack className="h-8 w-8 mb-2" />
+          <span>Payslip</span>
+        </Button>
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

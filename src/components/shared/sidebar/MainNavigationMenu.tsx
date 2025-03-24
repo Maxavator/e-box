@@ -91,95 +91,24 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* Desk section with submenu - MOVED UP */}
+      {/* Desk as a root item */}
       <SidebarMenuItem>
-        <SidebarMenuSub>
-          <SidebarMenuSubTrigger
-            tooltip="Desk"
-            isActive={location.pathname.includes('/mydesk') || location.pathname.includes('/leave')}
-          >
-            <Briefcase className="h-4 w-4" />
-            <span>Desk {organizationName ? `@${organizationName}` : ''}</span>
-            {(documentsCount > 0 || leaveCount > 0) && (
-              <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-                {documentsCount + leaveCount}
-              </SidebarMenuBadge>
-            )}
-          </SidebarMenuSubTrigger>
-          <SidebarMenuSubContent>
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                onClick={() => handleNavigation("/mydesk")}
-                isActive={location.pathname === "/mydesk"}
-              >
-                <Briefcase className="h-4 w-4" />
-                <span>Overview</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                onClick={() => handleNavigation("/desk/inbox")}
-                isActive={location.pathname === "/desk/inbox"}
-              >
-                <Inbox className="h-4 w-4" />
-                <span>Inbox</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                onClick={() => handleNavigation("/desk/calendar")}
-                isActive={location.pathname === "/desk/calendar"}
-              >
-                <Calendar className="h-4 w-4" />
-                <span>Calendar</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                onClick={() => handleNavigation("/desk/colleagues")}
-                isActive={location.pathname === "/desk/colleagues"}
-              >
-                <Users className="h-4 w-4" />
-                <span>Colleagues</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                onClick={() => handleNavigation("/desk/payslip")}
-                isActive={location.pathname === "/desk/payslip"}
-              >
-                <FileStack className="h-4 w-4" />
-                <span>Payslip</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                onClick={() => handleNavigation("/leave")}
-                isActive={location.pathname === "/leave"}
-              >
-                <Clock className="h-4 w-4" />
-                <span>Leave</span>
-                {leaveCount > 0 && (
-                  <SidebarMenuBadge className="ml-auto bg-purple-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-                    {leaveCount}
-                  </SidebarMenuBadge>
-                )}
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton 
-                onClick={() => handleNavigation("/policies")}
-                isActive={location.pathname === "/policies"}
-              >
-                <ScrollText className="h-4 w-4" />
-                <span>Policies</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenuSubContent>
-        </SidebarMenuSub>
+        <SidebarMenuButton 
+          tooltip="Desk" 
+          onClick={() => handleNavigation("/mydesk")}
+          isActive={location.pathname === "/mydesk"}
+        >
+          <Briefcase className="h-4 w-4" />
+          <span>Desk {organizationName ? `@${organizationName}` : ''}</span>
+          {(documentsCount > 0 || leaveCount > 0) && (
+            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {documentsCount + leaveCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* GovZA section with submenu - MOVED UP */}
+      {/* GovZA section with submenu */}
       <SidebarMenuItem>
         <SidebarMenuSub>
           <SidebarMenuSubTrigger
