@@ -1,12 +1,15 @@
 
 import { Globe, User, FileText, Car, Award } from "lucide-react";
+import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface DepartmentSelectorProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  className?: string;
 }
 
-export const DepartmentSelector = ({ activeTab, setActiveTab }: DepartmentSelectorProps) => {
+export const DepartmentSelector = ({ activeTab, setActiveTab, className }: DepartmentSelectorProps) => {
   const departments = [
     { id: "", label: "All Services", icon: <Globe className="h-4 w-4" /> },
     { id: "home-affairs", label: "Home Affairs", icon: <User className="h-4 w-4" /> },
@@ -16,7 +19,7 @@ export const DepartmentSelector = ({ activeTab, setActiveTab }: DepartmentSelect
   ];
 
   return (
-    <div className="flex overflow-x-auto bg-muted rounded-lg mb-8">
+    <div className={cn("flex overflow-x-auto bg-muted rounded-lg mb-8", className)}>
       {departments.map((dept) => (
         <button
           key={dept.id}

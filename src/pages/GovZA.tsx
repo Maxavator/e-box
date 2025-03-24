@@ -6,9 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Flag, Info, Globe, Shield, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-import { DepartmentSelector } from "@/components/govza/DepartmentSelector";
-import { PopularServices } from "@/components/govza/PopularServices";
-import { GovernmentDepartments } from "@/components/govza/GovernmentDepartments";
+import { GovServicesSection } from "@/components/govza/GovServicesSection";
 import { HomeAffairsSection } from "@/components/govza/departments/HomeAffairsSection";
 import { TransportSection } from "@/components/govza/departments/TransportSection";
 import { SarsSection } from "@/components/govza/departments/SarsSection";
@@ -16,7 +14,6 @@ import { SassaSection } from "@/components/govza/departments/SassaSection";
 
 export default function GovZA() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeDepartment, setActiveDepartment] = useState<string | null>(null);
   
   return (
     <div className="container max-w-7xl mx-auto py-6 px-4 md:px-6">
@@ -49,23 +46,35 @@ export default function GovZA() {
         </Button>
       </div>
       
-      <DepartmentSelector 
-        activeTab={activeDepartment || ""} 
-        setActiveTab={setActiveDepartment}
-      />
-      
-      {!activeDepartment && (
-        <>
-          <PopularServices />
-          <Separator className="my-8" />
-          <GovernmentDepartments onSelectDepartment={setActiveDepartment} />
-        </>
-      )}
-      
-      {activeDepartment === "home-affairs" && <HomeAffairsSection />}
-      {activeDepartment === "transport" && <TransportSection />}
-      {activeDepartment === "sars" && <SarsSection />}
-      {activeDepartment === "sassa" && <SassaSection />}
+      <Tabs defaultValue="overview" className="mb-8">
+        <TabsList className="w-full justify-start overflow-x-auto mb-4">
+          <TabsTrigger value="overview" className="px-4">Overview</TabsTrigger>
+          <TabsTrigger value="home-affairs" className="px-4">Home Affairs</TabsTrigger>
+          <TabsTrigger value="sars" className="px-4">SARS</TabsTrigger>
+          <TabsTrigger value="transport" className="px-4">Transport</TabsTrigger>
+          <TabsTrigger value="sassa" className="px-4">SASSA</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview">
+          <GovServicesSection searchQuery={searchQuery} />
+        </TabsContent>
+        
+        <TabsContent value="home-affairs">
+          <HomeAffairsSection />
+        </TabsContent>
+        
+        <TabsContent value="sars">
+          <SarsSection />
+        </TabsContent>
+        
+        <TabsContent value="transport">
+          <TransportSection />
+        </TabsContent>
+        
+        <TabsContent value="sassa">
+          <SassaSection />
+        </TabsContent>
+      </Tabs>
       
       <Separator className="my-8" />
       
