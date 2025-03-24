@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { NavigationCards } from "@/components/admin/dashboard/NavigationCards";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuthDialog } from "@/hooks/useAuthDialog";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -20,6 +22,7 @@ const Dashboard = () => {
   const [userName, setUserName] = useState("User");
   const [lastUpdate, setLastUpdate] = useState("Just now");
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const { checkAuth, AuthDialog } = useAuthDialog();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -59,22 +62,26 @@ const Dashboard = () => {
 
   const handleQuickAction = (action: string) => {
     console.log(`Quick action: ${action}`);
-    switch (action) {
-      case 'documents':
-        navigate('/documents');
-        break;
-      case 'calendar':
-        navigate('/calendar');
-        break;
-      case 'messages':
-        navigate('/chat');
-        break;
-      case 'profile':
-        navigate('/profile');
-        break;
-      default:
-        navigate(`/${action}`);
-    }
+    
+    // Use checkAuth to verify authentication before navigation
+    checkAuth(() => {
+      switch (action) {
+        case 'documents':
+          navigate('/documents');
+          break;
+        case 'calendar':
+          navigate('/calendar');
+          break;
+        case 'messages':
+          navigate('/chat');
+          break;
+        case 'profile':
+          navigate('/profile');
+          break;
+        default:
+          navigate(`/${action}`);
+      }
+    });
   };
 
   if (isLoading) {
@@ -96,6 +103,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex-1 min-h-screen bg-background">
+      <AuthDialog />
       <header className="h-16 bg-card border-b px-8 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold">Dashboard</h1>

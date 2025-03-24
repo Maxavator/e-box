@@ -30,9 +30,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 
 // Import the MainLayout
 import { MainLayout } from '@/components/shared/MainLayout';
+import { AuthenticationDialog } from '@/components/auth/AuthenticationDialog';
 
 function App() {
   const [isMounted, setIsMounted] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const session = useSession();
   const supabase = useSupabaseClient();
   const location = useLocation();
@@ -48,11 +50,24 @@ function App() {
       return () => {};
     }
 
-    const handleAuthStateChange = async (_event: any, _session: any) => {
-      if (!session && location.pathname !== '/auth') {
-        navigate('/auth');
-      } else if (session && location.pathname === '/auth') {
-        navigate('/dashboard');
+    const handleAuthStateChange = async (event: string, newSession: any) => {
+      console.log("Auth state changed:", event);
+      
+      if (event === 'SIGNED_OUT') {
+        // Show auth dialog instead of redirecting if on a protected route
+        if (location.pathname !== '/' && location.pathname !== '/auth') {
+          setShowAuthDialog(true);
+        } else {
+          navigate('/auth');
+        }
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        // Close auth dialog and stay on current page if dialog was shown
+        setShowAuthDialog(false);
+        
+        // If on auth page, redirect to dashboard
+        if (location.pathname === '/auth') {
+          navigate('/dashboard');
+        }
       }
     };
 
@@ -68,7 +83,7 @@ function App() {
       console.error("Error setting up auth state change listener:", error);
       return () => {};
     }
-  }, [session, location, navigate, supabase]);
+  }, [location, navigate, supabase]);
 
   // Wrap protected route components with MainLayout
   const withLayout = (Component: React.ComponentType) => (props: any) => (
@@ -107,6 +122,13 @@ function App() {
           
           <Route path="*" element={<NotFound />} />
         </Routes>
+        
+        {/* Global auth dialog */}
+        <AuthenticationDialog 
+          isOpen={showAuthDialog}
+          onClose={() => setShowAuthDialog(false)}
+        />
+        
         <Toaster />
         <Sonner />
       </ThemeProvider>
