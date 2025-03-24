@@ -27,6 +27,8 @@ export const useOrganizationMembers = () => {
         throw new Error("Not authenticated");
       }
 
+      console.log("Current user ID:", userData.user.id);
+
       // Get user's organization ID
       const { data: userProfile, error: profileError } = await supabase
         .from('profiles')
@@ -44,23 +46,26 @@ export const useOrganizationMembers = () => {
         return [];
       }
 
-      console.log("Fetching members for organization:", userProfile.organization_id);
+      console.log("User's organization ID:", userProfile.organization_id);
       
       // Fetch all members in the organization
-      const { data, error } = await supabase
+      const { data, error: membersError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, organization_id')
         .eq('organization_id', userProfile.organization_id);
 
-      if (error) {
-        console.error("Error fetching organization members:", error);
-        throw error;
+      if (membersError) {
+        console.error("Error fetching organization members:", membersError);
+        throw membersError;
       }
       
-      console.log("Found organization members:", data?.length || 0);
-      console.log("Organization members:", data);
+      // Filter out the current user from the list
+      const filteredMembers = data?.filter(member => member.id !== userData.user.id) || [];
       
-      return data as OrganizationMember[];
+      console.log("Found organization members:", filteredMembers.length);
+      console.log("Organization members:", filteredMembers);
+      
+      return filteredMembers as OrganizationMember[];
     }
   });
 

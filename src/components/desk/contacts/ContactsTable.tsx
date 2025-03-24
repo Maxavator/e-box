@@ -25,6 +25,11 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
   const navigate = useNavigate();
 
   const filteredContacts = contacts?.filter(contact => {
+    if (!contact.contact) {
+      console.log("Missing contact data for:", contact);
+      return false;
+    }
+    
     const searchLower = searchQuery.toLowerCase();
     const firstName = (contact.contact.first_name || '').toLowerCase();
     const lastName = (contact.contact.last_name || '').toLowerCase();
@@ -110,7 +115,7 @@ export const ContactsTable = ({ contacts, isLoading, searchQuery, onToggleFavori
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                       <User className="h-4 w-4 text-primary" />
                     </div>
-                    {contact.contact.first_name || 'Unknown'} {contact.contact.last_name || ''}
+                    {contact.contact?.first_name || 'Unknown'} {contact.contact?.last_name || ''}
                   </div>
                 </TableCell>
                 <TableCell>

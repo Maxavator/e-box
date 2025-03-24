@@ -30,25 +30,6 @@ export const useContacts = () => {
       
       console.log("Current user ID:", userData.user.id);
 
-      // Get user's organization ID
-      const { data: userProfile, error: profileError } = await supabase
-        .from('profiles')
-        .select('organization_id')
-        .eq('id', userData.user.id)
-        .maybeSingle();
-
-      if (profileError) {
-        console.error("Error fetching user profile:", profileError);
-        throw profileError;
-      }
-
-      if (!userProfile?.organization_id) {
-        console.log("User has no organization, returning empty contacts list");
-        return []; // Return empty array if user has no organization
-      }
-
-      console.log("User organization ID:", userProfile.organization_id);
-
       // Fetch user's explicit contacts
       const { data: userContacts, error: contactsError } = await supabase
         .from('contacts')
@@ -77,7 +58,7 @@ export const useContacts = () => {
           
         return {
           ...contact,
-          is_colleague: contactProfile?.organization_id === userProfile.organization_id,
+          is_colleague: contactProfile?.organization_id === userProfile?.organization_id,
           contact: contactProfile || {
             id: contact.contact_id,
             first_name: null,
@@ -95,52 +76,89 @@ export const useContacts = () => {
         }
       });
       
-      // Add all organization members as colleagues
+      // Get user's organization ID for colleague check
+      const { data: userProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', userData.user.id)
+        .maybeSingle();
+      
+      if (profileError) {
+        console.error("Error fetching user profile:", profileError);
+        throw profileError;
+      }
+      
+      // Add all organization members as colleagues if they're not already contacts
       if (organizationMembers && organizationMembers.length > 0) {
         console.log("Adding organization members to contacts...");
-        console.log("Organization members count:", organizationMembers.length);
         
-        organizationMembers.forEach(member => {
-          // Skip adding yourself as a contact
-          if (member.id === userData.user.id) {
-            console.log("Skipping self as contact:", member.id);
-            return;
+        for (const member of organizationMembers) {
+          // Skip if already in contacts
+          if (contactsMap.has(member.id)) {
+            const existingContact = contactsMap.get(member.id);
+            existingContact.is_colleague = true;
+            contactsMap.set(member.id, existingContact);
+            continue;
           }
           
-          if (!contactsMap.has(member.id)) {
-            console.log("Adding colleague to contacts:", member.first_name, member.last_name);
-            // Create virtual contact entry for organization member
+          console.log("Adding organization member to contacts:", member.first_name, member.last_name);
+          
+          try {
+            // First try to add the member as a contact in the database
+            const { data: newContact, error: insertError } = await supabase
+              .from('contacts')
+              .insert({
+                user_id: userData.user.id,
+                contact_id: member.id,
+                is_favorite: false
+              })
+              .select('id, user_id, contact_id, is_favorite, created_at')
+              .maybeSingle();
+            
+            if (insertError) {
+              console.error("Error adding colleague to contacts:", insertError);
+              // Still add as a virtual contact even if DB insert fails
+              contactsMap.set(member.id, {
+                id: `org-${member.id}`,
+                user_id: userData.user.id,
+                contact_id: member.id,
+                is_favorite: false,
+                is_colleague: true,
+                created_at: new Date().toISOString(),
+                contact: member
+              });
+            } else if (newContact) {
+              // Add the successfully inserted contact to our map
+              contactsMap.set(member.id, {
+                ...newContact,
+                is_colleague: true,
+                contact: member
+              });
+            }
+          } catch (error) {
+            console.error("Error during contact insertion:", error);
+            // Still add as a virtual contact if there's an exception
             contactsMap.set(member.id, {
-              id: `org-${member.id}`, // Use prefix to create unique id
+              id: `org-${member.id}`,
               user_id: userData.user.id,
               contact_id: member.id,
               is_favorite: false,
               is_colleague: true,
               created_at: new Date().toISOString(),
-              contact: {
-                id: member.id,
-                first_name: member.first_name,
-                last_name: member.last_name,
-                organization_id: member.organization_id
-              }
+              contact: member
             });
-          } else {
-            // Update existing contact to mark as colleague
-            const existingContact = contactsMap.get(member.id);
-            existingContact.is_colleague = true;
-            contactsMap.set(member.id, existingContact);
           }
-        });
+        }
       } else {
         console.log("No organization members to add to contacts or error fetching members:", membersError);
       }
       
       const result = Array.from(contactsMap.values()) as Contact[];
-      console.log("Final contacts list:", result.length);
+      console.log("Final contacts list count:", result.length);
       console.log("Final contacts:", result);
       return result;
     },
-    enabled: !loadingOrg // Allow this query to run even if members are still loading
+    enabled: !loadingOrg && !isLoadingMembers
   });
 
   const toggleFavoriteMutation = useMutation({
@@ -187,7 +205,7 @@ export const useContacts = () => {
 
   return {
     contacts: contacts || [],
-    isLoading: isLoadingContacts || loadingOrg,
+    isLoading: isLoadingContacts || loadingOrg || isLoadingMembers,
     error: contactsError || membersError,
     toggleFavoriteMutation
   };
