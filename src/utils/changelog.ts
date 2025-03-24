@@ -11,6 +11,17 @@ export type ChangeLogEntry = {
  */
 export const CHANGELOG: ChangeLogEntry[] = [
   {
+    version: 'v2.5.0',
+    date: '2024-07-15',
+    changes: [
+      'Added SalesKit documentation with comprehensive product information',
+      'Implemented automated version increment system',
+      'Integrated changelog with admin documentation portal',
+      'Enhanced reporting features in admin portal',
+      'Added data sovereignty and compliance documentation'
+    ]
+  },
+  {
     version: 'v2.4.0',
     date: '2024-07-10',
     changes: [
@@ -62,6 +73,31 @@ export function getChangelog(limit?: number): ChangeLogEntry[] {
  */
 export function getLatestChanges(): ChangeLogEntry | undefined {
   return getChangelog(1)[0];
+}
+
+/**
+ * Add a new changelog entry
+ * @param changes Array of change descriptions
+ * @param versionType Type of version increment: "major", "minor", or "patch"
+ * @returns The new version string
+ */
+export function addChangelogEntry(changes: string[], versionType: 'major' | 'minor' | 'patch' = 'minor'): string {
+  // Import from version.ts
+  import { APP_VERSION, incrementVersion } from './version';
+  
+  const newVersion = incrementVersion(APP_VERSION, versionType);
+  const today = new Date().toISOString().split('T')[0];
+  
+  const newEntry: ChangeLogEntry = {
+    version: newVersion,
+    date: today,
+    changes
+  };
+  
+  // Add to the beginning of the changelog
+  CHANGELOG.unshift(newEntry);
+  
+  return newVersion;
 }
 
 import { compareVersions } from './version';

@@ -1,6 +1,6 @@
 
 // App version information and utilities
-export const APP_VERSION = 'v2.4.0';
+export const APP_VERSION = 'v2.5.0';
 
 /**
  * Compare two semver version strings
@@ -23,4 +23,31 @@ export function compareVersions(v1: string, v2: string): number {
  */
 export function isNewerVersion(version: string): boolean {
   return compareVersions(version, APP_VERSION) > 0;
+}
+
+/**
+ * Increment version number based on semver rules
+ * @param version Current version string (e.g., "v2.4.0")
+ * @param type Type of increment: "major", "minor", or "patch"
+ * @returns New version string
+ */
+export function incrementVersion(version: string, type: 'major' | 'minor' | 'patch'): string {
+  const versionParts = version.replace('v', '').split('.').map(Number);
+  
+  switch (type) {
+    case 'major':
+      versionParts[0] += 1;
+      versionParts[1] = 0;
+      versionParts[2] = 0;
+      break;
+    case 'minor':
+      versionParts[1] += 1;
+      versionParts[2] = 0;
+      break;
+    case 'patch':
+      versionParts[2] += 1;
+      break;
+  }
+  
+  return `v${versionParts.join('.')}`;
 }
