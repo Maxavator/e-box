@@ -51,7 +51,7 @@ export function MainNavigationMenu({
 }: MainNavigationMenuProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { organizationName } = useUserProfile();
+  const { organizationName, loading } = useUserProfile();
   const { isAdmin, userRole } = useUserRole();
   
   // Consider a user to have admin access if they are either global_admin or org_admin
@@ -99,7 +99,7 @@ export function MainNavigationMenu({
           isActive={location.pathname === "/mydesk"}
         >
           <Briefcase className="h-4 w-4" />
-          <span>Desk {organizationName ? `@${organizationName}` : ''}</span>
+          <span>Desk {!loading && organizationName ? `@${organizationName}` : ''}</span>
           {(documentsCount > 0 || leaveCount > 0) && (
             <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
               {documentsCount + leaveCount}

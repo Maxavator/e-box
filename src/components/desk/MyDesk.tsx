@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 export function MyDesk() {
   const [activeTab, setActiveTab] = useState("documents");
-  const { organizationName } = useUserProfile();
+  const { organizationName, loading } = useUserProfile();
   const navigate = useNavigate();
   
   const handleNavigation = (path: string) => {
@@ -22,7 +22,7 @@ export function MyDesk() {
     <div className="p-4 md:p-6">
       <div className="flex items-center gap-2 mb-6">
         <Briefcase className="h-6 w-6 text-primary" />
-        <h1 className="text-3xl font-bold">Desk {organizationName ? `@${organizationName}` : ''}</h1>
+        <h1 className="text-3xl font-bold">Desk {!loading && organizationName ? `@${organizationName}` : ''}</h1>
       </div>
       
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">

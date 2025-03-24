@@ -44,13 +44,8 @@ export function useUserProfile(): UserProfileData {
               throw orgError;
             }
             
-            // Remove the "(Pty) Ltd." suffix if present
-            let orgName = orgData?.name || null;
-            if (orgName) {
-              orgName = orgName.replace(/\s*\(Pty\)\s*Ltd\.\s*$/i, '').trim();
-            }
-            
-            setOrganizationName(orgName);
+            // Use the full organization name
+            setOrganizationName(orgData?.name || null);
           }
         }
       } catch (err) {
