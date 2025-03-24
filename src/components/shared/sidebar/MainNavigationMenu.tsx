@@ -91,77 +91,7 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Calendar" 
-          onClick={() => handleNavigation("/calendar")}
-          isActive={location.pathname === "/calendar"}
-        >
-          <Calendar className="h-4 w-4" />
-          <span>Calendar</span>
-          {calendarCount > 0 && (
-            <SidebarMenuBadge className="ml-auto bg-green-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {calendarCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Contacts" 
-          onClick={() => handleNavigation("/contacts")}
-          isActive={location.pathname === "/contacts"}
-        >
-          <Users className="h-4 w-4" />
-          <span>Contacts</span>
-          {contactsCount > 0 && (
-            <SidebarMenuBadge className="ml-auto bg-amber-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {contactsCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Documents" 
-          onClick={() => handleNavigation("/documents")}
-          isActive={location.pathname === "/documents"}
-        >
-          <FileText className="h-4 w-4" />
-          <span>Documents</span>
-          {documentsCount > 0 && (
-            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {documentsCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Notes" 
-          onClick={() => handleNavigation("/notes")}
-          isActive={location.pathname === "/notes"}
-        >
-          <ScrollText className="h-4 w-4" />
-          <span>Notes</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Surveys" 
-          onClick={() => handleNavigation("/surveys")}
-          isActive={location.pathname === "/surveys"}
-        >
-          <ClipboardList className="h-4 w-4" />
-          <span>Surveys</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      {/* Desk section with submenu */}
+      {/* Desk section with submenu - MOVED UP */}
       <SidebarMenuItem>
         <SidebarMenuSub>
           <SidebarMenuSubTrigger
@@ -249,7 +179,7 @@ export function MainNavigationMenu({
         </SidebarMenuSub>
       </SidebarMenuItem>
       
-      {/* GovZA section with submenu */}
+      {/* GovZA section with submenu - MOVED UP */}
       <SidebarMenuItem>
         <SidebarMenuSub>
           <SidebarMenuSubTrigger
@@ -289,6 +219,76 @@ export function MainNavigationMenu({
             </SidebarMenuItem>
           </SidebarMenuSubContent>
         </SidebarMenuSub>
+      </SidebarMenuItem>
+      
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Calendar" 
+          onClick={() => handleNavigation("/calendar")}
+          isActive={location.pathname === "/calendar"}
+        >
+          <Calendar className="h-4 w-4" />
+          <span>Calendar</span>
+          {calendarCount > 0 && (
+            <SidebarMenuBadge className="ml-auto bg-green-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {calendarCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Contacts" 
+          onClick={() => handleNavigation("/contacts")}
+          isActive={location.pathname === "/contacts"}
+        >
+          <Users className="h-4 w-4" />
+          <span>Contacts</span>
+          {contactsCount > 0 && (
+            <SidebarMenuBadge className="ml-auto bg-amber-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {contactsCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Documents" 
+          onClick={() => handleNavigation("/documents")}
+          isActive={location.pathname === "/documents"}
+        >
+          <FileText className="h-4 w-4" />
+          <span>Documents</span>
+          {documentsCount > 0 && (
+            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {documentsCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Notes" 
+          onClick={() => handleNavigation("/notes")}
+          isActive={location.pathname === "/notes"}
+        >
+          <ScrollText className="h-4 w-4" />
+          <span>Notes</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Surveys" 
+          onClick={() => handleNavigation("/surveys")}
+          isActive={location.pathname === "/surveys"}
+        >
+          <ClipboardList className="h-4 w-4" />
+          <span>Surveys</span>
+        </SidebarMenuButton>
       </SidebarMenuItem>
       
       {/* Admin Portal menu item - only show if user has admin access */}
