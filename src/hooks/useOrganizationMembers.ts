@@ -36,7 +36,7 @@ export function useOrganizationMembers() {
           .from('profiles')
           .select('organization_id')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
           
         if (profileError) {
           throw profileError;
@@ -57,47 +57,62 @@ export function useOrganizationMembers() {
           throw membersError;
         }
         
-        // Get roles for all users
-        const userIds = profilesData.map(profile => profile.id);
-        const { data: rolesData, error: rolesError } = await supabase
-          .from('user_roles')
-          .select('user_id, role')
-          .in('user_id', userIds);
+        // Create an array to store all members
+        const organizationMembers: OrganizationMember[] = [];
+        
+        // Process each profile
+        if (profilesData && profilesData.length > 0) {
+          // Get roles for all users
+          const userIds = profilesData.map(profile => profile.id);
+          const { data: rolesData, error: rolesError } = await supabase
+            .from('user_roles')
+            .select('user_id, role')
+            .in('user_id', userIds);
+            
+          if (rolesError) {
+            throw rolesError;
+          }
           
-        if (rolesError) {
-          throw rolesError;
+          // Get email addresses (try-catch in case user doesn't have admin access)
+          let usersData = null;
+          try {
+            const { data, error: usersError } = await supabase.auth.admin.listUsers();
+            if (!usersError) {
+              usersData = data;
+            }
+          } catch (err) {
+            console.warn('Could not fetch email addresses:', err);
+          }
+          
+          // Create a map of user IDs to roles
+          const rolesMap: Record<string, UserRole> = {};
+          if (rolesData) {
+            rolesData.forEach(roleData => {
+              rolesMap[roleData.user_id] = roleData.role as UserRole;
+            });
+          }
+          
+          // Create a map of user IDs to emails
+          const emailsMap: Record<string, string> = {};
+          if (usersData?.users) {
+            usersData.users.forEach((userData: any) => {
+              emailsMap[userData.id] = userData.email;
+            });
+          }
+          
+          // Combine the data
+          profilesData.forEach(profile => {
+            organizationMembers.push({
+              id: profile.id,
+              first_name: profile.first_name,
+              last_name: profile.last_name,
+              email: emailsMap[profile.id] || `user-${profile.id.substring(0, 8)}@example.com`,
+              role: rolesMap[profile.id] || 'user',
+              created_at: profile.created_at,
+              last_activity: profile.last_activity
+            });
+          });
         }
-        
-        // Get email addresses
-        const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers();
-        
-        if (usersError) {
-          // This might fail if the user doesn't have admin access
-          console.warn('Could not fetch email addresses:', usersError);
-        }
-        
-        // Create a map of user IDs to roles
-        const rolesMap = {};
-        rolesData?.forEach(roleData => {
-          rolesMap[roleData.user_id] = roleData.role;
-        });
-        
-        // Create a map of user IDs to emails
-        const emailsMap = {};
-        usersData?.users?.forEach(userData => {
-          emailsMap[userData.id] = userData.email;
-        });
-        
-        // Combine the data
-        const organizationMembers = profilesData.map(profile => ({
-          id: profile.id,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          email: emailsMap[profile.id] || `user-${profile.id.substring(0, 8)}@example.com`,
-          role: rolesMap[profile.id] || 'user',
-          created_at: profile.created_at,
-          last_activity: profile.last_activity
-        }));
         
         setMembers(organizationMembers);
       } catch (err) {
