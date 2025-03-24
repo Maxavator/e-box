@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { MainLayout } from '@/layouts/MainLayout';
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
-import { Index, Auth, Dashboard, NotFound, Chat, AdminPortal, OrganizationDashboard, Changelog, Settings, Documents, Calendar, ContactsList, LeaveManager, Policies, Desk } from './pages';
+import { Index, Auth, Dashboard, NotFound, Chat, AdminPortal, OrganizationDashboard, Changelog, Settings, Documents, Calendar, ContactsList, LeaveManager, Policies, Desk, Notes } from './pages';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import GovZA from "./pages/GovZA";
 
@@ -18,7 +17,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Create a layout route component that doesn't add another Router
 const ProtectedLayoutRoute = () => {
   return (
     <ProtectedRoute>
@@ -29,7 +27,6 @@ const ProtectedLayoutRoute = () => {
   );
 };
 
-// Wrapper component that can access route information
 const ThemeWrapper = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const isAuthPage = location.pathname === "/auth";
@@ -79,7 +76,6 @@ function App() {
           path: '/changelog',
           element: <Changelog />,
         },
-        // Protected routes using the layout route pattern
         {
           element: <ProtectedLayoutRoute />,
           children: [
@@ -105,7 +101,7 @@ function App() {
             },
             {
               path: '/notes',
-              element: <div>Notes</div>,
+              element: <Notes />,
             },
             {
               path: '/surveys',

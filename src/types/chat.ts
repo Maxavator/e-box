@@ -83,3 +83,15 @@ export interface GroupConversation extends Conversation {
   isBusiness?: boolean;
   members?: GroupMember[];
 }
+
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  tags?: string[];
+  color?: string;
+  isPinned?: boolean;
+}

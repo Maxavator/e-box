@@ -18,6 +18,7 @@ import {
   Zap,
   HelpCircle,
   Flag,
+  StickyNote,
 } from "lucide-react";
 
 import {
@@ -54,15 +55,12 @@ export function MainNavigationMenu({
   const { organizationName, loading } = useUserProfile();
   const { isAdmin, userRole } = useUserRole();
   
-  // Consider a user to have admin access if they are either global_admin or org_admin
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
-  // Check if current route is an admin route
   const isAdminPage = location.pathname.includes('/admin') || 
                       location.pathname.includes('/organization');
   
   const handleNavigation = (path: string) => {
-    // Reset the respective badge count when navigating to a section
     if (path === "/chat") resetBadgeCount("chat");
     if (path === "/documents") resetBadgeCount("documents");
     if (path === "/calendar") resetBadgeCount("calendar");
@@ -74,7 +72,6 @@ export function MainNavigationMenu({
   
   return (
     <SidebarMenu>
-      {/* Root menu items section */}
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="Chats" 
@@ -145,7 +142,7 @@ export function MainNavigationMenu({
           onClick={() => handleNavigation("/notes")}
           isActive={location.pathname === "/notes"}
         >
-          <ScrollText className="h-4 w-4" />
+          <StickyNote className="h-4 w-4" />
           <span>Notes</span>
         </SidebarMenuButton>
       </SidebarMenuItem>
@@ -161,7 +158,6 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* Admin Portal menu item - only show if user has admin access */}
       {hasAdminAccess && (
         <SidebarMenuItem>
           <SidebarMenuButton 
@@ -175,7 +171,6 @@ export function MainNavigationMenu({
         </SidebarMenuItem>
       )}
       
-      {/* Desk as a root item - moved just above Settings */}
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="Desk" 
@@ -193,7 +188,6 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* GovZA as a root item with improved styling */}
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="GovZA" 
