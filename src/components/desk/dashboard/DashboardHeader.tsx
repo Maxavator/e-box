@@ -19,7 +19,7 @@ export const DashboardHeader = ({ currentView, onBackClick, onAdminClick }: Dash
                       location.pathname.includes('/organization');
 
   return (
-    <header className="h-16 bg-white border-b px-4 md:px-6 flex items-center justify-between">
+    <header className="h-16 bg-card border-b px-4 md:px-6 flex items-center justify-between">
       <div>
         <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-500">System Overview</p>

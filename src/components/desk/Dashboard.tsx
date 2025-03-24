@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -80,21 +81,23 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-full">
+    <div className="p-0 max-w-full">
       <DashboardHeader 
         currentView="dashboard"
         onBackClick={() => {}}
         onAdminClick={() => handleCardClick('admin')}
       />
       
-      <StatsCards onCardClick={handleCardClick} />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ActivitySection />
-        <AnnouncementsSection />
-      </div>
+      <div className="p-4 md:p-6 space-y-6">
+        <StatsCards onCardClick={handleCardClick} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ActivitySection />
+          <AnnouncementsSection />
+        </div>
 
-      <QuickActions onActionClick={handleCardClick} />
+        <QuickActions onActionClick={handleCardClick} />
+      </div>
     </div>
   );
 };

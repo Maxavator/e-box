@@ -30,7 +30,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar>
+    <Sidebar className="border-r border-border/30">
       <SidebarHeader className="flex items-center justify-center p-4 border-none bg-sidebar">
         <button 
           onClick={handleLogoClick}
