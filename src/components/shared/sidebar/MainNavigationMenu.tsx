@@ -1,6 +1,6 @@
 
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
-import { SidebarMenu, SidebarMenuBadge, SidebarMenuButton } from "@/components/ui/sidebar/menu/sidebar-menu";
+import { Link, useLocation } from "react-router-dom";
 import {
   BookOpen,
   BookText,
@@ -17,14 +17,14 @@ import {
   ShieldCheck,
   Users
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
 import { useSidebarBadges } from "@/hooks/useSidebarBadges";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuBadge } from "@/components/ui/sidebar/menu/sidebar-menu";
 
 export default function MainNavigationMenu() {
   const location = useLocation();
   const pathname = location.pathname;
   const { isAdmin, userRole } = useUserRole();
-  const { unreadCount, flaggedItems } = useSidebarBadges();
+  const { chatCount, documentsCount, flaggedItems } = useSidebarBadges();
   
   const isModerator = 
     userRole === 'hr_moderator' || 
@@ -42,7 +42,7 @@ export default function MainNavigationMenu() {
         </Link>
       </SidebarMenuButton>
       
-      {/* Desk Group */}
+      {/* Desk Group - Moved before Moderation */}
       <SidebarMenuButton asChild>
         <Link to="/mydesk" className={pathname === "/mydesk" ? "active" : ""}>
           <FolderClosed className="h-4 w-4 mr-2" />
@@ -103,7 +103,7 @@ export default function MainNavigationMenu() {
         </SidebarMenuButton>
       )}
       
-      {/* Moderation */}
+      {/* Moderation - Moved after Desk */}
       {(isAdmin || isModerator) && (
         <SidebarMenuButton asChild>
           <Link to="/moderation" className={pathname === "/moderation" ? "active" : ""}>
@@ -123,9 +123,9 @@ export default function MainNavigationMenu() {
         <Link to="/chat" className={pathname === "/chat" ? "active" : ""}>
           <MessageSquare className="h-4 w-4 mr-2" />
           Messages
-          {unreadCount > 0 && (
+          {chatCount > 0 && (
             <SidebarMenuBadge>
-              {unreadCount}
+              {chatCount}
             </SidebarMenuBadge>
           )}
         </Link>
