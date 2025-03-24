@@ -110,12 +110,14 @@ const AdminPortal = () => {
 
       {activeView === 'dashboard' && (
         <div className="space-y-8">
+          {/* Stats Cards moved to the top */}
+          <StatsCards />
+          
           <NavigationCards 
             activeView={activeView}
             onViewChange={handleViewChange}
           />
           
-          <StatsCards />
           <LookupTools />
         </div>
       )}
