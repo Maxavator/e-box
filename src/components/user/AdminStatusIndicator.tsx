@@ -11,10 +11,11 @@ export function AdminStatusIndicator() {
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
   // Check if the user has a moderator role
+  // Since UserRoleType doesn't include these roles yet, we need to check them as strings
   const isModerator = 
-    userRole === 'hr_moderator' || 
-    userRole === 'comm_moderator' || 
-    userRole === 'stakeholder_moderator';
+    userRole === 'hr_moderator' as UserRoleType || 
+    userRole === 'comm_moderator' as UserRoleType || 
+    userRole === 'stakeholder_moderator' as UserRoleType;
   
   if (isLoading) {
     return (
@@ -44,8 +45,8 @@ export function AdminStatusIndicator() {
   if (isModerator) {
     return (
       <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
-        {userRole === 'hr_moderator' ? 'HR Moderator' : 
-         userRole === 'comm_moderator' ? 'Comm Moderator' : 
+        {userRole === 'hr_moderator' as UserRoleType ? 'HR Moderator' : 
+         userRole === 'comm_moderator' as UserRoleType ? 'Comm Moderator' : 
          'Stakeholder Moderator'}
       </Badge>
     );

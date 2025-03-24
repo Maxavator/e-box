@@ -40,36 +40,35 @@ export const useContacts = () => {
       // Then fetch user's explicit contacts
       const { data: userContacts, error: contactsError } = await supabase
         .from('contacts')
-        .select(`
-          id,
-          user_id,
-          contact_id,
-          is_favorite,
-          created_at,
-          contact:profiles (
-            id,
-            first_name,
-            last_name,
-            organization_id
-          )
-        `)
+        .select('id, user_id, contact_id, is_favorite, created_at')
         .eq('user_id', userData.user.id);
 
       if (contactsError) throw contactsError;
-      
-      // Convert to map for easy lookup
-      const contactsMap = new Map();
-      (userContacts as any[]).forEach(contact => {
-        contactsMap.set(contact.contact_id, {
+
+      // For each contact, fetch the profile details separately
+      const contactsWithProfiles = await Promise.all((userContacts || []).map(async (contact) => {
+        const { data: contactProfile } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, organization_id')
+          .eq('id', contact.contact_id)
+          .single();
+          
+        return {
           ...contact,
-          is_colleague: contact.contact?.organization_id === userProfile.organization_id,
-          contact: contact.contact || {
+          is_colleague: contactProfile?.organization_id === userProfile.organization_id,
+          contact: contactProfile || {
             id: contact.contact_id,
             first_name: null,
             last_name: null,
             organization_id: null
           }
-        });
+        };
+      }));
+      
+      // Convert to map for easy lookup
+      const contactsMap = new Map();
+      contactsWithProfiles.forEach(contact => {
+        contactsMap.set(contact.contact_id, contact);
       });
       
       // Add all organization members as colleagues if they're not already in contacts
