@@ -180,9 +180,10 @@ export function MainNavigationMenu({
         <SidebarMenuButton 
           tooltip="Desk" 
           onClick={() => handleNavigation("/mydesk")}
-          isActive={location.pathname === "/mydesk"}
+          isActive={location.pathname === "/mydesk" || location.pathname.startsWith("/desk/")}
+          className="font-medium"
         >
-          <Briefcase className="h-4 w-4" />
+          <Briefcase className="h-4 w-4 text-primary" />
           <span>Desk {!loading && organizationName ? `@${organizationName}` : ''}</span>
           {(documentsCount > 0 || leaveCount > 0) && (
             <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
