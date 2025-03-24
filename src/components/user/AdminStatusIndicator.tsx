@@ -10,7 +10,8 @@ export function AdminStatusIndicator() {
   // Consider a user to have admin access if they are either global_admin or org_admin
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
-  // Check if the user has a moderator role
+  // Check if the user has a moderator role using string literals instead of using the UserRoleType
+  // to avoid TypeScript errors with role types that may not be in the UserRoleType
   const isModerator = 
     userRole === 'hr_moderator' || 
     userRole === 'comm_moderator' || 

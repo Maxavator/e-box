@@ -1,11 +1,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Building2, Settings, Shield } from "lucide-react";
+import { Users, Building2, Settings, Shield, Server } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export interface NavigationCardsProps {
   activeView?: string;
-  onViewChange?: (view: 'dashboard' | 'users' | 'organizations' | 'settings') => void;
+  onViewChange?: (view: 'dashboard' | 'users' | 'organizations' | 'settings' | 'system') => void;
 }
 
 export const NavigationCards = ({ 
@@ -14,13 +14,13 @@ export const NavigationCards = ({
 }: NavigationCardsProps) => {
   const navigate = useNavigate();
 
-  const handleCardClick = (view: 'dashboard' | 'users' | 'organizations' | 'settings') => {
+  const handleCardClick = (view: 'dashboard' | 'users' | 'organizations' | 'settings' | 'system') => {
     onViewChange?.(view);
     navigate('/admin', { state: { view } });
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
       <NavCard
         title="User Management"
         description="Add, remove, and manage user access and permissions"
@@ -41,6 +41,13 @@ export const NavigationCards = ({
         icon={<Settings className="w-5 h-5 text-brand-600" />}
         isActive={activeView === 'settings'}
         onClick={() => handleCardClick('settings')}
+      />
+      <NavCard
+        title="System Information"
+        description="Monitor server status, database metrics, and system health"
+        icon={<Server className="w-5 h-5 text-brand-600" />}
+        isActive={activeView === 'system'}
+        onClick={() => handleCardClick('system')}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import { LookupTools } from "@/components/admin/dashboard/LookupTools";
 import { StatsCards } from "@/components/admin/dashboard/StatsCards";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
+import { SystemInfo } from "@/components/admin/SystemInfo";
 import OrganizationManagement from "@/components/admin/OrganizationManagement";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -20,7 +21,7 @@ const AdminPortal = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const initialView = location.state?.view || 'dashboard';
-  const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'organizations' | 'settings'>(initialView);
+  const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'organizations' | 'settings' | 'system'>(initialView);
   const { isAdmin, userRole, isLoading } = useUserRole();
   
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
@@ -45,7 +46,7 @@ const AdminPortal = () => {
     checkAccess();
   }, [navigate, isAdmin, userRole, isLoading, hasAdminAccess]);
 
-  const handleViewChange = (view: 'dashboard' | 'users' | 'organizations' | 'settings') => {
+  const handleViewChange = (view: 'dashboard' | 'users' | 'organizations' | 'settings' | 'system') => {
     setActiveView(view);
   };
 
@@ -136,6 +137,12 @@ const AdminPortal = () => {
       {activeView === 'settings' && (
         <Card className="p-6">
           <SystemSettings />
+        </Card>
+      )}
+
+      {activeView === 'system' && (
+        <Card className="p-6">
+          <SystemInfo />
         </Card>
       )}
     </div>
