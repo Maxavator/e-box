@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { ThemeProvider } from './components/ui/theme-provider';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from '@/components/shared/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
-import { MainLayout } from '@/layouts/MainLayout';
+import { MainLayout } from '@/components/shared/MainLayout';
 import { createBrowserRouter, RouterProvider, useLocation } from 'react-router-dom';
 import { Index, Auth, Dashboard, NotFound, Chat, AdminPortal, OrganizationDashboard, Changelog, Settings, Documents, Calendar, ContactsList, LeaveManager, Policies, Desk } from './pages';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
