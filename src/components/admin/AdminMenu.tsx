@@ -1,5 +1,5 @@
 
-import { Settings, Users, Building2 } from "lucide-react";
+import { Settings, Users, Building2, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -42,6 +42,10 @@ export function AdminMenu({ activeView, setActiveView }: AdminMenuProps) {
         <DropdownMenuItem onClick={() => handleAdminNav('/admin/users')}>
           <Users className="h-4 w-4 mr-2" />
           User Management
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setActiveView('sassa')}>
+          <Award className="h-4 w-4 mr-2" />
+          Sassa Management
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

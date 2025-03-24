@@ -1,10 +1,9 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, Building2, Settings, Shield, FileText, Server } from "lucide-react";
 
 // Define the possible views type to match AdminPortal.tsx
-export type AdminView = 'dashboard' | 'users' | 'organizations' | 'settings' | 'system' | 'reporting' | 'documentation';
+export type AdminView = 'dashboard' | 'users' | 'organizations' | 'reporting' | 'system' | 'documentation' | 'sassa';
 
 export interface NavigationCardsProps {
   activeView: AdminView;
