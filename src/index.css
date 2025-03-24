@@ -125,4 +125,9 @@
   .bg-sidebar {
     @apply bg-background;
   }
+
+  /* Resizable sidebar handle styles */
+  .sidebar-resize-handle {
+    @apply absolute top-0 right-0 h-full w-1 bg-transparent cursor-ew-resize hover:bg-primary/10 active:bg-primary/20;
+  }
 }
