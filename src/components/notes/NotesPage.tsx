@@ -5,7 +5,7 @@ import { NotesList } from './NotesList';
 import { NoteEditor } from './NoteEditor';
 import { Note } from '@/types/chat';
 import { Loader2, FileText } from 'lucide-react';
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 export function NotesPage() {
   const {
