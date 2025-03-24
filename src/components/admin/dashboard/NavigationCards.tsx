@@ -1,127 +1,60 @@
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Users, Building2, Settings, Shield } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Building2, Settings, Shield, Server } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-
-export interface NavigationCardsProps {
-  activeView?: string;
-  onViewChange?: (view: 'dashboard' | 'users' | 'organizations' | 'settings' | 'system') => void;
+interface NavigationCardsProps {
+  activeView: string;
+  onViewChange: (view: any) => void;
 }
 
-export const NavigationCards = ({ 
-  activeView, 
-  onViewChange
-}: NavigationCardsProps) => {
-  const navigate = useNavigate();
-
-  const handleCardClick = (view: 'dashboard' | 'users' | 'organizations' | 'settings' | 'system') => {
-    onViewChange?.(view);
-    navigate('/admin', { state: { view } });
-  };
+export const NavigationCards = ({ activeView, onViewChange }: NavigationCardsProps) => {
+  const cards = [
+    {
+      title: "User Management",
+      description: "Manage users, roles, and permissions",
+      icon: <Users className="h-6 w-6 text-primary" />,
+      view: "users",
+    },
+    {
+      title: "Organizations",
+      description: "Manage organizations and departments",
+      icon: <Building2 className="h-6 w-6 text-primary" />,
+      view: "organizations",
+    },
+    {
+      title: "System Settings",
+      description: "Configure system-wide settings",
+      icon: <Settings className="h-6 w-6 text-primary" />,
+      view: "settings",
+    },
+  ];
 
   return (
     <>
-      <NavCard
-        title="User Management"
-        description="Add, remove, and manage user access and permissions"
-        icon={<Users className="w-5 h-5" />}
-        isActive={activeView === 'users'}
-        onClick={() => handleCardClick('users')}
-        color="blue"
-      />
-      <NavCard
-        title="Organizations"
-        description="Manage organization settings and administrators"
-        icon={<Building2 className="w-5 h-5" />}
-        isActive={activeView === 'organizations'}
-        onClick={() => handleCardClick('organizations')}
-        color="purple"
-      />
-      <NavCard
-        title="System Settings"
-        description="Configure system-wide settings and preferences"
-        icon={<Settings className="w-5 h-5" />}
-        isActive={activeView === 'settings'}
-        onClick={() => handleCardClick('settings')}
-        color="amber"
-      />
-      <NavCard
-        title="System Info"
-        description="Monitor server status, database metrics, and system health"
-        icon={<Server className="w-5 h-5" />}
-        isActive={activeView === 'system'}
-        onClick={() => handleCardClick('system')}
-        color="green"
-      />
-    </>
-  );
-};
-
-interface NavCardProps {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  isActive?: boolean;
-  onClick?: () => void;
-  color: "blue" | "purple" | "amber" | "green";
-}
-
-const NavCard = ({ title, description, icon, isActive, onClick, color }: NavCardProps) => {
-  const getColorClasses = () => {
-    switch (color) {
-      case "blue":
-        return {
-          bg: "bg-blue-50 hover:bg-blue-100",
-          icon: "text-blue-600 bg-blue-100",
-          border: isActive ? "border-blue-500" : ""
-        };
-      case "purple":
-        return {
-          bg: "bg-purple-50 hover:bg-purple-100",
-          icon: "text-purple-600 bg-purple-100",
-          border: isActive ? "border-purple-500" : ""
-        };
-      case "amber":
-        return {
-          bg: "bg-amber-50 hover:bg-amber-100",
-          icon: "text-amber-600 bg-amber-100",
-          border: isActive ? "border-amber-500" : ""
-        };
-      case "green":
-        return {
-          bg: "bg-green-50 hover:bg-green-100",
-          icon: "text-green-600 bg-green-100",
-          border: isActive ? "border-green-500" : ""
-        };
-      default:
-        return {
-          bg: "bg-gray-50 hover:bg-gray-100",
-          icon: "text-gray-600 bg-gray-100",
-          border: isActive ? "border-gray-500" : ""
-        };
-    }
-  };
-
-  const colorClasses = getColorClasses();
-
-  return (
-    <Card 
-      className={`hover:shadow-md transition-all cursor-pointer border h-full ${
-        isActive ? `border-2 ${colorClasses.border} ring-1 ring-primary/30` : 'border-border'
-      } ${colorClasses.bg}`}
-      onClick={onClick}
-    >
-      <CardHeader className="pb-2">
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${colorClasses.icon}`}>
-            {icon}
+      {cards.map((card) => (
+        <Card
+          key={card.title}
+          className={`p-6 hover:shadow-md transition-all cursor-pointer ${
+            activeView === card.view
+              ? "border-2 border-primary"
+              : "border-2 border-transparent"
+          }`}
+          onClick={() => onViewChange(card.view)}
+        >
+          <div className="flex flex-col h-full">
+            <div className="rounded-full w-12 h-12 flex items-center justify-center bg-primary/10 mb-4">
+              {card.icon}
+            </div>
+            <h3 className="text-lg font-semibold mb-2">{card.title}</h3>
+            <p className="text-sm text-muted-foreground flex-grow">
+              {card.description}
+            </p>
+            <Button variant="ghost" size="sm" className="mt-4 justify-start pl-0">
+              {activeView === card.view ? "Currently Viewing" : "Open"}
+            </Button>
           </div>
-          <CardTitle className="text-lg">{title}</CardTitle>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground text-sm">{description}</p>
-      </CardContent>
-    </Card>
+        </Card>
+      ))}
+    </>
   );
 };

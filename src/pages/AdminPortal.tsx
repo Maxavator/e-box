@@ -4,13 +4,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { NavigationCards } from "@/components/admin/dashboard/NavigationCards";
 import { LookupTools } from "@/components/admin/dashboard/LookupTools";
 import { StatsCards } from "@/components/admin/dashboard/StatsCards";
+import { AdminReporting } from "@/components/admin/dashboard/AdminReporting";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { SystemInfo } from "@/components/admin/SystemInfo";
 import OrganizationManagement from "@/components/admin/OrganizationManagement";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Link2, ShieldAlert, ArrowLeft } from "lucide-react";
+import { Link2, ShieldAlert, ArrowLeft, BarChart } from "lucide-react";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
@@ -21,7 +22,7 @@ const AdminPortal = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const initialView = location.state?.view || 'dashboard';
-  const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'organizations' | 'settings' | 'system'>(initialView);
+  const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'organizations' | 'settings' | 'system' | 'reporting'>(initialView);
   const { isAdmin, userRole, isLoading } = useUserRole();
   
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
@@ -46,7 +47,7 @@ const AdminPortal = () => {
     checkAccess();
   }, [navigate, isAdmin, userRole, isLoading, hasAdminAccess]);
 
-  const handleViewChange = (view: 'dashboard' | 'users' | 'organizations' | 'settings' | 'system') => {
+  const handleViewChange = (view: 'dashboard' | 'users' | 'organizations' | 'settings' | 'system' | 'reporting') => {
     setActiveView(view);
   };
 
@@ -121,6 +122,25 @@ const AdminPortal = () => {
                 activeView={activeView}
                 onViewChange={handleViewChange}
               />
+              
+              {/* Add a new Reporting card */}
+              <Card 
+                className="p-6 hover:shadow-md transition-all cursor-pointer border-2 hover:border-primary border-transparent"
+                onClick={() => handleViewChange('reporting')}
+              >
+                <div className="flex flex-col h-full">
+                  <div className="rounded-full w-12 h-12 flex items-center justify-center bg-primary/10 mb-4">
+                    <BarChart className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Reporting</h3>
+                  <p className="text-sm text-muted-foreground flex-grow">
+                    Access advanced analytics and reporting tools
+                  </p>
+                  <Button variant="ghost" size="sm" className="mt-4 justify-start pl-0">
+                    View Reports
+                  </Button>
+                </div>
+              </Card>
             </div>
           </div>
           
@@ -156,6 +176,10 @@ const AdminPortal = () => {
         <Card className="p-6">
           <SystemInfo />
         </Card>
+      )}
+
+      {activeView === 'reporting' && (
+        <AdminReporting />
       )}
     </div>
   );
