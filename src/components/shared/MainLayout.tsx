@@ -1,75 +1,14 @@
 
-import { AppSidebar } from "@/components/shared/AppSidebar";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { SidebarProvider, SIDEBAR_WIDTH } from "@/components/ui/sidebar";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactNode, useEffect } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
+// This file is deprecated - use src/layouts/MainLayout.tsx instead
+import { MainLayout as ActualMainLayout } from "@/layouts/MainLayout";
 
-// Create a client for components using MainLayout
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
-    },
-  },
-});
-
-interface MainLayoutProps {
-  children: React.ReactNode;
-}
-
-export function MainLayout({ children }: MainLayoutProps) {
-  const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast.success("Logged out successfully");
-      navigate('/auth');
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast.error("Failed to logout");
-    }
-  };
-
-  // Force sidebar to be visible on page load
-  useEffect(() => {
-    const sidebarCookie = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('sidebar:state='));
-    
-    // If the sidebar is collapsed, set it to expanded
-    if (sidebarCookie && sidebarCookie.split('=')[1] === 'collapsed') {
-      document.cookie = 'sidebar:state=expanded; path=/; max-age=604800';
-    }
-  }, []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <SidebarProvider defaultOpen={true}>
-        <div className="flex h-screen bg-background">
-          <AppSidebar />
-          <main className={`flex-1 overflow-auto ${!isMobile ? 'md:ml-[var(--sidebar-width)]' : ''} transition-all duration-300`}>
-            {children}
-          </main>
-        </div>
-      </SidebarProvider>
-    </QueryClientProvider>
-  );
-}
-
-// This is a higher-order component to wrap any page component with MainLayout
-export function withMainLayout(Component: React.ComponentType<any>) {
+export const MainLayout = ActualMainLayout;
+export const withMainLayout = (Component: React.ComponentType<any>) => {
   return function WrappedComponent(props: any) {
     return (
-      <MainLayout>
+      <ActualMainLayout>
         <Component {...props} />
-      </MainLayout>
+      </ActualMainLayout>
     );
   };
-}
+};

@@ -1,6 +1,5 @@
 
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createClient } from '@supabase/supabase-js'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
@@ -32,9 +31,7 @@ const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
 createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <SessionContextProvider supabaseClient={supabaseClient}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <App />
     </SessionContextProvider>
   </QueryClientProvider>
 );

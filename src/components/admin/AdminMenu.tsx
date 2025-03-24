@@ -8,8 +8,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { AdminView } from "../admin/dashboard/NavigationCards";
 
-export function AdminMenu() {
+interface AdminMenuProps {
+  activeView: string;
+  setActiveView: (view: AdminView) => void;
+}
+
+export function AdminMenu({ activeView, setActiveView }: AdminMenuProps) {
   const navigate = useNavigate();
 
   const handleAdminNav = (path: string) => {
