@@ -18,13 +18,15 @@ import {
   Users
 } from "lucide-react";
 import { useSidebarBadges } from "@/hooks/useSidebarBadges";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuBadge } from "@/components/ui/sidebar/menu/sidebar-menu";
+import { SidebarMenu } from "@/components/ui/sidebar/menu/sidebar-menu";
+import { SidebarMenuButton } from "@/components/ui/sidebar/menu/sidebar-menu-button";
+import { SidebarMenuBadge } from "@/components/ui/sidebar/menu/sidebar-menu-badge";
 
 export default function MainNavigationMenu() {
   const location = useLocation();
   const pathname = location.pathname;
   const { isAdmin, userRole } = useUserRole();
-  const { chatCount, documentsCount, flaggedItems } = useSidebarBadges();
+  const { chatCount, documentsCount, calendarCount, contactsCount, leaveCount } = useSidebarBadges();
   
   const isModerator = 
     userRole === 'hr_moderator' || 
@@ -54,6 +56,11 @@ export default function MainNavigationMenu() {
         <Link to="/documents" className={pathname === "/documents" ? "active" : ""}>
           <FileText className="h-4 w-4 mr-2" />
           Documents
+          {documentsCount > 0 && (
+            <SidebarMenuBadge>
+              {documentsCount}
+            </SidebarMenuBadge>
+          )}
         </Link>
       </SidebarMenuButton>
       
@@ -61,6 +68,11 @@ export default function MainNavigationMenu() {
         <Link to="/calendar" className={pathname === "/calendar" ? "active" : ""}>
           <Calendar className="h-4 w-4 mr-2" />
           Calendar
+          {calendarCount > 0 && (
+            <SidebarMenuBadge>
+              {calendarCount}
+            </SidebarMenuBadge>
+          )}
         </Link>
       </SidebarMenuButton>
       
@@ -68,6 +80,11 @@ export default function MainNavigationMenu() {
         <Link to="/contacts" className={pathname === "/contacts" ? "active" : ""}>
           <Users className="h-4 w-4 mr-2" />
           Contacts
+          {contactsCount > 0 && (
+            <SidebarMenuBadge>
+              {contactsCount}
+            </SidebarMenuBadge>
+          )}
         </Link>
       </SidebarMenuButton>
       
@@ -93,27 +110,22 @@ export default function MainNavigationMenu() {
         </Link>
       </SidebarMenuButton>
       
-      {/* Admin */}
-      {(isAdmin || isOrgAdmin) && (
-        <SidebarMenuButton asChild>
-          <Link to="/admin" className={pathname === "/admin" ? "active" : ""}>
-            <ShieldCheck className="h-4 w-4 mr-2" />
-            Admin Portal
-          </Link>
-        </SidebarMenuButton>
-      )}
-      
       {/* Moderation - Moved after Desk */}
       {(isAdmin || isModerator) && (
         <SidebarMenuButton asChild>
           <Link to="/moderation" className={pathname === "/moderation" ? "active" : ""}>
             <Flag className="h-4 w-4 mr-2" />
             Moderation
-            {flaggedItems > 0 && (
-              <SidebarMenuBadge>
-                {flaggedItems}
-              </SidebarMenuBadge>
-            )}
+          </Link>
+        </SidebarMenuButton>
+      )}
+
+      {/* Admin */}
+      {(isAdmin || isOrgAdmin) && (
+        <SidebarMenuButton asChild>
+          <Link to="/admin" className={pathname === "/admin" ? "active" : ""}>
+            <ShieldCheck className="h-4 w-4 mr-2" />
+            Admin Portal
           </Link>
         </SidebarMenuButton>
       )}
