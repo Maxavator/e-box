@@ -44,14 +44,14 @@ const Auth = () => {
             <img 
               src="/lovable-uploads/dbb30299-d801-4939-9dd4-ef26c4cc55cd.png" 
               alt="e-Box Logo" 
-              className="h-16 mb-4"
+              className="h-20 mb-4"
             />
-            <div className="text-center text-sm text-muted-foreground">
-              <p>by</p>
+            <div className="text-center text-xs text-muted-foreground mt-1">
+              <p>powered by</p>
               <img 
                 src="/lovable-uploads/7366015f-cd77-4ca3-94bb-3848e07b8868.png" 
                 alt="Afrovation Logo" 
-                className="h-7 mt-2" 
+                className="h-5 mt-1" 
               />
             </div>
           </div>

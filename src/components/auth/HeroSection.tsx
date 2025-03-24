@@ -17,6 +17,13 @@ const HeroSection = () => {
       {/* Content with glass effect */}
       <div className="max-w-xl relative z-10 p-12 text-white backdrop-blur-sm bg-white/5 rounded-2xl border border-white/10 shadow-xl">
         <div className="space-y-6">
+          <div className="flex justify-center mb-8">
+            <img 
+              src="/lovable-uploads/dbb30299-d801-4939-9dd4-ef26c4cc55cd.png" 
+              alt="e-Box Logo" 
+              className="h-16"
+            />
+          </div>
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-5 h-5 text-amber-300" />
@@ -108,8 +115,16 @@ const HeroSection = () => {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-white/20">
-            <p className="text-sm leading-relaxed text-white/70">
+          <div className="pt-6 border-t border-white/20 text-center">
+            <p className="text-xs text-white/70">
+              powered by
+            </p>
+            <img 
+              src="/lovable-uploads/7366015f-cd77-4ca3-94bb-3848e07b8868.png" 
+              alt="Afrovation" 
+              className="h-5 mt-1 mx-auto"
+            />
+            <p className="text-xs mt-2 text-white/70">
               © 2025 Afrovation Technology Solutions (Pty) Ltd. All rights reserved.
             </p>
           </div>

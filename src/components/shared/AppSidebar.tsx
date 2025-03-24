@@ -40,7 +40,7 @@ export function AppSidebar() {
           <img 
             src="/lovable-uploads/dbb30299-d801-4939-9dd4-ef26c4cc55cd.png" 
             alt="e-Box" 
-            className="h-12 w-auto max-w-[90%]" 
+            className="h-14 w-auto max-w-[90%]" 
           />
         </button>
       </SidebarHeader>
