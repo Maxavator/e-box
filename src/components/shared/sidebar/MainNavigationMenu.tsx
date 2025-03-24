@@ -9,6 +9,15 @@ import {
   Settings,
   Shield,
   Briefcase,
+  Inbox,
+  Building2,
+  FileStack,
+  ScrollText,
+  Lightbulb,
+  ClipboardList,
+  Mail,
+  Zap,
+  HelpCircle,
 } from "lucide-react";
 
 import {
@@ -16,6 +25,9 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuBadge,
+  SidebarMenuSub,
+  SidebarMenuSubTrigger,
+  SidebarMenuSubContent,
 } from "@/components/ui/sidebar";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -62,6 +74,7 @@ export function MainNavigationMenu({
   
   return (
     <SidebarMenu>
+      {/* Root menu items section */}
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="Chats" 
@@ -109,6 +122,174 @@ export function MainNavigationMenu({
           )}
         </SidebarMenuButton>
       </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Documents" 
+          onClick={() => handleNavigation("/documents")}
+          isActive={location.pathname === "/documents"}
+        >
+          <FileText className="h-4 w-4" />
+          <span>Documents</span>
+          {documentsCount > 0 && (
+            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {documentsCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Notes" 
+          onClick={() => handleNavigation("/notes")}
+          isActive={location.pathname === "/notes"}
+        >
+          <ScrollText className="h-4 w-4" />
+          <span>Notes</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Surveys" 
+          onClick={() => handleNavigation("/surveys")}
+          isActive={location.pathname === "/surveys"}
+        >
+          <ClipboardList className="h-4 w-4" />
+          <span>Surveys</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      
+      {/* Desk section with submenu */}
+      <SidebarMenuItem>
+        <SidebarMenuSub>
+          <SidebarMenuSubTrigger
+            tooltip="Desk"
+            isActive={location.pathname.includes('/mydesk') || location.pathname.includes('/leave')}
+          >
+            <Briefcase className="h-4 w-4" />
+            <span>Desk {organizationName ? `@${organizationName}` : ''}</span>
+            {(documentsCount > 0 || leaveCount > 0) && (
+              <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+                {documentsCount + leaveCount}
+              </SidebarMenuBadge>
+            )}
+          </SidebarMenuSubTrigger>
+          <SidebarMenuSubContent>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={() => handleNavigation("/mydesk")}
+                isActive={location.pathname === "/mydesk"}
+              >
+                <Briefcase className="h-4 w-4" />
+                <span>Overview</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={() => handleNavigation("/desk/inbox")}
+                isActive={location.pathname === "/desk/inbox"}
+              >
+                <Inbox className="h-4 w-4" />
+                <span>Inbox</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={() => handleNavigation("/desk/calendar")}
+                isActive={location.pathname === "/desk/calendar"}
+              >
+                <Calendar className="h-4 w-4" />
+                <span>Calendar</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={() => handleNavigation("/desk/colleagues")}
+                isActive={location.pathname === "/desk/colleagues"}
+              >
+                <Users className="h-4 w-4" />
+                <span>Colleagues</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={() => handleNavigation("/desk/payslip")}
+                isActive={location.pathname === "/desk/payslip"}
+              >
+                <FileStack className="h-4 w-4" />
+                <span>Payslip</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={() => handleNavigation("/leave")}
+                isActive={location.pathname === "/leave"}
+              >
+                <Clock className="h-4 w-4" />
+                <span>Leave</span>
+                {leaveCount > 0 && (
+                  <SidebarMenuBadge className="ml-auto bg-purple-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+                    {leaveCount}
+                  </SidebarMenuBadge>
+                )}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={() => handleNavigation("/policies")}
+                isActive={location.pathname === "/policies"}
+              >
+                <ScrollText className="h-4 w-4" />
+                <span>Policies</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenuSubContent>
+        </SidebarMenuSub>
+      </SidebarMenuItem>
+      
+      {/* GovZA section with submenu */}
+      <SidebarMenuItem>
+        <SidebarMenuSub>
+          <SidebarMenuSubTrigger
+            tooltip="GovZA"
+            isActive={location.pathname.includes('/govza')}
+          >
+            <Building2 className="h-4 w-4" />
+            <span>GovZA</span>
+          </SidebarMenuSubTrigger>
+          <SidebarMenuSubContent>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={() => handleNavigation("/govza/post-office")}
+                isActive={location.pathname === "/govza/post-office"}
+              >
+                <Mail className="h-4 w-4" />
+                <span>Post Office</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={() => handleNavigation("/govza/sassa")}
+                isActive={location.pathname === "/govza/sassa"}
+              >
+                <HelpCircle className="h-4 w-4" />
+                <span>SASSA</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={() => handleNavigation("/govza/eskom")}
+                isActive={location.pathname === "/govza/eskom"}
+              >
+                <Zap className="h-4 w-4" />
+                <span>Eskom</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenuSubContent>
+        </SidebarMenuSub>
+      </SidebarMenuItem>
       
       {/* Admin Portal menu item - only show if user has admin access */}
       {hasAdminAccess && (
@@ -132,23 +313,6 @@ export function MainNavigationMenu({
         >
           <Settings className="h-4 w-4" />
           <span>Settings</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      {/* Renamed from "My Desk" to "Desk" */}
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Desk"
-          onClick={() => handleNavigation("/mydesk")}
-          isActive={location.pathname === "/mydesk"}
-        >
-          <Briefcase className="h-4 w-4" />
-          <span>Desk {organizationName ? `@${organizationName}` : ''}</span>
-          {(documentsCount > 0 || leaveCount > 0) && (
-            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {documentsCount + leaveCount}
-            </SidebarMenuBadge>
-          )}
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
