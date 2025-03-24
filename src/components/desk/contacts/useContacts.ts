@@ -21,7 +21,7 @@ export const useContacts = () => {
         .from('profiles')
         .select('organization_id')
         .eq('id', userData.user.id)
-        .single();
+        .maybeSingle();
 
       if (!userProfile?.organization_id) {
         console.log("User has no organization, returning empty contacts list");
@@ -135,7 +135,7 @@ export const useContacts = () => {
         .select('id')
         .eq('user_id', userData.user.id)
         .eq('contact_id', contactId)
-        .single();
+        .maybeSingle();
 
       if (existingContact) {
         // Update existing contact

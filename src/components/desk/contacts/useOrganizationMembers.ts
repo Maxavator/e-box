@@ -20,7 +20,7 @@ export const useOrganizationMembers = () => {
         .from('profiles')
         .select('organization_id')
         .eq('id', userData.user.id)
-        .single();
+        .maybeSingle();
 
       if (!userProfile?.organization_id) {
         console.log("No organization found for user");
