@@ -3,9 +3,10 @@ import { AppSidebar } from "@/components/shared/AppSidebar";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SIDEBAR_WIDTH } from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Create a client for components using MainLayout
 const queryClient = new QueryClient({
@@ -23,6 +24,7 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const handleLogout = async () => {
     try {
@@ -52,7 +54,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <SidebarProvider defaultOpen={true}>
         <div className="flex h-screen bg-background">
           <AppSidebar />
-          <main className="flex-1 overflow-auto w-full p-0">
+          <main className={`flex-1 overflow-auto ${!isMobile ? 'md:ml-[var(--sidebar-width)]' : ''} transition-all duration-300`}>
             {children}
           </main>
         </div>
