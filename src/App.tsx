@@ -11,6 +11,7 @@ import Chat from '@/pages/Chat';
 import Changelog from '@/pages/Changelog';
 import AdminPortal from '@/pages/AdminPortal';
 import OrganizationDashboard from '@/pages/OrganizationDashboard';
+import OrganizationMembers from '@/pages/OrganizationMembers';
 import Notes from '@/pages/Notes'; 
 import Moderation from '@/pages/Moderation';
 
@@ -119,6 +120,7 @@ const App: React.FC = () => {
             <Route path="/notes" element={withLayout(Notes)({})} />
             <Route path="/profile" element={withLayout(Settings)({})} />
             <Route path="/organization" element={withLayout(OrganizationDashboard)({})} />
+            <Route path="/members" element={withLayout(OrganizationMembers)({})} />
             <Route path="/admin" element={withLayout(AdminPortal)({})} />
             <Route path="/moderation" element={withLayout(Moderation)({})} />
             <Route path="/changelog" element={withLayout(Changelog)({})} />

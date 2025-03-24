@@ -4,12 +4,16 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface UserProfileData {
   organizationName: string | null;
+  firstName: string | null;
+  lastName: string | null;
   loading: boolean;
   error: Error | null;
 }
 
 export function useUserProfile(): UserProfileData {
   const [organizationName, setOrganizationName] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState<string | null>(null);
+  const [lastName, setLastName] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -21,16 +25,19 @@ export function useUserProfile(): UserProfileData {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          // Get user's organization ID from profiles table
+          // Get user's profile data
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
-            .select('organization_id')
+            .select('organization_id, first_name, last_name')
             .eq('id', user.id)
             .single();
             
           if (profileError) {
             throw profileError;
           }
+          
+          setFirstName(profileData?.first_name);
+          setLastName(profileData?.last_name);
           
           if (profileData?.organization_id) {
             // Get organization name
@@ -64,5 +71,5 @@ export function useUserProfile(): UserProfileData {
     fetchUserProfile();
   }, []);
 
-  return { organizationName, loading, error };
+  return { organizationName, firstName, lastName, loading, error };
 }
