@@ -91,35 +91,6 @@ export function MainNavigationMenu({
         </SidebarMenuButton>
       </SidebarMenuItem>
       
-      {/* Desk as a root item */}
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="Desk" 
-          onClick={() => handleNavigation("/mydesk")}
-          isActive={location.pathname === "/mydesk"}
-        >
-          <Briefcase className="h-4 w-4" />
-          <span>Desk {!loading && organizationName ? `@${organizationName}` : ''}</span>
-          {(documentsCount > 0 || leaveCount > 0) && (
-            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
-              {documentsCount + leaveCount}
-            </SidebarMenuBadge>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      {/* GovZA as a root item instead of submenu */}
-      <SidebarMenuItem>
-        <SidebarMenuButton 
-          tooltip="GovZA" 
-          onClick={() => handleNavigation("/govza")}
-          isActive={location.pathname.includes('/govza')}
-        >
-          <Building2 className="h-4 w-4" />
-          <span>GovZA</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
       <SidebarMenuItem>
         <SidebarMenuButton 
           tooltip="Calendar" 
@@ -203,6 +174,35 @@ export function MainNavigationMenu({
           </SidebarMenuButton>
         </SidebarMenuItem>
       )}
+      
+      {/* Desk as a root item - moved just above Settings */}
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Desk" 
+          onClick={() => handleNavigation("/mydesk")}
+          isActive={location.pathname === "/mydesk"}
+        >
+          <Briefcase className="h-4 w-4" />
+          <span>Desk {!loading && organizationName ? `@${organizationName}` : ''}</span>
+          {(documentsCount > 0 || leaveCount > 0) && (
+            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {documentsCount + leaveCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      
+      {/* GovZA as a root item - moved just above Settings */}
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="GovZA" 
+          onClick={() => handleNavigation("/govza")}
+          isActive={location.pathname.includes('/govza')}
+        >
+          <Building2 className="h-4 w-4" />
+          <span>GovZA</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
       
       <SidebarMenuItem>
         <SidebarMenuButton 
