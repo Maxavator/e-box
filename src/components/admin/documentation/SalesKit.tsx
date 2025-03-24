@@ -1,12 +1,14 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Download, FileText, Lock, ShieldCheck } from "lucide-react";
+import { AlertCircle, Download, FileText, Lock, ShieldCheck, Book, FileImage, BookOpen, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { DatasheetSection } from "./sales-kit/DatasheetSection";
+import { FeatureDatasheets } from "./sales-kit/FeatureDatasheets";
+import { UseCasesSection } from "./sales-kit/UseCasesSection";
 
 export function SalesKit() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -36,7 +38,7 @@ export function SalesKit() {
           </Alert>
           
           <Tabs defaultValue="overview" className="mt-6" onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 mb-6">
+            <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-6 overflow-auto">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="demo">Demo & POC</TabsTrigger>
               <TabsTrigger value="licensing">Licensing</TabsTrigger>
@@ -45,6 +47,18 @@ export function SalesKit() {
               <TabsTrigger value="data">Data Management</TabsTrigger>
               <TabsTrigger value="support">Support</TabsTrigger>
               <TabsTrigger value="compliance">Compliance</TabsTrigger>
+              <TabsTrigger value="datasheets" className="flex items-center gap-1">
+                <FileImage className="h-4 w-4" />
+                <span>Datasheets</span>
+              </TabsTrigger>
+              <TabsTrigger value="features" className="flex items-center gap-1">
+                <Image className="h-4 w-4" />
+                <span>Feature Sheets</span>
+              </TabsTrigger>
+              <TabsTrigger value="usecases" className="flex items-center gap-1">
+                <BookOpen className="h-4 w-4" />
+                <span>Use Cases</span>
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="overview" className="space-y-4">
@@ -520,6 +534,18 @@ export function SalesKit() {
                   </Button>
                 </div>
               </div>
+            </TabsContent>
+            
+            <TabsContent value="datasheets">
+              <DatasheetSection />
+            </TabsContent>
+            
+            <TabsContent value="features">
+              <FeatureDatasheets />
+            </TabsContent>
+            
+            <TabsContent value="usecases">
+              <UseCasesSection />
             </TabsContent>
           </Tabs>
         </CardContent>
