@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Server, Database, Cpu, Memory, AlertTriangle, Clock } from "lucide-react";
+import { Server, Database, Cpu, HardDrive, AlertTriangle, Clock } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -19,7 +18,6 @@ export const SystemInfo = () => {
     totalServices: 15
   });
 
-  // Mock data - in a real app, this would come from an API
   const databaseMetrics = {
     connections: 28,
     activeQueries: 13,
@@ -45,7 +43,6 @@ export const SystemInfo = () => {
     { name: "Scheduled Tasks", status: "operational", uptime: "99.89%" }
   ];
 
-  // Simulate fetching metrics
   useEffect(() => {
     const timer = setInterval(() => {
       setServerMetrics(prev => ({
@@ -105,7 +102,6 @@ export const SystemInfo = () => {
           </TabsTrigger>
         </TabsList>
 
-        {/* Overview Tab */}
         <TabsContent value="overview">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <MetricCard 
@@ -124,7 +120,7 @@ export const SystemInfo = () => {
             <MetricCard 
               title="Memory Usage" 
               value={`${serverMetrics.memoryUsage}%`} 
-              icon={<Memory />}
+              icon={<HardDrive />}
               progress={serverMetrics.memoryUsage}
               variant={serverMetrics.memoryUsage > 80 ? "danger" : serverMetrics.memoryUsage > 60 ? "warning" : "normal"}
             />
@@ -172,7 +168,6 @@ export const SystemInfo = () => {
           </Card>
         </TabsContent>
 
-        {/* Server Tab */}
         <TabsContent value="server">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
@@ -235,7 +230,6 @@ export const SystemInfo = () => {
           </div>
         </TabsContent>
 
-        {/* Database Tab */}
         <TabsContent value="database">
           <Card>
             <CardHeader>
@@ -279,7 +273,6 @@ export const SystemInfo = () => {
           </Card>
         </TabsContent>
 
-        {/* Incidents Tab */}
         <TabsContent value="incidents">
           <Card>
             <CardHeader>
