@@ -103,50 +103,32 @@ export const useContacts = () => {
           
           console.log("Adding organization member to contacts:", member.first_name, member.last_name);
           
+          // Add as a virtual contact
+          contactsMap.set(member.id, {
+            id: `org-${member.id}`,
+            user_id: userData.user.id,
+            contact_id: member.id,
+            is_favorite: false,
+            is_colleague: true,
+            created_at: new Date().toISOString(),
+            contact: member
+          });
+          
+          // Try to add the member as a contact in the database
           try {
-            // First try to add the member as a contact in the database
-            const { data: newContact, error: insertError } = await supabase
+            const { error: insertError } = await supabase
               .from('contacts')
               .insert({
                 user_id: userData.user.id,
                 contact_id: member.id,
                 is_favorite: false
-              })
-              .select('id, user_id, contact_id, is_favorite, created_at')
-              .maybeSingle();
+              });
             
             if (insertError) {
               console.error("Error adding colleague to contacts:", insertError);
-              // Still add as a virtual contact even if DB insert fails
-              contactsMap.set(member.id, {
-                id: `org-${member.id}`,
-                user_id: userData.user.id,
-                contact_id: member.id,
-                is_favorite: false,
-                is_colleague: true,
-                created_at: new Date().toISOString(),
-                contact: member
-              });
-            } else if (newContact) {
-              // Add the successfully inserted contact to our map
-              contactsMap.set(member.id, {
-                ...newContact,
-                is_colleague: true,
-                contact: member
-              });
             }
           } catch (error) {
             console.error("Error during contact insertion:", error);
-            // Still add as a virtual contact if there's an exception
-            contactsMap.set(member.id, {
-              id: `org-${member.id}`,
-              user_id: userData.user.id,
-              contact_id: member.id,
-              is_favorite: false,
-              is_colleague: true,
-              created_at: new Date().toISOString(),
-              contact: member
-            });
           }
         }
       } else {
