@@ -531,7 +531,7 @@ export const useGroupConversations = () => {
         createdBy: group.created_by,
         createdAt: group.created_at,
         updatedAt: group.updated_at,
-        participantIds: members?.map(m => m.user.id) || [],
+        participantIds: members?.map(m => m.user?.id) || [],
         members: members || [],
         unreadCount: 0
       };

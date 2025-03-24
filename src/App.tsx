@@ -1,8 +1,10 @@
+
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
+  Outlet,
 } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
@@ -45,12 +47,13 @@ function App() {
     checkSession();
   }, [supabase]);
 
-  const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  // Using Outlet from react-router-dom for the protected routes
+  const ProtectedRoute = () => {
     if (!session && !isLoading) {
       return <Navigate to="/auth" replace />;
     }
 
-    return children;
+    return <Outlet />;
   };
 
   return (
