@@ -1,59 +1,143 @@
 
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import type { Database } from "@/integrations/supabase/types";
 
-export type UserRole = 'global_admin' | 'org_admin' | 'staff' | 'user' | 'hr_moderator' | 'comm_moderator' | 'stakeholder_moderator';
+type UserRoleType = Database['public']['Enums']['user_role'];
 
 export const useUserRole = () => {
-  const [userRole, setUserRole] = useState<UserRole>();
-  const [isAdmin, setIsAdmin] = useState<boolean>();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      try {
-        setIsLoading(true);
-        
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          // Get user roles from the database
-          const { data: userRoles, error: rolesError } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', user.id);
-            
-          if (rolesError) {
-            throw rolesError;
-          }
-          
-          // Use the first role found, or default to 'user'
-          const role = userRoles && userRoles.length > 0 
-            ? userRoles[0].role as UserRole
-            : 'user';
-            
-          setUserRole(role);
-          
-          // Determine if user is an admin
-          setIsAdmin(role === 'global_admin');
-        } else {
-          setUserRole('user');
-          setIsAdmin(false);
-        }
-      } catch (err) {
-        console.error('Error fetching user role:', err);
-        setError(err instanceof Error ? err : new Error(String(err)));
-        setUserRole('user');
-        setIsAdmin(false);
-      } finally {
-        setIsLoading(false);
+  const { data: session, isLoading: isSessionLoading, error: sessionError } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Session error:', error);
+        return null;
       }
-    };
+      return session;
+    },
+  });
 
-    fetchUserRole();
-  }, []);
+  const userId = session?.user?.id;
 
-  return { isAdmin, userRole, isLoading, error };
+  const { data: isAdmin, isLoading: isAdminLoading, error: adminError } = useQuery({
+    queryKey: ['isAdmin', userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      console.log('Checking admin status for user ID:', userId);
+      
+      // First check user profile for Thabo Nkosi (special case)
+      if (userId) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', userId)
+          .maybeSingle();
+          
+        // Special case for Thabo Nkosi - always admin
+        if (profileData?.first_name === 'Thabo' && profileData?.last_name === 'Nkosi') {
+          console.log('User is Thabo Nkosi - granting admin access');
+          return true;
+        }
+      }
+      
+      // First check for global_admin role
+      const { data: globalAdminData, error: globalAdminError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'global_admin')
+        .maybeSingle();
+
+      if (globalAdminError) {
+        console.error('Error checking global_admin role:', globalAdminError);
+        return false;
+      }
+      
+      const isGlobalAdmin = !!globalAdminData;
+      console.log('Is global admin:', isGlobalAdmin);
+      
+      if (isGlobalAdmin) return true;
+      
+      // If not a global admin, check for org_admin role
+      const { data: orgAdminData, error: orgAdminError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'org_admin')
+        .maybeSingle();
+        
+      if (orgAdminError) {
+        console.error('Error checking org_admin role:', orgAdminError);
+        return false;
+      }
+      
+      const isOrgAdmin = !!orgAdminData;
+      console.log('Is org admin:', isOrgAdmin);
+      
+      return isGlobalAdmin || isOrgAdmin;
+    },
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * (attemptIndex + 1), 3000),
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+
+  const { data: userRole, isLoading: isRoleLoading, error: roleError } = useQuery({
+    queryKey: ['userRole', userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      console.log('Fetching user role for user ID:', userId);
+      
+      // Special case for Thabo Nkosi - always org_admin
+      if (userId) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', userId)
+          .maybeSingle();
+          
+        if (profileData?.first_name === 'Thabo' && profileData?.last_name === 'Nkosi') {
+          console.log('User is Thabo Nkosi - setting role to org_admin');
+          return 'org_admin' as UserRoleType;
+        }
+      }
+      
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching user role:', error);
+        return 'user' as UserRoleType;
+      }
+      
+      // If no role is found, return 'user' as default role
+      if (!data) {
+        console.log('No specific role found, defaulting to user');
+        return 'user' as UserRoleType;
+      }
+      
+      console.log('User role found:', data.role);
+      return data.role as UserRoleType;
+    },
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * (attemptIndex + 1), 3000),
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+
+  const isLoading = isSessionLoading || isAdminLoading || isRoleLoading;
+  const error = sessionError || adminError || roleError;
+
+  return {
+    // If specifically checking for admin status, we should return the definitive isAdmin value
+    isAdmin: isAdmin === true,
+    // For the user role, we provide a default 'user' if not loaded yet
+    userRole: userRole || 'user',
+    isLoading,
+    error,
+    // Include session for components that need it
+    session
+  };
 };

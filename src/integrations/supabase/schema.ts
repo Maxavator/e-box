@@ -15,8 +15,7 @@ export const schema = {
     calendar_event_invites: 'Calendar event invites - attendees for events',
     leave_requests: 'Leave requests - time off requests',
     contacts: 'Contacts - user connections',
-    notifications: 'Notifications - system messages to users',
-    notes: 'Notes - personal user notes' // Add this entry
+    notifications: 'Notifications - system messages to users'
   },
   enums: {
     user_role: 'User role types (global_admin, org_admin, staff, user)',

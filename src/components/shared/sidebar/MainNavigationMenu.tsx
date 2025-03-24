@@ -1,162 +1,156 @@
 
-import { useUserRole } from "@/components/admin/hooks/useUserRole";
-import { SidebarMenu, SidebarMenuBadge, SidebarMenuButton } from "@/components/ui/sidebar/menu/sidebar-menu";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
-  BookOpen,
-  BookText,
-  Building2,
-  Calendar,
-  ClipboardList,
-  Cog,
-  FileText,
-  Flag,
-  FolderClosed,
-  Home,
-  LifeBuoy,
   MessageSquare,
-  ShieldCheck,
-  Users
+  FileText,
+  Calendar,
+  Users,
+  Clock,
+  Settings,
+  Shield,
+  Briefcase,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-import { useSidebarBadges } from "@/hooks/useSidebarBadges";
 
-export default function MainNavigationMenu() {
+import {
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuBadge,
+} from "@/components/ui/sidebar";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserRole } from "@/components/admin/hooks/useUserRole";
+
+interface MainNavigationMenuProps {
+  chatCount: number;
+  documentsCount: number;
+  calendarCount: number;
+  contactsCount: number;
+  leaveCount: number;
+  resetBadgeCount: (type: 'chat' | 'documents' | 'calendar' | 'contacts' | 'leave') => void;
+}
+
+export function MainNavigationMenu({
+  chatCount,
+  documentsCount,
+  calendarCount,
+  contactsCount,
+  leaveCount,
+  resetBadgeCount,
+}: MainNavigationMenuProps) {
+  const navigate = useNavigate();
   const location = useLocation();
-  const pathname = location.pathname;
+  const { organizationName } = useUserProfile();
   const { isAdmin, userRole } = useUserRole();
-  const { unreadCount, flaggedItems } = useSidebarBadges();
   
-  const isModerator = 
-    userRole === 'hr_moderator' || 
-    userRole === 'comm_moderator' || 
-    userRole === 'stakeholder_moderator';
+  // Consider a user to have admin access if they are either global_admin or org_admin
+  const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
-  const isOrgAdmin = userRole === 'org_admin';
-
+  // Check if current route is an admin route
+  const isAdminPage = location.pathname.includes('/admin') || 
+                      location.pathname.includes('/organization');
+  
+  const handleNavigation = (path: string) => {
+    // Reset the respective badge count when navigating to a section
+    if (path === "/chat") resetBadgeCount("chat");
+    if (path === "/documents") resetBadgeCount("documents");
+    if (path === "/calendar") resetBadgeCount("calendar");
+    if (path === "/contacts") resetBadgeCount("contacts");
+    if (path === "/leave") resetBadgeCount("leave");
+    
+    navigate(path);
+  };
+  
   return (
     <SidebarMenu>
-      <SidebarMenuButton asChild>
-        <Link to="/dashboard" className={pathname === "/dashboard" ? "active" : ""}>
-          <Home className="h-4 w-4 mr-2" />
-          Dashboard
-        </Link>
-      </SidebarMenuButton>
-      
-      {/* Desk Group */}
-      <SidebarMenuButton asChild>
-        <Link to="/mydesk" className={pathname === "/mydesk" ? "active" : ""}>
-          <FolderClosed className="h-4 w-4 mr-2" />
-          My Desk
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/documents" className={pathname === "/documents" ? "active" : ""}>
-          <FileText className="h-4 w-4 mr-2" />
-          Documents
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/calendar" className={pathname === "/calendar" ? "active" : ""}>
-          <Calendar className="h-4 w-4 mr-2" />
-          Calendar
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/contacts" className={pathname === "/contacts" ? "active" : ""}>
-          <Users className="h-4 w-4 mr-2" />
-          Contacts
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/notes" className={pathname === "/notes" ? "active" : ""}>
-          <ClipboardList className="h-4 w-4 mr-2" />
-          Notes
-        </Link>
-      </SidebarMenuButton>
-      
-      {/* Organization */}
-      <SidebarMenuButton asChild>
-        <Link to="/organization" className={pathname === "/organization" ? "active" : ""}>
-          <Building2 className="h-4 w-4 mr-2" />
-          Organization
-        </Link>
-      </SidebarMenuButton>
-      
-      <SidebarMenuButton asChild>
-        <Link to="/members" className={pathname === "/members" ? "active" : ""}>
-          <Users className="h-4 w-4 mr-2" />
-          Organization Members
-        </Link>
-      </SidebarMenuButton>
-      
-      {/* Admin */}
-      {(isAdmin || isOrgAdmin) && (
-        <SidebarMenuButton asChild>
-          <Link to="/admin" className={pathname === "/admin" ? "active" : ""}>
-            <ShieldCheck className="h-4 w-4 mr-2" />
-            Admin Portal
-          </Link>
-        </SidebarMenuButton>
-      )}
-      
-      {/* Moderation */}
-      {(isAdmin || isModerator) && (
-        <SidebarMenuButton asChild>
-          <Link to="/moderation" className={pathname === "/moderation" ? "active" : ""}>
-            <Flag className="h-4 w-4 mr-2" />
-            Moderation
-            {flaggedItems > 0 && (
-              <SidebarMenuBadge>
-                {flaggedItems}
-              </SidebarMenuBadge>
-            )}
-          </Link>
-        </SidebarMenuButton>
-      )}
-      
-      {/* Communication */}
-      <SidebarMenuButton asChild>
-        <Link to="/chat" className={pathname === "/chat" ? "active" : ""}>
-          <MessageSquare className="h-4 w-4 mr-2" />
-          Messages
-          {unreadCount > 0 && (
-            <SidebarMenuBadge>
-              {unreadCount}
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Chats" 
+          onClick={() => handleNavigation("/chat")}
+          isActive={location.pathname === "/chat"}
+        >
+          <MessageSquare className="h-4 w-4" />
+          <span>Chats</span>
+          {chatCount > 0 && (
+            <SidebarMenuBadge className="ml-auto bg-red-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {chatCount}
             </SidebarMenuBadge>
           )}
-        </Link>
-      </SidebarMenuButton>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
       
-      {/* Settings & Help */}
-      <SidebarMenuButton asChild>
-        <Link to="/policies" className={pathname === "/policies" ? "active" : ""}>
-          <BookOpen className="h-4 w-4 mr-2" />
-          Policies
-        </Link>
-      </SidebarMenuButton>
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Calendar" 
+          onClick={() => handleNavigation("/calendar")}
+          isActive={location.pathname === "/calendar"}
+        >
+          <Calendar className="h-4 w-4" />
+          <span>Calendar</span>
+          {calendarCount > 0 && (
+            <SidebarMenuBadge className="ml-auto bg-green-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {calendarCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
       
-      <SidebarMenuButton asChild>
-        <Link to="/profile" className={pathname === "/profile" ? "active" : ""}>
-          <Cog className="h-4 w-4 mr-2" />
-          Settings
-        </Link>
-      </SidebarMenuButton>
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Contacts" 
+          onClick={() => handleNavigation("/contacts")}
+          isActive={location.pathname === "/contacts"}
+        >
+          <Users className="h-4 w-4" />
+          <span>Contacts</span>
+          {contactsCount > 0 && (
+            <SidebarMenuBadge className="ml-auto bg-amber-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {contactsCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
       
-      <SidebarMenuButton asChild>
-        <Link to="/changelog" className={pathname === "/changelog" ? "active" : ""}>
-          <BookText className="h-4 w-4 mr-2" />
-          Changelog
-        </Link>
-      </SidebarMenuButton>
+      {/* Admin Portal menu item - only show if user has admin access */}
+      {hasAdminAccess && (
+        <SidebarMenuItem>
+          <SidebarMenuButton 
+            tooltip="Admin Portal" 
+            onClick={() => handleNavigation("/admin")}
+            isActive={isAdminPage}
+          >
+            <Shield className="h-4 w-4" />
+            <span>Admin Portal</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      )}
       
-      <SidebarMenuButton className="cursor-not-allowed">
-        <LifeBuoy className="h-4 w-4 mr-2" />
-        Help & Support
-      </SidebarMenuButton>
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Settings" 
+          onClick={() => handleNavigation("/profile")}
+          isActive={location.pathname === "/profile"}
+        >
+          <Settings className="h-4 w-4" />
+          <span>Settings</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      
+      {/* Renamed from "My Desk" to "Desk" */}
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          tooltip="Desk"
+          onClick={() => handleNavigation("/mydesk")}
+          isActive={location.pathname === "/mydesk"}
+        >
+          <Briefcase className="h-4 w-4" />
+          <span>Desk {organizationName ? `@${organizationName}` : ''}</span>
+          {(documentsCount > 0 || leaveCount > 0) && (
+            <SidebarMenuBadge className="ml-auto bg-blue-500 text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full">
+              {documentsCount + leaveCount}
+            </SidebarMenuBadge>
+          )}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
     </SidebarMenu>
   );
 }
