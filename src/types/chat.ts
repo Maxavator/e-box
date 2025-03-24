@@ -56,3 +56,30 @@ export interface User {
   avatar?: string;
   initials?: string;
 }
+
+export interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  isPublic: boolean;
+  organizationId?: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  memberCount?: number;
+}
+
+export interface GroupMember {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string;
+  role?: 'admin' | 'member';
+}
+
+export interface GroupConversation extends Conversation {
+  groupId: string;
+  description?: string;
+  isBusiness?: boolean;
+  members?: GroupMember[];
+}
