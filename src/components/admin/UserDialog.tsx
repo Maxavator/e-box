@@ -123,7 +123,7 @@ export const UserDialog = ({
                   <SelectValue placeholder="Select an organization" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {organizations?.map((org) => (
                     <SelectItem key={org.id} value={org.id}>
                       {org.name}
