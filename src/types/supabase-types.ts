@@ -1,4 +1,3 @@
-
 // Define types for all the tables in our Supabase database
 
 export interface Organization {
@@ -21,7 +20,8 @@ export interface Profile {
   updated_at: string;
 }
 
-export type UserRoleType = 'global_admin' | 'org_admin' | 'staff' | 'user';
+export type UserRoleType = 'global_admin' | 'org_admin' | 'staff' | 'user' | 
+  'hr_moderator' | 'comm_moderator' | 'stakeholder_moderator';
 
 export interface UserRole {
   id: string;

@@ -6,6 +6,7 @@ import type { UserWithRole } from "./types";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 interface UserTableProps {
   users: UserWithRole[] | undefined;
@@ -67,6 +68,27 @@ export const UserTable = ({
     }
   };
 
+  const getRoleDisplayName = (role: string) => {
+    switch(role) {
+      case 'global_admin': return 'Global Admin';
+      case 'org_admin': return 'Organization Admin';
+      case 'staff': return 'Staff';
+      case 'hr_moderator': return 'HR Moderator';
+      case 'comm_moderator': return 'Communication Moderator';
+      case 'stakeholder_moderator': return 'Stakeholder Moderator';
+      default: return role || 'User';
+    }
+  };
+
+  const getRoleBadgeStyle = (role: string) => {
+    if (['global_admin', 'org_admin'].includes(role)) {
+      return 'bg-green-600 text-white';
+    } else if (['hr_moderator', 'comm_moderator', 'stakeholder_moderator'].includes(role)) {
+      return 'bg-blue-600 text-white';
+    }
+    return 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+  };
+
   // Check if a user belongs to the org admin's organization
   const isSameOrganization = (user: UserWithRole) => {
     return userOrganizationId && user.organization_id === userOrganizationId;
@@ -98,9 +120,10 @@ export const UserTable = ({
               </TableCell>
             </TableRow>
           ) : users?.map((user) => {
-            const userRole = user.user_roles?.[0]?.role || 'user';
-            const isOrgAdmin = userRole === 'org_admin';
-            const isGlobalAdmin = userRole === 'global_admin';
+            const userRoleValue = user.user_roles?.[0]?.role || 'user';
+            const isGlobalAdmin = userRoleValue === 'global_admin';
+            const isOrgAdminRole = userRoleValue === 'org_admin';
+            const isModerator = ['hr_moderator', 'comm_moderator', 'stakeholder_moderator'].includes(userRoleValue);
             const isThabo = user.first_name === 'Thabo' && user.last_name === 'Nkosi';
             const isGolderUser = user.organizations?.[0]?.name?.toLowerCase().includes('golder');
             
@@ -125,7 +148,16 @@ export const UserTable = ({
                 </TableCell>
                 <TableCell>User #{user.id.substring(0, 8)}</TableCell>
                 <TableCell>
-                  {userRole || 'N/A'}
+                  <Badge className={`text-xs font-normal ${getRoleBadgeStyle(userRoleValue)}`}>
+                    {getRoleDisplayName(userRoleValue)}
+                  </Badge>
+                  {isModerator && (
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {userRoleValue === 'hr_moderator' && 'Manages HR, leave requests, vacancies'}
+                      {userRoleValue === 'comm_moderator' && 'Manages internal & external communications'}
+                      {userRoleValue === 'stakeholder_moderator' && 'Manages stakeholder communications'}
+                    </div>
+                  )}
                 </TableCell>
                 <TableCell>
                   {user.organizations?.[0]?.name || 'N/A'}
@@ -148,7 +180,7 @@ export const UserTable = ({
                         <KeyRound className="h-4 w-4 mr-2" />
                         Reset Password
                       </Button>
-                      {!isGlobalAdmin && !isOrgAdmin && isAdmin && (
+                      {!isGlobalAdmin && !isOrgAdminRole && !isModerator && isAdmin && (
                         <Button 
                           variant={isThabo ? "default" : "ghost"}
                           size="sm" 
@@ -164,7 +196,7 @@ export const UserTable = ({
                           Make Org Admin
                         </Button>
                       )}
-                      {!isGlobalAdmin && !isOrgAdmin && isOrgAdmin && isSameOrganization(user) && (
+                      {!isGlobalAdmin && !isOrgAdminRole && !isModerator && isOrgAdmin && isSameOrganization(user) && (
                         <Button 
                           variant="ghost"
                           size="sm" 

@@ -1,10 +1,11 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import type { UserFormData, Organization } from "./types";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UserFormData } from "./types";
+import { Organization } from "@/types/supabase-types";
 
 interface UserDialogProps {
   isOpen: boolean;
@@ -31,93 +32,98 @@ export const UserDialog = ({
   isSubmitting = false,
   isOrgAdmin = false,
 }: UserDialogProps) => {
-  // Find current organization name for org admins
-  const currentOrgName = isOrgAdmin && organizations 
-    ? organizations.find(org => org.id === formData.organizationId)?.name 
-    : null;
-
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
-          {!isEdit && (
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="firstName">First Name</Label>
               <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => onFormChange('email', e.target.value)}
-                placeholder="user@example.com"
+                id="firstName"
+                value={formData.firstName}
+                onChange={(e) => onFormChange("firstName", e.target.value)}
                 required
               />
             </div>
-          )}
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                value={formData.lastName}
+                onChange={(e) => onFormChange("lastName", e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="firstName">First Name</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
-              id="firstName"
-              value={formData.firstName}
-              onChange={(e) => onFormChange('firstName', e.target.value)}
-              placeholder="John"
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => onFormChange("email", e.target.value)}
               required
+              disabled={isEdit}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="lastName">Last Name</Label>
-            <Input
-              id="lastName"
-              value={formData.lastName}
-              onChange={(e) => onFormChange('lastName', e.target.value)}
-              placeholder="Doe"
-              required
-            />
-          </div>
+
           <div className="space-y-2">
             <Label htmlFor="role">Role</Label>
             <Select
               value={formData.role}
-              onValueChange={(value) => onFormChange('role', value)}
+              onValueChange={(value) => onFormChange("role", value)}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Select role" />
+              <SelectTrigger id="role">
+                <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="staff">Staff</SelectItem>
-                <SelectItem value="org_admin">Organization Admin</SelectItem>
                 {!isOrgAdmin && (
                   <SelectItem value="global_admin">Global Admin</SelectItem>
                 )}
+                <SelectItem value="org_admin">Organization Admin</SelectItem>
+                <SelectItem value="staff">Staff</SelectItem>
+                <SelectItem value="user">User</SelectItem>
+                
+                {/* New moderator roles */}
+                <SelectItem value="hr_moderator">HR Moderator</SelectItem>
+                <SelectItem value="comm_moderator">Communication Moderator</SelectItem>
+                <SelectItem value="stakeholder_moderator">Stakeholder Moderator</SelectItem>
               </SelectContent>
             </Select>
-            {isOrgAdmin && formData.role === "global_admin" && (
-              <p className="text-xs text-amber-600 mt-1">
-                Note: As an organization admin, you cannot create global admins. 
-                The user will be assigned the organization admin role.
+            {formData.role === 'hr_moderator' && (
+              <p className="text-xs text-muted-foreground mt-1">
+                HR Moderator can manage HR information, leave requests, and issue vacancies.
+              </p>
+            )}
+            {formData.role === 'comm_moderator' && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Communication Moderator can manage internal, external, and broadcast communications.
+              </p>
+            )}
+            {formData.role === 'stakeholder_moderator' && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Stakeholder Moderator can manage external communication with shareholders and public announcements.
               </p>
             )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="organization">Organization</Label>
-            {isOrgAdmin ? (
-              <div className="border rounded-md px-3 py-2 bg-muted text-muted-foreground">
-                {currentOrgName || "Your organization"}
-                <p className="text-xs mt-1">
-                  As an organization admin, you can only manage users in your organization.
-                </p>
-              </div>
-            ) : (
+
+          {!isOrgAdmin && (
+            <div className="space-y-2">
+              <Label htmlFor="organization">Organization</Label>
               <Select
                 value={formData.organizationId}
-                onValueChange={(value) => onFormChange('organizationId', value)}
+                onValueChange={(value) => onFormChange("organizationId", value)}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select organization" />
+                <SelectTrigger id="organization">
+                  <SelectValue placeholder="Select an organization" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="">None</SelectItem>
                   {organizations?.map((org) => (
                     <SelectItem key={org.id} value={org.id}>
                       {org.name}
@@ -125,22 +131,21 @@ export const UserDialog = ({
                   ))}
                 </SelectContent>
               </Select>
-            )}
+            </div>
+          )}
+
+          <div className="flex justify-end space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Processing..." : isEdit ? "Update" : "Create"}
+            </Button>
           </div>
-          <Button 
-            type="submit" 
-            className="w-full"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <span className="flex items-center gap-2">
-                <span className="animate-spin">⚪</span>
-                {isEdit ? "Updating..." : "Creating..."}
-              </span>
-            ) : (
-              isEdit ? "Update User" : "Add User"
-            )}
-          </Button>
         </form>
       </DialogContent>
     </Dialog>

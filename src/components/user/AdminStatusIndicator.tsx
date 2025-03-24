@@ -8,6 +8,7 @@ export function AdminStatusIndicator() {
   
   // Consider a user to have admin access if they are either global_admin or org_admin
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
+  const isModerator = ['hr_moderator', 'comm_moderator', 'stakeholder_moderator'].includes(userRole || '');
   
   if (isLoading) {
     return (
@@ -30,6 +31,16 @@ export function AdminStatusIndicator() {
     return (
       <Badge variant="default" className="bg-green-600 hover:bg-green-700">
         {userRole === 'global_admin' ? 'Global Admin' : userRole === 'org_admin' ? 'Organization Admin' : 'Admin'}
+      </Badge>
+    );
+  }
+  
+  if (isModerator) {
+    return (
+      <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
+        {userRole === 'hr_moderator' ? 'HR Moderator' : 
+         userRole === 'comm_moderator' ? 'Comm Moderator' : 
+         'Stakeholder Moderator'}
       </Badge>
     );
   }
