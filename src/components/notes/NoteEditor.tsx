@@ -1,39 +1,26 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Save, Trash } from "lucide-react";
-import { Note } from "@/types/notes";
 import { useNotes } from "@/hooks/useNotes";
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from "@/components/ui/alert-dialog";
+import { Note, CreateNoteInput } from "@/types/notes";
+import { Save, X } from "lucide-react";
 
 interface NoteEditorProps {
-  note?: Note | null;
-  onSave?: () => void;
-  onCancel?: () => void;
+  note: Note | null;
+  onSave: () => void;
+  onCancel: () => void;
 }
 
 export const NoteEditor: React.FC<NoteEditorProps> = ({
   note,
   onSave,
-  onCancel
+  onCancel,
 }) => {
-  const { createNote, updateNote, deleteNote, isCreating, isUpdating, isDeleting } = useNotes();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [title, setTitle] = useState<string>("");
+  const [content, setContent] = useState<string>("");
+  const { createNote, updateNote, isCreating, isUpdating } = useNotes();
 
   useEffect(() => {
     if (note) {
@@ -45,114 +32,66 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
     }
   }, [note]);
 
-  const handleSave = () => {
-    if (!title.trim()) {
+  const handleSave = async () => {
+    if (title.trim() === "") {
+      // Don't save notes without a title
       return;
     }
 
-    if (note && note.id) {
-      updateNote({
+    if (note) {
+      // Update existing note
+      await updateNote({
         id: note.id,
-        title,
-        content
-      }, {
-        onSuccess: () => {
-          if (onSave) onSave();
-        }
+        title: title.trim(),
+        content: content.trim(),
       });
     } else {
-      createNote({
-        title,
-        content
-      }, {
-        onSuccess: () => {
-          setTitle("");
-          setContent("");
-          if (onSave) onSave();
-        }
-      });
+      // Create new note
+      const newNote: CreateNoteInput = {
+        title: title.trim(),
+        content: content.trim(),
+      };
+      await createNote(newNote);
     }
-  };
 
-  const handleDelete = () => {
-    if (note && note.id) {
-      deleteNote(note.id, {
-        onSuccess: () => {
-          setShowDeleteDialog(false);
-          if (onCancel) onCancel();
-        }
-      });
-    }
+    onSave();
   };
-
-  const isLoading = isCreating || isUpdating || isDeleting;
-  const isEditMode = !!note;
 
   return (
-    <Card className="w-full h-full flex flex-col">
-      <CardHeader className="pb-3">
-        <CardTitle>
-          <Input 
-            placeholder="Note title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="text-lg font-bold border-none bg-transparent px-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-          />
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1">
-        <Textarea 
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between p-4 border-b">
+        <Input
+          placeholder="Note title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="text-lg font-medium bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0"
+        />
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onCancel}
+          >
+            <X className="h-4 w-4 mr-2" /> Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={title.trim() === "" || isCreating || isUpdating}
+            size="sm"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {note ? "Update" : "Save"}
+          </Button>
+        </div>
+      </div>
+      <div className="flex-1 p-4 overflow-auto">
+        <Textarea
           placeholder="Write your note content here..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="min-h-[200px] h-full resize-none border-none focus-visible:ring-0"
+          className="w-full h-full min-h-[calc(100vh-280px)] resize-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent p-0"
         />
-      </CardContent>
-      <CardFooter className="flex justify-between border-t pt-3">
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={onCancel}
-            disabled={isLoading}
-          >
-            Cancel
-          </Button>
-          {isEditMode && (
-            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-              <AlertDialogTrigger asChild>
-                <Button 
-                  variant="destructive" 
-                  disabled={isLoading}
-                >
-                  {isDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash className="h-4 w-4 mr-2" />}
-                  Delete
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will permanently delete this note. This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
-        </div>
-        <Button 
-          onClick={handleSave}
-          disabled={isLoading || !title.trim()}
-        >
-          {isCreating || isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-          Save
-        </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
