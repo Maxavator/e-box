@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -82,229 +83,236 @@ export const SystemInfo = () => {
         </p>
       </div>
 
-      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full justify-start">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
+      <Tabs 
+        defaultValue="overview" 
+        value={activeTab} 
+        onValueChange={setActiveTab} 
+        className="w-full bg-white rounded-lg shadow-sm border"
+      >
+        <TabsList className="w-full justify-start p-1 bg-muted/20">
+          <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-white">
             <Server className="w-4 h-4" />
             Overview
           </TabsTrigger>
-          <TabsTrigger value="server" className="flex items-center gap-2">
+          <TabsTrigger value="server" className="flex items-center gap-2 data-[state=active]:bg-white">
             <Cpu className="w-4 h-4" />
             Server
           </TabsTrigger>
-          <TabsTrigger value="database" className="flex items-center gap-2">
+          <TabsTrigger value="database" className="flex items-center gap-2 data-[state=active]:bg-white">
             <Database className="w-4 h-4" />
             Database
           </TabsTrigger>
-          <TabsTrigger value="incidents" className="flex items-center gap-2">
+          <TabsTrigger value="incidents" className="flex items-center gap-2 data-[state=active]:bg-white">
             <AlertTriangle className="w-4 h-4" />
             Incidents
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <MetricCard 
-              title="System Status" 
-              value="Operational" 
-              icon={<Server />}
-              variant="success"
-            />
-            <MetricCard 
-              title="CPU Usage" 
-              value={`${serverMetrics.cpuUsage}%`} 
-              icon={<Cpu />}
-              progress={serverMetrics.cpuUsage}
-              variant={serverMetrics.cpuUsage > 80 ? "danger" : serverMetrics.cpuUsage > 60 ? "warning" : "normal"}
-            />
-            <MetricCard 
-              title="Memory Usage" 
-              value={`${serverMetrics.memoryUsage}%`} 
-              icon={<HardDrive />}
-              progress={serverMetrics.memoryUsage}
-              variant={serverMetrics.memoryUsage > 80 ? "danger" : serverMetrics.memoryUsage > 60 ? "warning" : "normal"}
-            />
-            <MetricCard 
-              title="Active Services" 
-              value={`${serverMetrics.activeServices}/${serverMetrics.totalServices}`} 
-              icon={<Cpu />}
-            />
-            <MetricCard 
-              title="Database Connections" 
-              value={databaseMetrics.connections.toString()} 
-              icon={<Database />}
-            />
-            <MetricCard 
-              title="System Uptime" 
-              value={serverMetrics.uptime} 
-              icon={<Clock />}
-            />
-          </div>
+        <div className="p-4">
+          <TabsContent value="overview">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <MetricCard 
+                title="System Status" 
+                value="Operational" 
+                icon={<Server />}
+                variant="success"
+              />
+              <MetricCard 
+                title="CPU Usage" 
+                value={`${serverMetrics.cpuUsage}%`} 
+                icon={<Cpu />}
+                progress={serverMetrics.cpuUsage}
+                variant={serverMetrics.cpuUsage > 80 ? "danger" : serverMetrics.cpuUsage > 60 ? "warning" : "normal"}
+              />
+              <MetricCard 
+                title="Memory Usage" 
+                value={`${serverMetrics.memoryUsage}%`} 
+                icon={<HardDrive />}
+                progress={serverMetrics.memoryUsage}
+                variant={serverMetrics.memoryUsage > 80 ? "danger" : serverMetrics.memoryUsage > 60 ? "warning" : "normal"}
+              />
+              <MetricCard 
+                title="Active Services" 
+                value={`${serverMetrics.activeServices}/${serverMetrics.totalServices}`} 
+                icon={<Cpu />}
+              />
+              <MetricCard 
+                title="Database Connections" 
+                value={databaseMetrics.connections.toString()} 
+                icon={<Database />}
+              />
+              <MetricCard 
+                title="System Uptime" 
+                value={serverMetrics.uptime} 
+                icon={<Clock />}
+              />
+            </div>
 
-          <Separator className="my-6" />
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-500" />
-                Recent Incidents
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentIncidents.slice(0, 3).map(incident => (
-                  <div key={incident.id} className="flex items-center justify-between border-b pb-2">
-                    <div>
-                      <div className="font-medium">{incident.title}</div>
-                      <div className="text-sm text-muted-foreground">{incident.date}</div>
-                    </div>
-                    <Badge className={getSeverityColor(incident.severity)}>
-                      {incident.severity}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="server">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
+            <Separator className="my-6" />
+            
+            <Card className="border-none shadow-md bg-gradient-to-br from-white to-gray-50">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Cpu className="h-5 w-5 text-primary" />
-                  Server Metrics
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <MetricWithProgress 
-                  label="CPU Usage" 
-                  value={`${serverMetrics.cpuUsage}%`} 
-                  progress={serverMetrics.cpuUsage}
-                />
-                <MetricWithProgress 
-                  label="Memory Usage" 
-                  value={`${serverMetrics.memoryUsage}%`} 
-                  progress={serverMetrics.memoryUsage}
-                />
-                <MetricWithProgress 
-                  label="Disk Usage" 
-                  value={`${serverMetrics.diskUsage}%`} 
-                  progress={serverMetrics.diskUsage}
-                />
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Last Reboot:</span>
-                  <span className="text-sm">{serverMetrics.lastReboot}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">System Uptime:</span>
-                  <span className="text-sm">{serverMetrics.uptime}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Server className="h-5 w-5 text-primary" />
-                  Services Status
+                  <AlertTriangle className="h-5 w-5 text-amber-500" />
+                  Recent Incidents
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {servicesStatus.map((service, index) => (
-                    <div key={index} className="flex items-center justify-between">
+                  {recentIncidents.slice(0, 3).map(incident => (
+                    <div key={incident.id} className="flex items-center justify-between border-b pb-3 transition-colors hover:bg-muted/10 p-2 rounded-md">
                       <div>
-                        <div className="font-medium">{service.name}</div>
-                        <div className="text-sm text-muted-foreground">Uptime: {service.uptime}</div>
+                        <div className="font-medium">{incident.title}</div>
+                        <div className="text-sm text-muted-foreground">{incident.date}</div>
                       </div>
-                      <Badge className={getStatusColor(service.status)}>
-                        {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
+                      <Badge className={`${getSeverityColor(incident.severity)} shadow-sm`}>
+                        {incident.severity}
                       </Badge>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </TabsContent>
+          </TabsContent>
 
-        <TabsContent value="database">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Database className="h-5 w-5 text-primary" />
-                Database Metrics
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Active Connections:</span>
-                    <span className="text-sm">{databaseMetrics.connections}</span>
+          <TabsContent value="server">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="border-none shadow-md bg-gradient-to-br from-white to-gray-50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Cpu className="h-5 w-5 text-primary" />
+                    Server Metrics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <MetricWithProgress 
+                    label="CPU Usage" 
+                    value={`${serverMetrics.cpuUsage}%`} 
+                    progress={serverMetrics.cpuUsage}
+                  />
+                  <MetricWithProgress 
+                    label="Memory Usage" 
+                    value={`${serverMetrics.memoryUsage}%`} 
+                    progress={serverMetrics.memoryUsage}
+                  />
+                  <MetricWithProgress 
+                    label="Disk Usage" 
+                    value={`${serverMetrics.diskUsage}%`} 
+                    progress={serverMetrics.diskUsage}
+                  />
+                  <div className="flex justify-between items-center p-2 rounded-md bg-gray-50">
+                    <span className="text-sm font-medium">Last Reboot:</span>
+                    <span className="text-sm">{serverMetrics.lastReboot}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Active Queries:</span>
-                    <span className="text-sm">{databaseMetrics.activeQueries}</span>
+                  <div className="flex justify-between items-center p-2 rounded-md bg-gray-50">
+                    <span className="text-sm font-medium">System Uptime:</span>
+                    <span className="text-sm">{serverMetrics.uptime}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Avg. Query Time:</span>
-                    <span className="text-sm">{databaseMetrics.avgQueryTime}</span>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Cache Hit Ratio:</span>
-                    <span className="text-sm">{(databaseMetrics.cacheHitRatio * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Storage Used:</span>
-                    <span className="text-sm">{databaseMetrics.storageUsed}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Last Backup:</span>
-                    <span className="text-sm">{databaseMetrics.backupStatus}</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                </CardContent>
+              </Card>
 
-        <TabsContent value="incidents">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-primary" />
-                System Incidents
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentIncidents.map(incident => (
-                  <div key={incident.id} className="flex items-center justify-between border-b pb-4">
-                    <div>
-                      <div className="font-medium">{incident.title}</div>
-                      <div className="text-sm text-muted-foreground">{incident.date}</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className={getSeverityColor(incident.severity)}>
-                        {incident.severity}
-                      </Badge>
-                      {incident.resolved && (
-                        <Badge variant="outline" className="border-green-500 text-green-500">
-                          Resolved
+              <Card className="border-none shadow-md bg-gradient-to-br from-white to-gray-50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Server className="h-5 w-5 text-primary" />
+                    Services Status
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {servicesStatus.map((service, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 rounded-md transition-colors hover:bg-muted/10">
+                        <div>
+                          <div className="font-medium">{service.name}</div>
+                          <div className="text-sm text-muted-foreground">Uptime: {service.uptime}</div>
+                        </div>
+                        <Badge className={`${getStatusColor(service.status)} shadow-sm`}>
+                          {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
                         </Badge>
-                      )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="database">
+            <Card className="border-none shadow-md bg-gradient-to-br from-white to-gray-50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Database className="h-5 w-5 text-primary" />
+                  Database Metrics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-2 rounded-md bg-gray-50">
+                      <span className="text-sm font-medium">Active Connections:</span>
+                      <span className="text-sm font-bold">{databaseMetrics.connections}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 rounded-md bg-gray-50">
+                      <span className="text-sm font-medium">Active Queries:</span>
+                      <span className="text-sm font-bold">{databaseMetrics.activeQueries}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 rounded-md bg-gray-50">
+                      <span className="text-sm font-medium">Avg. Query Time:</span>
+                      <span className="text-sm font-bold">{databaseMetrics.avgQueryTime}</span>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-2 rounded-md bg-gray-50">
+                      <span className="text-sm font-medium">Cache Hit Ratio:</span>
+                      <span className="text-sm font-bold">{(databaseMetrics.cacheHitRatio * 100).toFixed(1)}%</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 rounded-md bg-gray-50">
+                      <span className="text-sm font-medium">Storage Used:</span>
+                      <span className="text-sm font-bold">{databaseMetrics.storageUsed}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 rounded-md bg-gray-50">
+                      <span className="text-sm font-medium">Last Backup:</span>
+                      <span className="text-sm font-bold">{databaseMetrics.backupStatus}</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="incidents">
+            <Card className="border-none shadow-md bg-gradient-to-br from-white to-gray-50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-primary" />
+                  System Incidents
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {recentIncidents.map(incident => (
+                    <div key={incident.id} className="flex items-center justify-between border-b pb-4 p-2 rounded-md transition-colors hover:bg-muted/10">
+                      <div>
+                        <div className="font-medium">{incident.title}</div>
+                        <div className="text-sm text-muted-foreground">{incident.date}</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={`${getSeverityColor(incident.severity)} shadow-sm`}>
+                          {incident.severity}
+                        </Badge>
+                        {incident.resolved && (
+                          <Badge variant="outline" className="border-green-500 text-green-500 shadow-sm">
+                            Resolved
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
@@ -321,10 +329,10 @@ interface MetricCardProps {
 const MetricCard = ({ title, value, icon, progress, variant = "normal" }: MetricCardProps) => {
   const getVariantClasses = () => {
     switch (variant) {
-      case "success": return "text-green-600 bg-green-50";
-      case "warning": return "text-amber-600 bg-amber-50";
-      case "danger": return "text-red-600 bg-red-50";
-      default: return "text-primary bg-primary/10";
+      case "success": return "text-green-600 bg-green-50 shadow-sm shadow-green-100";
+      case "warning": return "text-amber-600 bg-amber-50 shadow-sm shadow-amber-100";
+      case "danger": return "text-red-600 bg-red-50 shadow-sm shadow-red-100";
+      default: return "text-primary bg-primary/5 shadow-sm";
     }
   };
 
@@ -338,17 +346,17 @@ const MetricCard = ({ title, value, icon, progress, variant = "normal" }: Metric
   };
 
   return (
-    <Card>
+    <Card className="border-none shadow-md overflow-hidden bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-shadow">
       <CardContent className="p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
-          {icon && <div className={`h-8 w-8 rounded-full flex items-center justify-center ${getVariantClasses()}`}>
+          {icon && <div className={`h-9 w-9 rounded-full flex items-center justify-center ${getVariantClasses()}`}>
             {icon}
           </div>}
         </div>
         <div className="text-2xl font-bold">{value}</div>
         {progress !== undefined && (
-          <Progress value={progress} className={`h-1.5 mt-2 ${getProgressColor()}`} />
+          <Progress value={progress} className={`h-2 mt-3 ${getProgressColor()}`} />
         )}
       </CardContent>
     </Card>
@@ -374,7 +382,7 @@ const MetricWithProgress = ({ label, value, progress }: MetricWithProgressProps)
         <span className="text-sm font-medium">{label}</span>
         <span className="text-sm font-medium">{value}</span>
       </div>
-      <Progress value={progress} className={`h-1.5 ${getProgressColor()}`} />
+      <Progress value={progress} className={`h-2 ${getProgressColor()}`} />
     </div>
   );
 };
