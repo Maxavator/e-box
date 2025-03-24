@@ -26,21 +26,9 @@ export function MainLayout({ children }: MainLayoutProps) {
     }
   };
 
-  // Force sidebar to be visible on page load
-  useEffect(() => {
-    const sidebarCookie = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('sidebar:state='));
-    
-    // If the sidebar is collapsed, set it to expanded
-    if (sidebarCookie && sidebarCookie.split('=')[1] === 'collapsed') {
-      document.cookie = 'sidebar:state=expanded; path=/; max-age=604800';
-    }
-  }, []);
-
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex h-screen bg-background">
+      <div className="flex h-screen w-full bg-background">
         <AppSidebar />
         <main className={`flex-1 overflow-auto ${!isMobile ? 'md:ml-[var(--sidebar-width)]' : ''} transition-all duration-300`}>
           {children}

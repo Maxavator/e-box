@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -81,17 +80,17 @@ export const useGroupConversations = () => {
       const memberConversations = memberGroups
         ?.filter(g => g.conversations)
         .map(g => ({
-          id: g.conversations.id,
-          name: g.conversations.name,
-          description: g.conversations.description,
-          isGroup: g.conversations.is_group,
-          isPublic: g.conversations.is_public,
-          isBusiness: g.conversations.is_business,
-          uniqueGroupId: g.conversations.unique_group_id,
-          organizationId: g.conversations.organization_id,
-          createdBy: g.conversations.created_by,
-          createdAt: g.conversations.created_at,
-          updatedAt: g.conversations.updated_at,
+          id: g.conversations?.id,
+          name: g.conversations?.name,
+          description: g.conversations?.description,
+          isGroup: g.conversations?.is_group,
+          isPublic: g.conversations?.is_public,
+          isBusiness: g.conversations?.is_business,
+          uniqueGroupId: g.conversations?.unique_group_id,
+          organizationId: g.conversations?.organization_id,
+          createdBy: g.conversations?.created_by,
+          createdAt: g.conversations?.created_at,
+          updatedAt: g.conversations?.updated_at,
           userRole: g.role,
           participantIds: [],
           unreadCount: 0

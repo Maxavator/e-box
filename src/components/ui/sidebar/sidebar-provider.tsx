@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
@@ -57,7 +56,7 @@ export const SidebarProvider = React.forwardRef<
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
 
-    // Always keep the sidebar open
+    // Always keep the sidebar open on desktop
     const [_open, _setOpen] = React.useState(true)
     const open = openProp ?? _open
     const setOpen = React.useCallback(
@@ -72,7 +71,7 @@ export const SidebarProvider = React.forwardRef<
         }
 
         // This sets the cookie to keep the sidebar state
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState ? 'expanded' : 'collapsed'}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
       },
       [setOpenProp, isMobile]
     )
@@ -86,7 +85,7 @@ export const SidebarProvider = React.forwardRef<
 
     // We add a state so that we can do data-state="expanded" or "collapsed"
     // Ensure desktop is always expanded
-    const state = isMobile ? (open ? "expanded" : "collapsed") : "expanded"
+    const state = isMobile ? (openMobile ? "expanded" : "collapsed") : "expanded"
 
     const contextValue = React.useMemo<SidebarContext>(
       () => ({
