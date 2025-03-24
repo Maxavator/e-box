@@ -3,7 +3,6 @@
 
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { useLocation } from "react-router-dom";
 
 // Define the Attribute type
 type Attribute = "class" | "data-theme";
@@ -30,11 +29,6 @@ export function ThemeProvider({
   disableTransitionOnChange,
   forcedTheme
 }: ThemeProviderProps) {
-  // Check current route to force light theme on auth page
-  const location = useLocation();
-  const isAuthPage = location.pathname === "/auth";
-  const themeToUse = isAuthPage ? "light" : forcedTheme;
-
   return (
     <NextThemesProvider 
       attribute={attribute}
@@ -43,7 +37,7 @@ export function ThemeProvider({
       value={value}
       enableSystem={enableSystem}
       disableTransitionOnChange={disableTransitionOnChange}
-      forcedTheme={themeToUse}
+      forcedTheme={forcedTheme}
     >
       {children}
     </NextThemesProvider>

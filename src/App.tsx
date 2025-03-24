@@ -4,12 +4,19 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { MainLayout } from '@/layouts/MainLayout';
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import { Index, Auth, Dashboard, NotFound, Chat, AdminPortal, OrganizationDashboard, Changelog, Settings, Documents, Calendar, ContactsList, LeaveManager, Policies, Desk } from './pages';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import GovZA from "./pages/GovZA";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 // Create a layout route component that doesn't add another Router
 const ProtectedLayoutRoute = () => {
@@ -19,6 +26,22 @@ const ProtectedLayoutRoute = () => {
         <Outlet />
       </MainLayout>
     </ProtectedRoute>
+  );
+};
+
+// Wrapper component that can access route information
+const ThemeWrapper = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === "/auth";
+  
+  return (
+    <ThemeProvider 
+      defaultTheme="light" 
+      storageKey="e-box-theme"
+      forcedTheme={isAuthPage ? "light" : undefined}
+    >
+      {children}
+    </ThemeProvider>
   );
 };
 
@@ -41,103 +64,107 @@ function App() {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Index />,
+      element: <ThemeWrapper><Outlet /></ThemeWrapper>,
       errorElement: <NotFound />,
-    },
-    {
-      path: '/auth',
-      element: <Auth />,
-    },
-    {
-      path: '/changelog',
-      element: <Changelog />,
-    },
-    // Protected routes using the layout route pattern
-    {
-      element: <ProtectedLayoutRoute />,
       children: [
         {
-          path: '/dashboard',
-          element: <Dashboard />,
+          index: true,
+          element: <Index />,
         },
         {
-          path: '/chat',
-          element: <Chat />,
+          path: '/auth',
+          element: <Auth />,
         },
         {
-          path: '/calendar',
-          element: <Calendar />,
+          path: '/changelog',
+          element: <Changelog />,
+        },
+        // Protected routes using the layout route pattern
+        {
+          element: <ProtectedLayoutRoute />,
+          children: [
+            {
+              path: '/dashboard',
+              element: <Dashboard />,
+            },
+            {
+              path: '/chat',
+              element: <Chat />,
+            },
+            {
+              path: '/calendar',
+              element: <Calendar />,
+            },
+            {
+              path: '/contacts',
+              element: <ContactsList />,
+            },
+            {
+              path: '/documents',
+              element: <Documents />,
+            },
+            {
+              path: '/notes',
+              element: <div>Notes</div>,
+            },
+            {
+              path: '/surveys',
+              element: <div>Surveys</div>,
+            },
+            {
+              path: '/admin',
+              element: <AdminPortal />,
+            },
+            {
+              path: '/organization',
+              element: <OrganizationDashboard />,
+            },
+            {
+              path: '/admin/users',
+              element: <AdminPortal />,
+            },
+            {
+              path: '/profile',
+              element: <Settings />,
+            },
+            {
+              path: '/leave',
+              element: <LeaveManager />,
+            },
+            {
+              path: '/policies',
+              element: <Policies />,
+            },
+            {
+              path: '/mydesk',
+              element: <Desk />,
+            },
+            {
+              path: '/desk/:page',
+              element: <Desk />,
+            },
+          ]
         },
         {
-          path: '/contacts',
-          element: <ContactsList />,
+          path: '/govza/*',
+          element: (
+            <MainLayout>
+              <GovZA />
+            </MainLayout>
+          ),
         },
         {
-          path: '/documents',
-          element: <Documents />,
-        },
-        {
-          path: '/notes',
-          element: <div>Notes</div>,
-        },
-        {
-          path: '/surveys',
-          element: <div>Surveys</div>,
-        },
-        {
-          path: '/admin',
-          element: <AdminPortal />,
-        },
-        {
-          path: '/organization',
-          element: <OrganizationDashboard />,
-        },
-        {
-          path: '/admin/users',
-          element: <AdminPortal />,
-        },
-        {
-          path: '/profile',
-          element: <Settings />,
-        },
-        {
-          path: '/leave',
-          element: <LeaveManager />,
-        },
-        {
-          path: '/policies',
-          element: <Policies />,
-        },
-        {
-          path: '/mydesk',
-          element: <Desk />,
-        },
-        {
-          path: '/desk/:page',
-          element: <Desk />,
+          path: '*',
+          element: <NotFound />,
         },
       ]
-    },
-    {
-      path: '/govza/*',
-      element: (
-        <MainLayout>
-          <GovZA />
-        </MainLayout>
-      ),
-    },
-    {
-      path: '*',
-      element: <NotFound />,
     },
   ]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="e-box-theme">
-        <RouterProvider router={router} />
-        <Toaster />
-      </ThemeProvider>
+      <RouterProvider router={router} />
+      <Toaster />
     </QueryClientProvider>
   );
 }
