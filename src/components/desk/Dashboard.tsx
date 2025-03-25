@@ -8,14 +8,40 @@ import { ActivitySection } from "./dashboard/ActivitySection";
 import { AnnouncementsSection } from "./dashboard/AnnouncementsSection";
 import { QuickActions } from "./dashboard/QuickActions";
 import { Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const { userRole, isLoading: isRoleLoading, error: roleError } = useUserRole();
 
+  // Fetch the user profile data including job title
+  const { data: profile, isLoading: isProfileLoading } = useQuery({
+    queryKey: ['dashboardProfileData'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, job_title, organization_id')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching profile data:', error);
+        return null;
+      }
+      
+      return data;
+    },
+  });
+
   useEffect(() => {
     console.log('Dashboard mounted, userRole:', userRole, 'isLoading:', isRoleLoading);
-  }, [userRole, isRoleLoading]);
+    console.log('Profile data:', profile);
+  }, [userRole, isRoleLoading, profile]);
 
   const handleCardClick = (feature: string) => {
     console.log('Card clicked:', feature);
@@ -52,7 +78,9 @@ export const Dashboard = () => {
     }
   };
 
-  if (isRoleLoading) {
+  const isLoading = isRoleLoading || isProfileLoading;
+
+  if (isLoading) {
     return (
       <div className="flex-1 min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
@@ -80,6 +108,14 @@ export const Dashboard = () => {
     );
   }
 
+  // Format user name
+  const userName = profile ? 
+    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
+    'User';
+  
+  // Get job title
+  const jobTitle = profile?.job_title || '';
+
   return (
     <div className="p-0 max-w-full">
       <DashboardHeader 
@@ -89,6 +125,12 @@ export const Dashboard = () => {
       />
       
       <div className="p-4 md:p-6 space-y-6">
+        {/* Display welcome message with user's name and job title */}
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold">Welcome, {userName}</h1>
+          {jobTitle && <p className="text-muted-foreground">{jobTitle}</p>}
+        </div>
+
         <StatsCards onCardClick={handleCardClick} />
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
