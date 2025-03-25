@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { ShieldCheck } from "lucide-react";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardHeaderProps {
   currentView: string;
@@ -14,6 +16,29 @@ export const DashboardHeader = ({ currentView, onBackClick, onAdminClick }: Dash
   const { userRole } = useUserRole();
   const location = useLocation();
   
+  // Get the user's profile info
+  const { data: profile } = useQuery({
+    queryKey: ['headerProfileData'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('job_title')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching profile data:', error);
+        return null;
+      }
+      
+      return data;
+    },
+  });
+  
   // Don't show admin button on admin-related pages
   const isAdminPage = location.pathname.includes('/admin') || 
                       location.pathname.includes('/organization');
@@ -22,7 +47,9 @@ export const DashboardHeader = ({ currentView, onBackClick, onAdminClick }: Dash
     <header className="h-16 bg-card border-b px-4 md:px-6 flex items-center justify-between">
       <div>
         <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500">System Overview</p>
+        <p className="text-sm text-gray-500">
+          {profile?.job_title ? profile.job_title : "System Overview"}
+        </p>
       </div>
       <div className="flex items-center gap-4">
         {currentView !== 'dashboard' && (

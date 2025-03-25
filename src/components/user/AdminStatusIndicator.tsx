@@ -3,15 +3,39 @@ import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
 import { UserRoleType } from "@/types/supabase-types";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export function AdminStatusIndicator() {
   const { isAdmin, userRole, isLoading, error } = useUserRole();
+  
+  // Get the user's job title
+  const { data: profile } = useQuery({
+    queryKey: ['adminIndicatorProfile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('job_title')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching profile job title:', error);
+        return null;
+      }
+      
+      return data;
+    },
+  });
   
   // Consider a user to have admin access if they are either global_admin or org_admin
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
   // Check if the user has a moderator role
-  // Since UserRoleType doesn't include these roles yet, we need to check them as strings
   const isModerator = 
     userRole === 'hr_moderator' as UserRoleType || 
     userRole === 'comm_moderator' as UserRoleType || 
@@ -21,7 +45,7 @@ export function AdminStatusIndicator() {
     return (
       <div className="flex items-center gap-2">
         <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-        <span className="text-xs text-muted-foreground">Checking admin status...</span>
+        <span className="text-xs text-muted-foreground">Checking status...</span>
       </div>
     );
   }
@@ -29,11 +53,21 @@ export function AdminStatusIndicator() {
   if (error) {
     return (
       <Badge variant="outline" className="text-red-500 border-red-500">
-        Error checking admin status
+        Error checking status
       </Badge>
     );
   }
   
+  // If we have a job title, display it instead of role
+  if (profile?.job_title) {
+    return (
+      <Badge variant={hasAdminAccess ? "default" : "outline"} className={hasAdminAccess ? "bg-green-600 hover:bg-green-700" : ""}>
+        {profile.job_title}
+      </Badge>
+    );
+  }
+  
+  // Fallback to displaying role-based badges if no job title is set
   if (hasAdminAccess) {
     return (
       <Badge variant="default" className="bg-green-600 hover:bg-green-700">
@@ -52,6 +86,7 @@ export function AdminStatusIndicator() {
     );
   }
   
+  // Default case - just a regular user
   return (
     <Badge variant="outline">
       User
