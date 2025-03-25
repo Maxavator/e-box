@@ -5,7 +5,7 @@ import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { CalendarDays, Users, Clock, MapPin, Calendar as CalendarIcon, Inbox } from "lucide-react";
+import { CalendarDays, Users, Clock, MapPin, Calendar as CalendarIcon, Inbox, PlusCircle } from "lucide-react";
 import { TaskManager } from "@/components/calendar/TaskManager";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +16,7 @@ import { CalendarInbox } from "@/components/calendar/CalendarInbox";
 import { ProposedTimesList } from "@/components/calendar/ProposedTimesList";
 import { useChat } from "@/hooks/use-chat";
 import { Badge } from "@/components/ui/badge";
+import { NewEventDialog } from "@/components/calendar/NewEventDialog";
 
 export function Calendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -160,9 +161,14 @@ export function Calendar() {
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Calendar</h1>
-        <Button onClick={() => setActiveTab("manage")}>Manage Calendar</Button>
+      <div className="flex flex-col mb-8">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-900">My Calendar</h1>
+          <Button onClick={() => setActiveTab("manage")}>Manage Calendar</Button>
+        </div>
+        <div className="mt-4">
+          <NewEventDialog />
+        </div>
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
@@ -187,6 +193,12 @@ export function Calendar() {
                   onSelect={setDate}
                   className="mx-auto"
                 />
+              </div>
+              <div className="mt-4">
+                <Button variant="outline" className="w-full gap-2" onClick={() => document.querySelector<HTMLButtonElement>('.new-meeting-dialog-trigger')?.click()}>
+                  <PlusCircle className="h-4 w-4" />
+                  New Meeting
+                </Button>
               </div>
             </Card>
 

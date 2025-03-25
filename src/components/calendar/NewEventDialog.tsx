@@ -69,9 +69,9 @@ export function NewEventDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" className="gap-2">
+        <Button variant="default" className="gap-2 new-meeting-dialog-trigger">
           <PlusCircle className="h-4 w-4" />
-          Create New Event
+          New Meeting
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
