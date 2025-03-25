@@ -23,6 +23,27 @@ const Dashboard = () => {
   const [isDataLoading, setIsDataLoading] = useState(false);
   const { checkAuth, AuthDialog } = useAuthDialog();
 
+  const handleQuickAction = (action: string) => {
+    console.log(`Quick action clicked: ${action}`);
+    switch (action) {
+      case 'documents':
+        navigate('/mydesk');
+        break;
+      case 'calendar':
+        navigate('/calendar');
+        break;
+      case 'messages':
+        navigate('/chat');
+        break;
+      case 'profile':
+        navigate('/profile');
+        break;
+      default:
+        toast.info(`${action} feature coming soon`);
+        break;
+    }
+  };
+
   const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['dashboardProfile'],
     queryFn: async () => {
