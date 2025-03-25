@@ -1,17 +1,18 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageList } from "./MessageList";
-import type { Conversation } from "@/types/chat";
+import type { Conversation, Message } from "@/types/chat";
 import { getUserById } from "@/data/chat";
 import { Shield } from "lucide-react";
 
-interface ChatContentProps {
-  conversation: Conversation;
+export interface ChatContentProps {
+  conversation: Conversation | null;
   onEditMessage: (messageId: string, newContent: string) => void;
   onDeleteMessage: (messageId: string) => void;
   onReactToMessage: (messageId: string, emoji: string) => void;
   isAdminChat?: boolean;
   isNewConversation?: boolean;
+  messages?: Message[];
 }
 
 export function ChatContent({
@@ -21,7 +22,10 @@ export function ChatContent({
   onReactToMessage,
   isAdminChat = false,
   isNewConversation = false,
+  messages = [],
 }: ChatContentProps) {
+  if (!conversation) return null;
+  
   const user = getUserById(conversation.userId || '');
 
   return (
@@ -53,7 +57,7 @@ export function ChatContent({
         </div>
         
         <MessageList
-          messages={conversation.messages}
+          messages={conversation.messages || messages}
           onEditMessage={onEditMessage}
           onDeleteMessage={onDeleteMessage}
           onReactToMessage={onReactToMessage}

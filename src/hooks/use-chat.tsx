@@ -12,6 +12,7 @@ export const useChat = () => {
   const [calendarView, setCalendarView] = useState<"calendar" | "inbox" | "proposed">("calendar");
   const [selectedFeature, setSelectedFeature] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   // Fetch colleagues
   const { data: colleagues, isLoading: isLoadingColleagues } = useQuery({
@@ -153,6 +154,8 @@ export const useChat = () => {
     attachments,
     colleagues,
     isLoadingColleagues,
+    showSidebar,
+    setShowSidebar,
     handleSendMessage,
     handleEditMessage,
     handleDeleteMessage,

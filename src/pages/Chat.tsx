@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { MessageCircle, Users } from "lucide-react";
 import { NewMessageDialog } from "@/components/chat/NewMessageDialog";
 import { useChat } from "@/hooks/use-chat";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Card } from "@/components/ui/card";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,7 +16,15 @@ import { useQuery } from "@tanstack/react-query";
 export default function Chat() {
   const { chatId } = useParams();
   const { isMobile, isDesktop } = useMediaQuery();
-  const { setShowSidebar, showSidebar } = useChat();
+  const { 
+    setShowSidebar, 
+    showSidebar,
+    searchQuery,
+    setSearchQuery,
+    activeTab,
+    setActiveTab,
+    handleSelectConversation
+  } = useChat();
   const navigate = useNavigate();
   const [newDialogOpen, setNewDialogOpen] = useState(false);
   
@@ -70,8 +78,8 @@ export default function Chat() {
   };
   
   // Handle conversation selection
-  const handleSelectConversation = (conversation: Conversation) => {
-    navigate(`/chat/${conversation.id}`);
+  const handleConversationSelect = (conversationId: string) => {
+    navigate(`/chat/${conversationId}`);
     if (isMobile) {
       setShowSidebar(false);
     }
@@ -95,6 +103,22 @@ export default function Chat() {
     redirectToFirstConversation();
   }, [chatId, navigate]);
 
+  // Props for ChatContent component handling
+  const handleEditMessage = (messageId: string, newContent: string) => {
+    console.log('Edit message:', messageId, newContent);
+    // Implement edit message functionality
+  };
+
+  const handleDeleteMessage = (messageId: string) => {
+    console.log('Delete message:', messageId);
+    // Implement delete message functionality
+  };
+
+  const handleReactToMessage = (messageId: string, emoji: string) => {
+    console.log('React to message:', messageId, emoji);
+    // Implement react to message functionality
+  };
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Mobile toggle for sidebar */}
@@ -113,19 +137,26 @@ export default function Chat() {
       {(showSidebar || isDesktop) && (
         <div className={`${isMobile ? 'fixed inset-0 z-40 bg-background/80' : 'w-80 border-r'}`}>
           <ChatSidebar 
-            onSelectConversation={handleSelectConversation} 
-            onNewMessage={handleNewMessage}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            conversations={[]}
+            selectedConversation={currentChat || null}
+            onSelectConversation={handleConversationSelect}
+            onCalendarActionClick={() => {}}
           />
         </div>
       )}
 
       {/* Main chat area */}
       <div className="flex-1 overflow-hidden">
-        {chatId ? (
+        {chatId && currentChat ? (
           <ChatContent 
-            conversation={currentChat} 
-            messages={messages || []} 
-            isLoading={chatLoading || messagesLoading}
+            conversation={currentChat}
+            onEditMessage={handleEditMessage}
+            onDeleteMessage={handleDeleteMessage}
+            onReactToMessage={handleReactToMessage}
           />
         ) : (
           <div className="flex h-full items-center justify-center">
@@ -144,9 +175,9 @@ export default function Chat() {
 
       {/* New message dialog */}
       <NewMessageDialog 
-        open={newDialogOpen} 
+        open={newDialogOpen}
         onOpenChange={setNewDialogOpen}
-        onSelectConversation={handleSelectConversation}
+        onSelectConversation={handleConversationSelect}
       />
     </div>
   );

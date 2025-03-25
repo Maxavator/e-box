@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 
-// Define a Profile type for this component since we need it here
 interface Profile {
   id: string;
   first_name: string | null;
@@ -28,11 +26,24 @@ interface Group {
   avatar_url?: string;
 }
 
-export function NewMessageDialog() {
+interface NewMessageDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onSelectConversation?: (conversationId: string) => void;
+}
+
+export function NewMessageDialog({ 
+  open, 
+  onOpenChange,
+  onSelectConversation
+}: NewMessageDialogProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [open, setOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("contacts");
   const { toast } = useToast();
+
+  const isOpen = open !== undefined ? open : dialogOpen;
+  const setIsOpen = onOpenChange || setDialogOpen;
 
   const { data: contacts = [], isLoading: isLoadingContacts } = useQuery({
     queryKey: ['organization-contacts'],
@@ -77,7 +88,6 @@ export function NewMessageDialog() {
         throw new Error('User not in organization');
       }
 
-      // Fetch all colleagues in the same organization
       const { data: orgColleagues, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, avatar_url, organization_id, job_title')
@@ -105,7 +115,6 @@ export function NewMessageDialog() {
         throw new Error('User not in organization');
       }
 
-      // Fetch all public groups and groups where the user is a member
       const { data: publicGroups, error } = await supabase
         .from('conversations')
         .select('id, name, is_public, avatar_url')
@@ -139,7 +148,6 @@ export function NewMessageDialog() {
       const currentUser = (await supabase.auth.getUser()).data.user;
       if (!currentUser) throw new Error('Not authenticated');
 
-      // Check if conversation already exists 
       const { data: existingConvs, error: searchError } = await supabase
         .from('conversations')
         .select('id')
@@ -149,22 +157,33 @@ export function NewMessageDialog() {
       if (searchError) throw searchError;
 
       if (existingConvs) {
+        if (onSelectConversation) {
+          onSelectConversation(existingConvs.id);
+        }
+        
         toast({
           title: "Conversation exists",
-          description: "You already have a conversation with this contact"
+          description: "Opening existing conversation with this contact"
         });
+        
+        setIsOpen(false);
         return;
       }
 
-      // Create new conversation
-      const { error: insertError } = await supabase
+      const { data: newConv, error: insertError } = await supabase
         .from('conversations')
         .insert({
           user1_id: currentUser.id,
           user2_id: contact.id
-        });
+        })
+        .select('id')
+        .single();
 
       if (insertError) throw insertError;
+
+      if (onSelectConversation && newConv) {
+        onSelectConversation(newConv.id);
+      }
 
       toast({
         title: "Conversation started",
@@ -178,27 +197,26 @@ export function NewMessageDialog() {
         variant: "destructive"
       });
     } finally {
-      setOpen(false);
+      setIsOpen(false);
     }
   };
 
   const handleSelectColleague = async (colleague: Profile) => {
-    // For colleagues, we use the same handler as contacts
     handleSelectContact(colleague);
   };
 
   const handleSelectGroup = async (group: Group) => {
     try {
-      // For groups, we can directly navigate to the group conversation
       toast({
         title: "Group selected",
         description: `Joined the group conversation: ${group.name}`
       });
       
-      // In a complete implementation, we would add the user to the group if not already a member
-      // and then redirect to the group conversation
+      if (onSelectConversation) {
+        onSelectConversation(group.id);
+      }
       
-      setOpen(false);
+      setIsOpen(false);
     } catch (error) {
       console.error('Error joining group:', error);
       toast({
@@ -210,7 +228,7 @@ export function NewMessageDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full justify-start">
           <Pen className="mr-2 h-4 w-4" />
