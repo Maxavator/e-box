@@ -6,15 +6,14 @@ import Chat from "./Chat";
 import AdminPortal from "./AdminPortal";
 import OrganizationDashboard from "./OrganizationDashboard";
 import Changelog from "./Changelog";
-import Settings from "./Settings";
-import Documents from "./Documents";
-import LeaveManager from "./LeaveManager";
-import Policies from "./Policies";
 import Index from "./Index";
-import Calendar from "./Calendar";
-import ContactsList from "./Contacts";
+import Contacts from "./Contacts";
 import Notes from "./Notes";
-import Desk from "./Desk";
+import GovZA from "./GovZA";
+
+// Import components rather than pages for these since we don't have the page files
+import { Settings } from "@/components/settings/Settings";
+import { ContactsList } from "@/components/desk/contacts/ContactsList";
 
 export {
   Index,
@@ -26,11 +25,8 @@ export {
   OrganizationDashboard,
   Changelog,
   Settings,
-  Documents,
-  LeaveManager,
-  Policies,
-  Calendar,
+  Contacts,
   ContactsList,
   Notes,
-  Desk,
+  GovZA
 };
