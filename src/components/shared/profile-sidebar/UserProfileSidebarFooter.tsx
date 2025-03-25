@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -9,7 +10,6 @@ import { VersionInfo } from "./VersionInfo";
 
 export function UserProfileSidebarFooter() {
   const { isAdmin } = useUserRole();
-  const [userName, setUserName] = useState<{ firstName: string; lastName: string } | null>(null);
 
   // Get current session
   const { data: session } = useQuery({
@@ -41,39 +41,6 @@ export function UserProfileSidebarFooter() {
     },
   });
 
-  // Use the same approach as Dashboard to fetch user data
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        if (session?.user) {
-          const { data } = await supabase
-            .from('profiles')
-            .select('first_name, last_name, job_title')
-            .eq('id', session.user.id)
-            .maybeSingle();
-
-          if (data) {
-            setUserName({
-              firstName: data.first_name || '',
-              lastName: data.last_name || ''
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-
-    if (session?.user?.id && (!profile || !profile.first_name)) {
-      fetchUserData();
-    } else if (profile) {
-      setUserName({
-        firstName: profile.first_name || '',
-        lastName: profile.last_name || ''
-      });
-    }
-  }, [session, profile]);
-
   if (!session?.user) {
     return (
       <div className="p-3 text-center text-sm text-muted-foreground">
@@ -82,7 +49,7 @@ export function UserProfileSidebarFooter() {
     );
   }
 
-  if (isProfileLoading && !userName) {
+  if (isProfileLoading && !profile) {
     return (
       <div className="p-3 text-center text-sm text-muted-foreground">
         Loading profile...
@@ -90,9 +57,9 @@ export function UserProfileSidebarFooter() {
     );
   }
 
-  // Use either the profile data or the fallback from useEffect
-  const firstName = profile?.first_name || userName?.firstName || '';
-  const lastName = profile?.last_name || userName?.lastName || '';
+  // Use the profile data
+  const firstName = profile?.first_name || '';
+  const lastName = profile?.last_name || '';
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   
   // Check if user is specifically Thabo Nkosi and set the title to Chief Information Officer

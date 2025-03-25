@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Building2, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface DashboardHeaderProps {
   orgName: string;
@@ -17,31 +18,54 @@ export const DashboardHeader = ({
   onLogout, 
   onManageOrg 
 }: DashboardHeaderProps) => {
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
+  // Get current session
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      return session;
+    },
+  });
 
-  useEffect(() => {
-    const fetchUserName = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', user.id)
-          .single();
-
-        if (profileData) {
-          setFirstName(profileData.first_name || '');
-          setLastName(profileData.last_name || '');
-        }
+  // Get user profile
+  const { data: profile } = useQuery({
+    queryKey: ['profile', session?.user?.id],
+    enabled: !!session?.user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, job_title')
+        .eq('id', session!.user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
       }
-    };
-
-    fetchUserName();
-  }, []);
+      
+      return data;
+    },
+  });
 
   // Format the name as "last_name, first_name"
-  const formattedName = firstName && lastName ? `${lastName}, ${firstName}` : "";
+  const formattedName = profile ? 
+    `${profile.last_name || ''}, ${profile.first_name || ''}`.trim() : 
+    '';
+
+  // Check if user is specifically Thabo Nkosi and set the title to Chief Information Officer
+  let jobTitle = profile?.job_title || '';
+  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
+    jobTitle = 'Chief Information Officer';
+  }
+
+  // For debugging
+  console.log('DashboardHeader - Profile data:', {
+    firstName: profile?.first_name,
+    lastName: profile?.last_name,
+    formattedName,
+    jobTitle
+  });
 
   return (
     <header className="space-y-4">
@@ -56,8 +80,9 @@ export const DashboardHeader = ({
           )}
           <div className="flex items-center gap-4">
             {formattedName && (
-              <span className="text-sm text-muted-foreground">
-                {formattedName}
+              <span className="text-sm text-muted-foreground flex flex-col">
+                <span>{formattedName}</span>
+                {jobTitle && <span className="text-xs opacity-75">{jobTitle}</span>}
               </span>
             )}
             <Button 

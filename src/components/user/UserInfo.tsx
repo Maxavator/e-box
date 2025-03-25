@@ -20,15 +20,21 @@ export function UserInfo({ className }: UserInfoProps) {
     },
   });
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading } = useQuery({
     queryKey: ['profile', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('first_name, last_name, avatar_url, job_title, organization_id')
         .eq('id', session!.user.id)
         .single();
+      
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+      }
+      
       return data;
     },
   });
@@ -43,6 +49,16 @@ export function UserInfo({ className }: UserInfoProps) {
   let jobTitle = profile?.job_title || '';
   if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
     jobTitle = 'Chief Information Officer';
+  }
+
+  // For debugging
+  if (!isLoading) {
+    console.log('UserInfo - Profile data:', {
+      firstName: profile?.first_name,
+      lastName: profile?.last_name,
+      jobTitle,
+      hasOrganization: !!profile?.organization_id
+    });
   }
 
   return (

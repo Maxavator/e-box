@@ -14,49 +14,44 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 interface UserProfileProps {
   onLogout: () => void;
 }
 
 export const UserProfile = ({ onLogout }: UserProfileProps) => {
-  const [userInfo, setUserInfo] = useState<{
-    firstName: string;
-    lastName: string;
-    avatarUrl: string | null;
-  } | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+  // Get current session
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      return session;
+    },
+  });
+
+  // Get user profile
+  const { data: profile } = useQuery({
+    queryKey: ['profile', session?.user?.id],
+    enabled: !!session?.user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, avatar_url, job_title')
+        .eq('id', session!.user.id)
+        .single();
       
-      if (user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('first_name, last_name, avatar_url')
-          .eq('id', user.id)
-          .single();
-
-        if (profileData) {
-          setUserInfo({
-            firstName: profileData.first_name || '',
-            lastName: profileData.last_name || '',
-            avatarUrl: profileData.avatar_url,
-          });
-        } else {
-          // Set default values if no profile data
-          setUserInfo({
-            firstName: 'User',
-            lastName: '',
-            avatarUrl: null,
-          });
-        }
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
       }
-    };
-
-    fetchUserInfo();
-  }, []);
+      
+      return data;
+    },
+  });
 
   const handleProfileClick = () => {
     navigate('/profile');
@@ -72,10 +67,27 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
     }
   };
 
-  if (!userInfo) return null;
+  if (!session) return null;
 
-  const initials = `${userInfo.firstName?.[0] || ''}${userInfo.lastName?.[0] || ''}`;
-  const fullName = `${userInfo.firstName} ${userInfo.lastName}`.trim() || 'User';
+  // Check if user is specifically Thabo Nkosi and set the title to Chief Information Officer
+  let jobTitle = profile?.job_title || '';
+  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
+    jobTitle = 'Chief Information Officer';
+  }
+
+  const firstName = profile?.first_name || '';
+  const lastName = profile?.last_name || '';
+  const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
+  const fullName = `${firstName} ${lastName}`.trim() || 'User';
+  
+  // For debugging
+  console.log('UserProfile - Profile data:', {
+    firstName,
+    lastName,
+    jobTitle,
+    initials,
+    fullName
+  });
 
   return (
     <div className="flex items-center gap-4">
@@ -93,7 +105,7 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar>
-              <AvatarImage src={userInfo.avatarUrl || ''} alt={initials} />
+              <AvatarImage src={profile?.avatar_url || ''} alt={initials} />
               <AvatarFallback>{initials || 'U'}</AvatarFallback>
             </Avatar>
           </Button>
@@ -102,7 +114,9 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
           <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">{fullName}</p>
-              <p className="text-xs leading-none text-muted-foreground">User Profile</p>
+              <p className="text-xs leading-none text-muted-foreground">
+                {jobTitle || 'User Profile'}
+              </p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -122,4 +136,4 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
       </DropdownMenu>
     </div>
   );
-};
+}
