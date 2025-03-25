@@ -24,11 +24,14 @@ const Chat = () => {
     setNewMessage,
     filteredConversations,
     attachments,
+    colleagues,
+    isLoadingColleagues,
     handleSendMessage,
     handleEditMessage,
     handleDeleteMessage,
     handleReaction,
     handleSelectConversation,
+    handleStartConversationWithColleague,
     handleAttachFiles,
     handleRemoveAttachment,
     isNewConversation,
@@ -81,6 +84,9 @@ const Chat = () => {
           selectedConversation={selectedConversation}
           onSelectConversation={handleSelectConversation}
           onCalendarActionClick={handleCalendarActionClick}
+          colleagues={colleagues}
+          isLoadingColleagues={isLoadingColleagues}
+          onStartConversation={handleStartConversationWithColleague}
         />
       </ResizablePanel>
       

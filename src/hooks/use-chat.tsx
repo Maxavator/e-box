@@ -4,12 +4,42 @@ import { useConversations } from "./useConversations";
 import { useMessages } from "./useMessages";
 import { useRealtime } from "./useRealtime";
 import { Attachment } from "@/types/chat";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useChat = () => {
   const [activeTab, setActiveTab] = useState("chats");
   const [calendarView, setCalendarView] = useState<"calendar" | "inbox">("calendar");
   const [selectedFeature, setSelectedFeature] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+
+  // Fetch colleagues
+  const { data: colleagues, isLoading: isLoadingColleagues } = useQuery({
+    queryKey: ['chat-colleagues'],
+    queryFn: async () => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session?.user) return [];
+      
+      // Get user's organization ID
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (!userProfile?.organization_id) return [];
+      
+      // Get all colleagues in the same organization
+      const { data: colleagueProfiles } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, avatar_url, job_title')
+        .eq('organization_id', userProfile.organization_id)
+        .neq('id', session.user.id);
+      
+      return colleagueProfiles || [];
+    },
+    enabled: activeTab === "colleagues"
+  });
 
   const {
     conversations,
@@ -66,6 +96,46 @@ export const useChat = () => {
   const handleRemoveAttachment = (attachmentId: string) => {
     setAttachments(attachments.filter(a => a.id !== attachmentId));
   };
+  
+  // Handle starting conversation with a colleague
+  const handleStartConversationWithColleague = async (colleagueId: string) => {
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.user) return;
+    
+    // Check if conversation already exists
+    const { data: existingConvs } = await supabase
+      .from('conversations')
+      .select('id')
+      .or(`and(user1_id.eq.${session.user.id},user2_id.eq.${colleagueId}),and(user1_id.eq.${colleagueId},user2_id.eq.${session.user.id})`)
+      .maybeSingle();
+    
+    if (existingConvs) {
+      // Use existing conversation
+      handleSelectConversation(existingConvs.id);
+      setActiveTab("chats");
+      return existingConvs.id;
+    }
+    
+    // Create new conversation
+    const { data: newConv, error } = await supabase
+      .from('conversations')
+      .insert({
+        user1_id: session.user.id,
+        user2_id: colleagueId
+      })
+      .select('id')
+      .single();
+    
+    if (error) {
+      console.error("Error creating conversation:", error);
+      return null;
+    }
+    
+    // Select the new conversation
+    handleSelectConversation(newConv.id);
+    setActiveTab("chats");
+    return newConv.id;
+  };
 
   return {
     searchQuery,
@@ -81,6 +151,8 @@ export const useChat = () => {
     setSelectedFeature,
     filteredConversations,
     attachments,
+    colleagues,
+    isLoadingColleagues,
     handleSendMessage,
     handleEditMessage,
     handleDeleteMessage,
@@ -88,6 +160,7 @@ export const useChat = () => {
     handleSelectConversation,
     handleAttachFiles,
     handleRemoveAttachment,
+    handleStartConversationWithColleague,
     isNewConversation,
   };
 };
