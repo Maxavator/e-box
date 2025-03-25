@@ -2,7 +2,17 @@
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Check, MoreVertical, Pen, Trash2, X } from "lucide-react";
+import { 
+  Check, 
+  CheckCheck, 
+  Clock, 
+  File, 
+  Image, 
+  MoreVertical, 
+  Pen, 
+  Trash2, 
+  X 
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -10,9 +20,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Message } from "@/types/chat";
+import type { Message, Attachment } from "@/types/chat";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 
 interface MessageItemProps {
   message: Message;
@@ -62,6 +73,50 @@ export function MessageItem({
       emoji,
       users: Array.isArray(users) ? users : []
     })) : [];
+
+  // Render message status indicator
+  const renderStatusIndicator = () => {
+    if (!isSentByMe || isSystemMessage) return null;
+    
+    switch (message.status) {
+      case 'sending':
+        return <Clock className="h-3 w-3 text-muted-foreground" />;
+      case 'sent':
+        return <Check className="h-3 w-3 text-muted-foreground" />;
+      case 'delivered':
+        return <CheckCheck className="h-3 w-3 text-muted-foreground" />;
+      case 'read':
+        return <CheckCheck className="h-3 w-3 text-primary" />;
+      case 'failed':
+        return <X className="h-3 w-3 text-destructive" />;
+      default:
+        return null;
+    }
+  };
+
+  // Render attachments
+  const renderAttachments = () => {
+    if (!message.attachments || message.attachments.length === 0) return null;
+    
+    return (
+      <div className="flex flex-wrap gap-2 mt-2">
+        {message.attachments.map(attachment => (
+          <div 
+            key={attachment.id}
+            className={`flex items-center p-2 rounded-md ${
+              isSentByMe ? 'bg-primary/10' : 'bg-muted/80'
+            }`}
+          >
+            {attachment.type.startsWith('image/')
+              ? <Image className="h-4 w-4 mr-2" />
+              : <File className="h-4 w-4 mr-2" />
+            }
+            <span className="text-xs truncate max-w-[120px]">{attachment.name}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
   
   return (
     <div
@@ -145,6 +200,8 @@ export function MessageItem({
             )}
           </div>
           
+          {renderAttachments()}
+          
           {reactionArray.length > 0 && !isSystemMessage && (
             <div className="flex gap-1">
               {reactionArray.map((reaction) => (
@@ -163,9 +220,10 @@ export function MessageItem({
             </div>
           )}
           
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground flex items-center gap-1">
             {formattedTimestamp}
             {(message.edited || message.isEdited) && ' (edited)'}
+            {renderStatusIndicator()}
           </div>
         </div>
         

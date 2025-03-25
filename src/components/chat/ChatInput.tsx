@@ -8,9 +8,10 @@ interface ChatInputProps {
   value: string;
   onChange: (value: string) => void;
   onSendMessage: () => void;
+  onAttach?: () => void;
 }
 
-export function ChatInput({ value, onChange, onSendMessage }: ChatInputProps) {
+export function ChatInput({ value, onChange, onSendMessage, onAttach }: ChatInputProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -29,6 +30,12 @@ export function ChatInput({ value, onChange, onSendMessage }: ChatInputProps) {
           className="min-h-10 flex-1 resize-none"
         />
         <div className="flex flex-col gap-2">
+          {onAttach && (
+            <Button size="icon" variant="ghost" onClick={onAttach}>
+              <PaperclipIcon className="h-4 w-4" />
+              <span className="sr-only">Attach file</span>
+            </Button>
+          )}
           <Button 
             type="submit" 
             size="icon" 

@@ -7,6 +7,8 @@ import { startMessageSimulation } from "@/utils/messageSimulator";
 import { useToast } from "@/hooks/use-toast";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
+import { File, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Chat = () => {
   const { toast } = useToast();
@@ -21,11 +23,14 @@ const Chat = () => {
     newMessage,
     setNewMessage,
     filteredConversations,
+    attachments,
     handleSendMessage,
     handleEditMessage,
     handleDeleteMessage,
     handleReaction,
     handleSelectConversation,
+    handleAttachFiles,
+    handleRemoveAttachment,
     isNewConversation,
   } = useChat();
 
@@ -57,6 +62,10 @@ const Chat = () => {
   const handleCalendarActionClick = (view: 'calendar' | 'inbox') => {
     setCalendarView(view);
     setActiveTab('calendar');
+  };
+
+  const handleSendWithAttachments = () => {
+    handleSendMessage(attachments);
   };
 
   return (
@@ -92,10 +101,35 @@ const Chat = () => {
                 onReactToMessage={handleReaction}
                 isNewConversation={isNewConversation}
               />
+              
+              {/* Attachments preview */}
+              {attachments.length > 0 && (
+                <div className="bg-background p-2 border-t flex flex-wrap gap-2">
+                  {attachments.map(attachment => (
+                    <div 
+                      key={attachment.id}
+                      className="flex items-center bg-muted p-2 rounded-md"
+                    >
+                      <File className="h-4 w-4 mr-2" />
+                      <span className="text-xs max-w-32 truncate">{attachment.name}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-5 w-5 ml-1"
+                        onClick={() => handleRemoveAttachment(attachment.id)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
               <ChatInput
                 value={newMessage}
                 onChange={setNewMessage}
-                onSendMessage={handleSendMessage}
+                onSendMessage={handleSendWithAttachments}
+                onAttach={handleAttachFiles}
               />
             </>
           ) : (

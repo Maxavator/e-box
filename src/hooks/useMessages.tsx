@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import type { Message, Conversation } from "@/types/chat";
+import type { Message, Conversation, Attachment } from "@/types/chat";
 
 export const useMessages = (
   selectedConversation: Conversation | null,
@@ -24,8 +24,8 @@ export const useMessages = (
     });
   };
 
-  const handleSendMessage = async () => {
-    if (!selectedConversation || !newMessage.trim()) return;
+  const handleSendMessage = async (attachments: Attachment[] = []) => {
+    if (!selectedConversation || (!newMessage.trim() && attachments.length === 0)) return;
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -42,6 +42,40 @@ export const useMessages = (
         return;
       }
 
+      // Create a temporary message with sending status
+      const tempMessageId = crypto.randomUUID();
+      const tempMessage: Message = {
+        id: tempMessageId,
+        conversationId: selectedConversation.id,
+        senderId: user.id,
+        senderName: 'You', // Could be improved with actual user name from profile
+        content: newMessage,
+        text: newMessage, // For backwards compatibility
+        timestamp: formatTimestamp(new Date().toISOString()),
+        status: 'sending',
+        reactions: {},
+        sender: 'me', // For backwards compatibility
+        attachments: attachments
+      };
+
+      // Add temporary message to conversation
+      if (selectedConversation.messages) {
+        setSelectedConversation({
+          ...selectedConversation,
+          messages: [...selectedConversation.messages, tempMessage],
+          lastMessage: tempMessage
+        });
+      } else {
+        setSelectedConversation({
+          ...selectedConversation,
+          lastMessage: tempMessage
+        });
+      }
+
+      // Clear message input
+      setNewMessage("");
+
+      // Actually send message to database
       const { data: messageData, error } = await supabase
         .from('messages')
         .insert({
@@ -55,6 +89,17 @@ export const useMessages = (
 
       if (error) {
         console.error('Error sending message:', error);
+        
+        // Update message status to failed
+        if (selectedConversation.messages) {
+          setSelectedConversation({
+            ...selectedConversation,
+            messages: selectedConversation.messages.map(m => 
+              m.id === tempMessageId ? { ...m, status: 'failed' } : m
+            )
+          });
+        }
+        
         toast({
           title: "Error",
           description: "Failed to send message",
@@ -63,8 +108,7 @@ export const useMessages = (
         return;
       }
 
-      setNewMessage("");
-
+      // Update temporary message with real message data and sent status
       const newMessageObj: Message = {
         id: messageData.id,
         conversationId: selectedConversation.id,
@@ -75,24 +119,55 @@ export const useMessages = (
         timestamp: formatTimestamp(messageData.created_at),
         status: 'sent',
         reactions: {},
-        sender: 'me' // For backwards compatibility
+        sender: 'me', // For backwards compatibility
+        attachments: attachments
       };
 
-      // Handle updating the conversation with the new message
+      // Update conversation with confirmed message
       if (selectedConversation.messages) {
-        // For conversations with the messages array
         setSelectedConversation({
           ...selectedConversation,
-          messages: [...selectedConversation.messages, newMessageObj],
+          messages: selectedConversation.messages.map(m => 
+            m.id === tempMessageId ? newMessageObj : m
+          ),
           lastMessage: newMessageObj
         });
       } else {
-        // For conversations without the messages array
         setSelectedConversation({
           ...selectedConversation,
           lastMessage: newMessageObj
         });
       }
+
+      // Simulate message delivery after a delay
+      setTimeout(() => {
+        if (selectedConversation.messages) {
+          setSelectedConversation(prev => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              messages: prev.messages?.map(m => 
+                m.id === messageData.id ? { ...m, status: 'delivered' } : m
+              ) || []
+            };
+          });
+        }
+      }, 1000);
+
+      // Simulate message read after a longer delay
+      setTimeout(() => {
+        if (selectedConversation.messages) {
+          setSelectedConversation(prev => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              messages: prev.messages?.map(m => 
+                m.id === messageData.id ? { ...m, status: 'read' } : m
+              ) || []
+            };
+          });
+        }
+      }, 3000);
     } catch (error) {
       console.error('Error in handleSendMessage:', error);
     }
