@@ -6,6 +6,7 @@ import { useRealtime } from "./useRealtime";
 import { Attachment } from "@/types/chat";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useGolderColleagues } from "@/components/contacts/hooks/useGolderColleagues";
 
 export const useChat = () => {
   const [activeTab, setActiveTab] = useState("chats");
@@ -41,6 +42,9 @@ export const useChat = () => {
     },
     enabled: activeTab === "colleagues"
   });
+
+  // Fetch Golder colleagues
+  const { data: golderColleagues, isLoading: isLoadingGolderColleagues } = useGolderColleagues();
 
   const {
     conversations,
@@ -153,7 +157,9 @@ export const useChat = () => {
     filteredConversations,
     attachments,
     colleagues,
+    golderColleagues,
     isLoadingColleagues,
+    isLoadingGolderColleagues,
     showSidebar,
     setShowSidebar,
     handleSendMessage,
