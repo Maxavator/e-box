@@ -45,7 +45,7 @@ export function AdminMenu({ activeView, setActiveView }: AdminMenuProps) {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setActiveView('sassa')}>
           <Award className="h-4 w-4 mr-2" />
-          Sassa Management
+          Government Services
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

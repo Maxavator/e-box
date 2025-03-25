@@ -19,11 +19,11 @@ export default function GovZA() {
     <div className="container max-w-7xl mx-auto py-6 px-4 md:px-6">
       <div className="flex items-center mb-4">
         <Flag className="h-6 w-6 text-primary mr-2" />
-        <h1 className="text-2xl font-bold tracking-tight">GovZA Services</h1>
+        <h1 className="text-2xl font-bold tracking-tight">South African Government Services</h1>
       </div>
       
       <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white p-6 rounded-lg mb-8">
-        <h2 className="text-2xl font-bold mb-2">Welcome to GovZA Services</h2>
+        <h2 className="text-2xl font-bold mb-2">Welcome to South African Government Services</h2>
         <p>
           Access South African government services directly from your device. Find information, submit
           applications, and track your requests - all in one place.
@@ -80,7 +80,7 @@ export default function GovZA() {
       
       <footer className="text-center py-4">
         <p className="text-sm text-muted-foreground">
-          © Republic of South Africa, e-Box GovZA Portal. All rights reserved.
+          © Republic of South Africa, e-Box Government Services Portal. All rights reserved.
         </p>
         <div className="flex justify-center gap-4 mt-2">
           <Link to="/govza/terms" className="text-xs text-primary hover:underline">Terms of Use</Link>

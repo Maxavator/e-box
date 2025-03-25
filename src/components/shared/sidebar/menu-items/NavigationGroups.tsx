@@ -137,7 +137,7 @@ export const DeskNavigationGroup = ({
       
       <MenuItemWithBadge
         icon={Flag}
-        label="GovZA"
+        label="Government Services"
         path="/govza"
         isActive={location.pathname.includes('/govza')}
         badgeLabel="New"
