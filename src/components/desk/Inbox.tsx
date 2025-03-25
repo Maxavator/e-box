@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Inbox as InboxIcon, Mail, Archive, Star, Trash2, AlertCircle, FileCheck } from "lucide-react";
+import { Inbox as InboxIcon, Mail, Archive, Star, Trash2, AlertCircle, FileCheck, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Mock data for inbox messages
 const mockMessages = [
@@ -103,6 +104,7 @@ const MessageItem = ({ message, onMessageSelect }: MessageItemProps) => {
 export const Inbox = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
   
   const handleMessageSelect = (id: string) => {
     setSelectedMessage(id);
@@ -127,7 +129,7 @@ export const Inbox = () => {
   const documentsCount = mockMessages.filter(m => m.type === 'document').length;
   
   return (
-    <div className="p-6">
+    <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div className="flex items-center gap-2">
           <InboxIcon className="h-6 w-6 text-primary" />

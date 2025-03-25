@@ -128,9 +128,15 @@ export const DeskNavigationGroup = ({
   // Calculate total desk notifications, but only show if greater than 0
   const totalDeskNotifications = documentsCount + leaveCount;
   
-  // Check if we're on any desk-related page
+  // Improved active state detection for desk-related pages
   const isDeskActive = location.pathname === "/mydesk" || 
-                        location.pathname.startsWith("/desk/");
+                       location.pathname.startsWith("/desk/");
+                     
+  // Check if we're on a specific desk subpage
+  const isDocumentsActive = location.pathname === "/desk/documents";
+  const isLeaveActive = location.pathname === "/desk/leave";
+  const isInboxActive = location.pathname === "/desk/inbox";
+  const isPayslipActive = location.pathname === "/desk/payslip";
                         
   // Check if we're on the GovZA page
   const isGovZAActive = location.pathname.includes('/govza');
@@ -154,7 +160,7 @@ export const DeskNavigationGroup = ({
             icon={FileText}
             label="Documents"
             path="/desk/documents"
-            isActive={location.pathname === "/desk/documents"}
+            isActive={isDocumentsActive}
             badgeCount={documentsCount > 0 ? documentsCount : undefined}
             badgeColor="bg-blue-500"
             onClick={() => handleNavigation("/desk/documents")}
@@ -164,7 +170,7 @@ export const DeskNavigationGroup = ({
             icon={Calendar}
             label="Leave"
             path="/desk/leave"
-            isActive={location.pathname === "/desk/leave"}
+            isActive={isLeaveActive}
             badgeCount={leaveCount > 0 ? leaveCount : undefined}
             badgeColor="bg-green-500"
             onClick={() => handleNavigation("/desk/leave")}
@@ -174,7 +180,7 @@ export const DeskNavigationGroup = ({
             icon={MailOpen}
             label="Inbox"
             path="/desk/inbox"
-            isActive={location.pathname === "/desk/inbox"}
+            isActive={isInboxActive}
             onClick={() => handleNavigation("/desk/inbox")}
           />
           
@@ -182,7 +188,7 @@ export const DeskNavigationGroup = ({
             icon={FileStack}
             label="Payslip"
             path="/desk/payslip"
-            isActive={location.pathname === "/desk/payslip"}
+            isActive={isPayslipActive}
             badgeLabel="New"
             badgeColor="bg-green-500"
             onClick={() => handleNavigation("/desk/payslip")}

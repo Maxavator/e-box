@@ -9,6 +9,9 @@ import { Calendar } from "@/components/desk/Calendar";
 import { ContactsList } from "@/components/desk/contacts/ContactsList";
 import { Inbox } from "@/components/desk/Inbox";
 import { Payslip } from "@/components/desk/Payslip";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Desk() {
   const { page } = useParams();
@@ -21,28 +24,69 @@ export default function Desk() {
     }
   }, [page, navigate]);
   
+  const handleBackToDesk = () => {
+    navigate("/mydesk");
+  };
+  
+  // Create a navigation header for subpages
+  const renderHeader = () => {
+    if (!page) return null;
+    
+    return (
+      <Card className="mb-6 shadow-sm">
+        <CardContent className="p-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-2"
+            onClick={handleBackToDesk}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to Desk</span>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  };
+  
   // Render different components based on the subpage
   if (page) {
+    let Component = null;
+    
     switch (page) {
       case "documents":
-        return <Documents />;
+        Component = Documents;
+        break;
       case "leave":
-        return <LeaveManager />;
+        Component = LeaveManager;
+        break;
       case "policies":
-        return <Policies />;
+        Component = Policies;
+        break;
       case "calendar":
-        return <Calendar />;
+        Component = Calendar;
+        break;
       case "colleagues":
-        return <ContactsList />;
+        Component = ContactsList;
+        break;
       case "inbox":
-        return <Inbox />;
+        Component = Inbox;
+        break;
       case "payslip":
-        return <Payslip />;
+        Component = Payslip;
+        break;
       default:
         // If page doesn't exist, navigate to the main desk page
         navigate("/mydesk", { replace: true });
         return null;
     }
+    
+    return (
+      <div className="p-4 md:p-6">
+        {renderHeader()}
+        <Component />
+      </div>
+    );
   }
   
   // Default to the main desk view

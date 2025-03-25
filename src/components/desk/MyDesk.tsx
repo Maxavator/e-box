@@ -6,12 +6,13 @@ import { LeaveManager } from "./LeaveManager";
 import { Policies } from "./Policies";
 import { 
   Briefcase, FileText, Clock, Scroll, Inbox, Calendar, 
-  Users, FileStack, AlertCircle, MailOpen, UserCheck 
+  Users, FileStack, AlertCircle, MailOpen, UserCheck, 
+  ArrowRight
 } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
@@ -84,33 +85,6 @@ export function MyDesk() {
             <span className="text-sm">Error loading organization information</span>
           </div>
         )}
-        
-        <div className="flex flex-wrap gap-2">
-          <Button 
-            variant={activeTab === "documents" ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setActiveTab("documents")}
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            Documents
-          </Button>
-          <Button 
-            variant={activeTab === "leave" ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setActiveTab("leave")}
-          >
-            <Clock className="mr-2 h-4 w-4" />
-            Leave
-          </Button>
-          <Button 
-            variant={activeTab === "policies" ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setActiveTab("policies")}
-          >
-            <Scroll className="mr-2 h-4 w-4" />
-            Policies
-          </Button>
-        </div>
       </div>
       
       {mockLeaveNotice && (
@@ -123,53 +97,117 @@ export function MyDesk() {
                 <p className="text-sm text-green-700">Your request for April 15-18 has been approved by management.</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={handleDismissNotice}>
-              Dismiss
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/desk/leave")}>
+                View
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleDismissNotice}>
+                Dismiss
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-        <Button 
-          variant="outline" 
-          className="flex flex-col items-center justify-center h-28 p-4 hover:bg-primary/5" 
-          onClick={() => handleNavigation("/desk/inbox")}
-        >
-          <MailOpen className="h-8 w-8 mb-2 text-primary" />
-          <span className="font-medium">Inbox</span>
-          <span className="text-xs text-muted-foreground">View messages</span>
-        </Button>
+        <Card className="flex flex-col hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MailOpen className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Inbox</CardTitle>
+              </div>
+              <Badge className="bg-blue-500">2 New</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <p className="text-sm text-muted-foreground">Access your messages and notifications</p>
+          </CardContent>
+          <CardFooter className="pt-0">
+            <Button 
+              variant="outline" 
+              className="w-full justify-between" 
+              onClick={() => handleNavigation("/desk/inbox")}
+            >
+              <span>Open Inbox</span>
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </CardFooter>
+        </Card>
         
-        <Button 
-          variant="outline" 
-          className="flex flex-col items-center justify-center h-28 p-4 hover:bg-green-50" 
-          onClick={() => handleNavigation("/desk/calendar")}
-        >
-          <Calendar className="h-8 w-8 mb-2 text-green-600" />
-          <span className="font-medium">Calendar</span>
-          <span className="text-xs text-muted-foreground">View schedule</span>
-        </Button>
+        <Card className="flex flex-col hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-green-600" />
+                <CardTitle className="text-lg">Calendar</CardTitle>
+              </div>
+              <Badge className="bg-green-500">1 Event</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <p className="text-sm text-muted-foreground">View your schedule and upcoming events</p>
+          </CardContent>
+          <CardFooter className="pt-0">
+            <Button 
+              variant="outline" 
+              className="w-full justify-between" 
+              onClick={() => handleNavigation("/desk/calendar")}
+            >
+              <span>Open Calendar</span>
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </CardFooter>
+        </Card>
         
-        <Button 
-          variant="outline" 
-          className="flex flex-col items-center justify-center h-28 p-4 hover:bg-amber-50" 
-          onClick={() => handleNavigation("/desk/colleagues")}
-        >
-          <UserCheck className="h-8 w-8 mb-2 text-amber-600" />
-          <span className="font-medium">Colleagues</span>
-          <span className="text-xs text-muted-foreground">View team members</span>
-        </Button>
+        <Card className="flex flex-col hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <UserCheck className="h-5 w-5 text-amber-600" />
+                <CardTitle className="text-lg">Colleagues</CardTitle>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <p className="text-sm text-muted-foreground">View your team and organization contacts</p>
+          </CardContent>
+          <CardFooter className="pt-0">
+            <Button 
+              variant="outline" 
+              className="w-full justify-between" 
+              onClick={() => handleNavigation("/desk/colleagues")}
+            >
+              <span>View Colleagues</span>
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </CardFooter>
+        </Card>
         
-        <Button 
-          variant="outline" 
-          className="flex flex-col items-center justify-center h-28 p-4 hover:bg-blue-50" 
-          onClick={() => handleNavigation("/desk/payslip")}
-        >
-          <FileStack className="h-8 w-8 mb-2 text-blue-600" />
-          <span className="font-medium">Payslip</span>
-          <Badge variant="outline" className="mt-1">New</Badge>
-        </Button>
+        <Card className="flex flex-col hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileStack className="h-5 w-5 text-blue-600" />
+                <CardTitle className="text-lg">Payslip</CardTitle>
+              </div>
+              <Badge variant="outline" className="border-green-500 text-green-600">New</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <p className="text-sm text-muted-foreground">Access your latest payslips and tax documents</p>
+          </CardContent>
+          <CardFooter className="pt-0">
+            <Button 
+              variant="outline" 
+              className="w-full justify-between" 
+              onClick={() => handleNavigation("/desk/payslip")}
+            >
+              <span>View Payslips</span>
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -239,43 +277,126 @@ export function MyDesk() {
               <div className="space-y-2">
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start" 
+                  className="w-full justify-between" 
                   onClick={() => navigate("/desk/documents")}
                 >
-                  <FileText className="mr-2 h-4 w-4" />
-                  My Documents
+                  <div className="flex items-center">
+                    <FileText className="mr-2 h-4 w-4" />
+                    <span>My Documents</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start" 
+                  className="w-full justify-between" 
                   onClick={() => navigate("/desk/leave")}
                 >
-                  <Clock className="mr-2 h-4 w-4" />
-                  Leave Management
+                  <div className="flex items-center">
+                    <Clock className="mr-2 h-4 w-4" />
+                    <span>Leave Management</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start" 
+                  className="w-full justify-between" 
                   onClick={() => navigate("/desk/policies")}
                 >
-                  <Scroll className="mr-2 h-4 w-4" />
-                  Company Policies
+                  <div className="flex items-center">
+                    <Scroll className="mr-2 h-4 w-4" />
+                    <span>Company Policies</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
                 <Separator className="my-2" />
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start" 
+                  className="w-full justify-between" 
                   onClick={() => navigate("/desk/payslip")}
                 >
-                  <FileStack className="mr-2 h-4 w-4" />
-                  Payslip
-                  <Badge className="ml-auto" variant="success">New</Badge>
+                  <div className="flex items-center">
+                    <FileStack className="mr-2 h-4 w-4" />
+                    <span>Payslip</span>
+                  </div>
+                  <Badge className="ml-2" variant="outline" className="border-green-500 text-green-600">New</Badge>
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+      
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Desk Features</CardTitle>
+          <CardDescription>Explore all available desk features</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex flex-col items-center justify-center" 
+              onClick={() => navigate("/desk/documents")}
+            >
+              <FileText className="h-6 w-6 mb-2" />
+              <span className="text-sm font-medium">Documents</span>
+              <span className="text-xs text-muted-foreground mt-1">Access and manage files</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex flex-col items-center justify-center" 
+              onClick={() => navigate("/desk/leave")}
+            >
+              <Clock className="h-6 w-6 mb-2" />
+              <span className="text-sm font-medium">Leave Management</span>
+              <span className="text-xs text-muted-foreground mt-1">Request and track time off</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex flex-col items-center justify-center" 
+              onClick={() => navigate("/desk/policies")}
+            >
+              <Scroll className="h-6 w-6 mb-2" />
+              <span className="text-sm font-medium">Policies</span>
+              <span className="text-xs text-muted-foreground mt-1">View company guidelines</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex flex-col items-center justify-center" 
+              onClick={() => navigate("/desk/inbox")}
+            >
+              <MailOpen className="h-6 w-6 mb-2" />
+              <span className="text-sm font-medium">Inbox</span>
+              <span className="text-xs text-muted-foreground mt-1">Manage communications</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex flex-col items-center justify-center" 
+              onClick={() => navigate("/desk/calendar")}
+            >
+              <Calendar className="h-6 w-6 mb-2" />
+              <span className="text-sm font-medium">Calendar</span>
+              <span className="text-xs text-muted-foreground mt-1">View your schedule</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex flex-col items-center justify-center" 
+              onClick={() => navigate("/desk/payslip")}
+            >
+              <FileStack className="h-6 w-6 mb-2" />
+              <span className="text-sm font-medium">Payslip</span>
+              <span className="text-xs text-muted-foreground mt-1">Access financial documents</span>
+              <Badge variant="outline" className="mt-1 border-green-500 text-green-600">New</Badge>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-3 mb-8">
