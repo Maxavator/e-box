@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogIn, Loader2 } from "lucide-react";
+import { LogIn, Loader2, LockIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { validateSaId, formatSaIdToEmail, formatSaIdPassword } from "@/utils/saIdValidation";
 import { toast } from "sonner";
@@ -46,18 +46,22 @@ export const AuthenticationDialog = ({
       return;
     }
     
+    // Make sure password is provided
+    if (!password) {
+      toast.error("Password is required");
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
       // Transform SA ID to email format
       const loginEmail = formatSaIdToEmail(saId);
       
-      // Always use the standard password for SA ID logins
-      const loginPassword = formatSaIdPassword(saId);
-      
+      // Use user-provided password instead of standard password
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
-        password: loginPassword,
+        password: password,
       });
 
       if (error) {
@@ -109,6 +113,21 @@ export const AuthenticationDialog = ({
               onChange={(e) => setSaId(e.target.value)}
               required
             />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <div className="relative">
+              <Input 
+                id="password"
+                type="password"
+                placeholder="Enter your password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <LockIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            </div>
           </div>
           
           <div className="flex justify-end gap-2 pt-4">

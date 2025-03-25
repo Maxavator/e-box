@@ -8,6 +8,7 @@ import { Index, Auth, Dashboard, NotFound, Chat, AdminPortal, OrganizationDashbo
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import GovZA from "./pages/GovZA";
 import Contacts from "./pages/Contacts";
+import LogoutPage from "./pages/LogoutPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,7 +31,7 @@ const ProtectedLayoutRoute = () => {
 
 const ThemeWrapper = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
-  const isAuthPage = location.pathname === "/auth";
+  const isAuthPage = location.pathname === "/auth" || location.pathname === "/logout";
   
   return (
     <ThemeProvider 
@@ -72,6 +73,10 @@ function App() {
         {
           path: '/auth',
           element: <Auth />,
+        },
+        {
+          path: '/logout',
+          element: <LogoutPage />,
         },
         {
           path: '/changelog',
