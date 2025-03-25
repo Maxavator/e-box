@@ -1,53 +1,47 @@
 
-import React from "react";
-import { SidebarMenuItem, SidebarMenuButton, SidebarMenuBadge } from "@/components/ui/sidebar";
 import { LucideIcon } from "lucide-react";
+import { SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuBadge } from "@/components/ui/sidebar";
 
 interface MenuItemWithBadgeProps {
   icon: LucideIcon;
   label: string;
   path: string;
-  isActive: boolean;
+  isActive?: boolean;
   badgeCount?: number;
-  badgeColor?: string;
   badgeLabel?: string;
+  badgeColor?: string;
   onClick: () => void;
+  subMenu?: React.ReactNode;
 }
 
-export const MenuItemWithBadge = ({
+export function MenuItemWithBadge({
   icon: Icon,
   label,
   path,
   isActive,
   badgeCount,
-  badgeColor = "bg-red-500",
   badgeLabel,
+  badgeColor = "bg-blue-500",
   onClick,
-}: MenuItemWithBadgeProps) => {
+  subMenu,
+}: MenuItemWithBadgeProps) {
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton
-        tooltip={label}
-        onClick={onClick}
-        isActive={isActive}
-      >
+      <SidebarMenuButton onClick={onClick} isActive={isActive}>
         <Icon className="h-4 w-4" />
         <span>{label}</span>
-        
-        {/* Only show badge count if it's greater than 0 and defined */}
         {badgeCount !== undefined && badgeCount > 0 && (
-          <SidebarMenuBadge className={`ml-auto ${badgeColor} text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full`}>
+          <SidebarMenuBadge className={badgeColor}>
             {badgeCount}
           </SidebarMenuBadge>
         )}
-        
-        {/* For label badges like "New" */}
         {badgeLabel && (
-          <SidebarMenuBadge className={`ml-auto ${badgeColor} text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full`}>
+          <SidebarMenuBadge className={badgeColor}>
             {badgeLabel}
           </SidebarMenuBadge>
         )}
       </SidebarMenuButton>
+      {subMenu}
     </SidebarMenuItem>
   );
-};
+}

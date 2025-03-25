@@ -15,8 +15,11 @@ import {
   Flag,
   FileStack,
   MailOpen,
+  Clock,
+  Scroll,
 } from "lucide-react";
 import { MenuItemWithBadge } from "./MenuItemWithBadge";
+import { SidebarMenu, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from "@/components/ui/sidebar";
 
 interface NavigationGroupsProps {
   chatCount: number;
@@ -137,6 +140,7 @@ export const DeskNavigationGroup = ({
   const isLeaveActive = location.pathname === "/desk/leave";
   const isInboxActive = location.pathname === "/desk/inbox";
   const isPayslipActive = location.pathname === "/desk/payslip";
+  const isPoliciesActive = location.pathname === "/desk/policies";
                         
   // Check if we're on the GovZA page
   const isGovZAActive = location.pathname.includes('/govza');
@@ -151,50 +155,62 @@ export const DeskNavigationGroup = ({
         badgeCount={totalDeskNotifications > 0 ? totalDeskNotifications : undefined}
         badgeColor="bg-blue-500"
         onClick={() => handleNavigation("/mydesk")}
+        subMenu={
+          isDeskActive && (
+            <SidebarMenuSub>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton 
+                  isActive={isDocumentsActive}
+                  onClick={() => handleNavigation("/desk/documents")}
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>Documents</span>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton 
+                  isActive={isLeaveActive}
+                  onClick={() => handleNavigation("/desk/leave")}
+                >
+                  <Clock className="h-4 w-4" />
+                  <span>Leave</span>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton 
+                  isActive={isPoliciesActive}
+                  onClick={() => handleNavigation("/desk/policies")}
+                >
+                  <Scroll className="h-4 w-4" />
+                  <span>Policies</span>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton 
+                  isActive={isInboxActive}
+                  onClick={() => handleNavigation("/desk/inbox")}
+                >
+                  <MailOpen className="h-4 w-4" />
+                  <span>Inbox</span>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton 
+                  isActive={isPayslipActive}
+                  onClick={() => handleNavigation("/desk/payslip")}
+                >
+                  <FileStack className="h-4 w-4" />
+                  <span>Payslip</span>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            </SidebarMenuSub>
+          )
+        }
       />
-      
-      {/* Only show these items if we are in a desk-related page */}
-      {isDeskActive && (
-        <>
-          <MenuItemWithBadge
-            icon={FileText}
-            label="Documents"
-            path="/desk/documents"
-            isActive={isDocumentsActive}
-            badgeCount={documentsCount > 0 ? documentsCount : undefined}
-            badgeColor="bg-blue-500"
-            onClick={() => handleNavigation("/desk/documents")}
-          />
-          
-          <MenuItemWithBadge
-            icon={Calendar}
-            label="Leave"
-            path="/desk/leave"
-            isActive={isLeaveActive}
-            badgeCount={leaveCount > 0 ? leaveCount : undefined}
-            badgeColor="bg-green-500"
-            onClick={() => handleNavigation("/desk/leave")}
-          />
-          
-          <MenuItemWithBadge
-            icon={MailOpen}
-            label="Inbox"
-            path="/desk/inbox"
-            isActive={isInboxActive}
-            onClick={() => handleNavigation("/desk/inbox")}
-          />
-          
-          <MenuItemWithBadge
-            icon={FileStack}
-            label="Payslip"
-            path="/desk/payslip"
-            isActive={isPayslipActive}
-            badgeLabel="New"
-            badgeColor="bg-green-500"
-            onClick={() => handleNavigation("/desk/payslip")}
-          />
-        </>
-      )}
       
       <MenuItemWithBadge
         icon={Flag}
