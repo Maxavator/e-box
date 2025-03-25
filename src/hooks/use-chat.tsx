@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const useChat = () => {
   const [activeTab, setActiveTab] = useState("chats");
-  const [calendarView, setCalendarView] = useState<"calendar" | "inbox">("calendar");
+  const [calendarView, setCalendarView] = useState<"calendar" | "inbox" | "proposed">("calendar");
   const [selectedFeature, setSelectedFeature] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 

@@ -15,6 +15,9 @@ export type Database = {
           event_id: string
           id: string
           invitee_id: string
+          proposal_message: string | null
+          proposed_end_time: string | null
+          proposed_start_time: string | null
           status: string
           updated_at: string
         }
@@ -23,6 +26,9 @@ export type Database = {
           event_id: string
           id?: string
           invitee_id: string
+          proposal_message?: string | null
+          proposed_end_time?: string | null
+          proposed_start_time?: string | null
           status?: string
           updated_at?: string
         }
@@ -31,6 +37,9 @@ export type Database = {
           event_id?: string
           id?: string
           invitee_id?: string
+          proposal_message?: string | null
+          proposed_end_time?: string | null
+          proposed_start_time?: string | null
           status?: string
           updated_at?: string
         }

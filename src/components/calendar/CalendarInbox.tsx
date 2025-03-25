@@ -4,8 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Check, X, Clock } from "lucide-react";
+import { Check, X, Clock, Calendar as CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface CalendarEvent {
   id: string;
@@ -25,15 +30,21 @@ interface CalendarInvite {
 }
 
 export function CalendarInbox() {
+  const [proposeTimeOpen, setProposeTimeOpen] = useState(false);
+  const [currentInvite, setCurrentInvite] = useState<CalendarInvite | null>(null);
+  const [proposedStartTime, setProposedStartTime] = useState('');
+  const [proposedEndTime, setProposedEndTime] = useState('');
+  const [proposalMessage, setProposalMessage] = useState('');
+
   const { data: invites, isLoading, refetch } = useQuery({
     queryKey: ['calendar-invites'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('calendar_invites')
+        .from('calendar_event_invites')
         .select(`
           id,
           status,
-          event:calendar_events (
+          event:event_id (
             id,
             title,
             description,
@@ -52,18 +63,7 @@ export function CalendarInbox() {
       const transformedData = data.map((item: any) => ({
         id: item.id,
         status: item.status,
-        event: Array.isArray(item.event) && item.event.length > 0 
-          ? item.event[0] 
-          : {
-              id: '',
-              title: '',
-              description: null,
-              start_time: '',
-              end_time: '',
-              location: null,
-              is_online: false,
-              meeting_link: null
-            }
+        event: item.event
       }));
       
       return transformedData as CalendarInvite[];
@@ -72,7 +72,7 @@ export function CalendarInbox() {
 
   const updateInviteStatus = async (inviteId: string, newStatus: string) => {
     const { error } = await supabase
-      .from('calendar_invites')
+      .from('calendar_event_invites')
       .update({ status: newStatus })
       .eq('id', inviteId);
 
@@ -83,6 +83,71 @@ export function CalendarInbox() {
 
     toast.success(`Invitation ${newStatus}`);
     refetch();
+  };
+
+  const openProposeTimeDialog = (invite: CalendarInvite) => {
+    setCurrentInvite(invite);
+    
+    // Set default values from the original event
+    const eventStart = new Date(invite.event.start_time);
+    const eventEnd = new Date(invite.event.end_time);
+    
+    // Format the dates for the input fields (YYYY-MM-DDThh:mm)
+    setProposedStartTime(formatDateTimeLocal(eventStart));
+    setProposedEndTime(formatDateTimeLocal(eventEnd));
+    
+    setProposeTimeOpen(true);
+  };
+
+  const formatDateTimeLocal = (date: Date) => {
+    const pad = (num: number) => num.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  };
+
+  const handleProposeTime = async () => {
+    if (!currentInvite) return;
+    
+    const startTime = new Date(proposedStartTime);
+    const endTime = new Date(proposedEndTime);
+    
+    const { error } = await supabase
+      .from('calendar_event_invites')
+      .update({
+        status: 'proposed',
+        proposed_start_time: startTime.toISOString(),
+        proposed_end_time: endTime.toISOString(),
+        proposal_message: proposalMessage
+      })
+      .eq('id', currentInvite.id);
+
+    if (error) {
+      toast.error("Failed to propose new time");
+      console.error("Error proposing time:", error);
+      return;
+    }
+
+    toast.success("Alternative time proposed");
+    setProposeTimeOpen(false);
+    refetch();
+    
+    // Send notification
+    const { data: userData } = await supabase.auth.getUser();
+    if (userData.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', userData.user.id)
+        .single();
+      
+      const userName = profile ? `${profile.first_name} ${profile.last_name}` : "A user";
+      
+      await supabase.from('notifications').insert({
+        subject: "Calendar Invitation Response",
+        message: `${userName} proposed a different time for "${currentInvite.event.title}"`,
+        receiver_id: currentInvite.event.id, // This should be the event creator
+        sender_id: userData.user.id
+      });
+    }
   };
 
   if (isLoading) {
@@ -109,17 +174,17 @@ export function CalendarInbox() {
                       )}
                       <div className="mt-2 text-sm">
                         <p>
-                          Start: {new Date(invite.event.start_time).toLocaleString()}
+                          <span className="font-medium">Start:</span> {new Date(invite.event.start_time).toLocaleString()}
                         </p>
                         <p>
-                          End: {new Date(invite.event.end_time).toLocaleString()}
+                          <span className="font-medium">End:</span> {new Date(invite.event.end_time).toLocaleString()}
                         </p>
                         {invite.event.location && (
-                          <p className="mt-1">Location: {invite.event.location}</p>
+                          <p className="mt-1"><span className="font-medium">Location:</span> {invite.event.location}</p>
                         )}
                         {invite.event.is_online && invite.event.meeting_link && (
                           <p className="mt-1">
-                            Meeting link: <a href={invite.event.meeting_link} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">{invite.event.meeting_link}</a>
+                            <span className="font-medium">Meeting link:</span> <a href={invite.event.meeting_link} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">{invite.event.meeting_link}</a>
                           </p>
                         )}
                       </div>
@@ -149,6 +214,14 @@ export function CalendarInbox() {
                       >
                         <X className="h-4 w-4" />
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-blue-600"
+                        onClick={() => openProposeTimeDialog(invite)}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </Card>
@@ -159,6 +232,51 @@ export function CalendarInbox() {
           </div>
         </ScrollArea>
       </div>
+
+      <Dialog open={proposeTimeOpen} onOpenChange={setProposeTimeOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Propose Alternative Time</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="proposed-start">Proposed Start Time</Label>
+              <Input
+                id="proposed-start"
+                type="datetime-local"
+                value={proposedStartTime}
+                onChange={(e) => setProposedStartTime(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="proposed-end">Proposed End Time</Label>
+              <Input
+                id="proposed-end"
+                type="datetime-local"
+                value={proposedEndTime}
+                onChange={(e) => setProposedEndTime(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="proposal-message">Message (Optional)</Label>
+              <Textarea
+                id="proposal-message"
+                placeholder="Explain why you're proposing a different time..."
+                value={proposalMessage}
+                onChange={(e) => setProposalMessage(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setProposeTimeOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleProposeTime}>
+              Propose New Time
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

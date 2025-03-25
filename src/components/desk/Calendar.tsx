@@ -5,18 +5,71 @@ import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { CalendarDays, Users, Clock, MapPin, Calendar as CalendarIcon } from "lucide-react";
+import { CalendarDays, Users, Clock, MapPin, Calendar as CalendarIcon, Inbox } from "lucide-react";
 import { TaskManager } from "@/components/calendar/TaskManager";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SouthAfricanHolidays } from "@/components/calendar/SouthAfricanHolidays";
 import { Button } from "@/components/ui/button";
+import { CalendarView } from "@/components/calendar/CalendarView";
+import { CalendarInbox } from "@/components/calendar/CalendarInbox";
+import { ProposedTimesList } from "@/components/calendar/ProposedTimesList";
+import { useChat } from "@/hooks/use-chat";
+import { Badge } from "@/components/ui/badge";
 
 export function Calendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [activeTab, setActiveTab] = useState("calendar");
+  const { calendarView, setCalendarView } = useChat();
   const { toast } = useToast();
 
+  // Fetch pending invites count for badge
+  const { data: pendingInvitesCount } = useQuery({
+    queryKey: ['pending-invites-count'],
+    queryFn: async () => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user?.user) return 0;
+      
+      const { count, error } = await supabase
+        .from('calendar_event_invites')
+        .select('*', { count: 'exact', head: true })
+        .eq('invitee_id', user.user.id)
+        .eq('status', 'pending');
+      
+      if (error) {
+        console.error('Error fetching pending invites count:', error);
+        return 0;
+      }
+      
+      return count || 0;
+    },
+    refetchInterval: 60000 // Refetch every minute
+  });
+
+  // Fetch proposed times count for badge
+  const { data: proposedTimesCount } = useQuery({
+    queryKey: ['proposed-times-count'],
+    queryFn: async () => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user?.user) return 0;
+      
+      const { count, error } = await supabase
+        .from('calendar_event_invites')
+        .select('*, event:event_id!inner(created_by)', { count: 'exact', head: true })
+        .eq('status', 'proposed')
+        .eq('event.created_by', user.user.id);
+      
+      if (error) {
+        console.error('Error fetching proposed times count:', error);
+        return 0;
+      }
+      
+      return count || 0;
+    },
+    refetchInterval: 60000 // Refetch every minute
+  });
+
+  // Fetch upcoming events (next 5 days) for calendar overview
   const { data: events, isError } = useQuery({
     queryKey: ['calendar-events'],
     queryFn: async () => {
@@ -55,9 +108,62 @@ export function Calendar() {
   // Get upcoming holidays (next 3)
   const upcomingHolidays = getUpcomingHolidays(3);
 
+  // Conditional rendering based on view
+  if (activeTab === "manage") {
+    return (
+      <div className="p-8 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Calendar Management</h1>
+          <div className="flex gap-2">
+            <Button 
+              variant={calendarView === "calendar" ? "default" : "outline"} 
+              onClick={() => setCalendarView("calendar")}
+            >
+              <CalendarIcon className="h-4 w-4 mr-2" />
+              Calendar View
+            </Button>
+            <Button 
+              variant={calendarView === "inbox" ? "default" : "outline"} 
+              onClick={() => setCalendarView("inbox")}
+              className="relative"
+            >
+              <Inbox className="h-4 w-4 mr-2" />
+              Inbox
+              {pendingInvitesCount && pendingInvitesCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center">
+                  {pendingInvitesCount}
+                </Badge>
+              )}
+            </Button>
+            <Button 
+              variant={calendarView === "proposed" ? "default" : "outline"} 
+              onClick={() => setCalendarView("proposed")}
+              className="relative"
+            >
+              <Clock className="h-4 w-4 mr-2" />
+              Proposed Times
+              {proposedTimesCount && proposedTimesCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center">
+                  {proposedTimesCount}
+                </Badge>
+              )}
+            </Button>
+          </div>
+        </div>
+        
+        {calendarView === "calendar" && <CalendarView />}
+        {calendarView === "inbox" && <CalendarInbox />}
+        {calendarView === "proposed" && <ProposedTimesList />}
+      </div>
+    );
+  }
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 text-gray-900">My Calendar</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">My Calendar</h1>
+        <Button onClick={() => setActiveTab("manage")}>Manage Calendar</Button>
+      </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
         <TabsList className="grid w-full md:w-auto grid-cols-2 md:grid-cols-3">
@@ -127,6 +233,66 @@ export function Calendar() {
             {/* Task Manager */}
             <div className="grid grid-cols-1 gap-8">
               <TaskManager />
+              
+              {/* Notifications Section */}
+              <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    <Inbox className="h-6 w-6 text-primary" />
+                    <h2 className="text-xl font-semibold text-gray-900">Calendar Notifications</h2>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 rounded-md border bg-blue-50 border-blue-200">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Inbox className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-blue-800">
+                          {pendingInvitesCount || 0} pending invitation{pendingInvitesCount !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-blue-600 hover:text-blue-800 hover:bg-blue-100"
+                      onClick={() => {
+                        setActiveTab("manage");
+                        setCalendarView("inbox");
+                      }}
+                      disabled={!pendingInvitesCount}
+                    >
+                      View
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-md border bg-amber-50 border-amber-200">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 bg-amber-100 rounded-full flex items-center justify-center">
+                        <Clock className="h-4 w-4 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-amber-800">
+                          {proposedTimesCount || 0} proposed time change{proposedTimesCount !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-amber-600 hover:text-amber-800 hover:bg-amber-100"
+                      onClick={() => {
+                        setActiveTab("manage");
+                        setCalendarView("proposed");
+                      }}
+                      disabled={!proposedTimesCount}
+                    >
+                      Review
+                    </Button>
+                  </div>
+                </div>
+              </Card>
               
               {/* Upcoming Holidays Preview Card */}
               <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">

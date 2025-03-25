@@ -20,12 +20,9 @@ export function useEventCreation() {
   });
   const user = useUser();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (!user?.id) {
-      toast.error("You must be logged in to create events");
-      return;
+      return { success: false, error: "You must be logged in to create events" };
     }
 
     const startDateTime = new Date(formData.date);
@@ -53,31 +50,53 @@ export function useEventCreation() {
       .single();
 
     if (eventError) {
-      toast.error("Failed to create event");
       console.error("Error creating event:", eventError);
-      return;
+      return { success: false, error: "Failed to create event" };
     }
 
     // Create invites for selected users
     if (formData.invitees.length > 0) {
-      const { error: inviteError } = await supabase
-        .from('calendar_invites')
-        .insert(
-          formData.invitees.map(inviteeId => ({
-            event_id: eventData.id,
-            invitee_id: inviteeId,
-            status: 'pending'
-          }))
-        );
+      try {
+        const { error: inviteError } = await supabase
+          .from('calendar_event_invites')
+          .insert(
+            formData.invitees.map(inviteeId => ({
+              event_id: eventData.id,
+              invitee_id: inviteeId,
+              status: 'pending'
+            }))
+          );
 
-      if (inviteError) {
-        toast.error("Failed to send some invites");
-        console.error("Error sending invites:", inviteError);
+        if (inviteError) {
+          console.error("Error sending invites:", inviteError);
+          return { success: true, warning: "Event created but some invites failed to send" };
+        }
+
+        // Send notifications to invitees
+        const { data: creatorProfile } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', user.id)
+          .single();
+
+        const creatorName = creatorProfile 
+          ? `${creatorProfile.first_name} ${creatorProfile.last_name}` 
+          : "Someone";
+
+        const notifications = formData.invitees.map(inviteeId => ({
+          subject: "New Calendar Invitation",
+          message: `${creatorName} has invited you to "${formData.title}"`,
+          receiver_id: inviteeId,
+          sender_id: user.id
+        }));
+
+        await supabase.from('notifications').insert(notifications);
+      } catch (error) {
+        console.error("Error processing invites:", error);
+        return { success: true, warning: "Event created but notifications may not have been sent" };
       }
     }
 
-    toast.success("Event created successfully");
-    setOpen(false);
     setFormData({
       title: "",
       description: "",
@@ -89,6 +108,8 @@ export function useEventCreation() {
       endTime: "10:00",
       invitees: [],
     });
+
+    return { success: true };
   };
 
   const toggleInvitee = (userId: string) => {
