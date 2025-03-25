@@ -14,6 +14,11 @@ import GovZA from "./GovZA";
 // Import components rather than pages for these since we don't have the page files
 import { Settings } from "@/components/settings/Settings";
 import { ContactsList } from "@/components/desk/contacts/ContactsList";
+import { Calendar } from "@/components/desk/Calendar";
+import { Documents } from "@/components/desk/Documents";
+import { LeaveManager } from "@/components/desk/LeaveManager";
+import { Policies } from "@/components/desk/Policies";
+import { MyDesk as Desk } from "@/components/desk/MyDesk";
 
 export {
   Index,
@@ -28,5 +33,10 @@ export {
   Contacts,
   ContactsList,
   Notes,
-  GovZA
+  GovZA,
+  Calendar,
+  Documents,
+  LeaveManager,
+  Policies,
+  Desk
 };

@@ -105,7 +105,7 @@ export const PersonalContacts = () => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={contact.status === "Available" ? "success" : "outline"}>
+                  <Badge variant={contact.status === "Available" ? "default" : "outline"}>
                     {contact.status}
                   </Badge>
                 </TableCell>

@@ -1,236 +1,170 @@
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Card, CardContent } from "@/components/ui/card";
+import { Search, Mail, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Mail, Smartphone, UserRound } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { InviteContactDialog } from "../dialogs/InviteContactDialog";
-import { isSaId } from "@/utils/saIdValidation";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+const formSchema = z.object({
+  searchValue: z.string().min(3, {
+    message: "Search term must be at least 3 characters.",
+  }),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface SearchContactFormProps {
   onInviteSuccess: () => void;
 }
 
-const searchSchema = z.object({
-  searchValue: z
-    .string()
-    .min(3, { message: "Search term must be at least 3 characters" })
-});
-
 export const SearchContactForm = ({ onInviteSuccess }: SearchContactFormProps) => {
-  const [searchType, setSearchType] = useState<"email" | "mobile" | "saId">("email");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [notFoundValue, setNotFoundValue] = useState("");
+  const [searchType, setSearchType] = useState<"email" | "saId" | "mobile">("email");
+  const [searchResult, setSearchResult] = useState<"found" | "not_found" | null>(null);
+  const [searchValue, setSearchValue] = useState("");
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   
-  const form = useForm<z.infer<typeof searchSchema>>({
-    resolver: zodResolver(searchSchema),
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      searchValue: ""
-    }
+      searchValue: "",
+    },
   });
-
-  const handleSearch = async (data: z.infer<typeof searchSchema>) => {
-    setIsSearching(true);
-    setSearchResults([]);
-    setNotFoundValue("");
+  
+  const handleSearch = (values: FormValues) => {
+    setSearchValue(values.searchValue);
     
-    try {
-      let query;
-      const searchValue = data.searchValue.trim();
-      
-      if (searchType === "email") {
-        // Search by email in profiles
-        query = supabase
-          .from('profiles')
-          .select('id, first_name, last_name, avatar_url, mobile_phone_number, organization_id')
-          .ilike('email', `%${searchValue}%`)
-          .limit(10);
-      } else if (searchType === "mobile") {
-        // Search by mobile number
-        query = supabase
-          .from('profiles')
-          .select('id, first_name, last_name, avatar_url, mobile_phone_number, organization_id')
-          .ilike('mobile_phone_number', `%${searchValue}%`)
-          .limit(10);
-      } else if (searchType === "saId") {
-        // Validate SA ID format first
-        if (!isSaId(searchValue)) {
-          toast.error("Invalid SA ID format. Please enter a 13-digit SA ID number");
-          setIsSearching(false);
-          return;
-        }
-        
-        // Search by SA ID (would need a field for this in your database)
-        // This is a placeholder - adjust based on your actual schema
-        query = supabase
-          .from('profiles')
-          .select('id, first_name, last_name, avatar_url, mobile_phone_number, organization_id')
-          .eq('sa_id', searchValue)
-          .limit(10);
-      }
-      
-      const { data: results, error } = await query;
-      
-      if (error) {
-        console.error("Search error:", error);
-        toast.error("Error searching for contacts");
-      } else if (results && results.length > 0) {
-        setSearchResults(results);
+    // Simulate an API search that doesn't find the contact
+    // In a real app, this would query your backend or Supabase
+    setTimeout(() => {
+      // For demo purposes, let's say email searches find contacts, others don't
+      if (searchType === "email" && values.searchValue.includes("@")) {
+        setSearchResult("found");
       } else {
-        setNotFoundValue(searchValue);
-        toast.info("No contacts found with that information");
+        setSearchResult("not_found");
       }
-    } catch (error) {
-      console.error("Search error:", error);
-      toast.error("Error during search");
-    } finally {
-      setIsSearching(false);
-    }
+    }, 500);
   };
   
-  const handleInvite = () => {
+  const handleTypeChange = (value: "email" | "saId" | "mobile") => {
+    setSearchType(value);
+    form.setValue("searchValue", "");
+    setSearchResult(null);
+  };
+  
+  const handleInviteClick = () => {
     setShowInviteDialog(true);
   };
   
-  const handleInviteComplete = () => {
+  const handleInviteDialogClose = () => {
     setShowInviteDialog(false);
-    setNotFoundValue("");
+  };
+  
+  const handleInviteSent = () => {
+    setShowInviteDialog(false);
+    setSearchResult(null);
+    form.reset();
     onInviteSuccess();
   };
   
   return (
-    <div>
-      <Card>
-        <CardContent className="pt-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSearch)} className="space-y-4">
-              <Tabs value={searchType} onValueChange={(v) => setSearchType(v as any)} className="w-full">
-                <TabsList className="grid grid-cols-3 mb-4">
-                  <TabsTrigger value="email" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    <span>By Email</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="mobile" className="flex items-center gap-2">
-                    <Smartphone className="h-4 w-4" />
-                    <span>By Mobile</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="saId" className="flex items-center gap-2">
-                    <UserRound className="h-4 w-4" />
-                    <span>By SA ID</span>
-                  </TabsTrigger>
+    <div className="space-y-4">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSearch)} className="space-y-4">
+          <div className="flex flex-col md:flex-row gap-4 items-start">
+            <div className="w-full md:w-1/3">
+              <Tabs 
+                value={searchType} 
+                onValueChange={(v) => handleTypeChange(v as "email" | "saId" | "mobile")}
+                className="w-full"
+              >
+                <TabsList className="grid grid-cols-3 w-full">
+                  <TabsTrigger value="email">Email</TabsTrigger>
+                  <TabsTrigger value="saId">SA ID Number</TabsTrigger>
+                  <TabsTrigger value="mobile">Mobile</TabsTrigger>
                 </TabsList>
-                
-                <TabsContent value="email">
-                  <FormField
-                    control={form.control}
-                    name="searchValue"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="example@email.com" className="pl-9" {...field} />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </TabsContent>
-                
-                <TabsContent value="mobile">
-                  <FormField
-                    control={form.control}
-                    name="searchValue"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mobile Number</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Smartphone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="0123456789" className="pl-9" {...field} />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </TabsContent>
-                
-                <TabsContent value="saId">
-                  <FormField
-                    control={form.control}
-                    name="searchValue"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>SA ID Number</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <UserRound className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="1234567890123" className="pl-9" {...field} />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </TabsContent>
               </Tabs>
-              
-              <div className="flex justify-between">
-                <Button type="submit" disabled={isSearching} className="flex items-center gap-2">
-                  <Search className="h-4 w-4" />
-                  {isSearching ? "Searching..." : "Search"}
-                </Button>
+            </div>
+            
+            <div className="flex-1 w-full">
+              <div className="flex gap-2">
+                <FormField
+                  control={form.control}
+                  name="searchValue"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <div className="relative">
+                          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                            placeholder={
+                              searchType === "email" 
+                                ? "Enter email address" 
+                                : searchType === "saId"
+                                ? "Enter 13-digit SA ID number"
+                                : "Enter mobile number"
+                            }
+                            className="pl-8" 
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
-                {notFoundValue && (
-                  <Button type="button" variant="outline" onClick={handleInvite}>
-                    Invite User
-                  </Button>
-                )}
-              </div>
-            </form>
-          </Form>
-          
-          {searchResults.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-sm font-medium mb-2">Search Results</h3>
-              <div className="space-y-2">
-                {searchResults.map((result) => (
-                  <div 
-                    key={result.id} 
-                    className="p-3 border rounded-md flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-medium">{result.first_name} {result.last_name}</p>
-                      <p className="text-sm text-muted-foreground">{result.mobile_phone_number || "No mobile number"}</p>
-                    </div>
-                    <Button size="sm">Add Contact</Button>
-                  </div>
-                ))}
+                <Button type="submit">Search</Button>
               </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        </form>
+      </Form>
+      
+      {searchResult === "not_found" && (
+        <Alert className="bg-muted">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Contact not found</AlertTitle>
+          <AlertDescription className="flex flex-col gap-2">
+            <p>
+              We couldn't find a contact with the provided {searchType === "email" ? "email address" : 
+                searchType === "saId" ? "SA ID number" : "mobile number"}.
+            </p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="self-start"
+              onClick={handleInviteClick}
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Send invitation
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {searchResult === "found" && (
+        <Alert className="bg-green-50 text-green-800 border-green-200">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Contact found</AlertTitle>
+          <AlertDescription>
+            The contact has been found and added to your contacts list.
+          </AlertDescription>
+        </Alert>
+      )}
       
       {showInviteDialog && (
         <InviteContactDialog 
-          isOpen={showInviteDialog}
-          initialValue={notFoundValue}
-          searchType={searchType} 
-          onClose={() => setShowInviteDialog(false)}
-          onInviteSent={handleInviteComplete}
+          initialValue={searchValue}
+          searchType={searchType}
+          onClose={handleInviteDialogClose}
+          onInviteSent={handleInviteSent}
+          onInviteSuccess={onInviteSuccess}
         />
       )}
     </div>

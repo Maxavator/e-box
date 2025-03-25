@@ -1,10 +1,8 @@
 
-// This file doesn't exist in our current code, so I'm creating a basic version
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,18 +19,39 @@ type SearchFormValues = z.infer<typeof searchSchema>;
 
 interface InviteContactDialogProps {
   onInviteSuccess: () => void;
+  // Optional props for when used from SearchContactForm
+  initialValue?: string;
+  searchType?: "email" | "saId" | "mobile";
+  onClose?: () => void;
+  onInviteSent?: () => void;
 }
 
-export const InviteContactDialog = ({ onInviteSuccess }: InviteContactDialogProps) => {
+export const InviteContactDialog = ({ 
+  onInviteSuccess, 
+  initialValue = "", 
+  searchType: initialSearchType = "email",
+  onClose,
+  onInviteSent
+}: InviteContactDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Convert mobile to phone for the form
+  const convertedSearchType = initialSearchType === "mobile" ? "phone" : initialSearchType;
   
   const form = useForm<SearchFormValues>({
     resolver: zodResolver(searchSchema),
     defaultValues: {
-      searchValue: "",
-      searchType: "email",
+      searchValue: initialValue,
+      searchType: convertedSearchType,
     },
   });
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open && onClose) {
+      onClose();
+    }
+  };
 
   const onSubmit = async (data: SearchFormValues) => {
     try {
@@ -45,6 +64,10 @@ export const InviteContactDialog = ({ onInviteSuccess }: InviteContactDialogProp
         setIsOpen(false);
         form.reset();
         onInviteSuccess();
+        
+        if (onInviteSent) {
+          onInviteSent();
+        }
       }, 1500);
     } catch (error) {
       toast.error("Failed to send invitation");
@@ -52,7 +75,7 @@ export const InviteContactDialog = ({ onInviteSuccess }: InviteContactDialogProp
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 gap-1">
           <Mail className="h-3.5 w-3.5" />
@@ -135,7 +158,7 @@ export const InviteContactDialog = ({ onInviteSuccess }: InviteContactDialogProp
             />
             
             <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
                 Cancel
               </Button>
               <Button type="submit">
