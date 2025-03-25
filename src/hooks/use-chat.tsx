@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useConversations } from "./useConversations";
-import { useMessages } from "./useMessages";
+import { useMessages } from "./messages";
 import { useRealtime } from "./useRealtime";
 import { Attachment } from "@/types/chat";
 import { useQuery } from "@tanstack/react-query";
@@ -17,14 +17,14 @@ export const useChat = () => {
   const { data: colleagues, isLoading: isLoadingColleagues } = useQuery({
     queryKey: ['chat-colleagues'],
     queryFn: async () => {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.user) return [];
+      const { data } = await supabase.auth.getSession();
+      if (!data?.session?.user) return [];
       
       // Get user's organization ID
       const { data: userProfile } = await supabase
         .from('profiles')
         .select('organization_id')
-        .eq('id', session.user.id)
+        .eq('id', data.session.user.id)
         .single();
       
       if (!userProfile?.organization_id) return [];
@@ -34,7 +34,7 @@ export const useChat = () => {
         .from('profiles')
         .select('id, first_name, last_name, avatar_url, job_title')
         .eq('organization_id', userProfile.organization_id)
-        .neq('id', session.user.id);
+        .neq('id', data.session.user.id);
       
       return colleagueProfiles || [];
     },
@@ -99,14 +99,14 @@ export const useChat = () => {
   
   // Handle starting conversation with a colleague
   const handleStartConversationWithColleague = async (colleagueId: string) => {
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.user) return;
+    const { data } = await supabase.auth.getSession();
+    if (!data?.session?.user) return;
     
     // Check if conversation already exists
     const { data: existingConvs } = await supabase
       .from('conversations')
       .select('id')
-      .or(`and(user1_id.eq.${session.user.id},user2_id.eq.${colleagueId}),and(user1_id.eq.${colleagueId},user2_id.eq.${session.user.id})`)
+      .or(`and(user1_id.eq.${data.session.user.id},user2_id.eq.${colleagueId}),and(user1_id.eq.${colleagueId},user2_id.eq.${data.session.user.id})`)
       .maybeSingle();
     
     if (existingConvs) {
@@ -120,7 +120,7 @@ export const useChat = () => {
     const { data: newConv, error } = await supabase
       .from('conversations')
       .insert({
-        user1_id: session.user.id,
+        user1_id: data.session.user.id,
         user2_id: colleagueId
       })
       .select('id')

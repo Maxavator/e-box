@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -84,7 +83,13 @@ export function ChatSidebar({
             <ConversationList
               conversations={conversations}
               selectedConversation={selectedConversation}
-              onSelectConversation={onSelectConversation}
+              onSelectConversation={(conversation) => {
+                if (typeof conversation === 'string') {
+                  onSelectConversation(conversation);
+                } else {
+                  onSelectConversation(conversation.id);
+                }
+              }}
             />
           </TabsContent>
           <TabsContent value="calendar" className="space-y-4 pt-2">

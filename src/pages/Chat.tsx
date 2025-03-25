@@ -82,7 +82,11 @@ const Chat = () => {
           onTabChange={setActiveTab}
           conversations={filteredConversations}
           selectedConversation={selectedConversation}
-          onSelectConversation={handleSelectConversation}
+          onSelectConversation={(id) => {
+            if (typeof id === 'string') {
+              handleSelectConversation(id);
+            }
+          }}
           onCalendarActionClick={handleCalendarActionClick}
           colleagues={colleagues}
           isLoadingColleagues={isLoadingColleagues}
