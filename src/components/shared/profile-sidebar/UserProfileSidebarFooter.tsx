@@ -68,13 +68,7 @@ export function UserProfileSidebarFooter() {
   const firstName = profile?.first_name || '';
   const lastName = profile?.last_name || '';
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
-  
-  // Check if user is specifically Thabo Nkosi and set the title to Chief Information Officer
-  let jobTitle = profile?.job_title || '';
-  if (firstName === 'Thabo' && lastName === 'Nkosi') {
-    jobTitle = 'Chief Information Officer';
-  }
-  
+  const jobTitle = profile?.job_title || '';
   const hasOrganization = !!profile?.organization_id;
 
   // Debug information

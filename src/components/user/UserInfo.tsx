@@ -39,17 +39,12 @@ export function UserInfo({ className }: UserInfoProps) {
     },
   });
 
-  // Create the display name in the format "last_name, first_name"
+  // Create the display name in the format "First Last"
   const displayName = profile ? 
-    `${profile.last_name || ''}, ${profile.first_name || ''}`.trim() : 
+    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
     'User';
   const avatarUrl = profile?.avatar_url || '';
-  
-  // Check if user is specifically Thabo Nkosi and set the title to Chief Information Officer
-  let jobTitle = profile?.job_title || '';
-  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
-    jobTitle = 'Chief Information Officer';
-  }
+  const jobTitle = profile?.job_title || '';
 
   // For debugging
   if (!isLoading) {

@@ -102,10 +102,7 @@ const Dashboard = () => {
     `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
     "User";
     
-  let jobTitle = profile?.job_title || '';
-  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
-    jobTitle = 'Chief Information Officer';
-  }
+  const jobTitle = profile?.job_title || '';
 
   const refreshData = () => {
     setIsDataLoading(true);

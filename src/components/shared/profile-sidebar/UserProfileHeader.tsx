@@ -22,11 +22,11 @@ export function UserProfileHeader({
   // Add navigation hook
   const navigate = useNavigate();
   
-  // Format the name - ensure we have at least one part of the name
+  // Format the name - showing firstName lastName format instead of lastName, firstName
   let formattedName = "User";
   
   if (firstName && lastName) {
-    formattedName = `${lastName}, ${firstName}`;
+    formattedName = `${firstName} ${lastName}`;
   } else if (firstName) {
     formattedName = firstName;
   } else if (lastName) {

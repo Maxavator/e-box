@@ -69,14 +69,9 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
 
   if (!session) return null;
 
-  // Check if user is specifically Thabo Nkosi and set the title to Chief Information Officer
-  let jobTitle = profile?.job_title || '';
-  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
-    jobTitle = 'Chief Information Officer';
-  }
-
   const firstName = profile?.first_name || '';
   const lastName = profile?.last_name || '';
+  const jobTitle = profile?.job_title || '';
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   const fullName = `${firstName} ${lastName}`.trim() || 'User';
   
