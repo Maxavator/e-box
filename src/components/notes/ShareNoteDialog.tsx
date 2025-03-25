@@ -68,9 +68,9 @@ export function ShareNoteDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Share Note</DialogTitle>
+          <DialogTitle>Share via e-Box</DialogTitle>
           <DialogDescription>
-            Share "{noteTitle}" with other users by email
+            Share "{noteTitle}" with other e-Box users by email
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3 py-4">
@@ -106,7 +106,7 @@ export function ShareNoteDialog({
           </Button>
           <Button onClick={handleSubmit} className="bg-primary">
             <Share className="h-4 w-4 mr-2" />
-            Share Note
+            Share via e-Box
           </Button>
         </DialogFooter>
       </DialogContent>
