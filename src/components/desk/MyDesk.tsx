@@ -1,23 +1,68 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Documents } from "./Documents";
 import { LeaveManager } from "./LeaveManager";
 import { Policies } from "./Policies";
-import { Briefcase, FileText, Clock, Scroll, Inbox, Calendar, Users, FileStack, AlertCircle } from "lucide-react";
+import { 
+  Briefcase, FileText, Clock, Scroll, Inbox, Calendar, 
+  Users, FileStack, AlertCircle, MailOpen, UserCheck 
+} from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+
+// Sample announcements
+const announcements = [
+  {
+    id: "1",
+    title: "Company Outing Next Month",
+    description: "Join us for a team building event on May 20. RSVP by April 30.",
+    date: "2 days ago",
+    priority: "medium"
+  },
+  {
+    id: "2",
+    title: "New Expense System Rollout",
+    description: "Training sessions will be held next week for the new expense management system.",
+    date: "1 week ago",
+    priority: "high"
+  }
+];
 
 export function MyDesk() {
   const [activeTab, setActiveTab] = useState("documents");
   const { organizationName, loading, error } = useUserProfile();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  const [mockLeaveNotice, setMockLeaveNotice] = useState(true);
+  
+  // Demo effect - mock pending tasks notification
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (mockLeaveNotice) {
+        toast({
+          title: "Leave Request Updated",
+          description: "Your leave request has been approved by management.",
+          variant: "default",
+        });
+      }
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, [toast, mockLeaveNotice]);
   
   const handleNavigation = (path: string) => {
     navigate(path);
+  };
+  
+  const handleDismissNotice = () => {
+    setMockLeaveNotice(false);
   };
   
   return (
@@ -41,20 +86,49 @@ export function MyDesk() {
         )}
         
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => setActiveTab("documents")}>
+          <Button 
+            variant={activeTab === "documents" ? "default" : "outline"} 
+            size="sm" 
+            onClick={() => setActiveTab("documents")}
+          >
             <FileText className="mr-2 h-4 w-4" />
             Documents
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setActiveTab("leave")}>
+          <Button 
+            variant={activeTab === "leave" ? "default" : "outline"} 
+            size="sm" 
+            onClick={() => setActiveTab("leave")}
+          >
             <Clock className="mr-2 h-4 w-4" />
             Leave
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setActiveTab("policies")}>
+          <Button 
+            variant={activeTab === "policies" ? "default" : "outline"} 
+            size="sm" 
+            onClick={() => setActiveTab("policies")}
+          >
             <Scroll className="mr-2 h-4 w-4" />
             Policies
           </Button>
         </div>
       </div>
+      
+      {mockLeaveNotice && (
+        <Card className="mb-6 border-green-200 bg-green-50">
+          <CardContent className="p-4 flex justify-between items-center">
+            <div className="flex items-start gap-2">
+              <Clock className="h-5 w-5 text-green-600 mt-0.5" />
+              <div>
+                <h3 className="font-medium text-green-800">Leave Request Approved</h3>
+                <p className="text-sm text-green-700">Your request for April 15-18 has been approved by management.</p>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleDismissNotice}>
+              Dismiss
+            </Button>
+          </CardContent>
+        </Card>
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
         <Button 
@@ -62,7 +136,7 @@ export function MyDesk() {
           className="flex flex-col items-center justify-center h-28 p-4 hover:bg-primary/5" 
           onClick={() => handleNavigation("/desk/inbox")}
         >
-          <Inbox className="h-8 w-8 mb-2 text-primary" />
+          <MailOpen className="h-8 w-8 mb-2 text-primary" />
           <span className="font-medium">Inbox</span>
           <span className="text-xs text-muted-foreground">View messages</span>
         </Button>
@@ -82,7 +156,7 @@ export function MyDesk() {
           className="flex flex-col items-center justify-center h-28 p-4 hover:bg-amber-50" 
           onClick={() => handleNavigation("/desk/colleagues")}
         >
-          <Users className="h-8 w-8 mb-2 text-amber-600" />
+          <UserCheck className="h-8 w-8 mb-2 text-amber-600" />
           <span className="font-medium">Colleagues</span>
           <span className="text-xs text-muted-foreground">View team members</span>
         </Button>
@@ -98,39 +172,110 @@ export function MyDesk() {
         </Button>
       </div>
       
-      <Card className="mb-8">
-        <CardHeader className="pb-3">
-          <CardTitle>Organization Updates</CardTitle>
-          <CardDescription>Latest updates from {organizationName || 'your organization'}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {organizationName ? (
-              <>
-                <div className="p-4 rounded-lg border bg-primary/5">
-                  <h3 className="font-medium">Welcome to your organizational workspace</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Access all your documents, leave requests, and organizational policies in one place.
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg border bg-green-50">
-                  <h3 className="font-medium text-green-700">New Document Verification System</h3>
-                  <p className="text-sm text-green-600/80 mt-1">
-                    All documents are now digitally signed and verified for authenticity.
-                  </p>
-                </div>
-              </>
-            ) : (
-              <div className="p-4 rounded-lg border bg-muted">
-                <h3 className="font-medium">Connect to an organization</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Join an organization to see updates and access shared resources.
-                </p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle>Organization Updates</CardTitle>
+              <CardDescription>Latest updates from {organizationName || 'your organization'}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {organizationName ? (
+                  <>
+                    {announcements.map((announcement) => (
+                      <div key={announcement.id} className={`p-4 rounded-lg border ${
+                        announcement.priority === 'high' ? 'bg-red-50 border-red-200' : 
+                        announcement.priority === 'medium' ? 'bg-yellow-50 border-yellow-200' : 
+                        'bg-primary/5'
+                      }`}>
+                        <div className="flex items-start justify-between">
+                          <h3 className="font-medium">{announcement.title}</h3>
+                          <Badge variant={
+                            announcement.priority === 'high' ? 'destructive' : 
+                            announcement.priority === 'medium' ? 'default' : 
+                            'outline'
+                          }>
+                            {announcement.priority === 'high' ? 'Important' : 
+                             announcement.priority === 'medium' ? 'Announcement' : 
+                             'Information'}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {announcement.description}
+                        </p>
+                        <div className="text-xs text-muted-foreground mt-2">
+                          Posted: {announcement.date}
+                        </div>
+                      </div>
+                    ))}
+                    <div className="p-4 rounded-lg border bg-green-50">
+                      <h3 className="font-medium text-green-700">New Document Verification System</h3>
+                      <p className="text-sm text-green-600/80 mt-1">
+                        All documents are now digitally signed and verified for authenticity.
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="p-4 rounded-lg border bg-muted">
+                    <h3 className="font-medium">Connect to an organization</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Join an organization to see updates and access shared resources.
+                    </p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="lg:col-span-1">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle>Quick Access</CardTitle>
+              <CardDescription>Frequently used tools</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  onClick={() => navigate("/desk/documents")}
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  My Documents
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  onClick={() => navigate("/desk/leave")}
+                >
+                  <Clock className="mr-2 h-4 w-4" />
+                  Leave Management
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  onClick={() => navigate("/desk/policies")}
+                >
+                  <Scroll className="mr-2 h-4 w-4" />
+                  Company Policies
+                </Button>
+                <Separator className="my-2" />
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  onClick={() => navigate("/desk/payslip")}
+                >
+                  <FileStack className="mr-2 h-4 w-4" />
+                  Payslip
+                  <Badge className="ml-auto" variant="success">New</Badge>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-3 mb-8">

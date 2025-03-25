@@ -13,6 +13,8 @@ import {
   StickyNote,
   ClipboardList,
   Flag,
+  FileStack,
+  MailOpen,
 } from "lucide-react";
 import { MenuItemWithBadge } from "./MenuItemWithBadge";
 
@@ -50,7 +52,7 @@ export const MainNavigationGroup = ({
         label="Chats"
         path="/chat"
         isActive={location.pathname === "/chat"}
-        badgeCount={chatCount}
+        badgeCount={chatCount > 0 ? chatCount : undefined}
         badgeColor="bg-red-500"
         onClick={() => handleNavigation("/chat")}
       />
@@ -60,7 +62,7 @@ export const MainNavigationGroup = ({
         label="Calendar"
         path="/calendar"
         isActive={location.pathname === "/calendar"}
-        badgeCount={calendarCount}
+        badgeCount={calendarCount > 0 ? calendarCount : undefined}
         badgeColor="bg-green-500"
         onClick={() => handleNavigation("/calendar")}
       />
@@ -70,7 +72,7 @@ export const MainNavigationGroup = ({
         label="Contacts"
         path="/contacts"
         isActive={location.pathname === "/contacts"}
-        badgeCount={contactsCount}
+        badgeCount={contactsCount > 0 ? contactsCount : undefined}
         badgeColor="bg-amber-500"
         onClick={() => handleNavigation("/contacts")}
       />
@@ -80,7 +82,7 @@ export const MainNavigationGroup = ({
         label="Documents"
         path="/documents"
         isActive={location.pathname === "/documents"}
-        badgeCount={documentsCount}
+        badgeCount={documentsCount > 0 ? documentsCount : undefined}
         badgeColor="bg-blue-500"
         onClick={() => handleNavigation("/documents")}
       />
@@ -126,23 +128,73 @@ export const DeskNavigationGroup = ({
   // Calculate total desk notifications, but only show if greater than 0
   const totalDeskNotifications = documentsCount + leaveCount;
   
+  // Check if we're on any desk-related page
+  const isDeskActive = location.pathname === "/mydesk" || 
+                        location.pathname.startsWith("/desk/");
+                        
+  // Check if we're on the GovZA page
+  const isGovZAActive = location.pathname.includes('/govza');
+  
   return (
     <>
       <MenuItemWithBadge
         icon={Briefcase}
         label={`Desk ${!loading && organizationName ? `@${organizationName}` : ''}`}
         path="/mydesk"
-        isActive={location.pathname === "/mydesk" || location.pathname.startsWith("/desk/")}
+        isActive={isDeskActive}
         badgeCount={totalDeskNotifications > 0 ? totalDeskNotifications : undefined}
         badgeColor="bg-blue-500"
         onClick={() => handleNavigation("/mydesk")}
       />
       
+      {/* Only show these items if we are in a desk-related page */}
+      {isDeskActive && (
+        <>
+          <MenuItemWithBadge
+            icon={FileText}
+            label="Documents"
+            path="/desk/documents"
+            isActive={location.pathname === "/desk/documents"}
+            badgeCount={documentsCount > 0 ? documentsCount : undefined}
+            badgeColor="bg-blue-500"
+            onClick={() => handleNavigation("/desk/documents")}
+          />
+          
+          <MenuItemWithBadge
+            icon={Calendar}
+            label="Leave"
+            path="/desk/leave"
+            isActive={location.pathname === "/desk/leave"}
+            badgeCount={leaveCount > 0 ? leaveCount : undefined}
+            badgeColor="bg-green-500"
+            onClick={() => handleNavigation("/desk/leave")}
+          />
+          
+          <MenuItemWithBadge
+            icon={MailOpen}
+            label="Inbox"
+            path="/desk/inbox"
+            isActive={location.pathname === "/desk/inbox"}
+            onClick={() => handleNavigation("/desk/inbox")}
+          />
+          
+          <MenuItemWithBadge
+            icon={FileStack}
+            label="Payslip"
+            path="/desk/payslip"
+            isActive={location.pathname === "/desk/payslip"}
+            badgeLabel="New"
+            badgeColor="bg-green-500"
+            onClick={() => handleNavigation("/desk/payslip")}
+          />
+        </>
+      )}
+      
       <MenuItemWithBadge
         icon={Flag}
         label="Government Services"
         path="/govza"
-        isActive={location.pathname.includes('/govza')}
+        isActive={isGovZAActive}
         badgeLabel="New"
         badgeColor="bg-green-500"
         onClick={() => handleNavigation("/govza")}

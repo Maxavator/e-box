@@ -34,12 +34,14 @@ export const MenuItemWithBadge = ({
         <Icon className="h-4 w-4" />
         <span>{label}</span>
         
-        {(badgeCount && badgeCount > 0) && (
+        {/* Only show badge count if it's greater than 0 and defined */}
+        {badgeCount !== undefined && badgeCount > 0 && (
           <SidebarMenuBadge className={`ml-auto ${badgeColor} text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full`}>
             {badgeCount}
           </SidebarMenuBadge>
         )}
         
+        {/* For label badges like "New" */}
         {badgeLabel && (
           <SidebarMenuBadge className={`ml-auto ${badgeColor} text-white text-[10px] h-4 min-w-4 flex items-center justify-center rounded-full`}>
             {badgeLabel}

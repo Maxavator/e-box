@@ -10,6 +10,7 @@ import Index from "./Index";
 import Contacts from "./Contacts";
 import Notes from "./Notes";
 import GovZA from "./GovZA";
+import Desk from "./Desk";
 
 // Import components rather than pages for these since we don't have the page files
 import { Settings } from "@/components/settings/Settings";
@@ -18,7 +19,7 @@ import { Calendar } from "@/components/desk/Calendar";
 import { Documents } from "@/components/desk/Documents";
 import { LeaveManager } from "@/components/desk/LeaveManager";
 import { Policies } from "@/components/desk/Policies";
-import { MyDesk as Desk } from "@/components/desk/MyDesk";
+import { MyDesk } from "@/components/desk/MyDesk";
 
 export {
   Index,
@@ -38,5 +39,6 @@ export {
   Documents,
   LeaveManager,
   Policies,
-  Desk
+  Desk,
+  MyDesk
 };
