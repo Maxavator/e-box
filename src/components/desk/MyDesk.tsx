@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Documents } from "./Documents";
@@ -318,7 +319,6 @@ export function MyDesk() {
                     <span>Payslip</span>
                   </div>
                   <Badge variant="outline" className="border-green-500 text-green-600">New</Badge>
-                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
             </CardContent>

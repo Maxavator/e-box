@@ -11,7 +11,6 @@ interface MenuItemWithBadgeProps {
   badgeLabel?: string;
   badgeColor?: string;
   onClick: () => void;
-  subMenu?: React.ReactNode;
 }
 
 export function MenuItemWithBadge({
@@ -23,7 +22,6 @@ export function MenuItemWithBadge({
   badgeLabel,
   badgeColor = "bg-blue-500",
   onClick,
-  subMenu,
 }: MenuItemWithBadgeProps) {
   return (
     <SidebarMenuItem>
@@ -41,7 +39,6 @@ export function MenuItemWithBadge({
           </SidebarMenuBadge>
         )}
       </SidebarMenuButton>
-      {subMenu}
     </SidebarMenuItem>
   );
 }

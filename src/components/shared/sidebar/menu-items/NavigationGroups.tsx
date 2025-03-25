@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -9,17 +8,12 @@ import {
   Settings,
   Shield,
   Briefcase,
-  Building2,
+  Flag,
   StickyNote,
   ClipboardList,
-  Flag,
-  FileStack,
-  MailOpen,
-  Clock,
-  Scroll,
 } from "lucide-react";
 import { MenuItemWithBadge } from "./MenuItemWithBadge";
-import { SidebarMenu, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from "@/components/ui/sidebar";
+import { SidebarMenu } from "@/components/ui/sidebar";
 
 interface NavigationGroupsProps {
   chatCount: number;
@@ -131,16 +125,9 @@ export const DeskNavigationGroup = ({
   // Calculate total desk notifications, but only show if greater than 0
   const totalDeskNotifications = documentsCount + leaveCount;
   
-  // Improved active state detection for desk-related pages
+  // Simplified active state detection for desk - only for the main desk page
   const isDeskActive = location.pathname === "/mydesk" || 
                        location.pathname.startsWith("/desk/");
-                     
-  // Check if we're on a specific desk subpage
-  const isDocumentsActive = location.pathname === "/desk/documents";
-  const isLeaveActive = location.pathname === "/desk/leave";
-  const isInboxActive = location.pathname === "/desk/inbox";
-  const isPayslipActive = location.pathname === "/desk/payslip";
-  const isPoliciesActive = location.pathname === "/desk/policies";
                         
   // Check if we're on the GovZA page
   const isGovZAActive = location.pathname.includes('/govza');
@@ -155,61 +142,6 @@ export const DeskNavigationGroup = ({
         badgeCount={totalDeskNotifications > 0 ? totalDeskNotifications : undefined}
         badgeColor="bg-blue-500"
         onClick={() => handleNavigation("/mydesk")}
-        subMenu={
-          isDeskActive && (
-            <SidebarMenuSub>
-              <SidebarMenuSubItem>
-                <SidebarMenuSubButton 
-                  isActive={isDocumentsActive}
-                  onClick={() => handleNavigation("/desk/documents")}
-                >
-                  <FileText className="h-4 w-4" />
-                  <span>Documents</span>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-              
-              <SidebarMenuSubItem>
-                <SidebarMenuSubButton 
-                  isActive={isLeaveActive}
-                  onClick={() => handleNavigation("/desk/leave")}
-                >
-                  <Clock className="h-4 w-4" />
-                  <span>Leave</span>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-              
-              <SidebarMenuSubItem>
-                <SidebarMenuSubButton 
-                  isActive={isPoliciesActive}
-                  onClick={() => handleNavigation("/desk/policies")}
-                >
-                  <Scroll className="h-4 w-4" />
-                  <span>Policies</span>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-              
-              <SidebarMenuSubItem>
-                <SidebarMenuSubButton 
-                  isActive={isInboxActive}
-                  onClick={() => handleNavigation("/desk/inbox")}
-                >
-                  <MailOpen className="h-4 w-4" />
-                  <span>Inbox</span>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-              
-              <SidebarMenuSubItem>
-                <SidebarMenuSubButton 
-                  isActive={isPayslipActive}
-                  onClick={() => handleNavigation("/desk/payslip")}
-                >
-                  <FileStack className="h-4 w-4" />
-                  <span>Payslip</span>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-            </SidebarMenuSub>
-          )
-        }
       />
       
       <MenuItemWithBadge
