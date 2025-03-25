@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Flag, Info, Globe, Shield, Clock } from "lucide-react";
+import { Search, Flag, Info, Globe, Shield, Clock, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GovServicesSection } from "@/components/govza/GovServicesSection";
 import { HomeAffairsSection } from "@/components/govza/departments/HomeAffairsSection";
@@ -12,6 +12,7 @@ import { TransportSection } from "@/components/govza/departments/TransportSectio
 import { SarsSection } from "@/components/govza/departments/SarsSection";
 import { SassaSection } from "@/components/govza/departments/SassaSection";
 import { NsfasSection } from "@/components/govza/departments/NsfasSection";
+import { MunicipalServicesSection } from "@/components/govza/departments/MunicipalServicesSection";
 
 export default function GovZA() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -55,6 +56,7 @@ export default function GovZA() {
           <TabsTrigger value="transport" className="px-4">Transport</TabsTrigger>
           <TabsTrigger value="sassa" className="px-4">SASSA</TabsTrigger>
           <TabsTrigger value="nsfas" className="px-4">NSFAS</TabsTrigger>
+          <TabsTrigger value="municipal" className="px-4">Municipal Services</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
@@ -79,6 +81,10 @@ export default function GovZA() {
         
         <TabsContent value="nsfas">
           <NsfasSection />
+        </TabsContent>
+        
+        <TabsContent value="municipal">
+          <MunicipalServicesSection />
         </TabsContent>
       </Tabs>
       
