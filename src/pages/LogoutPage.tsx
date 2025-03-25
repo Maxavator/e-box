@@ -12,6 +12,7 @@ export default function LogoutPage() {
   const navigate = useNavigate();
   const [feedback, setFeedback] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleLogin = () => {
     navigate("/auth");
@@ -20,21 +21,37 @@ export default function LogoutPage() {
   const handleFeedbackSubmit = async () => {
     if (!feedback.trim()) return;
     
+    setIsSubmitting(true);
+    
     try {
       // Save feedback to database if connected to Supabase
-      const { error } = await supabase
+      const { error: dbError } = await supabase
         .from('user_feedback')
         .insert({ feedback });
-        
-      if (error) throw error;
+      
+      if (dbError) console.error("Error saving feedback to database:", dbError);
+      
+      // Send email to applications@afrovation.com with the feedback
+      const { error: emailError } = await supabase.functions.invoke('send-feedback', {
+        body: {
+          to: 'applications@afrovation.com',
+          subject: 'User Feedback from e-Box Application',
+          message: feedback,
+        }
+      });
+      
+      if (emailError) throw emailError;
       
       toast.success("Thank you for your feedback!");
       setSubmitted(true);
       setFeedback("");
     } catch (error) {
       console.error("Error submitting feedback:", error);
-      toast.success("Thank you for your feedback!"); // Still show success even if DB insert fails
+      // Still show success to user even if there was an error
+      toast.success("Thank you for your feedback!");
       setSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -63,7 +80,7 @@ export default function LogoutPage() {
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               rows={4}
-              disabled={submitted}
+              disabled={submitted || isSubmitting}
             />
             {!submitted ? (
               <Button 
@@ -71,9 +88,9 @@ export default function LogoutPage() {
                 variant="outline" 
                 className="w-full" 
                 onClick={handleFeedbackSubmit}
-                disabled={!feedback.trim()}
+                disabled={!feedback.trim() || isSubmitting}
               >
-                Submit Feedback
+                {isSubmitting ? "Submitting..." : "Submit Feedback"}
               </Button>
             ) : (
               <p className="text-center text-sm text-muted-foreground">
