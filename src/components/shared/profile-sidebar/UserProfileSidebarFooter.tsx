@@ -15,7 +15,10 @@ export function UserProfileSidebarFooter() {
     queryKey: ['session'],
     queryFn: async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching session:', error);
+        throw error;
+      }
       return session;
     },
   });
@@ -25,6 +28,8 @@ export function UserProfileSidebarFooter() {
     queryKey: ['sidebarProfile', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
+      console.log('Fetching profile data for user ID:', session?.user?.id);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('first_name, last_name, avatar_url, job_title, organization_id')
@@ -36,11 +41,13 @@ export function UserProfileSidebarFooter() {
         return null;
       }
       
+      console.log('Profile data fetched successfully:', data);
       return data;
     },
   });
 
   if (!session?.user) {
+    console.log('No session user found');
     return (
       <div className="p-3 text-center text-sm text-muted-foreground">
         Not logged in
@@ -49,6 +56,7 @@ export function UserProfileSidebarFooter() {
   }
 
   if (isProfileLoading && !profile) {
+    console.log('Profile is loading...');
     return (
       <div className="p-3 text-center text-sm text-muted-foreground">
         Loading profile...
@@ -74,7 +82,10 @@ export function UserProfileSidebarFooter() {
     firstName,
     lastName,
     jobTitle,
-    hasOrganization
+    hasOrganization,
+    organizationId: profile?.organization_id,
+    sessionUser: session?.user?.id,
+    rawProfile: profile
   });
 
   return (

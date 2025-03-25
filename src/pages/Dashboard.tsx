@@ -26,23 +26,65 @@ const Dashboard = () => {
   const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['dashboardProfile'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      console.log("Fetching user profile data for dashboard...");
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.error("Error fetching auth user:", userError);
+        return null;
+      }
+      
       if (user) {
-        const { data } = await supabase
+        console.log("Auth user found:", user.id);
+        const { data, error } = await supabase
           .from('profiles')
-          .select('first_name, last_name, job_title')
+          .select('first_name, last_name, job_title, organization_id')
           .eq('id', user.id)
-          .maybeSingle();
+          .single();
 
+        if (error) {
+          console.error("Error fetching profile data:", error);
+          return null;
+        }
+        
+        console.log("Dashboard - Profile data retrieved:", data);
         return data;
       }
+      
+      console.log("No authenticated user found");
       return null;
+    },
+  });
+
+  const { data: organization } = useQuery({
+    queryKey: ['dashboardOrganization', profile?.organization_id],
+    enabled: !!profile?.organization_id,
+    queryFn: async () => {
+      console.log("Fetching organization data for dashboard...");
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('name')
+        .eq('id', profile!.organization_id)
+        .single();
+      
+      if (error) {
+        console.error("Error fetching organization data:", error);
+        return null;
+      }
+      
+      console.log("Organization data retrieved:", data);
+      return data;
     },
   });
 
   const formattedName = profile ? 
     `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
     "User";
+    
+  let jobTitle = profile?.job_title || '';
+  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
+    jobTitle = 'Chief Information Officer';
+  }
 
   const refreshData = () => {
     setIsDataLoading(true);
@@ -54,28 +96,10 @@ const Dashboard = () => {
     }, 800);
   };
 
-  const handleQuickAction = (action: string) => {
-    console.log(`Quick action: ${action}`);
-    
-    checkAuth(() => {
-      switch (action) {
-        case 'documents':
-          navigate('/documents');
-          break;
-        case 'calendar':
-          navigate('/calendar');
-          break;
-        case 'messages':
-          navigate('/chat');
-          break;
-        case 'profile':
-          navigate('/profile');
-          break;
-        default:
-          navigate(`/${action}`);
-      }
-    });
-  };
+  useEffect(() => {
+    console.log("Dashboard - Current profile data:", profile);
+    console.log("Dashboard - Organization data:", organization);
+  }, [profile, organization]);
 
   if (isLoading || isProfileLoading) {
     return (
@@ -103,6 +127,8 @@ const Dashboard = () => {
           <p className="text-sm text-muted-foreground">
             Welcome back, {formattedName}
             {isAdmin && " (Admin)"}
+            {jobTitle && <span className="ml-1 text-xs opacity-80">• {jobTitle}</span>}
+            {organization?.name && <span className="ml-1 text-xs opacity-80">• {organization.name}</span>}
           </p>
         </div>
         <div className="flex items-center gap-4">

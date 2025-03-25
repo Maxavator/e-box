@@ -22,8 +22,16 @@ export function UserProfileHeader({
   // Add navigation hook
   const navigate = useNavigate();
   
-  // Format the name as "last_name, first_name"
-  const formattedName = `${lastName || ''}, ${firstName || ''}`.trim() || 'User';
+  // Format the name - ensure we have at least one part of the name
+  let formattedName = "User";
+  
+  if (firstName && lastName) {
+    formattedName = `${lastName}, ${firstName}`;
+  } else if (firstName) {
+    formattedName = firstName;
+  } else if (lastName) {
+    formattedName = lastName;
+  }
   
   // Display the job title if available, otherwise show appropriate fallback
   const displayedRole = jobTitle || (hasOrganization ? "Employee" : "Private Individual");
@@ -39,14 +47,15 @@ export function UserProfileHeader({
     lastName,
     formattedName,
     jobTitle,
-    displayedRole
+    displayedRole,
+    hasOrganization
   });
 
   return (
     <div className="flex items-center gap-3 mb-3">
       <Avatar className="h-10 w-10">
         <AvatarImage src={avatarUrl || ''} alt={formattedName} />
-        <AvatarFallback>{initials || 'U'}</AvatarFallback>
+        <AvatarFallback>{initials || '?'}</AvatarFallback>
       </Avatar>
       <div 
         className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity" 

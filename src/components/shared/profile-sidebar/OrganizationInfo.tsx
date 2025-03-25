@@ -12,6 +12,8 @@ export function OrganizationInfo({ organizationId }: OrganizationInfoProps) {
     queryKey: ['organization', organizationId],
     enabled: !!organizationId,
     queryFn: async () => {
+      console.log('Fetching organization data for ID:', organizationId);
+      
       const { data, error } = await supabase
         .from('organizations')
         .select('name')
@@ -23,6 +25,7 @@ export function OrganizationInfo({ organizationId }: OrganizationInfoProps) {
         return null;
       }
       
+      console.log('Organization data fetched:', data);
       return data;
     },
   });
@@ -36,7 +39,10 @@ export function OrganizationInfo({ organizationId }: OrganizationInfoProps) {
     );
   }
 
-  if (!organization?.name) return null;
+  if (!organization?.name) {
+    console.log('No organization name found for ID:', organizationId);
+    return null;
+  }
 
   return (
     <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2">
