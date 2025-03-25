@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { MessageCircle, Users } from "lucide-react";
 import { NewMessageDialog } from "@/components/chat/NewMessageDialog";
 import { useChat } from "@/hooks/use-chat";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useMediaQuery } from "@/hooks/useMediaQuery"; // Updated import path
 import { Card } from "@/components/ui/card";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -182,3 +182,4 @@ export default function Chat() {
     </div>
   );
 }
+
