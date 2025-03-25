@@ -14,40 +14,35 @@ import { NavigationCards } from "@/components/admin/dashboard/NavigationCards";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthDialog } from "@/hooks/useAuthDialog";
+import { useQuery } from "@tanstack/react-query";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { isAdmin, userRole, isLoading } = useUserRole();
-  const [userName, setUserName] = useState("User");
   const [lastUpdate, setLastUpdate] = useState("Just now");
   const [isDataLoading, setIsDataLoading] = useState(false);
   const { checkAuth, AuthDialog } = useAuthDialog();
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data } = await supabase
-            .from('profiles')
-            .select('first_name, last_name')
-            .eq('id', user.id)
-            .maybeSingle();
+  const { data: profile, isLoading: isProfileLoading } = useQuery({
+    queryKey: ['dashboardProfile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('first_name, last_name, job_title')
+          .eq('id', user.id)
+          .maybeSingle();
 
-          if (data) {
-            setUserName(`${data.first_name} ${data.last_name}`);
-          } else {
-            setUserName(user.email?.split('@')[0] || "User");
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+        return data;
       }
-    };
+      return null;
+    },
+  });
 
-    console.log("Dashboard page mounted, fetching user data");
-    fetchUserData();
-  }, []);
+  const formattedName = profile ? 
+    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
+    "User";
 
   const refreshData = () => {
     setIsDataLoading(true);
@@ -82,7 +77,7 @@ const Dashboard = () => {
     });
   };
 
-  if (isLoading) {
+  if (isLoading || isProfileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
@@ -106,7 +101,7 @@ const Dashboard = () => {
         <div>
           <h1 className="text-xl font-bold">Dashboard</h1>
           <p className="text-sm text-muted-foreground">
-            Welcome back, {userName}
+            Welcome back, {formattedName}
             {isAdmin && " (Admin)"}
           </p>
         </div>

@@ -2,7 +2,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
-import { useState, useEffect } from "react";
 import { UserProfileHeader } from "./UserProfileHeader";
 import { OrganizationInfo } from "./OrganizationInfo";
 import { AdminButton } from "./AdminButton";
@@ -23,7 +22,7 @@ export function UserProfileSidebarFooter() {
 
   // Get user profile
   const { data: profile, isLoading: isProfileLoading } = useQuery({
-    queryKey: ['profile', session?.user?.id],
+    queryKey: ['sidebarProfile', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
       const { data, error } = await supabase
