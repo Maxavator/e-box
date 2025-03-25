@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { UsersRound, Store, Mail, User2, UserPlus, UsersRound2 } from "lucide-react";
+import { UsersRound, Store, Mail, User2, UserPlus } from "lucide-react";
 
 interface EmptyContactsProps {
   type: "personal" | "retail" | "groups" | "invites";
@@ -33,11 +33,11 @@ export const EmptyContacts = ({ type, subtype }: EmptyContactsProps) => {
       break;
       
     case "groups":
-      icon = <UsersRound2 className="h-12 w-12 text-primary opacity-70" />;
+      icon = <UsersRound className="h-12 w-12 text-primary opacity-70" />;
       title = "No Contact Groups Created";
       description = "Organize your contacts into groups for easier management and communication.";
       actionLabel = "Create Group";
-      actionIcon = <UsersRound2 className="h-4 w-4 mr-2" />;
+      actionIcon = <UsersRound className="h-4 w-4 mr-2" />;
       break;
       
     case "invites":

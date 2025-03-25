@@ -1,3 +1,4 @@
+
 import Auth from "./Auth";
 import Dashboard from "./Dashboard";
 import NotFound from "./NotFound";
@@ -12,7 +13,6 @@ import Policies from "./Policies";
 import Index from "./Index";
 import Calendar from "./Calendar";
 import ContactsList from "./Contacts";
-import Documents from "./Documents";
 import Notes from "./Notes";
 import Desk from "./Desk";
 
@@ -31,7 +31,6 @@ export {
   Policies,
   Calendar,
   ContactsList,
-  Documents,
   Notes,
   Desk,
 };
