@@ -5,9 +5,8 @@ import { ChatInput } from "@/components/chat/ChatInput";
 import { useEffect } from "react";
 import { startMessageSimulation } from "@/utils/messageSimulator";
 import { useToast } from "@/hooks/use-toast";
-import { MainLayout } from "@/components/shared/MainLayout";
-import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { ChatSidebar } from "@/components/chat/ChatSidebar";
 
 const Chat = () => {
   const { toast } = useToast();
@@ -27,6 +26,7 @@ const Chat = () => {
     handleDeleteMessage,
     handleReaction,
     handleSelectConversation,
+    isNewConversation,
   } = useChat();
 
   useEffect(() => {
@@ -90,6 +90,7 @@ const Chat = () => {
                 onEditMessage={handleEditMessage}
                 onDeleteMessage={handleDeleteMessage}
                 onReactToMessage={handleReaction}
+                isNewConversation={isNewConversation}
               />
               <ChatInput
                 value={newMessage}

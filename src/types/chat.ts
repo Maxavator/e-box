@@ -1,3 +1,4 @@
+
 export interface Message {
   id: string;
   conversationId: string;
@@ -11,7 +12,7 @@ export interface Message {
   attachments?: Attachment[];
   status?: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
   text?: string; // Legacy field for compatibility
-  sender?: string; // Legacy field for compatibility
+  sender?: 'me' | 'them' | 'system'; // Updated to include system messages
   edited?: boolean; // Legacy field for compatibility
 }
 

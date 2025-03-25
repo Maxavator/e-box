@@ -10,6 +10,7 @@ interface MessageListProps {
   onDeleteMessage: (messageId: string) => void;
   onReactToMessage: (messageId: string, emoji: string) => void;
   isAdminChat?: boolean;
+  isNewConversation?: boolean;
 }
 
 export function MessageList({
@@ -18,8 +19,24 @@ export function MessageList({
   onDeleteMessage,
   onReactToMessage,
   isAdminChat = false,
+  isNewConversation = false,
 }: MessageListProps) {
-  if (messages.length === 0) {
+  // Create welcome message
+  const welcomeMessage: Message = {
+    id: "welcome-message",
+    conversationId: messages[0]?.conversationId || "system",
+    senderId: "system",
+    senderName: "e-Box by Afrovation",
+    content: "Welcome to e-Box! This is your secure communication channel. You can send messages, share files, and collaborate with your team members.",
+    timestamp: new Date().toISOString(),
+    sender: "system",
+  };
+
+  const allMessages = isNewConversation || messages.length === 0
+    ? [welcomeMessage, ...messages]
+    : messages;
+
+  if (allMessages.length === 0) {
     return (
       <div className="flex items-center justify-center h-full py-12">
         <div className="text-center space-y-2">
@@ -46,7 +63,7 @@ export function MessageList({
   return (
     <ScrollArea className="flex-1">
       <div className="p-4 space-y-4">
-        {messages.map((message) => (
+        {allMessages.map((message) => (
           <MessageItem
             key={message.id}
             message={message}

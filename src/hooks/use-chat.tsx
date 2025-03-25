@@ -17,6 +17,7 @@ export const useChat = () => {
     setSearchQuery,
     filteredConversations,
     handleSelectConversation,
+    isNewConversation,
   } = useConversations();
 
   const {
@@ -49,5 +50,6 @@ export const useChat = () => {
     handleDeleteMessage,
     handleReaction,
     handleSelectConversation,
+    isNewConversation,
   };
 };

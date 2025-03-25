@@ -51,6 +51,7 @@ export function MessageItem({
   });
 
   const isSentByMe = message.sender === 'me';
+  const isSystemMessage = message.sender === 'system';
   
   // Format the timestamp to remove seconds
   const formattedTimestamp = formatMessageTimestamp(message.timestamp);
@@ -65,17 +66,23 @@ export function MessageItem({
   return (
     <div
       className={`flex flex-col ${
-        isSentByMe ? 'items-end' : 'items-start'
+        isSentByMe ? 'items-end' : isSystemMessage ? 'items-center' : 'items-start'
       }`}
     >
-      {isAdminChat && !isSentByMe && (
+      {isAdminChat && !isSentByMe && !isSystemMessage && (
         <div className="text-xs text-muted-foreground mb-1">
           {senderProfile ? `${senderProfile.first_name} ${senderProfile.last_name}` : 'Admin'}
         </div>
       )}
       
+      {isSystemMessage && (
+        <div className="text-xs text-muted-foreground mb-1">
+          e-Box by Afrovation
+        </div>
+      )}
+      
       <div className="flex items-start gap-2 group">
-        {!isSentByMe && (
+        {!isSentByMe && !isSystemMessage && (
           <Avatar className="h-8 w-8">
             {isAdminChat && senderProfile ? (
               <AvatarImage src={senderProfile.avatar_url || ''} />
@@ -89,12 +96,20 @@ export function MessageItem({
             </AvatarFallback>
           </Avatar>
         )}
+
+        {isSystemMessage && (
+          <Avatar className="h-8 w-8 bg-primary/20">
+            <AvatarFallback className="text-primary font-semibold">eB</AvatarFallback>
+          </Avatar>
+        )}
         
         <div className="space-y-1">
           <div
             className={`px-4 py-2 rounded-lg text-sm ${
               isSentByMe
                 ? 'bg-primary text-primary-foreground'
+                : isSystemMessage
+                ? 'bg-primary/10 text-primary border border-primary/20'
                 : 'bg-muted'
             }`}
           >
@@ -130,7 +145,7 @@ export function MessageItem({
             )}
           </div>
           
-          {reactionArray.length > 0 && (
+          {reactionArray.length > 0 && !isSystemMessage && (
             <div className="flex gap-1">
               {reactionArray.map((reaction) => (
                 <Button
@@ -154,7 +169,7 @@ export function MessageItem({
           </div>
         </div>
         
-        {isSentByMe && (
+        {isSentByMe && !isSystemMessage && (
           <div className="opacity-0 group-hover:opacity-100 transition-opacity flex">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

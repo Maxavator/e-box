@@ -11,6 +11,7 @@ interface ChatContentProps {
   onDeleteMessage: (messageId: string) => void;
   onReactToMessage: (messageId: string, emoji: string) => void;
   isAdminChat?: boolean;
+  isNewConversation?: boolean;
 }
 
 export function ChatContent({
@@ -19,6 +20,7 @@ export function ChatContent({
   onDeleteMessage,
   onReactToMessage,
   isAdminChat = false,
+  isNewConversation = false,
 }: ChatContentProps) {
   const user = getUserById(conversation.userId || '');
 
@@ -56,6 +58,7 @@ export function ChatContent({
           onDeleteMessage={onDeleteMessage}
           onReactToMessage={onReactToMessage}
           isAdminChat={isAdminChat}
+          isNewConversation={isNewConversation}
         />
       </div>
     </div>

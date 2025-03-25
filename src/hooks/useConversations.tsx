@@ -9,6 +9,7 @@ export const useConversations = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isNewConversation, setIsNewConversation] = useState(false);
 
   useEffect(() => {
     fetchConversations();
@@ -57,6 +58,7 @@ export const useConversations = () => {
         // If we have conversations, select the first one by default
         if (fetchedConversations.length > 0 && !selectedConversation) {
           setSelectedConversation(fetchedConversations[0]);
+          setIsNewConversation(false);
         }
       }
     } catch (error) {
@@ -66,6 +68,10 @@ export const useConversations = () => {
 
   const handleSelectConversation = (conversation: Conversation) => {
     setSelectedConversation(conversation);
+    
+    // Check if this conversation has any messages
+    const isNew = !conversation.messages || conversation.messages.length === 0;
+    setIsNewConversation(isNew);
   };
 
   // Filter conversations based on search query
@@ -81,5 +87,6 @@ export const useConversations = () => {
     setSearchQuery,
     filteredConversations,
     handleSelectConversation,
+    isNewConversation,
   };
 };
