@@ -1,105 +1,123 @@
 
+import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getUserById } from "@/data/chat";
-import type { Conversation } from "@/types/chat";
-import { Check, MoreVertical, Pen, Shield, Trash2, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { Conversation } from "@/types/chat";
 
 interface ConversationListProps {
   conversations: Conversation[];
   selectedConversation: Conversation | null;
-  onSelectConversation: (conversation: Conversation) => void;
-  isAdminChat?: boolean;
+  onSelectConversation: (conversationId: string) => void;
 }
 
 export function ConversationList({
   conversations,
   selectedConversation,
   onSelectConversation,
-  isAdminChat = false,
 }: ConversationListProps) {
-  return (
-    <div className="space-y-1 p-2">
-      {conversations.length === 0 ? (
-        <div className="p-4 text-center text-muted-foreground">
-          {isAdminChat ? "No admin messages yet" : "No conversations yet"}
-        </div>
-      ) : (
-        conversations.map((conversation) => {
-          // For admin group chat, use special rendering
-          if (isAdminChat || conversation.isGroup || conversation.isAdminGroup) {
-            return (
-              <button
-                key={conversation.id}
-                className={`flex items-center gap-3 w-full p-3 rounded-lg ${
-                  selectedConversation?.id === conversation.id
-                    ? 'bg-muted'
-                    : 'hover:bg-muted/60'
-                }`}
-                onClick={() => onSelectConversation(conversation)}
-              >
-                <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                  <Shield className="h-5 w-5 text-primary" />
-                  {conversation.unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-xs text-white">
-                      {conversation.unreadCount}
-                    </span>
-                  )}
-                </div>
-                <div className="flex-1 overflow-hidden">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium truncate">
-                      {conversation.groupName || "e-Box Admin Group"}
-                    </span>
-                  </div>
-                  <div className="truncate text-xs text-muted-foreground">
-                    {typeof conversation.lastMessage === 'string' 
-                      ? conversation.lastMessage 
-                      : conversation.lastMessage?.content || "No messages yet"}
-                  </div>
-                </div>
-              </button>
-            );
-          }
-
-          // Regular conversation rendering
-          const user = getUserById(conversation.userId || '');
-          if (!user) return null;
-
-          return (
-            <button
-              key={conversation.id}
-              className={`flex items-center gap-3 w-full p-3 rounded-lg ${
-                selectedConversation?.id === conversation.id
-                  ? 'bg-muted'
-                  : 'hover:bg-muted/60'
-              }`}
-              onClick={() => onSelectConversation(conversation)}
-            >
-              <div className="relative">
-                <Avatar>
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback>{user.initials}</AvatarFallback>
-                </Avatar>
-                {conversation.unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-xs text-white">
-                    {conversation.unreadCount}
+  return conversations.length === 0 ? (
+    <div className="flex flex-col items-center justify-center h-full pb-10">
+      <div className="text-center space-y-2">
+        <p className="text-sm text-muted-foreground">No conversations yet</p>
+        <p className="text-xs text-muted-foreground">
+          Start a new conversation using the button above
+        </p>
+      </div>
+    </div>
+  ) : (
+    <ScrollArea className="flex-1">
+      <div className="space-y-1 px-1">
+        {conversations.map((conversation) => (
+          <button
+            key={conversation.id}
+            className={cn(
+              "w-full flex items-start gap-3 p-2 rounded-md hover:bg-accent transition-colors text-left",
+              selectedConversation?.id === conversation.id &&
+                "bg-accent/50 hover:bg-accent"
+            )}
+            onClick={() => onSelectConversation(conversation.id)}
+          >
+            <Avatar className="h-9 w-9 mt-1">
+              <AvatarImage
+                src={conversation.avatar}
+                alt={conversation.name}
+              />
+              <AvatarFallback>
+                {conversation.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 space-y-1 overflow-hidden">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium leading-none truncate">
+                  {conversation.name}
+                </p>
+                {conversation.lastMessage && (
+                  <span className="text-xs text-muted-foreground">
+                    {formatMessageTime(conversation.lastMessage.timestamp)}
                   </span>
                 )}
               </div>
-              <div className="flex-1 overflow-hidden">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium truncate">{user.name}</span>
-                </div>
-                <div className="truncate text-xs text-muted-foreground">
-                  {typeof conversation.lastMessage === 'string' 
-                    ? conversation.lastMessage 
-                    : conversation.lastMessage?.content || "No messages yet"}
-                </div>
+              {conversation.lastMessage && (
+                <p className="text-xs text-muted-foreground truncate">
+                  {conversation.lastMessage.sender === "me" && "You: "}
+                  {conversation.lastMessage.text}
+                </p>
+              )}
+              <div className="flex items-center gap-1.5">
+                {conversation.draft && (
+                  <Badge
+                    variant="secondary"
+                    className="bg-primary/20 hover:bg-primary/30 text-xs font-normal"
+                  >
+                    Draft
+                  </Badge>
+                )}
+                {conversation.unread && (
+                  <Badge variant="default" className="text-xs font-normal">
+                    New
+                  </Badge>
+                )}
+                {conversation.labels &&
+                  conversation.labels.map((label) => (
+                    <Badge
+                      key={label}
+                      variant="outline"
+                      className="border-primary/50 text-xs font-normal"
+                    >
+                      {label}
+                    </Badge>
+                  ))}
               </div>
-            </button>
-          );
-        })
-      )}
-    </div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </ScrollArea>
   );
+}
+
+function formatMessageTime(timestamp: string): string {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffInDays = Math.floor(
+    (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  if (diffInDays === 0) {
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } else if (diffInDays === 1) {
+    return "Yesterday";
+  } else if (diffInDays < 7) {
+    return date.toLocaleDateString([], { weekday: "short" });
+  } else {
+    return date.toLocaleDateString([], {
+      month: "short",
+      day: "numeric",
+    });
+  }
 }

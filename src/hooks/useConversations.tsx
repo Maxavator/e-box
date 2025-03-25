@@ -66,12 +66,15 @@ export const useConversations = () => {
     }
   };
 
-  const handleSelectConversation = (conversation: Conversation) => {
-    setSelectedConversation(conversation);
-    
-    // Check if this conversation has any messages
-    const isNew = !conversation.messages || conversation.messages.length === 0;
-    setIsNewConversation(isNew);
+  const handleSelectConversation = (conversationId: string) => {
+    const conversation = conversations.find(conv => conv.id === conversationId);
+    if (conversation) {
+      setSelectedConversation(conversation);
+      
+      // Check if this conversation has any messages
+      const isNew = !conversation.messages || conversation.messages.length === 0;
+      setIsNewConversation(isNew);
+    }
   };
 
   // Filter conversations based on search query

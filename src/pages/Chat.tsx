@@ -2,7 +2,7 @@
 import { useChat } from "@/hooks/use-chat";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatContent } from "@/components/chat/ChatContent";
-import { Resizable } from "@/components/ui/resizable";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -120,29 +120,26 @@ export function Chat() {
                 <div className="flex-1 overflow-hidden">
                   <ChatContent
                     conversation={selectedConversation}
-                    newMessage={newMessage}
-                    setNewMessage={setNewMessage}
-                    onSendMessage={handleSendMessage}
                     onEditMessage={handleEditMessage}
                     onDeleteMessage={handleDeleteMessage}
-                    onReaction={handleReaction}
-                    calendarView={calendarView}
+                    onReactToMessage={handleReaction}
+                    messages={selectedConversation?.messages || []}
                   />
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <Resizable
-            defaultSize={{
-              width: 320,
-              height: "100%",
-            }}
-            minWidth={280}
-            maxWidth={400}
+          <ResizablePanelGroup
+            direction="horizontal"
             className="h-full"
           >
-            <div className="h-full border-r">
+            <ResizablePanel
+              defaultSize={25}
+              minSize={20}
+              maxSize={40}
+              className="h-full border-r"
+            >
               <ChatSidebar
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
@@ -158,21 +155,18 @@ export function Chat() {
                 isLoadingGolderColleagues={isLoadingGolderColleagues}
                 onStartConversation={handleStartConversationWithColleague}
               />
-            </div>
-            <Resizable.Handle />
-            <div className="h-full overflow-hidden">
+            </ResizablePanel>
+            <ResizableHandle />
+            <ResizablePanel className="h-full overflow-hidden">
               <ChatContent
                 conversation={selectedConversation}
-                newMessage={newMessage}
-                setNewMessage={setNewMessage}
-                onSendMessage={handleSendMessage}
                 onEditMessage={handleEditMessage}
                 onDeleteMessage={handleDeleteMessage}
-                onReaction={handleReaction}
-                calendarView={calendarView}
+                onReactToMessage={handleReaction}
+                messages={selectedConversation?.messages || []}
               />
-            </div>
-          </Resizable>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         )}
       </div>
     </div>
