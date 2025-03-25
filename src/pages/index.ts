@@ -1,20 +1,37 @@
-// Barrel export for pages - this can help with imports in the future
-export { default as Index } from './Index';
-export { default as Auth } from './Auth';
-export { default as Dashboard } from './Dashboard';
-export { default as NotFound } from './NotFound';
-export { default as Chat } from './Chat';
-export { default as AdminPortal } from './AdminPortal';
-export { default as OrganizationDashboard } from './OrganizationDashboard';
-export { default as Changelog } from './Changelog';
-export { default as Notes } from './Notes';
+import Auth from "./Auth";
+import Dashboard from "./Dashboard";
+import NotFound from "./NotFound";
+import Chat from "./Chat";
+import AdminPortal from "./AdminPortal";
+import OrganizationDashboard from "./OrganizationDashboard";
+import Changelog from "./Changelog";
+import Settings from "./Settings";
+import Documents from "./Documents";
+import LeaveManager from "./LeaveManager";
+import Policies from "./Policies";
+import Index from "./Index";
+import Calendar from "./Calendar";
+import ContactsList from "./Contacts";
+import Documents from "./Documents";
+import Notes from "./Notes";
+import Desk from "./Desk";
 
-// These are actually imported from components directory, not pages
-// We're re-exporting them here for consistency
-export { Settings } from '@/components/settings/Settings';
-export { Documents } from '@/components/desk/Documents';
-export { Calendar } from '@/components/desk/Calendar';
-export { ContactsList } from '@/components/desk/ContactsList';
-export { LeaveManager } from '@/components/desk/LeaveManager';
-export { Policies } from '@/components/desk/Policies';
-export { MyDesk as Desk } from '@/components/desk/MyDesk'; // Renamed for better naming
+export {
+  Index,
+  Auth,
+  Dashboard,
+  NotFound,
+  Chat,
+  AdminPortal,
+  OrganizationDashboard,
+  Changelog,
+  Settings,
+  Documents,
+  LeaveManager,
+  Policies,
+  Calendar,
+  ContactsList,
+  Documents,
+  Notes,
+  Desk,
+};

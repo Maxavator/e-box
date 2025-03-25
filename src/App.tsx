@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/shared/theme-provider';
@@ -8,6 +7,7 @@ import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-
 import { Index, Auth, Dashboard, NotFound, Chat, AdminPortal, OrganizationDashboard, Changelog, Settings, Documents, Calendar, ContactsList, LeaveManager, Policies, Desk, Notes } from './pages';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import GovZA from "./pages/GovZA";
+import Contacts from "./pages/Contacts";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -94,7 +94,7 @@ function App() {
             },
             {
               path: '/contacts',
-              element: <ContactsList />,
+              element: <Contacts />,
             },
             {
               path: '/documents',
