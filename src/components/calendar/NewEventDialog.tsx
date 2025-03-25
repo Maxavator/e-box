@@ -8,6 +8,7 @@ import { EventFormFields } from "./EventFormFields";
 import { InviteesList } from "./InviteesList";
 import { useEventCreation } from "./useEventCreation";
 import { toast } from "sonner";
+import { PlusCircle } from "lucide-react";
 
 export function NewEventDialog() {
   const { open, setOpen, formData, setFormData, handleSubmit, toggleInvitee } = useEventCreation();
@@ -68,7 +69,10 @@ export function NewEventDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default">Create New Event</Button>
+        <Button variant="default" className="gap-2">
+          <PlusCircle className="h-4 w-4" />
+          Create New Event
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>

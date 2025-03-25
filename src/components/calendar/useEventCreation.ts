@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useUser } from "@supabase/auth-helpers-react";
 import { NewEventFormData } from "./types";
 
@@ -80,7 +79,7 @@ export function useEventCreation() {
           .single();
 
         const creatorName = creatorProfile 
-          ? `${creatorProfile.first_name} ${creatorProfile.last_name}` 
+          ? `${creatorProfile.first_name || ''} ${creatorProfile.last_name || ''}`.trim() 
           : "Someone";
 
         const notifications = formData.invitees.map(inviteeId => ({
