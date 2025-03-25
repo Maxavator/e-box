@@ -3,24 +3,67 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useSession } from "@supabase/auth-helpers-react";
 import { useState, useEffect, ReactNode } from "react";
 import { AuthenticationDialog } from "./AuthenticationDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const session = useSession();
-  const location = useLocation();
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const location = useLocation();
+  
+  useEffect(() => {
+    // Check for existing session
+    const getSession = async () => {
+      try {
+        setLoading(true);
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error checking auth session:', error);
+        }
+        
+        setSession(session);
+      } catch (error) {
+        console.error('Unexpected error getting session:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setSession(session);
+    });
+
+    getSession();
+    
+    // Cleanup subscription
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
   
   useEffect(() => {
     // Show auth dialog if no session
-    if (!session) {
+    if (!loading && !session) {
       setShowAuthDialog(true);
     } else {
       setShowAuthDialog(false);
     }
-  }, [session]);
+  }, [session, loading]);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse">Loading authentication...</div>
+      </div>
+    );
+  }
 
   // If the user is authenticated, render the children
   if (session) {

@@ -1,159 +1,153 @@
 
-import { useChat } from "@/hooks/use-chat";
-import { ChatContent } from "@/components/chat/ChatContent";
-import { ChatInput } from "@/components/chat/ChatInput";
-import { useEffect } from "react";
-import { startMessageSimulation } from "@/utils/messageSimulator";
-import { useToast } from "@/hooks/use-toast";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { useEffect, useState } from "react";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
-import { File, X } from "lucide-react";
+import { ChatContent } from "@/components/chat/ChatContent";
 import { Button } from "@/components/ui/button";
+import { MessageCircle, Users } from "lucide-react";
+import { NewMessageDialog } from "@/components/chat/NewMessageDialog";
+import { useChat } from "@/hooks/use-chat";
+import { useMediaQuery } from "@/hooks/use-mobile";
+import { Card } from "@/components/ui/card";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Conversation, Message } from "@/types/chat";
+import { useQuery } from "@tanstack/react-query";
 
-const Chat = () => {
-  const { toast } = useToast();
-  const {
-    searchQuery,
-    setSearchQuery,
-    activeTab,
-    setActiveTab,
-    calendarView,
-    setCalendarView,
-    selectedConversation,
-    newMessage,
-    setNewMessage,
-    filteredConversations,
-    attachments,
-    colleagues,
-    isLoadingColleagues,
-    handleSendMessage,
-    handleEditMessage,
-    handleDeleteMessage,
-    handleReaction,
-    handleSelectConversation,
-    handleStartConversationWithColleague,
-    handleAttachFiles,
-    handleRemoveAttachment,
-    isNewConversation,
-  } = useChat();
-
+export default function Chat() {
+  const { chatId } = useParams();
+  const { isMobile, isDesktop } = useMediaQuery();
+  const { setShowSidebar, showSidebar } = useChat();
+  const navigate = useNavigate();
+  const [newDialogOpen, setNewDialogOpen] = useState(false);
+  
+  // Get the current conversation if chatId is provided
+  const { data: currentChat, isLoading: chatLoading } = useQuery({
+    queryKey: ['conversation', chatId],
+    queryFn: async () => {
+      if (!chatId) return null;
+      
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('id', chatId)
+        .single();
+        
+      if (error) {
+        console.error('Error fetching conversation:', error);
+        return null;
+      }
+      
+      return data as Conversation;
+    },
+    enabled: !!chatId,
+  });
+  
+  // Get messages for the current conversation
+  const { data: messages, isLoading: messagesLoading } = useQuery({
+    queryKey: ['messages', chatId],
+    queryFn: async () => {
+      if (!chatId) return [];
+      
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', chatId)
+        .order('created_at', { ascending: true });
+        
+      if (error) {
+        console.error('Error fetching messages:', error);
+        return [];
+      }
+      
+      return data as Message[];
+    },
+    enabled: !!chatId,
+  });
+  
+  // Handle opening new message dialog
+  const handleNewMessage = () => {
+    setNewDialogOpen(true);
+  };
+  
+  // Handle conversation selection
+  const handleSelectConversation = (conversation: Conversation) => {
+    navigate(`/chat/${conversation.id}`);
+    if (isMobile) {
+      setShowSidebar(false);
+    }
+  };
+  
   useEffect(() => {
-    let cleanup: (() => void) | undefined;
-
-    const startSimulation = async () => {
-      toast({
-        title: "Message Simulation Started",
-        description: "Messages will be simulated for the next 60 seconds",
-      });
-
-      cleanup = await startMessageSimulation(60000);
-    };
-
-    startSimulation();
-
-    return () => {
-      if (cleanup) {
-        cleanup();
-        toast({
-          title: "Message Simulation Ended",
-          description: "Message simulation has been stopped",
-        });
+    // Redirect to the first conversation if none is selected
+    const redirectToFirstConversation = async () => {
+      if (!chatId) {
+        const { data } = await supabase
+          .from('conversations')
+          .select('*')
+          .limit(1);
+          
+        if (data && data.length > 0) {
+          navigate(`/chat/${data[0].id}`);
+        }
       }
     };
-  }, [toast]);
-
-  const handleCalendarActionClick = (view: 'calendar' | 'inbox') => {
-    setCalendarView(view);
-    setActiveTab('calendar');
-  };
-
-  const handleSendWithAttachments = () => {
-    handleSendMessage(attachments);
-  };
+    
+    redirectToFirstConversation();
+  }, [chatId, navigate]);
 
   return (
-    <ResizablePanelGroup direction="horizontal" className="h-full">
-      {/* Chat sidebar */}
-      <ResizablePanel defaultSize={25} minSize={20} maxSize={30} className="h-full">
-        <ChatSidebar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          conversations={filteredConversations}
-          selectedConversation={selectedConversation}
-          onSelectConversation={(id) => {
-            if (typeof id === 'string') {
-              handleSelectConversation(id);
-            }
-          }}
-          onCalendarActionClick={handleCalendarActionClick}
-          colleagues={colleagues}
-          isLoadingColleagues={isLoadingColleagues}
-          onStartConversation={handleStartConversationWithColleague}
-        />
-      </ResizablePanel>
-      
-      <ResizableHandle withHandle />
-      
-      {/* Chat content */}
-      <ResizablePanel defaultSize={75} className="h-full">
-        <div className="flex flex-col h-full">
-          {selectedConversation ? (
-            <>
-              <div className="bg-muted/20 p-2 border-b flex justify-between items-center">
-                <h2 className="text-sm font-medium">{selectedConversation.name}</h2>
-              </div>
-              <ChatContent
-                conversation={selectedConversation}
-                onEditMessage={handleEditMessage}
-                onDeleteMessage={handleDeleteMessage}
-                onReactToMessage={handleReaction}
-                isNewConversation={isNewConversation}
-              />
-              
-              {/* Attachments preview */}
-              {attachments.length > 0 && (
-                <div className="bg-background p-2 border-t flex flex-wrap gap-2">
-                  {attachments.map(attachment => (
-                    <div 
-                      key={attachment.id}
-                      className="flex items-center bg-muted p-2 rounded-md"
-                    >
-                      <File className="h-4 w-4 mr-2" />
-                      <span className="text-xs max-w-32 truncate">{attachment.name}</span>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-5 w-5 ml-1"
-                        onClick={() => handleRemoveAttachment(attachment.id)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              <ChatInput
-                value={newMessage}
-                onChange={setNewMessage}
-                onSendMessage={handleSendWithAttachments}
-                onAttach={handleAttachFiles}
-              />
-            </>
-          ) : (
-            <div className="flex items-center justify-center h-full p-8 text-center text-muted-foreground">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Select a Conversation</h3>
-                <p>Choose a conversation from the sidebar or start a new one</p>
-              </div>
-            </div>
-          )}
+    <div className="flex h-screen overflow-hidden">
+      {/* Mobile toggle for sidebar */}
+      {isMobile && (
+        <Button
+          variant="outline"
+          size="icon"
+          className="fixed bottom-4 right-4 z-50 rounded-full h-12 w-12 shadow-lg"
+          onClick={() => setShowSidebar(!showSidebar)}
+        >
+          {showSidebar ? <MessageCircle /> : <Users />}
+        </Button>
+      )}
+
+      {/* Chat sidebar - conditional based on state or screen size */}
+      {(showSidebar || isDesktop) && (
+        <div className={`${isMobile ? 'fixed inset-0 z-40 bg-background/80' : 'w-80 border-r'}`}>
+          <ChatSidebar 
+            onSelectConversation={handleSelectConversation} 
+            onNewMessage={handleNewMessage}
+          />
         </div>
-      </ResizablePanel>
-    </ResizablePanelGroup>
+      )}
+
+      {/* Main chat area */}
+      <div className="flex-1 overflow-hidden">
+        {chatId ? (
+          <ChatContent 
+            conversation={currentChat} 
+            messages={messages || []} 
+            isLoading={chatLoading || messagesLoading}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <Card className="max-w-md p-6 text-center">
+              <h3 className="text-xl font-semibold mb-2">Select a conversation</h3>
+              <p className="text-muted-foreground mb-4">
+                Choose an existing conversation from the sidebar or start a new one.
+              </p>
+              <Button onClick={handleNewMessage} className="w-full">
+                <MessageCircle className="mr-2 h-4 w-4" /> New Message
+              </Button>
+            </Card>
+          </div>
+        )}
+      </div>
+
+      {/* New message dialog */}
+      <NewMessageDialog 
+        open={newDialogOpen} 
+        onOpenChange={setNewDialogOpen}
+        onSelectConversation={handleSelectConversation}
+      />
+    </div>
   );
 }
-
-export default Chat;
