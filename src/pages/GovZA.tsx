@@ -11,6 +11,7 @@ import { HomeAffairsSection } from "@/components/govza/departments/HomeAffairsSe
 import { TransportSection } from "@/components/govza/departments/TransportSection";
 import { SarsSection } from "@/components/govza/departments/SarsSection";
 import { SassaSection } from "@/components/govza/departments/SassaSection";
+import { NsfasSection } from "@/components/govza/departments/NsfasSection";
 
 export default function GovZA() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,6 +54,7 @@ export default function GovZA() {
           <TabsTrigger value="sars" className="px-4">SARS</TabsTrigger>
           <TabsTrigger value="transport" className="px-4">Transport</TabsTrigger>
           <TabsTrigger value="sassa" className="px-4">SASSA</TabsTrigger>
+          <TabsTrigger value="nsfas" className="px-4">NSFAS</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
@@ -73,6 +75,10 @@ export default function GovZA() {
         
         <TabsContent value="sassa">
           <SassaSection />
+        </TabsContent>
+        
+        <TabsContent value="nsfas">
+          <NsfasSection />
         </TabsContent>
       </Tabs>
       
