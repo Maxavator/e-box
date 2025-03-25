@@ -47,8 +47,8 @@ export const golderUsers: UserToCreate[] = [
     lastName: 'Tshabalala',
     saId: '8908075800086',
     email: 'mandla.tshabalala@golder.co.za',
-    role: 'user',
-    title: 'Staff Member',
+    role: 'comm_moderator',
+    title: 'Communication Moderator',
     jobTitle: 'Mining Executive'
   },
   {
@@ -65,8 +65,8 @@ export const golderUsers: UserToCreate[] = [
     lastName: 'Mokoena',
     saId: '9105120800187',
     email: 'precious.mokoena@golder.co.za',
-    role: 'user',
-    title: 'Staff Member',
+    role: 'hr_moderator',
+    title: 'HR Moderator',
     jobTitle: 'HR Executive'
   },
   {
@@ -101,8 +101,8 @@ export const golderUsers: UserToCreate[] = [
     lastName: 'Ndlovu',
     saId: '8606120800186',
     email: 'zanele.ndlovu@golder.co.za',
-    role: 'user',
-    title: 'Staff Member',
+    role: 'org_admin',
+    title: 'Organization Administrator',
     jobTitle: 'Chief Operations Officer'
   }
 ];
