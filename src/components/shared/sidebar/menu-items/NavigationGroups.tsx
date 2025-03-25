@@ -123,6 +123,9 @@ export const DeskNavigationGroup = ({
 }: Pick<NavigationGroupsProps, 'documentsCount' | 'leaveCount' | 'organizationName' | 'loading' | 'handleNavigation'>) => {
   const location = useLocation();
   
+  // Calculate total desk notifications, but only show if greater than 0
+  const totalDeskNotifications = documentsCount + leaveCount;
+  
   return (
     <>
       <MenuItemWithBadge
@@ -130,7 +133,7 @@ export const DeskNavigationGroup = ({
         label={`Desk ${!loading && organizationName ? `@${organizationName}` : ''}`}
         path="/mydesk"
         isActive={location.pathname === "/mydesk" || location.pathname.startsWith("/desk/")}
-        badgeCount={documentsCount + leaveCount > 0 ? documentsCount + leaveCount : undefined}
+        badgeCount={totalDeskNotifications > 0 ? totalDeskNotifications : undefined}
         badgeColor="bg-blue-500"
         onClick={() => handleNavigation("/mydesk")}
       />
