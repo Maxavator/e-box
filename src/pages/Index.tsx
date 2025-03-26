@@ -74,7 +74,7 @@ const Index = () => {
           Your centralized platform for organizational management and collaboration
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 animate-fadeIn delay-200">
+        <div className="flex justify-center mt-8 animate-fadeIn delay-200">
           <Button 
             onClick={() => navigate('/auth')}
             className="flex items-center gap-2 transition-all hover:scale-105"
@@ -82,16 +82,6 @@ const Index = () => {
           >
             <LogIn className="w-5 h-5" />
             Login to Continue
-          </Button>
-          
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/auth')}
-            className="flex items-center gap-2 transition-all hover:scale-105"
-            size="lg"
-          >
-            <Building2 className="w-5 h-5" />
-            Request Demo
           </Button>
         </div>
       </div>
