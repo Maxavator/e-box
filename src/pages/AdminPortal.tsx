@@ -12,12 +12,10 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 
 export const AdminPortal = () => {
   const [activeView, setActiveView] = useState<AdminView>("dashboard");
-  const { profile, isLoading } = useUserProfile();
+  const { organizationName, userDisplayName, loading } = useUserProfile();
   
   // Get the user's name from the profile
-  const userName = profile ? 
-    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
-    'User';
+  const userName = userDisplayName || 'User';
 
   // Handle navigation between different admin views
   const handleViewChange = (view: AdminView) => {

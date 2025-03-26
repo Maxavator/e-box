@@ -1,4 +1,3 @@
-
 import { APP_VERSION, incrementVersion, compareVersions } from './version';
 
 export type ChangeLogEntry = {
@@ -12,6 +11,28 @@ export type ChangeLogEntry = {
  * Newer versions should be added at the top
  */
 export const CHANGELOG: ChangeLogEntry[] = [
+  {
+    version: 'v2.6.0',
+    date: '2024-07-25',
+    changes: [
+      'Added Systems Documentation with detailed SLA information',
+      'Enhanced Architecture overview documentation',
+      'Implemented Technical Specifications documentation',
+      'Improved Documentation Portal navigation',
+      'Added detailed infrastructure documentation'
+    ]
+  },
+  {
+    version: 'v2.5.1',
+    date: '2024-07-20',
+    changes: [
+      'Fixed user profile display in admin portal',
+      'Enhanced documentation portal performance',
+      'Updated SLA compliance metrics',
+      'Improved system stability and error handling',
+      'Added router context safety checks'
+    ]
+  },
   {
     version: 'v2.5.0',
     date: '2024-07-15',

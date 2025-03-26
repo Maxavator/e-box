@@ -26,7 +26,7 @@ export function SystemsDocumentation() {
         <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-6">
           <TabsTrigger value="sla" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
-            <span>SLA & Uptime</span>
+            <span>SLA &amp; Uptime</span>
           </TabsTrigger>
           <TabsTrigger value="architecture" className="flex items-center gap-2">
             <Database className="h-4 w-4" />
