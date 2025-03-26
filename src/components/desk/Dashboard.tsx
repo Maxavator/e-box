@@ -56,7 +56,7 @@ export const Dashboard = () => {
         navigate('/calendar');
         break;
       case 'documents':
-        navigate('/mydesk');
+        navigate('/documents'); // Changed from '/mydesk' to '/documents'
         break;
       case 'organization':
         navigate('/organization');

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/shared/theme-provider';
@@ -9,6 +10,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import GovZA from "./pages/GovZA";
 import Contacts from "./pages/Contacts";
 import LogoutPage from "./pages/LogoutPage";
+import MyDocuments from "./pages/MyDocuments";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -103,7 +105,7 @@ function App() {
             },
             {
               path: '/documents',
-              element: <Documents />,
+              element: <MyDocuments />,
             },
             {
               path: '/notes',

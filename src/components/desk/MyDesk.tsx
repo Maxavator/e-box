@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Documents } from "./Documents";
@@ -7,7 +6,7 @@ import { Policies } from "./Policies";
 import { 
   Briefcase, FileText, Clock, Scroll, Inbox, Calendar, 
   Users, FileStack, AlertCircle, MailOpen, UserCheck, 
-  ArrowRight
+  ArrowRight, ExternalLink
 } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 
-// Sample announcements
 const announcements = [
   {
     id: "1",
@@ -43,7 +41,6 @@ export function MyDesk() {
   const { toast } = useToast();
   const [mockLeaveNotice, setMockLeaveNotice] = useState(true);
   
-  // Demo effect - mock pending tasks notification
   useEffect(() => {
     const timer = setTimeout(() => {
       if (mockLeaveNotice) {
@@ -85,6 +82,17 @@ export function MyDesk() {
             <span className="text-sm">Error loading organization information</span>
           </div>
         )}
+        
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-2"
+          onClick={() => navigate("/documents")}
+        >
+          <FileText className="h-4 w-4" />
+          <span>Open My Documents</span>
+          <ExternalLink className="h-3 w-3" />
+        </Button>
       </div>
       
       {mockLeaveNotice && (
@@ -278,14 +286,15 @@ export function MyDesk() {
                 <Button 
                   variant="outline" 
                   className="w-full justify-between" 
-                  onClick={() => navigate("/desk/documents")}
+                  onClick={() => navigate("/documents")}
                 >
                   <div className="flex items-center">
                     <FileText className="mr-2 h-4 w-4" />
                     <span>My Documents</span>
                   </div>
-                  <ArrowRight className="h-4 w-4" />
+                  <ExternalLink className="h-4 w-4" />
                 </Button>
+                
                 <Button 
                   variant="outline" 
                   className="w-full justify-between" 
@@ -297,6 +306,7 @@ export function MyDesk() {
                   </div>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
+                
                 <Button 
                   variant="outline" 
                   className="w-full justify-between" 
@@ -308,6 +318,7 @@ export function MyDesk() {
                   </div>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
+                
                 <Separator className="my-2" />
                 <Button 
                   variant="outline" 
@@ -401,7 +412,7 @@ export function MyDesk() {
         <TabsList className="grid grid-cols-3 mb-8">
           <TabsTrigger value="documents" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
-            <span>Documents</span>
+            <span>Desk Documents</span>
           </TabsTrigger>
           <TabsTrigger value="leave" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
