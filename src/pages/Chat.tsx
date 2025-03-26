@@ -1,3 +1,4 @@
+
 import { useChat } from "@/hooks/use-chat";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatContent } from "@/components/chat/ChatContent";

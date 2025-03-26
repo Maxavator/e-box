@@ -6,6 +6,8 @@ export interface User {
   lastSeen: string;
   avatar: string;
   initials: string;
+  email?: string;
+  organization?: string;
 }
 
 export interface Message {
@@ -16,9 +18,9 @@ export interface Message {
   content: string;
   text: string;
   timestamp: string;
-  status: 'sent' | 'delivered' | 'read';
+  status: 'sent' | 'delivered' | 'read' | 'sending' | 'failed';
   reactions: Record<string, string[]>;
-  sender?: 'me' | 'them';
+  sender?: 'me' | 'them' | 'system';
   edited?: boolean;
   isEdited?: boolean;
   attachments?: Attachment[];
@@ -82,4 +84,7 @@ export interface Note {
   isFavorite: boolean;
   owner: string;
   attachments?: Attachment[];
+  color?: string;
+  isPinned?: boolean;
+  isJournal?: boolean;
 }

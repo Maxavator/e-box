@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { UserSearch } from "./UserSearch";
 
 interface Profile {
   id: string;
@@ -39,7 +41,7 @@ export function NewMessageDialog({
 }: NewMessageDialogProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("contacts");
+  const [activeTab, setActiveTab] = useState("all-users");
   const { toast } = useToast();
 
   const isOpen = open !== undefined ? open : dialogOpen;
@@ -201,6 +203,11 @@ export function NewMessageDialog({
     }
   };
 
+  const handleSelectUser = async (user: any) => {
+    // Reuse the same logic as handleSelectContact
+    handleSelectContact(user);
+  };
+
   const handleSelectColleague = async (colleague: Profile) => {
     handleSelectContact(colleague);
   };
@@ -240,159 +247,144 @@ export function NewMessageDialog({
           <DialogTitle>New Message</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
-          <Input
-            placeholder="Search contacts or groups..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
-          />
-          
-          <Tabs defaultValue="contacts" value={activeTab} onValueChange={setActiveTab}>
+          <Tabs defaultValue="all-users" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="w-full">
-              <TabsTrigger value="contacts" className="flex-1">Contacts</TabsTrigger>
+              <TabsTrigger value="all-users" className="flex-1">
+                <UserPlus className="h-4 w-4 mr-2" />
+                All Users
+              </TabsTrigger>
               <TabsTrigger value="colleagues" className="flex-1">
                 <Building className="h-4 w-4 mr-2" />
                 Colleagues
               </TabsTrigger>
-              <TabsTrigger value="groups" className="flex-1">Groups</TabsTrigger>
+              <TabsTrigger value="groups" className="flex-1">
+                <Users className="h-4 w-4 mr-2" />
+                Groups
+              </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="contacts">
-              <ScrollArea className="h-[300px] pr-4">
-                <div className="space-y-2">
-                  {isLoadingContacts ? (
-                    <div className="text-center text-muted-foreground py-4">
-                      Loading contacts...
-                    </div>
-                  ) : filteredContacts.length === 0 ? (
-                    <div className="text-center text-muted-foreground py-4">
-                      No contacts found
-                    </div>
-                  ) : (
-                    filteredContacts.map((contact) => (
-                      <Button
-                        key={contact.id}
-                        variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => handleSelectContact(contact)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Avatar>
-                            {contact.avatar_url ? (
-                              <AvatarImage src={contact.avatar_url} alt={`${contact.first_name} ${contact.last_name}`} />
-                            ) : (
-                              <AvatarFallback>
-                                {`${contact.first_name?.[0] || ''}${contact.last_name?.[0] || ''}`}
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-                          <div className="flex flex-col items-start">
-                            <span className="font-medium">
-                              {`${contact.first_name} ${contact.last_name}`}
-                            </span>
-                          </div>
-                        </div>
-                      </Button>
-                    ))
-                  )}
-                </div>
-              </ScrollArea>
+            <TabsContent value="all-users">
+              <UserSearch onSelectUser={handleSelectUser} />
             </TabsContent>
 
             <TabsContent value="colleagues">
-              <ScrollArea className="h-[300px] pr-4">
-                <div className="space-y-2">
-                  {isLoadingColleagues ? (
-                    <div className="text-center text-muted-foreground py-4">
-                      Loading colleagues...
-                    </div>
-                  ) : filteredColleagues.length === 0 ? (
-                    <div className="text-center text-muted-foreground py-4">
-                      No colleagues found
-                    </div>
-                  ) : (
-                    filteredColleagues.map((colleague) => (
-                      <Button
-                        key={colleague.id}
-                        variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => handleSelectColleague(colleague)}
-                      >
-                        <div className="flex items-center gap-3 w-full">
-                          <Avatar>
-                            {colleague.avatar_url ? (
-                              <AvatarImage src={colleague.avatar_url} alt={`${colleague.first_name} ${colleague.last_name}`} />
-                            ) : (
-                              <AvatarFallback>
-                                {`${colleague.first_name?.[0] || ''}${colleague.last_name?.[0] || ''}`}
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-                          <div className="flex flex-col items-start">
-                            <span className="font-medium">
-                              {`${colleague.first_name} ${colleague.last_name}`}
-                            </span>
-                            {colleague.job_title && (
-                              <span className="text-xs text-muted-foreground">
-                                {colleague.job_title}
-                              </span>
-                            )}
-                          </div>
-                          <Badge variant="outline" className="ml-auto bg-blue-50 text-blue-600">
-                            <Building className="h-3 w-3 mr-1" />
-                            Colleague
-                          </Badge>
-                        </div>
-                      </Button>
-                    ))
-                  )}
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search colleagues..."
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
-              </ScrollArea>
+                
+                <ScrollArea className="h-[300px] pr-4">
+                  <div className="space-y-2">
+                    {isLoadingColleagues ? (
+                      <div className="text-center text-muted-foreground py-4">
+                        Loading colleagues...
+                      </div>
+                    ) : filteredColleagues.length === 0 ? (
+                      <div className="text-center text-muted-foreground py-4">
+                        No colleagues found
+                      </div>
+                    ) : (
+                      filteredColleagues.map((colleague) => (
+                        <Button
+                          key={colleague.id}
+                          variant="ghost"
+                          className="w-full justify-start"
+                          onClick={() => handleSelectColleague(colleague)}
+                        >
+                          <div className="flex items-center gap-3 w-full">
+                            <Avatar>
+                              {colleague.avatar_url ? (
+                                <AvatarImage src={colleague.avatar_url} alt={`${colleague.first_name} ${colleague.last_name}`} />
+                              ) : (
+                                <AvatarFallback>
+                                  {`${colleague.first_name?.[0] || ''}${colleague.last_name?.[0] || ''}`}
+                                </AvatarFallback>
+                              )}
+                            </Avatar>
+                            <div className="flex flex-col items-start">
+                              <span className="font-medium">
+                                {`${colleague.first_name} ${colleague.last_name}`}
+                              </span>
+                              {colleague.job_title && (
+                                <span className="text-xs text-muted-foreground">
+                                  {colleague.job_title}
+                                </span>
+                              )}
+                            </div>
+                            <Badge variant="outline" className="ml-auto bg-blue-50 text-blue-600">
+                              <Building className="h-3 w-3 mr-1" />
+                              Colleague
+                            </Badge>
+                          </div>
+                        </Button>
+                      ))
+                    )}
+                  </div>
+                </ScrollArea>
+              </div>
             </TabsContent>
             
             <TabsContent value="groups">
-              <ScrollArea className="h-[300px] pr-4">
-                <div className="space-y-2">
-                  {isLoadingGroups ? (
-                    <div className="text-center text-muted-foreground py-4">
-                      Loading groups...
-                    </div>
-                  ) : filteredGroups.length === 0 ? (
-                    <div className="text-center text-muted-foreground py-4">
-                      No groups found
-                    </div>
-                  ) : (
-                    filteredGroups.map((group) => (
-                      <Button
-                        key={group.id}
-                        variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => handleSelectGroup(group)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Avatar>
-                            {group.avatar_url ? (
-                              <AvatarImage src={group.avatar_url} alt={group.name} />
-                            ) : (
-                              <AvatarFallback>
-                                <Users className="h-4 w-4" />
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-                          <div className="flex flex-col items-start">
-                            <span className="font-medium">
-                              {group.name}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {group.is_public ? 'Public Group' : 'Private Group'}
-                            </span>
-                          </div>
-                        </div>
-                      </Button>
-                    ))
-                  )}
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search groups..."
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
-              </ScrollArea>
+                
+                <ScrollArea className="h-[300px] pr-4">
+                  <div className="space-y-2">
+                    {isLoadingGroups ? (
+                      <div className="text-center text-muted-foreground py-4">
+                        Loading groups...
+                      </div>
+                    ) : filteredGroups.length === 0 ? (
+                      <div className="text-center text-muted-foreground py-4">
+                        No groups found
+                      </div>
+                    ) : (
+                      filteredGroups.map((group) => (
+                        <Button
+                          key={group.id}
+                          variant="ghost"
+                          className="w-full justify-start"
+                          onClick={() => handleSelectGroup(group)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Avatar>
+                              {group.avatar_url ? (
+                                <AvatarImage src={group.avatar_url} alt={group.name} />
+                              ) : (
+                                <AvatarFallback>
+                                  <Users className="h-4 w-4" />
+                                </AvatarFallback>
+                              )}
+                            </Avatar>
+                            <div className="flex flex-col items-start">
+                              <span className="font-medium">
+                                {group.name}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {group.is_public ? 'Public Group' : 'Private Group'}
+                              </span>
+                            </div>
+                          </div>
+                        </Button>
+                      ))
+                    )}
+                  </div>
+                </ScrollArea>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
