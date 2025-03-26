@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { validateSaId, formatSaIdToEmail, formatSaIdPassword } from "@/utils/saIdValidation";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AuthenticationDialogProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export const AuthenticationDialog = ({
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +78,11 @@ export const AuthenticationDialog = ({
       }
       
       toast.success("Authentication successful!");
+      
+      // Invalidate all queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['session'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['sidebarProfile'] });
       
       if (onSuccess) {
         onSuccess();
