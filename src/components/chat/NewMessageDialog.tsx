@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Building, Pen, UserPlus, Users } from "lucide-react";
+import { Building, Pen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,7 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { UserSearch } from "./UserSearch";
-import { X, Users, Search, UserPlus } from "lucide-react";
+import { Search, Users, UserPlus } from "lucide-react";
 
 interface Profile {
   id: string;
