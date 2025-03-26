@@ -11,11 +11,15 @@ import { SystemsDocumentation } from "@/components/admin/documentation/SystemsDo
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { Badge } from "@/components/ui/badge";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
+import { GolderUsersManager } from "@/components/admin/GolderUsersManager";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UserPlus, Building } from "lucide-react";
 
 export const AdminPortal = () => {
   const [activeView, setActiveView] = useState<AdminView>("dashboard");
   const { organizationName, userDisplayName, loading } = useUserProfile();
   const { isAdmin, userRole } = useUserRole();
+  const [activeUsersTab, setActiveUsersTab] = useState("organization");
   
   // Get the user's name from the profile
   const userName = userDisplayName || 'User';
@@ -36,7 +40,30 @@ export const AdminPortal = () => {
   const renderViewContent = () => {
     switch (activeView) {
       case "users":
-        return <UserManagement />;
+        return (
+          <Tabs value={activeUsersTab} onValueChange={setActiveUsersTab} className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="organization" className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4" />
+                Organization Users
+              </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger value="golder" className="flex items-center gap-2">
+                  <Building className="h-4 w-4" />
+                  Golder Users
+                </TabsTrigger>
+              )}
+            </TabsList>
+            <TabsContent value="organization" className="mt-0">
+              <UserManagement />
+            </TabsContent>
+            {isAdmin && (
+              <TabsContent value="golder" className="mt-0">
+                <GolderUsersManager />
+              </TabsContent>
+            )}
+          </Tabs>
+        );
       case "system":
         return <SystemSettings />;
       case "reporting":

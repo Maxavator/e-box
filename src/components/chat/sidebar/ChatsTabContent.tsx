@@ -22,7 +22,7 @@ export function ChatsTabContent({
     conversations.filter(conv => 
       conv.participantIds.some(id => {
         // Find the participant in the conversation that matches this ID
-        const participant = conv.participants?.find(p => p.id === id);
+        const participant = conv.participantInfo?.find(p => p.id === id);
         if (!participant) return false;
         
         // Check if the participant's name includes the search query
