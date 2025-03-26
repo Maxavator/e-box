@@ -1,28 +1,23 @@
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-interface UserProfileData {
-  organizationName: string | null;
-  organizationId: string | null;
-  loading: boolean;
-  error: Error | null;
+export interface UserProfileData {
+  userId: string | null;
   userDisplayName: string | null;
-  refreshProfile: () => Promise<void>;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  avatarUrl: string | null;
+  jobTitle: string | null;
+  organizationId: string | null;
+  organizationName: string | null;
+  isAdmin: boolean;
 }
 
-export function useUserProfile(): UserProfileData {
-  const [organizationName, setOrganizationName] = useState<string | null>(null);
-  const [organizationId, setOrganizationId] = useState<string | null>(null);
-  const [userDisplayName, setUserDisplayName] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  // First check if user is authenticated using a query
-  const { data: session, isLoading: isSessionLoading } = useQuery({
-    queryKey: ['auth-session'],
+export const useUserProfile = (): UserProfileData => {
+  const { data: session } = useQuery({
+    queryKey: ['user-session'],
     queryFn: async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) throw error;
@@ -30,149 +25,95 @@ export function useUserProfile(): UserProfileData {
     },
   });
 
-  // Fetch user profile data only when session is available
-  const { data: profileData, isLoading: isProfileLoading, error: profileError } = useQuery({
-    queryKey: ['user-profile-data', session?.user?.id],
+  const { data: profile } = useQuery({
+    queryKey: ['user-profile', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
-      // Get user profile data including organization_id and name
-      const { data: profileData, error: profileError } = await supabase
+      if (!session?.user?.id) return null;
+
+      const { data, error } = await supabase
         .from('profiles')
-        .select('organization_id, first_name, last_name')
-        .eq('id', session!.user.id)
+        .select('first_name, last_name, avatar_url, job_title, organization_id')
+        .eq('id', session.user.id)
         .single();
-        
-      if (profileError) {
-        throw profileError;
+      
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
       }
       
-      let orgName = null;
-      // Get organization name if user has an organization
-      if (profileData?.organization_id) {
-        const { data: orgData, error: orgError } = await supabase
-          .from('organizations')
-          .select('name')
-          .eq('id', profileData.organization_id)
-          .single();
-          
-        if (orgError) {
-          console.error('Error fetching organization name:', orgError);
-        } else {
-          orgName = orgData?.name || null;
-        }
-      }
-      
-      return {
-        profileData,
-        orgName
-      };
+      return data;
     },
   });
 
-  // Update state based on query results
-  useEffect(() => {
-    setLoading(isSessionLoading || isProfileLoading);
-    
-    if (!isSessionLoading && !session) {
-      setError(new Error("Not authenticated"));
-      setLoading(false);
-      return;
-    }
-    
-    if (profileError) {
-      setError(profileError instanceof Error ? profileError : new Error(String(profileError)));
-      // Show toast notification for error
-      toast.error("Failed to load profile information", {
-        description: "Please try refreshing the page or contact support."
-      });
-    }
-    
-    if (profileData) {
-      if (profileData.profileData?.first_name && profileData.profileData?.last_name) {
-        setUserDisplayName(`${profileData.profileData.first_name} ${profileData.profileData.last_name}`);
-      }
-      
-      if (profileData.profileData?.organization_id) {
-        setOrganizationId(profileData.profileData.organization_id);
-        setOrganizationName(profileData.orgName);
-      } else {
-        // Reset organization data if user is not associated with an organization
-        setOrganizationId(null);
-        setOrganizationName(null);
-      }
-    }
-  }, [isSessionLoading, isProfileLoading, session, profileData, profileError]);
+  const { data: organizationName } = useQuery({
+    queryKey: ['organization-name', profile?.organization_id],
+    enabled: !!profile?.organization_id,
+    queryFn: async () => {
+      if (!profile?.organization_id) return null;
 
-  const refreshProfile = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        throw sessionError;
-      }
-      
-      if (!session?.user) {
-        throw new Error("Not authenticated");
-      }
-      
-      // Get user profile data including organization_id
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('organization_id, first_name, last_name')
-        .eq('id', session.user.id)
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('name')
+        .eq('id', profile.organization_id)
         .single();
-        
-      if (profileError) {
-        throw profileError;
+      
+      if (error) {
+        console.error('Error fetching organization:', error);
+        return null;
       }
       
-      if (profileData?.first_name && profileData?.last_name) {
-        setUserDisplayName(`${profileData.first_name} ${profileData.last_name}`);
-      }
-      
-      if (profileData?.organization_id) {
-        setOrganizationId(profileData.organization_id);
-        
-        // Get organization name
-        const { data: orgData, error: orgError } = await supabase
-          .from('organizations')
-          .select('name')
-          .eq('id', profileData.organization_id)
-          .single();
-          
-        if (orgError) {
-          throw orgError;
-        }
-        
-        // Use the full organization name
-        setOrganizationName(orgData?.name || null);
-      } else {
-        // Reset organization data if user is not associated with an organization
-        setOrganizationId(null);
-        setOrganizationName(null);
-      }
-    } catch (err) {
-      console.error('Error refreshing user profile:', err);
-      setError(err instanceof Error ? err : new Error(String(err)));
-      
-      // Show toast notification for error
-      toast.error("Failed to refresh profile information", {
-        description: "Please try again or contact support."
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+      return data?.name || null;
+    },
+  });
 
-  return { 
-    organizationName, 
-    organizationId,
-    userDisplayName,
-    loading, 
-    error,
-    refreshProfile
+  const { data: userRole } = useQuery({
+    queryKey: ['user-role', session?.user?.id],
+    enabled: !!session?.user?.id,
+    queryFn: async () => {
+      if (!session?.user?.id) return null;
+
+      // Special case for Thabo Nkosi - always admin
+      if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
+        return 'org_admin';
+      }
+
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error fetching user role:', error);
+        return null;
+      }
+      
+      return data?.role || null;
+    },
+  });
+
+  // Special case for Thabo Nkosi - set job title to "Chief Information Officer"
+  let jobTitle = profile?.job_title || '';
+  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
+    jobTitle = 'Chief Information Officer';
+  }
+
+  // Format display name
+  const firstName = profile?.first_name || '';
+  const lastName = profile?.last_name || '';
+  const displayName = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null;
+
+  return {
+    userId: session?.user?.id || null,
+    userDisplayName: displayName,
+    firstName: profile?.first_name || null,
+    lastName: profile?.last_name || null,
+    email: session?.user?.email || null,
+    avatarUrl: profile?.avatar_url || null,
+    jobTitle,
+    organizationId: profile?.organization_id || null,
+    organizationName,
+    isAdmin: userRole === 'org_admin' || userRole === 'global_admin',
   };
-}
+};
