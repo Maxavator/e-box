@@ -13,18 +13,24 @@ import { DocumentationPortal } from '@/components/admin/documentation/Documentat
 import { SalesKit } from '@/components/admin/documentation/SalesKit';
 import { Award, AlertCircle, FileText, Users, BarChart4 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 export default function AdminPortal() {
   const [activeView, setActiveView] = useState<AdminView>('dashboard');
   const [activeTab, setActiveTab] = useState('overview');
   const [docTab, setDocTab] = useState<'documentation' | 'saleskit'>('documentation');
   const [sassaTab, setSassaTab] = useState<'grants' | 'applications' | 'verification'>('grants');
+  const { isMobile } = useMediaQuery();
+  const { user } = useUserProfile();
+  
+  const username = user?.username || user?.email || "Admin";
 
   const renderDashboard = () => (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Admin Dashboard</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Administration Portal for {username}</h2>
           <p className="text-muted-foreground">
             Manage your organization, users, and system settings.
           </p>
@@ -32,18 +38,13 @@ export default function AdminPortal() {
       </div>
 
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2 md:w-auto">
+        <TabsList className="grid w-full grid-cols-1 md:w-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="tools">Admin Tools</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
           <StatsCards />
           <NavigationCards activeView={activeView} onNavigate={setActiveView} />
-        </TabsContent>
-
-        <TabsContent value="tools" className="space-y-6">
-          <LookupTools />
         </TabsContent>
       </Tabs>
     </div>
