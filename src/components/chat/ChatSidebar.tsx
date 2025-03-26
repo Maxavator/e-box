@@ -80,11 +80,8 @@ export function ChatSidebar({
         </TabsList>
         <div className="p-4 flex-1 overflow-hidden">
           <TabsContent value="chats" className="h-full flex flex-col">
-            <ChatsTabContent
-              conversations={conversations}
-              selectedConversation={selectedConversation}
-              onSelectConversation={onSelectConversation}
-            />
+            {/* We don't pass any props here as ChatsTabContent uses hooks internally */}
+            <ChatsTabContent />
           </TabsContent>
           
           <TabsContent value="calendar" className="space-y-4 pt-2">

@@ -10,17 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { UserToCreate } from "@/utils/organization/afrovationUserDefinitions";
 
-// Define the type for a user with role
-interface UserWithRole {
-  firstName: string;
-  secondName?: string;
-  lastName: string;
-  jobTitle: string;
-  saId: string;
-  email: string;
-  role: string;
-}
-
 export function GolderUsersManager() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{successCount: number, errorCount: number} | null>(null);
@@ -45,10 +34,10 @@ export function GolderUsersManager() {
       
       const orgId = orgData.id;
       
-      // Convert UserWithRole[] to UserToCreate[]
+      // Convert golderUsers to the format expected by createOrganizationUsers
+      // Ensure we only pass properties that exist in UserToCreate
       const convertedUsers: UserToCreate[] = golderUsers.map(user => ({
         firstName: user.firstName,
-        secondName: user.secondName,
         lastName: user.lastName,
         jobTitle: user.jobTitle,
         saId: user.saId,

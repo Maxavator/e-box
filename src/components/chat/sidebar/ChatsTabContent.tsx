@@ -1,3 +1,4 @@
+
 import { useChat } from "@/hooks/use-chat";
 import { Conversation } from "@/types/chat";
 import { UserSearch } from "../UserSearch";
@@ -9,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
 export const ChatsTabContent = () => {
-  const { conversations, isLoading } = useChat();
+  const { conversations = [], isLoading = false } = useChat();
   const { conversationId } = useParams();
   const navigate = useNavigate();
   const { openAuthDialog } = useAuthDialog();
@@ -19,19 +20,24 @@ export const ChatsTabContent = () => {
     if (!profile) return "Chat";
     
     // Fix: Use participantIds instead of participants
-    const otherParticipantId = conversation.participantIds.find(
+    const otherParticipantId = conversation.participantIds?.find(
       (id) => id !== profile.id
     );
     
-    // Find the other participant's name in the profiles
-    return conversation.profiles?.find(p => p.id === otherParticipantId)?.first_name || "Chat";
+    // Find the other participant's name in the profiles array if it exists
+    const otherParticipant = conversation.profiles?.find(p => p.id === otherParticipantId);
+    return otherParticipant?.first_name || "Chat";
   };
 
   return (
     <div className="h-full w-full relative">
       {/* User Search */}
       <div className="absolute top-2 left-2 right-2 z-10">
-        <UserSearch />
+        <UserSearch onSelectUser={(user) => {
+          // Handle user selection
+          console.log("Selected user:", user);
+          // Here you would start a conversation with the selected user
+        }} />
       </div>
 
       {/* New Chat Button */}
