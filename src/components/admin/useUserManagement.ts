@@ -19,8 +19,6 @@ export const useUserManagement = () => {
     organizationId: "",
   });
   const [refreshUsers, setRefreshUsers] = useState(0);
-  const [golderOrgId, setGolderOrgId] = useState<string | null>(null);
-  const [showingGolderUsers, setShowingGolderUsers] = useState(false);
 
   const { isAdmin, userRole, isLoading: isRoleLoading, error: roleError } = useUserRole();
   const { organizations, userProfile, isLoading: isOrgsLoading, error: orgsError } = useOrganizations(isAdmin, userRole);
@@ -28,25 +26,12 @@ export const useUserManagement = () => {
     isAdmin, 
     userRole, 
     userProfile, 
-    refreshUsers,
-    showingGolderUsers ? golderOrgId : null
+    refreshUsers
   );
   const { createUserMutation, updateUserMutation } = useUserMutations(isAdmin, userRole, userProfile);
 
   const isLoading = isRoleLoading || isOrgsLoading || isUsersLoading;
   const error = roleError || orgsError || usersError;
-
-  // Find the Golder organization ID when organizations are loaded
-  useEffect(() => {
-    if (organizations?.length) {
-      const golderOrg = organizations.find(
-        org => org.name.toLowerCase().includes('golder')
-      );
-      if (golderOrg) {
-        setGolderOrgId(golderOrg.id);
-      }
-    }
-  }, [organizations]);
 
   // Set up a polling interval to refresh the users list every 10 seconds
   useEffect(() => {
@@ -60,12 +45,6 @@ export const useUserManagement = () => {
   // Manual refresh function
   const refreshUsersList = () => {
     setRefreshUsers(prev => prev + 1);
-  };
-
-  // Toggle showing all Golder users
-  const toggleGolderUsers = () => {
-    setShowingGolderUsers(prev => !prev);
-    refreshUsersList();
   };
 
   // Show error toast if there's an error
@@ -127,8 +106,5 @@ export const useUserManagement = () => {
     updateUserMutation,
     userProfile,
     refreshUsersList,
-    showingGolderUsers,
-    toggleGolderUsers,
-    golderOrgId,
   };
 };

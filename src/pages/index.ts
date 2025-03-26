@@ -4,7 +4,7 @@ import Dashboard from "./Dashboard";
 import NotFound from "./NotFound";
 import Chat from "./Chat";
 import AdminPortal from "./AdminPortal";
-import OrganizationDashboard from "./OrganizationDashboard";
+import OrganizationManagement from "./OrganizationManagement";
 import Changelog from "./Changelog";
 import Index from "./Index";
 import Contacts from "./Contacts";
@@ -28,7 +28,7 @@ export {
   NotFound,
   Chat,
   AdminPortal,
-  OrganizationDashboard,
+  OrganizationManagement,
   Changelog,
   Settings,
   Contacts,
