@@ -10,6 +10,7 @@ import { LookupTools } from '@/components/admin/dashboard/LookupTools';
 import { SystemSettings } from '@/components/admin/SystemSettings';
 import { SystemInfo } from '@/components/admin/SystemInfo';
 import { DocumentationPortal } from '@/components/admin/documentation/DocumentationPortal';
+import { SystemsDocumentation } from '@/components/admin/documentation/SystemsDocumentation';
 import { SalesKit } from '@/components/admin/documentation/SalesKit';
 import { Award, AlertCircle, FileText, Users, BarChart4 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -22,9 +23,9 @@ export default function AdminPortal() {
   const [docTab, setDocTab] = useState<'documentation' | 'saleskit'>('documentation');
   const [sassaTab, setSassaTab] = useState<'grants' | 'applications' | 'verification'>('grants');
   const { isMobile } = useMediaQuery();
-  const { user } = useUserProfile();
+  const { user, userDisplayName } = useUserProfile();
   
-  const username = user?.username || user?.email || "Admin";
+  const username = userDisplayName || user?.username || user?.email || "Admin";
 
   const renderDashboard = () => (
     <div className="space-y-6">
@@ -343,6 +344,10 @@ export default function AdminPortal() {
     </div>
   );
 
+  const renderSystemsDocumentation = () => (
+    <SystemsDocumentation />
+  );
+
   const renderContent = () => {
     switch (activeView) {
       case 'dashboard':
@@ -359,6 +364,8 @@ export default function AdminPortal() {
         return renderDocumentation();
       case 'sassa':
         return renderSassa();
+      case 'systems-docs':
+        return renderSystemsDocumentation();
       default:
         return renderDashboard();
     }
