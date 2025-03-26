@@ -1,14 +1,19 @@
 
 import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { UserProfileHeader } from "./UserProfileHeader";
 import { OrganizationInfo } from "./OrganizationInfo";
 import { AdminButton } from "./AdminButton";
 import { VersionInfo } from "./VersionInfo";
+import { AuthenticationDialog } from "@/components/auth/AuthenticationDialog";
+import { LogIn } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function UserProfileSidebarFooter() {
   const { isAdmin } = useUserRole();
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
   // Get current session
   const { data: session } = useQuery({
@@ -49,8 +54,26 @@ export function UserProfileSidebarFooter() {
   if (!session?.user) {
     console.log('No session user found');
     return (
-      <div className="p-3 text-center text-sm text-muted-foreground">
-        Not logged in
+      <div className="p-3 space-y-2">
+        <div className="text-center text-sm text-muted-foreground">
+          Not logged in
+        </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full flex items-center gap-2"
+          onClick={() => setIsLoginDialogOpen(true)}
+        >
+          <LogIn className="h-4 w-4" />
+          Login
+        </Button>
+        
+        <AuthenticationDialog 
+          isOpen={isLoginDialogOpen} 
+          onClose={() => setIsLoginDialogOpen(false)}
+          title="Login to e-Box"
+          description="Please login to access all features"
+        />
       </div>
     );
   }
