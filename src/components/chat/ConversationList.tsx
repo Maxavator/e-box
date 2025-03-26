@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Conversation } from "@/types/chat";
+import { Conversation, Message } from "@/types/chat";
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -53,13 +53,13 @@ export function ConversationList({
                 <p className="text-sm font-medium leading-none truncate">
                   {conversation.name}
                 </p>
-                {conversation.lastMessage && (
+                {conversation.lastMessage && typeof conversation.lastMessage !== 'string' && (
                   <span className="text-xs text-muted-foreground">
                     {formatMessageTime(conversation.lastMessage.timestamp)}
                   </span>
                 )}
               </div>
-              {conversation.lastMessage && (
+              {conversation.lastMessage && typeof conversation.lastMessage !== 'string' && (
                 <p className="text-xs text-muted-foreground truncate">
                   {conversation.lastMessage.sender === "me" && "You: "}
                   {conversation.lastMessage.text}

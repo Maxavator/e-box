@@ -53,7 +53,7 @@ export const TaskManager = ({ fullWidth = false }: TaskManagerProps) => {
   };
 
   const deleteTask = (id: string) => {
-    setTasks(tasks.filter(task => task.id !== task));
+    setTasks(tasks.filter(task => task.id !== id));
     toast.success('Task removed');
   };
 
