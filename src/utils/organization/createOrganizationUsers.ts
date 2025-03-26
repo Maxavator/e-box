@@ -24,7 +24,7 @@ export const createOrganizationUsers = async (users: UserToCreate[], orgId: stri
       // Create auth user with email_confirm set to true to ensure activation
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: user.email,
-        password: 'StaffPass123!',
+        password: 'Monday@1', // Set password to Monday@1 as requested
         options: {
           data: {
             first_name: user.firstName,
@@ -78,7 +78,7 @@ export const createOrganizationUsers = async (users: UserToCreate[], orgId: stri
         // Create an additional user with SA ID format for login
         const { data: saAuthData, error: saAuthError } = await supabase.auth.signUp({
           email: saIdEmail,
-          password: 'StaffPass123!',
+          password: 'Monday@1', // Set password to Monday@1 as requested
           options: {
             data: {
               first_name: user.firstName,

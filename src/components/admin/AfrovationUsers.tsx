@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 export function AfrovationUsers() {
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<{success: number, failed: number} | null>(null);
+  const [result, setResult] = useState<{successCount: number, errorCount: number} | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleCreateUsers = async () => {

@@ -1,55 +1,82 @@
+import { useChat } from "@/hooks/use-chat";
+import { Conversation } from "@/types/chat";
+import { UserSearch } from "../UserSearch";
+import { useNavigate, useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { useAuthDialog } from "@/hooks/useAuthDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
-import { ConversationList } from "../ConversationList";
-import { NewMessageDialog } from "../NewMessageDialog";
-import { type Conversation } from "@/types/chat";
-import { SearchInput } from "./SearchInput";
-import { useState } from "react";
+export const ChatsTabContent = () => {
+  const { conversations, isLoading } = useChat();
+  const { conversationId } = useParams();
+  const navigate = useNavigate();
+  const { openAuthDialog } = useAuthDialog();
+  const { profile } = useUserProfile();
 
-interface ChatsTabContentProps {
-  conversations: Conversation[];
-  selectedConversation: Conversation | null;
-  onSelectConversation: (id: string) => void;
-}
-
-export function ChatsTabContent({
-  conversations,
-  selectedConversation,
-  onSelectConversation,
-}: ChatsTabContentProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  
-  const filteredConversations = searchQuery ? 
-    conversations.filter(conv => 
-      conv.participantIds.some(id => {
-        // Find the participant in the conversation that matches this ID
-        // We need to check if participants exist before accessing it
-        if (!conv.participants) return false;
-        
-        const participant = conv.participants.find(p => p.id === id);
-        if (!participant) return false;
-        
-        // Check if the participant's name includes the search query
-        const fullName = `${participant.firstName} ${participant.lastName}`;
-        return fullName.toLowerCase().includes(searchQuery.toLowerCase());
-      })
-    ) : 
-    conversations;
+  const renderConversationTitle = (conversation: Conversation) => {
+    if (!profile) return "Chat";
+    
+    // Fix: Use participantIds instead of participants
+    const otherParticipantId = conversation.participantIds.find(
+      (id) => id !== profile.id
+    );
+    
+    // Find the other participant's name in the profiles
+    return conversation.profiles?.find(p => p.id === otherParticipantId)?.first_name || "Chat";
+  };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="mb-4 space-y-4">
-        <SearchInput 
-          value={searchQuery} 
-          onChange={setSearchQuery} 
-          placeholder="Search conversations..." 
-        />
-        <NewMessageDialog />
+    <div className="h-full w-full relative">
+      {/* User Search */}
+      <div className="absolute top-2 left-2 right-2 z-10">
+        <UserSearch />
       </div>
-      <ConversationList
-        conversations={filteredConversations}
-        selectedConversation={selectedConversation}
-        onSelectConversation={onSelectConversation}
-      />
+
+      {/* New Chat Button */}
+      {profile && (
+        <Button
+          size="icon"
+          variant="ghost"
+          className="absolute top-2 right-2 z-10"
+          onClick={() => {
+            supabase.auth.signOut();
+            openAuthDialog();
+          }}
+        >
+          <PlusCircle className="h-5 w-5" />
+        </Button>
+      )}
+
+      {/* Conversation List */}
+      <div className="h-full mt-16">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            Loading chats...
+          </div>
+        ) : conversations && conversations.length > 0 ? (
+          <ul className="h-full overflow-y-auto px-2">
+            {conversations.map((conversation) => (
+              <li key={conversation.id} className="mb-2">
+                <Button
+                  variant="ghost"
+                  className={`w-full justify-start rounded-lg ${
+                    conversationId === conversation.id ? "bg-secondary" : ""
+                  }`}
+                  onClick={() => navigate(`/chat/${conversation.id}`)}
+                >
+                  {renderConversationTitle(conversation)}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            No chats yet. Start a conversation!
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
