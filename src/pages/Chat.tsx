@@ -78,7 +78,7 @@ export function Chat() {
   }, [isMobile, setShowSidebar]);
 
   // Handle calendar action selection
-  const handleCalendarAction = (view: "calendar" | "inbox") => {
+  const handleCalendarAction = (view: "calendar" | "inbox" | "proposed") => {
     setCalendarView(view);
     navigate(`/chat?view=${view}`);
   };

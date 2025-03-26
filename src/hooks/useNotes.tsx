@@ -32,7 +32,7 @@ export function useNotes() {
       }
 
       // Transform the data to match our Note type
-      setNotes(data.map(note => ({
+      const transformedNotes: Note[] = data.map(note => ({
         id: note.id,
         title: note.title,
         content: note.content,
@@ -42,8 +42,14 @@ export function useNotes() {
         isJournal: note.is_journal,
         color: note.color,
         userId: note.user_id,
-        isShared: note.is_shared
-      })));
+        isShared: note.is_shared,
+        category: '',  // Default values for required fields
+        tags: [],
+        isFavorite: false,
+        owner: user.id
+      }));
+      
+      setNotes(transformedNotes);
     } catch (error) {
       console.error('Error fetching notes:', error);
       toast.error('Failed to load notes');
@@ -87,7 +93,11 @@ export function useNotes() {
         isJournal: data.is_journal,
         color: data.color,
         userId: data.user_id,
-        isShared: data.is_shared
+        isShared: data.is_shared,
+        category: '',  // Default values for required fields
+        tags: [],
+        isFavorite: false,
+        owner: user.id
       };
       
       setNotes(prevNotes => [newNote, ...prevNotes]);
@@ -120,6 +130,9 @@ export function useNotes() {
         throw error;
       }
       
+      // Find the existing note to preserve fields not coming from the database
+      const existingNote = notes.find(note => note.id === data.id);
+      
       const updatedNote: Note = {
         id: data.id,
         title: data.title,
@@ -127,10 +140,14 @@ export function useNotes() {
         createdAt: data.created_at,
         updatedAt: data.updated_at,
         isPinned: data.is_pinned,
-        isJournal: data.is_journal,
+        isJournal: data.is_journal || existingNote?.isJournal || false,
         color: data.color,
         userId: data.user_id,
-        isShared: data.is_shared
+        isShared: data.is_shared,
+        category: existingNote?.category || '',
+        tags: existingNote?.tags || [],
+        isFavorite: existingNote?.isFavorite || false,
+        owner: existingNote?.owner || ''
       };
       
       setNotes(prevNotes => 

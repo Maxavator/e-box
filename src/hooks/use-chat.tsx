@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useConversations } from "./useConversations";
 import { useMessages } from "./messages";
@@ -15,14 +14,12 @@ export const useChat = () => {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [showSidebar, setShowSidebar] = useState(true);
 
-  // Fetch colleagues
   const { data: colleagues, isLoading: isLoadingColleagues } = useQuery({
     queryKey: ['chat-colleagues'],
     queryFn: async () => {
       const { data } = await supabase.auth.getSession();
       if (!data?.session?.user) return [];
       
-      // Get user's organization ID
       const { data: userProfile } = await supabase
         .from('profiles')
         .select('organization_id')
@@ -31,7 +28,6 @@ export const useChat = () => {
       
       if (!userProfile?.organization_id) return [];
       
-      // Get all colleagues in the same organization
       const { data: colleagueProfiles } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, avatar_url, job_title')
@@ -43,7 +39,6 @@ export const useChat = () => {
     enabled: activeTab === "colleagues"
   });
 
-  // Fetch Golder colleagues
   const { data: golderColleagues, isLoading: isLoadingGolderColleagues } = useGolderColleagues();
 
   const {
@@ -66,7 +61,6 @@ export const useChat = () => {
     handleReaction
   } = useMessages(selectedConversation, setSelectedConversation);
 
-  // Initialize realtime subscriptions
   useRealtime(selectedConversation, setSelectedConversation);
 
   const handleAttachFiles = () => {
@@ -86,7 +80,7 @@ export const useChat = () => {
         newAttachments.push({
           id: fileId,
           name: file.name,
-          type: file.type,
+          type: file.type.startsWith('image/') ? 'image' : 'file',
           size: file.size,
           url: URL.createObjectURL(file),
         });
@@ -101,13 +95,11 @@ export const useChat = () => {
   const handleRemoveAttachment = (attachmentId: string) => {
     setAttachments(attachments.filter(a => a.id !== attachmentId));
   };
-  
-  // Handle starting conversation with a colleague
+
   const handleStartConversationWithColleague = async (colleagueId: string) => {
     const { data } = await supabase.auth.getSession();
     if (!data?.session?.user) return;
     
-    // Check if conversation already exists
     const { data: existingConvs } = await supabase
       .from('conversations')
       .select('id')
@@ -115,13 +107,11 @@ export const useChat = () => {
       .maybeSingle();
     
     if (existingConvs) {
-      // Use existing conversation
       handleSelectConversation(existingConvs.id);
       setActiveTab("chats");
       return existingConvs.id;
     }
     
-    // Create new conversation
     const { data: newConv, error } = await supabase
       .from('conversations')
       .insert({
@@ -136,7 +126,6 @@ export const useChat = () => {
       return null;
     }
     
-    // Select the new conversation
     handleSelectConversation(newConv.id);
     setActiveTab("chats");
     return newConv.id;

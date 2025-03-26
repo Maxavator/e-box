@@ -87,4 +87,5 @@ export interface Note {
   color?: string;
   isPinned?: boolean;
   isJournal?: boolean;
+  userId?: string;
 }

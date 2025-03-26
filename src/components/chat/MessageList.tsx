@@ -28,7 +28,10 @@ export function MessageList({
     senderId: "system",
     senderName: "e-Box by Afrovation",
     content: "Welcome to e-Box! This is your secure communication channel. You can send messages, share files, and collaborate with your team members.",
+    text: "Welcome to e-Box! This is your secure communication channel. You can send messages, share files, and collaborate with your team members.",
     timestamp: new Date().toISOString(),
+    status: "sent",
+    reactions: {},
     sender: "system",
   };
 

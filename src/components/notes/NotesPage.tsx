@@ -33,7 +33,11 @@ export function NotesPage() {
       content,
       isJournal: true,
       color: '#f3e8ff', // Light purple
-      isPinned: false
+      isPinned: false,
+      category: 'Journal',
+      tags: ['journal'],
+      isFavorite: false,
+      owner: ''
     });
   };
 
