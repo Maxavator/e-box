@@ -71,7 +71,13 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
 
   const firstName = profile?.first_name || '';
   const lastName = profile?.last_name || '';
-  const jobTitle = profile?.job_title || '';
+  
+  // Special case for Thabo Nkosi - set job title to "Chief Information Officer"
+  let jobTitle = profile?.job_title || '';
+  if (firstName === 'Thabo' && lastName === 'Nkosi') {
+    jobTitle = 'Chief Information Officer';
+  }
+  
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   const fullName = `${firstName} ${lastName}`.trim() || 'User';
   

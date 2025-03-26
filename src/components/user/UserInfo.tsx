@@ -44,7 +44,12 @@ export function UserInfo({ className }: UserInfoProps) {
     `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
     'User';
   const avatarUrl = profile?.avatar_url || '';
-  const jobTitle = profile?.job_title || '';
+  
+  // Special case for Thabo Nkosi - set job title to "Chief Information Officer"
+  let jobTitle = profile?.job_title || '';
+  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
+    jobTitle = 'Chief Information Officer';
+  }
 
   // For debugging
   if (!isLoading) {
