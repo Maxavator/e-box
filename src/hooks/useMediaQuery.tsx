@@ -23,4 +23,3 @@ export function useMediaQuery() {
   
   return { isDesktop, isMobile };
 }
-

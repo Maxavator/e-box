@@ -37,7 +37,7 @@ export function Chat() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const { isMobile } = useMediaQuery();
 
   // Handle conversation selection from URL
   useEffect(() => {
