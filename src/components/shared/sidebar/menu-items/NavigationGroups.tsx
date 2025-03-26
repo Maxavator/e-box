@@ -97,7 +97,7 @@ export const MainNavigationGroup = ({
         icon={ClipboardList}
         label="Surveys"
         path="/surveys"
-        isActive={location.pathname === "/surveys"}
+        isActive={location.pathname.startsWith("/surveys")}
         onClick={() => handleNavigation("/surveys")}
       />
       

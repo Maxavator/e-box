@@ -2,59 +2,48 @@
 import { useState } from 'react';
 import { Note } from '@/types/chat';
 import { NoteEditor } from './NoteEditor';
-import { JournalEntry } from './JournalEntry';
 import { NoteTabs } from './NoteTabs';
 import { DeleteNoteDialog, EmptyNoteState } from './dialogs';
 import { ShareNoteDialog } from './ShareNoteDialog';
-import { JournalReminderDialog } from './JournalReminderDialog';
 import { NotesLoadingState } from './LoadingState';
 
 interface NotesContainerProps {
   filteredNotes: Note[];
-  journalEntries: Note[];
   activeNote: Note | null;
   setActiveNote: (note: Note | null) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   isLoading: boolean;
   createNote: (note: any) => Promise<Note>;
-  createJournalEntry: (title: string, content: string) => Promise<Note>;
   updateNote: (note: Partial<Note> & { id: string }) => Promise<Note>;
   deleteNote: (noteId: string) => Promise<void>;
   shareNote: (noteId: string, emails: string[]) => Promise<boolean>;
-  setupJournalReminder: (enabled: boolean, dayOfWeek: number, time: string) => Promise<boolean>;
 }
 
 export function NotesContainer({
   filteredNotes,
-  journalEntries,
   activeNote,
   setActiveNote,
   searchQuery,
   setSearchQuery,
   isLoading,
   createNote,
-  createJournalEntry,
   updateNote,
   deleteNote,
-  shareNote,
-  setupJournalReminder
+  shareNote
 }: NotesContainerProps) {
   const [activeTab, setActiveTab] = useState<string>("notes");
   const [isCreatingNote, setIsCreatingNote] = useState(false);
-  const [isCreatingJournal, setIsCreatingJournal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<string | null>(null);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [noteToShare, setNoteToShare] = useState<Note | null>(null);
-  const [showReminderDialog, setShowReminderDialog] = useState(false);
 
   const handleNoteSelect = (note: Note) => {
-    if (isCreatingNote || isCreatingJournal) {
+    if (isCreatingNote) {
       // Ask for confirmation if they're abandoning a new note
       if (window.confirm('Discard unsaved note?')) {
         setIsCreatingNote(false);
-        setIsCreatingJournal(false);
         setActiveNote(note);
       }
     } else {
@@ -64,13 +53,6 @@ export function NotesContainer({
 
   const handleNewNote = () => {
     setIsCreatingNote(true);
-    setIsCreatingJournal(false);
-    setActiveNote(null);
-  };
-
-  const handleNewJournal = () => {
-    setIsCreatingJournal(true);
-    setIsCreatingNote(false);
     setActiveNote(null);
   };
 
@@ -94,17 +76,6 @@ export function NotesContainer({
       }
     } catch (error) {
       console.error('Error saving note:', error);
-    }
-  };
-
-  const handleSaveJournal = async (title: string, content: string) => {
-    try {
-      const newJournal = await createJournalEntry(title, content);
-      setActiveNote(newJournal);
-      setIsCreatingJournal(false);
-      setActiveTab("journal");
-    } catch (error) {
-      console.error('Error saving journal entry:', error);
     }
   };
 
@@ -132,16 +103,9 @@ export function NotesContainer({
     }
   };
 
-  const handleSaveReminder = async (enabled: boolean, dayOfWeek: number, time: string) => {
-    await setupJournalReminder(enabled, dayOfWeek, time);
-  };
-
   const handleCancelNote = () => {
     if (isCreatingNote) {
       setIsCreatingNote(false);
-    }
-    if (isCreatingJournal) {
-      setIsCreatingJournal(false);
     }
   };
 
@@ -157,14 +121,11 @@ export function NotesContainer({
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           filteredNotes={filteredNotes}
-          journalEntries={journalEntries}
           activeNoteId={activeNote?.id}
           onNoteSelect={handleNoteSelect}
           onNewNote={handleNewNote}
-          onNewJournal={handleNewJournal}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onReminderClick={() => setShowReminderDialog(true)}
         />
       </div>
       
@@ -177,11 +138,6 @@ export function NotesContainer({
             onCancel={handleCancelNote}
             isNew={true}
           />
-        ) : isCreatingJournal ? (
-          <JournalEntry
-            onSave={handleSaveJournal}
-            onCancel={handleCancelNote}
-          />
         ) : activeNote ? (
           <NoteEditor
             note={activeNote}
@@ -193,7 +149,6 @@ export function NotesContainer({
         ) : (
           <EmptyNoteState
             handleNewNote={handleNewNote}
-            handleNewJournal={handleNewJournal}
           />
         )}
       </div>
@@ -210,12 +165,6 @@ export function NotesContainer({
         onOpenChange={setShowShareDialog}
         onShare={handleShareNote}
         noteTitle={noteToShare?.title || ''}
-      />
-      
-      <JournalReminderDialog
-        open={showReminderDialog}
-        onOpenChange={setShowReminderDialog}
-        onSave={handleSaveReminder}
       />
     </div>
   );

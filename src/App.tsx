@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/shared/theme-provider';
@@ -9,6 +10,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import GovZA from "./pages/GovZA";
 import Contacts from "./pages/Contacts";
 import LogoutPage from "./pages/LogoutPage";
+import Surveys from "./pages/Surveys";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -111,7 +113,19 @@ function App() {
             },
             {
               path: '/surveys',
-              element: <div>Surveys</div>,
+              element: <Surveys />,
+            },
+            {
+              path: '/surveys/:id',
+              element: <Surveys />,
+            },
+            {
+              path: '/surveys/:id/edit',
+              element: <Surveys />,
+            },
+            {
+              path: '/surveys/:id/results',
+              element: <Surveys />,
             },
             {
               path: '/admin',
