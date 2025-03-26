@@ -13,10 +13,12 @@ export interface UserProfileData {
   organizationId: string | null;
   organizationName: string | null;
   isAdmin: boolean;
+  loading: boolean;
+  error: Error | null;
 }
 
 export const useUserProfile = (): UserProfileData => {
-  const { data: session } = useQuery({
+  const { data: session, isLoading: isSessionLoading, error: sessionError } = useQuery({
     queryKey: ['user-session'],
     queryFn: async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
@@ -25,7 +27,7 @@ export const useUserProfile = (): UserProfileData => {
     },
   });
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: isProfileLoading, error: profileError } = useQuery({
     queryKey: ['user-profile', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
@@ -46,7 +48,7 @@ export const useUserProfile = (): UserProfileData => {
     },
   });
 
-  const { data: organizationName } = useQuery({
+  const { data: organizationName, isLoading: isOrgLoading, error: orgError } = useQuery({
     queryKey: ['organization-name', profile?.organization_id],
     enabled: !!profile?.organization_id,
     queryFn: async () => {
@@ -67,7 +69,7 @@ export const useUserProfile = (): UserProfileData => {
     },
   });
 
-  const { data: userRole } = useQuery({
+  const { data: userRole, isLoading: isRoleLoading, error: roleError } = useQuery({
     queryKey: ['user-role', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
@@ -104,6 +106,12 @@ export const useUserProfile = (): UserProfileData => {
   const lastName = profile?.last_name || '';
   const displayName = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null;
 
+  // Combine loading states
+  const loading = isSessionLoading || isProfileLoading || isOrgLoading || isRoleLoading;
+  
+  // Combine errors (prioritize session errors)
+  const error = sessionError || profileError || orgError || roleError;
+
   return {
     userId: session?.user?.id || null,
     userDisplayName: displayName,
@@ -115,5 +123,7 @@ export const useUserProfile = (): UserProfileData => {
     organizationId: profile?.organization_id || null,
     organizationName,
     isAdmin: userRole === 'org_admin' || userRole === 'global_admin',
+    loading,
+    error,
   };
 };
