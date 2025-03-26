@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NavigationCards, AdminView } from '@/components/admin/dashboard/NavigationCards';
 import { StatsCards } from '@/components/admin/dashboard/StatsCards';
-import { AdminMenu } from '@/components/admin/AdminMenu';
 import { UserTable } from '@/components/admin/UserTable';
 import { OrganizationsList } from '@/components/admin/organization/OrganizationsList';
 import { AdminReporting } from '@/components/admin/dashboard/AdminReporting';
@@ -366,13 +365,8 @@ export default function AdminPortal() {
 
   return (
     <div className="container max-w-7xl mx-auto p-4 md:p-8 pb-16">
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="lg:w-64 flex-shrink-0">
-          <AdminMenu activeView={activeView} setActiveView={setActiveView} />
-        </div>
-        <div className="flex-1 min-w-0">
-          {renderContent()}
-        </div>
+      <div className="w-full">
+        {renderContent()}
       </div>
     </div>
   );
