@@ -566,7 +566,14 @@ export type Database = {
     Enums: {
       leave_status: "pending" | "approved" | "rejected" | "cancelled"
       leave_type: "annual" | "sick" | "family" | "study" | "other"
-      user_role: "global_admin" | "org_admin" | "staff" | "user"
+      user_role:
+        | "global_admin"
+        | "org_admin"
+        | "staff"
+        | "user"
+        | "hr_moderator"
+        | "comm_moderator"
+        | "stakeholder_moderator"
     }
     CompositeTypes: {
       [_ in never]: never

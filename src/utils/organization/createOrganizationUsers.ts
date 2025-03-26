@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { UserToCreate } from "./golderUserDefinitions";
+import type { UserToCreate } from "./afrovationUserDefinitions";
 
 /**
  * Creates multiple users for an organization
