@@ -1,4 +1,3 @@
-
 import { useChat } from "@/hooks/use-chat";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatContent } from "@/components/chat/ChatContent";
@@ -87,6 +86,7 @@ export function Chat() {
     <div className="h-[calc(100vh-64px)] overflow-hidden flex flex-col">
       <div className="flex-1 overflow-hidden">
         {isMobile ? (
+          
           <div className="h-full flex flex-col">
             {showSidebar ? (
               <div className="h-full">
@@ -130,6 +130,7 @@ export function Chat() {
             )}
           </div>
         ) : (
+          
           <ResizablePanelGroup
             direction="horizontal"
             className="h-full"

@@ -19,6 +19,18 @@ export interface Message {
   status: 'sent' | 'delivered' | 'read';
   reactions: Record<string, string[]>;
   sender?: 'me' | 'them';
+  edited?: boolean;
+  isEdited?: boolean;
+  attachments?: Attachment[];
+}
+
+export interface Attachment {
+  id: string;
+  type: 'image' | 'file' | 'link';
+  url: string;
+  name: string;
+  size?: number;
+  preview?: string;
 }
 
 export interface Conversation {
@@ -35,4 +47,39 @@ export interface Conversation {
   draft?: boolean;
   unread?: boolean;
   labels?: string[];
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  avatarUrl: string;
+  memberIds: string[];
+  createdAt: string;
+}
+
+export interface GroupConversation extends Conversation {
+  isGroup: true;
+  memberIds: string[];
+}
+
+export interface GroupMember {
+  id: string;
+  userId: string;
+  groupId: string;
+  role: 'admin' | 'member';
+  joinedAt: string;
+}
+
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  isShared: boolean;
+  category: string;
+  tags: string[];
+  isFavorite: boolean;
+  owner: string;
+  attachments?: Attachment[];
 }
