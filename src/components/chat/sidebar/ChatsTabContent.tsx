@@ -19,12 +19,12 @@ export const ChatsTabContent = () => {
   const renderConversationTitle = (conversation: Conversation) => {
     if (!userDisplayName) return "Chat";
     
-    // Fix: Use participantIds instead of participants
+    // Find other participant in the conversation
     const otherParticipantId = conversation.participantIds?.find(
       (id) => id !== organizationId
     );
     
-    // Since profiles might not exist in the conversation object, provide a fallback
+    // If conversation has a name, use it
     if (conversation.name) {
       return conversation.name;
     }

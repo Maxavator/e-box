@@ -22,7 +22,7 @@ export function UserProfileHeader({
   // Add navigation hook
   const navigate = useNavigate();
   
-  // Format the name - showing firstName lastName format instead of lastName, firstName
+  // Format the name consistently across the app
   let formattedName = "User";
   
   if (firstName && lastName) {
@@ -40,16 +40,6 @@ export function UserProfileHeader({
   const handleNameClick = () => {
     navigate('/profile');
   };
-
-  // For debugging
-  console.log('UserProfileHeader - User data:', {
-    firstName,
-    lastName,
-    formattedName,
-    jobTitle,
-    displayedRole,
-    hasOrganization
-  });
 
   return (
     <div className="flex items-center gap-3 mb-3">

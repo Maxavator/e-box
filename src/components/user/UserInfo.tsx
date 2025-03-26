@@ -5,73 +5,46 @@ import { supabase } from "@/integrations/supabase/client";
 import { OnlineStatus } from "./OnlineStatus";
 import { UserRoleBadge } from "@/components/shared/profile-sidebar/UserRoleBadge";
 import { useQuery } from "@tanstack/react-query";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 interface UserInfoProps {
   className?: string;
 }
 
 export function UserInfo({ className }: UserInfoProps) {
-  const { data: session } = useQuery({
-    queryKey: ['session'],
-    queryFn: async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      return session;
-    },
-  });
-
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ['profile', session?.user?.id],
-    enabled: !!session?.user?.id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, avatar_url, job_title, organization_id')
-        .eq('id', session!.user.id)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-      
-      return data;
-    },
-  });
-
-  // Create the display name in the format "First Last"
-  const displayName = profile ? 
-    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
-    'User';
-  const avatarUrl = profile?.avatar_url || '';
+  const { 
+    userDisplayName, 
+    firstName, 
+    lastName, 
+    avatarUrl, 
+    jobTitle, 
+    loading 
+  } = useUserProfile();
   
-  // Special case for Thabo Nkosi - set job title to "Chief Information Officer"
-  let jobTitle = profile?.job_title || '';
-  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
-    jobTitle = 'Chief Information Officer';
-  }
-
-  // For debugging
-  if (!isLoading) {
-    console.log('UserInfo - Profile data:', {
-      firstName: profile?.first_name,
-      lastName: profile?.last_name,
-      jobTitle,
-      hasOrganization: !!profile?.organization_id
-    });
+  // Create initials from first and last name
+  const initials = `${firstName?.[0] || ''}${lastName?.[0] || ''}`;
+  
+  if (loading) {
+    return (
+      <div className={`flex items-center gap-2 ${className}`}>
+        <div className="h-8 w-8 bg-muted rounded-full animate-pulse"></div>
+        <div className="flex flex-col gap-1">
+          <div className="h-4 w-24 bg-muted rounded animate-pulse"></div>
+          <div className="h-3 w-16 bg-muted rounded animate-pulse"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <Avatar className="h-8 w-8">
-        <AvatarImage src={avatarUrl} />
-        <AvatarFallback>
-          {displayName?.split(' ').map(n => n[0]).join('') || 'U'}
-        </AvatarFallback>
+        <AvatarImage src={avatarUrl || ''} alt={userDisplayName || 'User'} />
+        <AvatarFallback>{initials || 'U'}</AvatarFallback>
       </Avatar>
       <div className="flex flex-col">
         <span className="text-sm font-medium">
-          {displayName}
+          {userDisplayName || 'User'}
         </span>
         <div className="flex items-center">
           <span className="text-xs text-muted-foreground mr-2">{jobTitle}</span>

@@ -95,16 +95,20 @@ export const useUserProfile = (): UserProfileData => {
     },
   });
 
-  // Special case for Thabo Nkosi - set job title to "Chief Information Officer"
-  let jobTitle = profile?.job_title || '';
-  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
-    jobTitle = 'Chief Information Officer';
-  }
-
-  // Format display name
+  // Format display name consistently
   const firstName = profile?.first_name || '';
   const lastName = profile?.last_name || '';
-  const displayName = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null;
+  
+  // Special case for Thabo Nkosi - set job title to "Chief Information Officer"
+  let jobTitle = profile?.job_title || '';
+  if (firstName === 'Thabo' && lastName === 'Nkosi') {
+    jobTitle = 'Chief Information Officer';
+  }
+  
+  // Format display name consistently
+  const displayName = firstName && lastName 
+    ? `${firstName} ${lastName}` 
+    : firstName || lastName || null;
 
   // Combine loading states
   const loading = isSessionLoading || isProfileLoading || isOrgLoading || isRoleLoading;
@@ -115,8 +119,8 @@ export const useUserProfile = (): UserProfileData => {
   return {
     userId: session?.user?.id || null,
     userDisplayName: displayName,
-    firstName: profile?.first_name || null,
-    lastName: profile?.last_name || null,
+    firstName,
+    lastName,
     email: session?.user?.email || null,
     avatarUrl: profile?.avatar_url || null,
     jobTitle,
