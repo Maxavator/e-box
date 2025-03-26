@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { UserSearch } from "./UserSearch";
+import { X, Users, Search, UserPlus } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -204,7 +204,6 @@ export function NewMessageDialog({
   };
 
   const handleSelectUser = async (user: any) => {
-    // Reuse the same logic as handleSelectContact
     handleSelectContact(user);
   };
 

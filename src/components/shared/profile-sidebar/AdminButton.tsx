@@ -1,17 +1,22 @@
 
 import { Button } from "@/components/ui/button";
 import { Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 
 export function AdminButton() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAdmin, userRole } = useUserRole();
+  
+  // Check if we're already on the admin page
+  const isAdminPage = location.pathname.includes('/admin');
   
   // Consider a user to have admin access if they are either global_admin or org_admin
   const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
   
-  if (!hasAdminAccess) return null;
+  // Don't render the button if user has no admin access or is already on admin page
+  if (!hasAdminAccess || isAdminPage) return null;
   
   return (
     <Button 
