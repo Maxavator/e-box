@@ -1,11 +1,13 @@
 
 import { Button } from "@/components/ui/button";
-import { UserPlus, Users, RefreshCcw } from "lucide-react";
+import { UserPlus, Users, RefreshCcw, Search } from "lucide-react";
 import { UserTable } from "./UserTable";
 import { UserDialog } from "./UserDialog";
 import { useUserManagement } from "./useUserManagement";
 import type { UserWithRole } from "./types";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 export const UserManagement = () => {
   const {
@@ -32,6 +34,8 @@ export const UserManagement = () => {
     userProfile,
   } = useUserManagement();
 
+  const [searchQuery, setSearchQuery] = useState("");
+
   const handleEditUser = (user: UserWithRole) => {
     setSelectedUser(user);
     setFormData({
@@ -47,6 +51,14 @@ export const UserManagement = () => {
   const handleFormChange = (field: keyof typeof formData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  const filteredUsers = searchQuery && users ? 
+    users.filter(user => 
+      `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.organizations[0]?.name || "").toLowerCase().includes(searchQuery.toLowerCase())
+    ) : 
+    users;
 
   if (!isAdmin && userRole !== 'org_admin') {
     return (
@@ -105,6 +117,19 @@ export const UserManagement = () => {
         </div>
       </div>
 
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search users by name, email or organization..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+
       <UserDialog
         isOpen={isAddUserOpen}
         onOpenChange={setIsAddUserOpen}
@@ -131,7 +156,7 @@ export const UserManagement = () => {
       />
 
       <UserTable
-        users={users}
+        users={filteredUsers}
         isLoading={isLoading}
         onEditUser={handleEditUser}
         isAdmin={!!isAdmin}

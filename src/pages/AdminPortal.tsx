@@ -9,13 +9,19 @@ import { LookupTools } from "@/components/admin/dashboard/LookupTools";
 import { DocumentationPortal } from "@/components/admin/documentation/DocumentationPortal";
 import { SystemsDocumentation } from "@/components/admin/documentation/SystemsDocumentation";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { Badge } from "@/components/ui/badge";
+import { useUserRole } from "@/components/admin/hooks/useUserRole";
 
 export const AdminPortal = () => {
   const [activeView, setActiveView] = useState<AdminView>("dashboard");
   const { organizationName, userDisplayName, loading } = useUserProfile();
+  const { isAdmin, userRole } = useUserRole();
   
   // Get the user's name from the profile
   const userName = userDisplayName || 'User';
+  
+  // Determine if the user is an org admin
+  const isOrgAdmin = !isAdmin && userRole === 'org_admin';
 
   // Handle navigation between different admin views
   const handleViewChange = (view: AdminView) => {
@@ -54,9 +60,23 @@ export const AdminPortal = () => {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Administration Portal for {userName}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">Administration Portal for {userName}</h1>
+          {isOrgAdmin && (
+            <Badge className="bg-blue-600 hover:bg-blue-700">
+              Organization Admin
+            </Badge>
+          )}
+          {isAdmin && (
+            <Badge className="bg-green-600 hover:bg-green-700">
+              Global Admin
+            </Badge>
+          )}
+        </div>
         <p className="text-muted-foreground">
-          Manage users, organizations, and system settings
+          {isOrgAdmin 
+            ? `Manage users and settings for your organization: ${organizationName || 'Your Organization'}`
+            : "Manage users, organizations, and system settings"}
         </p>
       </div>
 
