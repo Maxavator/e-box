@@ -53,61 +53,65 @@ export const TaskManager = ({ fullWidth = false }: TaskManagerProps) => {
   };
 
   const deleteTask = (id: string) => {
-    setTasks(tasks.filter(task => task.id !== id));
+    setTasks(tasks.filter(task => task.id !== task));
     toast.success('Task removed');
   };
 
   return (
-    <Card className={`p-6 shadow-lg hover:shadow-xl transition-shadow duration-200 ${fullWidth ? 'w-full' : ''}`}>
-      <div className="flex items-center gap-2 mb-6">
-        <CheckCircle2 className="h-6 w-6 text-primary" />
-        <h2 className="text-xl font-semibold text-gray-900">Tasks</h2>
-      </div>
-      
-      <div className="flex gap-2 mb-4">
-        <Input
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-          placeholder="Add a new task..."
-          onKeyDown={(e) => e.key === 'Enter' && addTask()}
-        />
-        <Button onClick={addTask}>Add</Button>
-      </div>
-      
-      <ScrollArea className="h-[300px] pr-4">
-        <div className="space-y-2">
-          {tasks.map((task) => (
-            <div
-              key={task.id}
-              className={`p-3 border rounded-lg flex items-center justify-between group ${
-                task.completed ? 'bg-muted border-muted-foreground/20' : 'bg-card'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <Checkbox
-                  checked={task.completed}
-                  onCheckedChange={() => toggleTaskStatus(task.id)}
-                  id={`task-${task.id}`}
-                />
-                <label
-                  htmlFor={`task-${task.id}`}
-                  className={`cursor-pointer ${task.completed ? 'line-through text-muted-foreground' : ''}`}
-                >
-                  {task.title}
-                </label>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => deleteTask(task.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                Remove
-              </Button>
-            </div>
-          ))}
+    <Card className={`h-full shadow-lg hover:shadow-xl transition-shadow duration-200 ${fullWidth ? 'col-span-full' : ''}`}>
+      <div className="flex flex-col h-full">
+        <div className="p-6 border-b">
+          <div className="flex items-center gap-2 mb-6">
+            <CheckCircle2 className="h-6 w-6 text-primary" />
+            <h2 className="text-xl font-semibold text-gray-900">Tasks</h2>
+          </div>
+          
+          <div className="flex gap-2">
+            <Input
+              value={newTask}
+              onChange={(e) => setNewTask(e.target.value)}
+              placeholder="Add a new task..."
+              onKeyDown={(e) => e.key === 'Enter' && addTask()}
+            />
+            <Button onClick={addTask}>Add</Button>
+          </div>
         </div>
-      </ScrollArea>
+        
+        <ScrollArea className="flex-1 p-6">
+          <div className="space-y-2">
+            {tasks.map((task) => (
+              <div
+                key={task.id}
+                className={`p-3 border rounded-lg flex items-center justify-between group ${
+                  task.completed ? 'bg-muted border-muted-foreground/20' : 'bg-card'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    checked={task.completed}
+                    onCheckedChange={() => toggleTaskStatus(task.id)}
+                    id={`task-${task.id}`}
+                  />
+                  <label
+                    htmlFor={`task-${task.id}`}
+                    className={`cursor-pointer ${task.completed ? 'line-through text-muted-foreground' : ''}`}
+                  >
+                    {task.title}
+                  </label>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => deleteTask(task.id)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
     </Card>
   );
 };

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
@@ -24,7 +23,6 @@ export function Calendar() {
   const { calendarView, setCalendarView } = useChat();
   const { toast } = useToast();
 
-  // Fetch pending invites count for badge
   const { data: pendingInvitesCount } = useQuery({
     queryKey: ['pending-invites-count'],
     queryFn: async () => {
@@ -44,10 +42,9 @@ export function Calendar() {
       
       return count || 0;
     },
-    refetchInterval: 60000 // Refetch every minute
+    refetchInterval: 60000
   });
 
-  // Fetch proposed times count for badge
   const { data: proposedTimesCount } = useQuery({
     queryKey: ['proposed-times-count'],
     queryFn: async () => {
@@ -67,10 +64,9 @@ export function Calendar() {
       
       return count || 0;
     },
-    refetchInterval: 60000 // Refetch every minute
+    refetchInterval: 60000
   });
 
-  // Fetch upcoming events (next 5 days) for calendar overview
   const { data: events, isError } = useQuery({
     queryKey: ['calendar-events'],
     queryFn: async () => {
@@ -106,10 +102,8 @@ export function Calendar() {
     retry: false
   });
 
-  // Get upcoming holidays (next 3)
   const upcomingHolidays = getUpcomingHolidays(3);
 
-  // Conditional rendering based on view
   if (activeTab === "manage") {
     return (
       <div className="p-8 max-w-7xl mx-auto">
@@ -172,15 +166,14 @@ export function Calendar() {
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-        <TabsList className="grid w-full md:w-auto grid-cols-2 md:grid-cols-3">
+        <TabsList className="grid w-full md:w-auto grid-cols-3">
           <TabsTrigger value="calendar">My Calendar</TabsTrigger>
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="holidays">SA Public Holidays</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="calendar">
+        <TabsContent value="calendar" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Calendar Widget */}
             <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
               <div className="flex items-center gap-2 mb-6">
                 <CalendarDays className="h-6 w-6 text-primary" />
@@ -202,7 +195,6 @@ export function Calendar() {
               </div>
             </Card>
 
-            {/* Today's Schedule */}
             <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
               <div className="flex items-center gap-2 mb-6">
                 <Clock className="h-6 w-6 text-primary" />
@@ -242,11 +234,9 @@ export function Calendar() {
               </ScrollArea>
             </Card>
 
-            {/* Task Manager */}
             <div className="grid grid-cols-1 gap-8">
               <TaskManager />
               
-              {/* Notifications Section */}
               <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
@@ -306,7 +296,6 @@ export function Calendar() {
                 </div>
               </Card>
               
-              {/* Upcoming Holidays Preview Card */}
               <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
@@ -349,13 +338,13 @@ export function Calendar() {
           </div>
         </TabsContent>
         
-        <TabsContent value="tasks">
-          <div className="grid grid-cols-1">
+        <TabsContent value="tasks" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <TaskManager fullWidth />
           </div>
         </TabsContent>
         
-        <TabsContent value="holidays">
+        <TabsContent value="holidays" className="mt-6">
           <SouthAfricanHolidays />
         </TabsContent>
       </Tabs>
@@ -363,11 +352,9 @@ export function Calendar() {
   );
 }
 
-// Helper function to get upcoming holidays
 function getUpcomingHolidays(count: number) {
   const currentDate = new Date();
   
-  // Import holidays from SouthAfricanHolidays component
   const allHolidays = [
     {
       id: 1,
@@ -462,14 +449,12 @@ function getUpcomingHolidays(count: number) {
     }
   ];
   
-  // Filter to get only upcoming holidays
   return allHolidays
     .filter(holiday => new Date(holiday.date) >= currentDate)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, count);
 }
 
-// Helper function to display days until holiday
 function getDaysUntil(dateString: string): string {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
