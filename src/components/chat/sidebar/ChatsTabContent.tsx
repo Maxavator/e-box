@@ -10,23 +10,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
 export const ChatsTabContent = () => {
-  const { conversations = [], isLoading = false } = useChat();
+  const { conversations = [], isLoading } = useChat();
   const { conversationId } = useParams();
   const navigate = useNavigate();
   const { openAuthDialog } = useAuthDialog();
-  const { profile } = useUserProfile();
+  const { userDisplayName, organizationId } = useUserProfile();
 
   const renderConversationTitle = (conversation: Conversation) => {
-    if (!profile) return "Chat";
+    if (!userDisplayName) return "Chat";
     
     // Fix: Use participantIds instead of participants
     const otherParticipantId = conversation.participantIds?.find(
-      (id) => id !== profile.id
+      (id) => id !== organizationId
     );
     
-    // Find the other participant's name in the profiles array if it exists
-    const otherParticipant = conversation.profiles?.find(p => p.id === otherParticipantId);
-    return otherParticipant?.first_name || "Chat";
+    // Since profiles might not exist in the conversation object, provide a fallback
+    if (conversation.name) {
+      return conversation.name;
+    }
+    
+    return "Chat";
   };
 
   return (
@@ -41,7 +44,7 @@ export const ChatsTabContent = () => {
       </div>
 
       {/* New Chat Button */}
-      {profile && (
+      {userDisplayName && (
         <Button
           size="icon"
           variant="ghost"

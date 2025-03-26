@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Conversation } from "@/types/chat";
-import { Message } from "@/types/chat";
 import { demoConversations } from "@/data/chat";
 
 export const useConversations = () => {
@@ -10,12 +9,14 @@ export const useConversations = () => {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isNewConversation, setIsNewConversation] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchConversations();
   }, []);
 
   const fetchConversations = async () => {
+    setIsLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -63,6 +64,8 @@ export const useConversations = () => {
       }
     } catch (error) {
       console.error("Error fetching user:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -91,5 +94,6 @@ export const useConversations = () => {
     filteredConversations,
     handleSelectConversation,
     isNewConversation,
+    isLoading
   };
 };

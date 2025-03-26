@@ -23,6 +23,8 @@ const Documents = Desk; // Temporary alias for Documents page
 const Calendar = Desk; // Temporary alias for Calendar page
 const LeaveManager = Desk; // Temporary alias for LeaveManager page
 const Policies = Desk; // Temporary alias for Policies page
+// Using existing Contacts component instead of ContactsList
+const ContactsList = Contacts; // This fixes the error in App.tsx
 
 export {
   AdminPortal,
@@ -44,5 +46,6 @@ export {
   Documents,
   Calendar,
   LeaveManager,
-  Policies
+  Policies,
+  ContactsList
 };

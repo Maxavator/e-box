@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useConversations } from "./useConversations";
 import { useMessages } from "./messages";
@@ -50,6 +51,7 @@ export const useChat = () => {
     filteredConversations,
     handleSelectConversation,
     isNewConversation,
+    isLoading: isLoadingConversations
   } = useConversations();
 
   const {
@@ -160,5 +162,8 @@ export const useChat = () => {
     handleRemoveAttachment,
     handleStartConversationWithColleague,
     isNewConversation,
+    // Add these missing exports to fix the ChatsTabContent errors
+    conversations,
+    isLoading: isLoadingConversations
   };
 };
