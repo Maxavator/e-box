@@ -6,11 +6,11 @@ import { StatsCards } from '@/components/admin/dashboard/StatsCards';
 import { UserTable } from '@/components/admin/UserTable';
 import { OrganizationsList } from '@/components/admin/organization/OrganizationsList';
 import { AdminReporting } from '@/components/admin/dashboard/AdminReporting';
+import { LookupTools } from '@/components/admin/dashboard/LookupTools';
 import { SystemSettings } from '@/components/admin/SystemSettings';
 import { SystemInfo } from '@/components/admin/SystemInfo';
 import { DocumentationPortal } from '@/components/admin/documentation/DocumentationPortal';
 import { SalesKit } from '@/components/admin/documentation/SalesKit';
-import { SystemsDocumentation } from '@/components/admin/documentation/SystemsDocumentation';
 import { Award, AlertCircle, FileText, Users, BarChart4 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -22,9 +22,9 @@ export default function AdminPortal() {
   const [docTab, setDocTab] = useState<'documentation' | 'saleskit'>('documentation');
   const [sassaTab, setSassaTab] = useState<'grants' | 'applications' | 'verification'>('grants');
   const { isMobile } = useMediaQuery();
-  const { userDisplayName, organizationName } = useUserProfile();
+  const { user } = useUserProfile();
   
-  const username = userDisplayName || organizationName || "Admin";
+  const username = user?.username || user?.email || "Admin";
 
   const renderDashboard = () => (
     <div className="space-y-6">
@@ -69,6 +69,7 @@ export default function AdminPortal() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
+          {/* Mock props for UserTable until we connect to real data */}
           <UserTable 
             users={[]} 
             isLoading={false} 
@@ -342,21 +343,6 @@ export default function AdminPortal() {
     </div>
   );
 
-  const renderSystemsDocumentation = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Systems Documentation</h2>
-          <p className="text-muted-foreground">
-            SLA information, architectural overview, and technical specifications.
-          </p>
-        </div>
-      </div>
-
-      <SystemsDocumentation />
-    </div>
-  );
-
   const renderContent = () => {
     switch (activeView) {
       case 'dashboard':
@@ -373,8 +359,6 @@ export default function AdminPortal() {
         return renderDocumentation();
       case 'sassa':
         return renderSassa();
-      case 'systems-documentation':
-        return renderSystemsDocumentation();
       default:
         return renderDashboard();
     }
