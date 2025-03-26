@@ -160,7 +160,7 @@ export function MyDesk() {
             <Button 
               variant="outline" 
               className="w-full justify-between" 
-              onClick={() => handleNavigation("/desk/calendar")}
+              onClick={() => navigate("/calendar")}
             >
               <span>Open Calendar</span>
               <ArrowRight className="h-4 w-4" />
@@ -387,7 +387,7 @@ export function MyDesk() {
             <Button 
               variant="outline" 
               className="h-auto py-4 flex flex-col items-center justify-center" 
-              onClick={() => navigate("/desk/calendar")}
+              onClick={() => navigate("/calendar")}
             >
               <Calendar className="h-6 w-6 mb-2" />
               <span className="text-sm font-medium">Calendar</span>

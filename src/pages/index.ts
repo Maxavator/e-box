@@ -13,6 +13,7 @@ import Notes from "./Notes";
 import OrganizationManagementPage from "./OrganizationManagement";
 import Changelog from "./Changelog";
 import MyDocuments from "./MyDocuments";
+import MyCalendar from "./MyCalendar";
 
 // Add OrganizationDashboard alias
 const OrganizationDashboard = OrganizationManagementPage;
@@ -42,6 +43,7 @@ export {
   OrganizationManagementPage,
   Changelog,
   MyDocuments,
+  MyCalendar,
   // Add missing exports
   OrganizationDashboard,
   Settings,

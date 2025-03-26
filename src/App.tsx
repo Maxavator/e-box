@@ -1,16 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import { Toaster } from 'sonner';
 import { MainLayout } from '@/layouts/MainLayout';
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
-import { Index, Auth, Dashboard, NotFound, Chat, AdminPortal, OrganizationDashboard, Changelog, Settings, Documents, Calendar, ContactsList, LeaveManager, Policies, Desk, Notes } from './pages';
+import { Index, Auth, Dashboard, NotFound, Chat, AdminPortal, OrganizationDashboard, Changelog, Settings, Documents, Calendar, ContactsList, LeaveManager, Policies, Desk, Notes, MyDocuments, MyCalendar } from './pages';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import GovZA from "./pages/GovZA";
 import Contacts from "./pages/Contacts";
 import LogoutPage from "./pages/LogoutPage";
-import MyDocuments from "./pages/MyDocuments";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -97,7 +95,7 @@ function App() {
             },
             {
               path: '/calendar',
-              element: <Calendar />,
+              element: <MyCalendar />,
             },
             {
               path: '/contacts',
