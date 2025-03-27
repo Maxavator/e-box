@@ -28,8 +28,6 @@ export function UserProfileSidebarFooter() {
     queryKey: ['sidebarProfile', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
-      console.log('Fetching profile data for user ID:', session?.user?.id);
-      
       const { data, error } = await supabase
         .from('profiles')
         .select('first_name, last_name, avatar_url, job_title, organization_id')
@@ -41,13 +39,11 @@ export function UserProfileSidebarFooter() {
         return null;
       }
       
-      console.log('Profile data fetched successfully:', data);
       return data;
     },
   });
 
   if (!session?.user) {
-    console.log('No session user found');
     return (
       <div className="p-3 text-center text-sm text-muted-foreground">
         Not logged in
@@ -56,7 +52,6 @@ export function UserProfileSidebarFooter() {
   }
 
   if (isProfileLoading && !profile) {
-    console.log('Profile is loading...');
     return (
       <div className="p-3 text-center text-sm text-muted-foreground">
         Loading profile...
@@ -70,17 +65,6 @@ export function UserProfileSidebarFooter() {
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   const jobTitle = profile?.job_title || '';
   const hasOrganization = !!profile?.organization_id;
-
-  // Debug information
-  console.log('UserProfileSidebarFooter - Profile data:', {
-    firstName,
-    lastName,
-    jobTitle,
-    hasOrganization,
-    organizationId: profile?.organization_id,
-    sessionUser: session?.user?.id,
-    rawProfile: profile
-  });
 
   return (
     <div className="flex flex-col p-3 w-full">

@@ -55,14 +55,6 @@ export const DashboardHeader = ({
 
   const jobTitle = profile?.job_title || '';
 
-  // For debugging
-  console.log('DashboardHeader - Profile data:', {
-    firstName: profile?.first_name,
-    lastName: profile?.last_name,
-    formattedName,
-    jobTitle
-  });
-
   return (
     <header className="space-y-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">

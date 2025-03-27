@@ -74,15 +74,6 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
   const jobTitle = profile?.job_title || '';
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   const fullName = `${firstName} ${lastName}`.trim() || 'User';
-  
-  // For debugging
-  console.log('UserProfile - Profile data:', {
-    firstName,
-    lastName,
-    jobTitle,
-    initials,
-    fullName
-  });
 
   return (
     <div className="flex items-center gap-4">

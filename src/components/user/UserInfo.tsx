@@ -46,16 +46,6 @@ export function UserInfo({ className }: UserInfoProps) {
   const avatarUrl = profile?.avatar_url || '';
   const jobTitle = profile?.job_title || '';
 
-  // For debugging
-  if (!isLoading) {
-    console.log('UserInfo - Profile data:', {
-      firstName: profile?.first_name,
-      lastName: profile?.last_name,
-      jobTitle,
-      hasOrganization: !!profile?.organization_id
-    });
-  }
-
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <Avatar className="h-8 w-8">

@@ -41,16 +41,6 @@ export function UserProfileHeader({
     navigate('/profile');
   };
 
-  // For debugging
-  console.log('UserProfileHeader - User data:', {
-    firstName,
-    lastName,
-    formattedName,
-    jobTitle,
-    displayedRole,
-    hasOrganization
-  });
-
   return (
     <div className="flex items-center gap-3 mb-3">
       <Avatar className="h-10 w-10">
