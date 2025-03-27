@@ -51,7 +51,7 @@ export function UserProfileHeader({
         className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity" 
         onClick={handleNameClick}
       >
-        <span className="text-sm font-medium">{displayName}</span>
+        <span className="text-sm font-medium font-bold">{displayName}</span>
         <span className="text-xs text-muted-foreground">{displayedRole}</span>
       </div>
     </div>

@@ -102,6 +102,8 @@ export function UserProfileSidebarFooter() {
   const jobTitle = profile?.job_title || '';
   const orgName = organization?.name || '';
 
+  console.log('Sidebar footer rendering with name:', firstName, lastName);
+
   return (
     <div className="flex flex-col p-3 w-full">
       <UserProfileHeader 

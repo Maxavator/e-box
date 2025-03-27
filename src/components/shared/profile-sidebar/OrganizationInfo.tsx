@@ -14,7 +14,7 @@ export function OrganizationInfo({ organizationId, organizationName, logo }: Org
     return (
       <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2">
         <Building2 className="h-3.5 w-3.5 text-primary" />
-        <span className="text-sm">{organizationName}</span>
+        <span className="text-sm font-medium">{organizationName}</span>
       </div>
     );
   }
@@ -58,7 +58,7 @@ export function OrganizationInfo({ organizationId, organizationName, logo }: Org
   return (
     <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2">
       <Building2 className="h-3.5 w-3.5 text-primary" />
-      <span className="text-sm">{organization?.name}</span>
+      <span className="text-sm font-medium">{organization?.name}</span>
     </div>
   );
 }

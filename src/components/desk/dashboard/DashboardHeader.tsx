@@ -26,7 +26,7 @@ export const DashboardHeader = ({ currentView, onBackClick, onAdminClick }: Dash
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('job_title')
+        .select('first_name, last_name, job_title')
         .eq('id', user.id)
         .single();
       
@@ -39,6 +39,11 @@ export const DashboardHeader = ({ currentView, onBackClick, onAdminClick }: Dash
     },
   });
   
+  // Format user name
+  const userName = profile ? 
+    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'User' : 
+    'User';
+  
   // Don't show admin button on admin-related pages
   const isAdminPage = location.pathname.includes('/admin') || 
                       location.pathname.includes('/organization');
@@ -48,7 +53,8 @@ export const DashboardHeader = ({ currentView, onBackClick, onAdminClick }: Dash
       <div>
         <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-500">
-          {profile?.job_title ? profile.job_title : "System Overview"}
+          <span className="font-medium">{userName}</span>
+          {profile?.job_title ? ` • ${profile.job_title}` : " • System Overview"}
         </p>
       </div>
       <div className="flex items-center gap-4">
