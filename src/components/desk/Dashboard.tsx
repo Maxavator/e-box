@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -34,6 +33,7 @@ export const Dashboard = () => {
         return null;
       }
       
+      console.log('Dashboard profile data fetched:', data);
       return data;
     },
   });
@@ -110,7 +110,7 @@ export const Dashboard = () => {
 
   // Format user name
   const userName = profile ? 
-    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
+    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'User' : 
     'User';
   
   // Get job title

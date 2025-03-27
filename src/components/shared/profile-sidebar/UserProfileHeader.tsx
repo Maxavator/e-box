@@ -22,7 +22,7 @@ export function UserProfileHeader({
   // Add navigation hook
   const navigate = useNavigate();
   
-  // Format the name to show full name
+  // Format the name to show full name with fallback
   let displayName = "User";
   
   if (firstName && lastName) {
@@ -41,6 +41,8 @@ export function UserProfileHeader({
     navigate('/profile');
   };
 
+  console.log('Rendering UserProfileHeader with displayName:', displayName);
+
   return (
     <div className="flex items-center gap-3 mb-3">
       <Avatar className="h-10 w-10">
@@ -51,7 +53,7 @@ export function UserProfileHeader({
         className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity" 
         onClick={handleNameClick}
       >
-        <span className="text-sm font-medium font-bold">{displayName}</span>
+        <span className="text-sm font-semibold">{displayName}</span>
         <span className="text-xs text-muted-foreground">{displayedRole}</span>
       </div>
     </div>

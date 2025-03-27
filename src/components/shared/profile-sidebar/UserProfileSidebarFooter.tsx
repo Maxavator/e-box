@@ -11,47 +11,47 @@ import { toast } from "sonner";
 export function UserProfileSidebarFooter() {
   const { isAdmin } = useUserRole();
 
-  // Get current session
-  const { data: session, isLoading: isSessionLoading } = useQuery({
-    queryKey: ['user-sidebar-session'],
+  // Get current user
+  const { data: user, isLoading: isUserLoading } = useQuery({
+    queryKey: ['sidebar-current-user'],
     queryFn: async () => {
-      console.log('Fetching session for sidebar footer');
-      const { data: { session }, error } = await supabase.auth.getSession();
+      console.log('Fetching current user for sidebar footer');
+      const { data: { user }, error } = await supabase.auth.getUser();
       if (error) {
-        console.error('Error fetching session for sidebar footer:', error);
+        console.error('Error fetching current user for sidebar footer:', error);
         throw error;
       }
-      console.log('Sidebar footer session fetched:', session);
-      return session;
+      console.log('Current user fetched:', user);
+      return user;
     },
   });
 
-  // Get user profile
+  // Get user profile data
   const { data: profile, isLoading: isProfileLoading } = useQuery({
-    queryKey: ['user-sidebar-profile', session?.user?.id],
-    enabled: !!session?.user?.id,
+    queryKey: ['sidebar-profile', user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
-      console.log('Fetching profile for sidebar footer:', session?.user?.id);
+      console.log('Fetching profile data for sidebar footer:', user?.id);
       const { data, error } = await supabase
         .from('profiles')
         .select('first_name, last_name, avatar_url, job_title, organization_id')
-        .eq('id', session!.user.id)
+        .eq('id', user!.id)
         .single();
       
       if (error) {
         console.error('Error fetching profile for sidebar footer:', error);
-        toast.error("Failed to load user profile");
+        toast.error("Failed to load profile information");
         throw error;
       }
       
-      console.log('Sidebar footer profile data fetched:', data);
+      console.log('Profile data fetched:', data);
       return data;
     },
   });
 
   // Get organization details if organization_id exists
-  const { data: organization } = useQuery({
-    queryKey: ['user-sidebar-organization', profile?.organization_id],
+  const { data: organization, isLoading: isOrgLoading } = useQuery({
+    queryKey: ['sidebar-organization', profile?.organization_id],
     enabled: !!profile?.organization_id,
     queryFn: async () => {
       console.log('Fetching organization for sidebar footer:', profile?.organization_id);
@@ -66,12 +66,12 @@ export function UserProfileSidebarFooter() {
         return null;
       }
       
-      console.log('Sidebar footer organization data fetched:', data);
+      console.log('Organization data fetched:', data);
       return data;
     },
   });
 
-  const isLoading = isSessionLoading || isProfileLoading;
+  const isLoading = isUserLoading || isProfileLoading;
 
   if (isLoading) {
     return (
@@ -87,7 +87,7 @@ export function UserProfileSidebarFooter() {
     );
   }
 
-  if (!session?.user) {
+  if (!user) {
     return (
       <div className="p-3 text-center text-sm text-muted-foreground">
         Not logged in
@@ -95,21 +95,27 @@ export function UserProfileSidebarFooter() {
     );
   }
 
-  // Use the profile data
+  // Use the profile data (with fallbacks)
   const firstName = profile?.first_name || '';
   const lastName = profile?.last_name || '';
-  const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
+  const initials = (firstName?.[0] || '') + (lastName?.[0] || '');
   const jobTitle = profile?.job_title || '';
   const orgName = organization?.name || '';
 
-  console.log('Sidebar footer rendering with name:', firstName, lastName);
+  console.log('Rendering sidebar footer with:', {
+    firstName,
+    lastName,
+    initials,
+    jobTitle,
+    organizationId: profile?.organization_id
+  });
 
   return (
     <div className="flex flex-col p-3 w-full">
       <UserProfileHeader 
         firstName={firstName}
         lastName={lastName}
-        initials={initials}
+        initials={initials || '?'}
         avatarUrl={profile?.avatar_url} 
         jobTitle={jobTitle}
         hasOrganization={!!profile?.organization_id}

@@ -1,3 +1,4 @@
+
 import { Building2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +12,7 @@ interface OrganizationInfoProps {
 export function OrganizationInfo({ organizationId, organizationName, logo }: OrganizationInfoProps) {
   // If organization name is directly provided, display it without querying
   if (organizationName) {
+    console.log('Rendering OrganizationInfo with provided name:', organizationName);
     return (
       <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2">
         <Building2 className="h-3.5 w-3.5 text-primary" />
