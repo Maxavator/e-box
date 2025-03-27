@@ -1,10 +1,9 @@
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { OnlineStatus } from "./OnlineStatus";
 import { UserRoleBadge } from "@/components/shared/profile-sidebar/UserRoleBadge";
-import { useQuery } from "@tanstack/react-query";
 
 interface UserInfoProps {
   className?: string;
