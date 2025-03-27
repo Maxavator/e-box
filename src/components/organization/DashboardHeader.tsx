@@ -34,12 +34,32 @@ export const DashboardHeader = ({
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name, job_title')
+        .select('first_name, last_name, job_title, organization_id')
         .eq('id', session!.user.id)
         .single();
       
       if (error) {
         console.error('Error fetching profile:', error);
+        return null;
+      }
+      
+      return data;
+    },
+  });
+
+  // Get organization name if organization_id exists
+  const { data: organization } = useQuery({
+    queryKey: ['organization', profile?.organization_id],
+    enabled: !!profile?.organization_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('name')
+        .eq('id', profile!.organization_id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching organization:', error);
         return null;
       }
       
@@ -53,15 +73,16 @@ export const DashboardHeader = ({
     '';
 
   const jobTitle = profile?.job_title || '';
+  const orgDisplayName = organization?.name || orgName;
 
   return (
     <header className="space-y-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
         <h1 className="heading-responsive font-bold tracking-tight">Organization Dashboard</h1>
         <div className="flex items-center gap-4">
-          {orgName && (
+          {orgDisplayName && (
             <p className="text-muted-foreground text-responsive">
-              {orgName}
+              {orgDisplayName}
               {isAdmin && <span className="ml-2 text-primary">(Admin)</span>}
             </p>
           )}

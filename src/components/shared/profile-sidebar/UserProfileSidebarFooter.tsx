@@ -43,6 +43,26 @@ export function UserProfileSidebarFooter() {
     },
   });
 
+  // Get organization details if organization_id exists
+  const { data: organization } = useQuery({
+    queryKey: ['sidebarOrganization', profile?.organization_id],
+    enabled: !!profile?.organization_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('name, domain, logo_url')
+        .eq('id', profile!.organization_id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching organization:', error);
+        return null;
+      }
+      
+      return data;
+    },
+  });
+
   if (!session?.user) {
     return (
       <div className="p-3 text-center text-sm text-muted-foreground">
@@ -65,6 +85,7 @@ export function UserProfileSidebarFooter() {
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   const jobTitle = profile?.job_title || '';
   const hasOrganization = !!profile?.organization_id;
+  const orgName = organization?.name || '';
 
   return (
     <div className="flex flex-col p-3 w-full">
@@ -78,7 +99,11 @@ export function UserProfileSidebarFooter() {
       />
       
       {profile?.organization_id && (
-        <OrganizationInfo organizationId={profile?.organization_id} />
+        <OrganizationInfo 
+          organizationId={profile?.organization_id}
+          organizationName={orgName}
+          logo={organization?.logo_url}
+        />
       )}
       
       <div className="flex items-center gap-2 mt-1">

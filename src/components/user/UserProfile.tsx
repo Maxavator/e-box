@@ -39,12 +39,32 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name, avatar_url, job_title')
+        .select('first_name, last_name, avatar_url, job_title, organization_id')
         .eq('id', session!.user.id)
         .single();
       
       if (error) {
         console.error('Error fetching profile:', error);
+        return null;
+      }
+      
+      return data;
+    },
+  });
+
+  // Get organization name if organization_id exists
+  const { data: organization } = useQuery({
+    queryKey: ['organization', profile?.organization_id],
+    enabled: !!profile?.organization_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('name')
+        .eq('id', profile!.organization_id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching organization:', error);
         return null;
       }
       
@@ -71,6 +91,7 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
   const firstName = profile?.first_name || '';
   const lastName = profile?.last_name || '';
   const jobTitle = profile?.job_title || '';
+  const orgName = organization?.name || '';
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`;
   const fullName = `${firstName} ${lastName}`.trim() || 'User';
 
@@ -102,6 +123,11 @@ export const UserProfile = ({ onLogout }: UserProfileProps) => {
               <p className="text-xs leading-none text-muted-foreground">
                 {jobTitle || 'User Profile'}
               </p>
+              {orgName && (
+                <p className="text-xs leading-none text-muted-foreground">
+                  {orgName}
+                </p>
+              )}
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />

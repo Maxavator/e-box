@@ -10,6 +10,7 @@ interface UserProfileData {
   loading: boolean;
   error: Error | null;
   userDisplayName: string | null;
+  userJobTitle: string | null;
   refreshProfile: () => Promise<void>;
 }
 
@@ -17,6 +18,7 @@ export function useUserProfile(): UserProfileData {
   const [organizationName, setOrganizationName] = useState<string | null>(null);
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [userDisplayName, setUserDisplayName] = useState<string | null>(null);
+  const [userJobTitle, setUserJobTitle] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -38,7 +40,7 @@ export function useUserProfile(): UserProfileData {
       // Get user profile data including organization_id and name
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('organization_id, first_name, last_name')
+        .select('organization_id, first_name, last_name, job_title')
         .eq('id', session!.user.id)
         .single();
         
@@ -64,7 +66,8 @@ export function useUserProfile(): UserProfileData {
       
       return {
         profileData,
-        orgName
+        orgName,
+        jobTitle: profileData?.job_title || null
       };
     },
   });
@@ -91,6 +94,8 @@ export function useUserProfile(): UserProfileData {
       if (profileData.profileData?.first_name && profileData.profileData?.last_name) {
         setUserDisplayName(`${profileData.profileData.first_name} ${profileData.profileData.last_name}`);
       }
+      
+      setUserJobTitle(profileData.jobTitle);
       
       if (profileData.profileData?.organization_id) {
         setOrganizationId(profileData.profileData.organization_id);
@@ -121,7 +126,7 @@ export function useUserProfile(): UserProfileData {
       // Get user profile data including organization_id
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('organization_id, first_name, last_name')
+        .select('organization_id, first_name, last_name, job_title')
         .eq('id', session.user.id)
         .single();
         
@@ -132,6 +137,8 @@ export function useUserProfile(): UserProfileData {
       if (profileData?.first_name && profileData?.last_name) {
         setUserDisplayName(`${profileData.first_name} ${profileData.last_name}`);
       }
+      
+      setUserJobTitle(profileData?.job_title || null);
       
       if (profileData?.organization_id) {
         setOrganizationId(profileData.organization_id);
@@ -171,6 +178,7 @@ export function useUserProfile(): UserProfileData {
     organizationName, 
     organizationId,
     userDisplayName,
+    userJobTitle,
     loading, 
     error,
     refreshProfile
