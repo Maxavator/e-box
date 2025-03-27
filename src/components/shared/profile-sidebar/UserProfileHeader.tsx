@@ -22,19 +22,19 @@ export function UserProfileHeader({
   // Add navigation hook
   const navigate = useNavigate();
   
-  // Format the name - showing firstName lastName format instead of lastName, firstName
-  let formattedName = "User";
+  // Format the name to show full name
+  let displayName = "User";
   
   if (firstName && lastName) {
-    formattedName = `${firstName} ${lastName}`;
+    displayName = `${firstName} ${lastName}`;
   } else if (firstName) {
-    formattedName = firstName;
+    displayName = firstName;
   } else if (lastName) {
-    formattedName = lastName;
+    displayName = lastName;
   }
   
   // Display the job title if available, otherwise show appropriate fallback
-  const displayedRole = jobTitle || (hasOrganization ? "Employee" : "Private Individual");
+  const displayedRole = jobTitle || (hasOrganization ? "Employee" : "User");
 
   // Handle click on user name to navigate to settings
   const handleNameClick = () => {
@@ -44,14 +44,14 @@ export function UserProfileHeader({
   return (
     <div className="flex items-center gap-3 mb-3">
       <Avatar className="h-10 w-10">
-        <AvatarImage src={avatarUrl || ''} alt={formattedName} />
+        <AvatarImage src={avatarUrl || ''} alt={displayName} />
         <AvatarFallback>{initials || '?'}</AvatarFallback>
       </Avatar>
       <div 
         className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity" 
         onClick={handleNameClick}
       >
-        <span className="text-sm font-medium">{formattedName}</span>
+        <span className="text-sm font-medium">{displayName}</span>
         <span className="text-xs text-muted-foreground">{displayedRole}</span>
       </div>
     </div>

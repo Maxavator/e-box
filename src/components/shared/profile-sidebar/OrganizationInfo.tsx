@@ -9,6 +9,7 @@ interface OrganizationInfoProps {
 }
 
 export function OrganizationInfo({ organizationId, organizationName, logo }: OrganizationInfoProps) {
+  // If organization name is directly provided, display it without querying
   if (organizationName) {
     return (
       <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2">
@@ -18,6 +19,7 @@ export function OrganizationInfo({ organizationId, organizationName, logo }: Org
     );
   }
 
+  // Otherwise, fetch organization info using the ID
   const { data: organization, isLoading } = useQuery({
     queryKey: ['sidebar-organization-info', organizationId],
     enabled: !!organizationId && !organizationName,
