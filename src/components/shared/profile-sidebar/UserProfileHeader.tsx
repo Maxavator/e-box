@@ -1,6 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Shield } from "lucide-react";
 
 interface UserProfileHeaderProps {
   firstName: string;
@@ -9,6 +10,7 @@ interface UserProfileHeaderProps {
   avatarUrl?: string;
   jobTitle?: string;
   hasOrganization: boolean;
+  province?: string;
 }
 
 export function UserProfileHeader({ 
@@ -17,7 +19,8 @@ export function UserProfileHeader({
   initials, 
   avatarUrl, 
   jobTitle,
-  hasOrganization
+  hasOrganization,
+  province
 }: UserProfileHeaderProps) {
   // Add navigation hook
   const navigate = useNavigate();
@@ -54,7 +57,15 @@ export function UserProfileHeader({
         onClick={handleNameClick}
       >
         <span className="text-sm font-semibold">{displayName}</span>
-        <span className="text-xs text-muted-foreground">{displayedRole}</span>
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-muted-foreground">{displayedRole}</span>
+          {province && (
+            <span className="text-xs flex items-center text-muted-foreground">
+              <Shield className="h-3 w-3 mx-1" />
+              {province}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

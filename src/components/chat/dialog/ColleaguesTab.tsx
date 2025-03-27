@@ -4,7 +4,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Search, Building } from "lucide-react";
+import { Search, Building, Calendar, Shield } from "lucide-react";
+import { extractDateFromSAID } from "@/utils/saIdValidation";
 
 interface ColleagueProfile {
   id: string;
@@ -13,6 +14,8 @@ interface ColleagueProfile {
   avatar_url?: string;
   organization_id: string | null;
   job_title?: string;
+  sa_id?: string;
+  province?: string;
 }
 
 interface ColleaguesTabProps {
@@ -34,8 +37,22 @@ export function ColleaguesTab({
     const searchLower = searchQuery.toLowerCase();
     const fullName = `${colleague.first_name} ${colleague.last_name}`.toLowerCase();
     const jobTitle = colleague.job_title?.toLowerCase() || '';
-    return fullName.includes(searchLower) || jobTitle.includes(searchLower);
+    const province = colleague.province?.toLowerCase() || '';
+    return fullName.includes(searchLower) || 
+           jobTitle.includes(searchLower) || 
+           province.includes(searchLower);
   });
+
+  // Function to extract and format the birth date from SA ID
+  const formatBirthDate = (saId?: string) => {
+    if (!saId) return null;
+    try {
+      const birthDate = extractDateFromSAID(saId);
+      return birthDate ? birthDate.toLocaleDateString() : null;
+    } catch (error) {
+      return null;
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -81,11 +98,25 @@ export function ColleaguesTab({
                     <span className="font-medium">
                       {`${colleague.first_name} ${colleague.last_name}`}
                     </span>
-                    {colleague.job_title && (
-                      <span className="text-xs text-muted-foreground">
-                        {colleague.job_title}
-                      </span>
-                    )}
+                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      {colleague.job_title && (
+                        <span>
+                          {colleague.job_title}
+                        </span>
+                      )}
+                      {colleague.province && (
+                        <span className="flex items-center">
+                          <Shield className="h-3 w-3 mr-1" />
+                          {colleague.province}
+                        </span>
+                      )}
+                      {formatBirthDate(colleague.sa_id) && (
+                        <span className="flex items-center">
+                          <Calendar className="h-3 w-3 mr-1" />
+                          Born: {formatBirthDate(colleague.sa_id)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <Badge variant="outline" className="ml-auto bg-blue-50 text-blue-600">
                     <Building className="h-3 w-3 mr-1" />

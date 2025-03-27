@@ -34,7 +34,7 @@ export function UserProfileSidebarFooter() {
       console.log('Fetching profile data for sidebar footer:', user?.id);
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name, avatar_url, job_title, organization_id')
+        .select('first_name, last_name, avatar_url, job_title, organization_id, province, sa_id, is_private')
         .eq('id', user!.id)
         .single();
       
@@ -101,12 +101,14 @@ export function UserProfileSidebarFooter() {
   const initials = (firstName?.[0] || '') + (lastName?.[0] || '');
   const jobTitle = profile?.job_title || '';
   const orgName = organization?.name || '';
+  const province = profile?.province || '';
 
   console.log('Rendering sidebar footer with:', {
     firstName,
     lastName,
     initials,
     jobTitle,
+    province,
     organizationId: profile?.organization_id
   });
 
@@ -119,6 +121,7 @@ export function UserProfileSidebarFooter() {
         avatarUrl={profile?.avatar_url} 
         jobTitle={jobTitle}
         hasOrganization={!!profile?.organization_id}
+        province={province}
       />
       
       {profile?.organization_id && (
