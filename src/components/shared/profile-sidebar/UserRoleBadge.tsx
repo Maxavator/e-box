@@ -13,7 +13,6 @@ export function UserRoleBadge() {
       case 'hr_moderator': return 'HR Moderator';
       case 'comm_moderator': return 'Communication Moderator';
       case 'stakeholder_moderator': return 'Stakeholder Moderator';
-      case 'survey_moderator': return 'Survey Moderator';
       default: return 'User';
     }
   };
@@ -21,14 +20,14 @@ export function UserRoleBadge() {
   const getRoleBadgeStyle = (role: string | undefined) => {
     if (['global_admin', 'org_admin'].includes(role || '')) {
       return 'bg-green-600 hover:bg-green-700';
-    } else if (['hr_moderator', 'comm_moderator', 'stakeholder_moderator', 'survey_moderator'].includes(role || '')) {
+    } else if (['hr_moderator', 'comm_moderator', 'stakeholder_moderator'].includes(role || '')) {
       return 'bg-blue-600 hover:bg-blue-700';
     }
     return '';
   };
 
   const isAdmin = ['global_admin', 'org_admin'].includes(userRole || '');
-  const isModerator = ['hr_moderator', 'comm_moderator', 'stakeholder_moderator', 'survey_moderator'].includes(userRole || '');
+  const isModerator = ['hr_moderator', 'comm_moderator', 'stakeholder_moderator'].includes(userRole || '');
   
   return (
     <Badge 

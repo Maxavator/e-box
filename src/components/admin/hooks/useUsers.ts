@@ -9,10 +9,11 @@ export const useUsers = (
   isAdmin: boolean | undefined, 
   userRole: string | undefined, 
   userProfile: Profile | undefined,
-  refreshTrigger: number = 0
+  refreshTrigger: number = 0,
+  organizationFilter?: string | null
 ) => {
   const { data: users, isLoading, error } = useQuery({
-    queryKey: ['users', refreshTrigger],
+    queryKey: ['users', refreshTrigger, organizationFilter],
     queryFn: async () => {
       if (!isAdmin && userRole !== 'org_admin') {
         throw new Error("Not authorized to view users");
@@ -23,12 +24,17 @@ export const useUsers = (
           .from('profiles')
           .select('*');
 
-        // If user is org_admin, filter by their organization
-        if (userRole === 'org_admin' && userProfile?.organization_id) {
+        // If filtering by organization_id is specified, use that
+        if (organizationFilter) {
+          profilesQuery = profilesQuery.eq('organization_id', organizationFilter);
+          console.log(`Filtering by organization: ${organizationFilter}`);
+        } 
+        // If user is org_admin, always filter by their organization
+        else if (userRole === 'org_admin' && userProfile?.organization_id) {
           profilesQuery = profilesQuery.eq('organization_id', userProfile.organization_id);
           console.log(`Org admin filtering by their organization: ${userProfile.organization_id}`);
         }
-        // For global admins, return all profiles
+        // For global admins with no filter, return all profiles
 
         const { data: profiles, error: profilesError } = await profilesQuery;
         if (profilesError) throw profilesError;

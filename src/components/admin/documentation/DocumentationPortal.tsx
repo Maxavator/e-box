@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SalesKit } from "./SalesKit";
 import { Badge } from "@/components/ui/badge";
-import { FileText, BarChart4, Megaphone, Download, Clock } from "lucide-react";
+import { FileText, BarChart4, Megaphone, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -61,10 +61,7 @@ export function DocumentationPortal() {
                         <Badge variant="secondary" className="text-xs">Latest</Badge>
                       )}
                     </h3>
-                    <span className="text-sm text-muted-foreground flex items-center">
-                      <Clock className="h-3 w-3 mr-1 opacity-70" />
-                      {entry.date}
-                    </span>
+                    <span className="text-sm text-muted-foreground">{entry.date}</span>
                   </div>
                   <ul className="space-y-1 pl-5 list-disc">
                     {entry.changes.map((change, i) => (

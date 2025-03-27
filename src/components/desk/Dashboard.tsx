@@ -53,10 +53,10 @@ export const Dashboard = () => {
         navigate('/admin');
         break;
       case 'calendar':
-        navigate('/calendar'); // This now goes to the standalone calendar page
+        navigate('/calendar');
         break;
       case 'documents':
-        navigate('/documents');
+        navigate('/mydesk');
         break;
       case 'organization':
         navigate('/organization');

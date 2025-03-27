@@ -4,7 +4,6 @@ import { MessageList } from "./MessageList";
 import type { Conversation, Message } from "@/types/chat";
 import { getUserById } from "@/data/chat";
 import { Shield } from "lucide-react";
-import { useUserProfile } from "@/hooks/useUserProfile";
 
 export interface ChatContentProps {
   conversation: Conversation | null;
@@ -25,8 +24,6 @@ export function ChatContent({
   isNewConversation = false,
   messages = [],
 }: ChatContentProps) {
-  const { loading } = useUserProfile();
-  
   if (!conversation) return null;
   
   const user = getUserById(conversation.userId || '');
@@ -52,30 +49,21 @@ export function ChatContent({
                 <AvatarFallback>{user?.initials || (user?.name ? user.name.substring(0, 2) : 'UN')}</AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="font-semibold">{user?.name || "Chat"}</h3>
-                <p className="text-xs text-muted-foreground">{user?.status || "Online"}</p>
+                <h3 className="font-semibold">{user?.name}</h3>
+                <p className="text-xs text-muted-foreground">{user?.status}</p>
               </div>
             </>
           )}
         </div>
         
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center space-y-2">
-              <div className="h-5 w-32 bg-muted rounded animate-pulse mx-auto"></div>
-              <div className="h-4 w-48 bg-muted rounded animate-pulse mx-auto"></div>
-            </div>
-          </div>
-        ) : (
-          <MessageList
-            messages={conversation.messages || messages}
-            onEditMessage={onEditMessage}
-            onDeleteMessage={onDeleteMessage}
-            onReactToMessage={onReactToMessage}
-            isAdminChat={isAdminChat}
-            isNewConversation={isNewConversation}
-          />
-        )}
+        <MessageList
+          messages={conversation.messages || messages}
+          onEditMessage={onEditMessage}
+          onDeleteMessage={onDeleteMessage}
+          onReactToMessage={onReactToMessage}
+          isAdminChat={isAdminChat}
+          isNewConversation={isNewConversation}
+        />
       </div>
     </div>
   );

@@ -15,7 +15,6 @@ interface AdminMenuProps {
   setActiveView: (view: AdminView) => void;
 }
 
-// This component is kept for reference but no longer used in AdminPortal
 export function AdminMenu({ activeView, setActiveView }: AdminMenuProps) {
   const navigate = useNavigate();
 

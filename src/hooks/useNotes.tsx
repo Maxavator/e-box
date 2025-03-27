@@ -72,7 +72,7 @@ export function useNotes() {
           title: noteData.title || 'Untitled',
           content: noteData.content || '',
           is_pinned: noteData.isPinned || false,
-          is_journal: false,
+          is_journal: noteData.isJournal || false,
           color: noteData.color || null,
           user_id: user.id
         })
@@ -140,7 +140,7 @@ export function useNotes() {
         createdAt: data.created_at,
         updatedAt: data.updated_at,
         isPinned: data.is_pinned,
-        isJournal: data.is_journal,
+        isJournal: data.is_journal || existingNote?.isJournal || false,
         color: data.color,
         userId: data.user_id,
         isShared: data.is_shared,
@@ -222,12 +222,28 @@ export function useNotes() {
     }
   };
 
+  const setupJournalReminder = async (enabled: boolean, dayOfWeek: number, time: string): Promise<boolean> => {
+    try {
+      // In a real app, we would store this in a user_preferences table
+      // For now, we'll just simulate that this was saved
+      console.log('Journal reminder settings:', { enabled, dayOfWeek, time });
+      
+      toast.success('Journal reminder set successfully');
+      return true;
+    } catch (error) {
+      console.error('Error setting up journal reminder:', error);
+      toast.error('Failed to set up journal reminder');
+      return false;
+    }
+  };
+
   return {
     notes,
     isLoading,
     createNote,
     updateNote,
     deleteNote,
-    shareNote
+    shareNote,
+    setupJournalReminder
   };
 }

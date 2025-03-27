@@ -1,55 +1,44 @@
 
-import AdminPortal from "./AdminPortal";
 import Auth from "./Auth";
-import Chat from "./Chat";
-import Contacts from "./Contacts";
 import Dashboard from "./Dashboard";
-import Desk from "./Desk";
-import GovZA from "./GovZA";
-import Index from "./Index";
-import LogoutPage from "./LogoutPage";
 import NotFound from "./NotFound";
-import Notes from "./Notes";
-import OrganizationManagementPage from "./OrganizationManagement";
+import Chat from "./Chat";
+import AdminPortal from "./AdminPortal";
+import OrganizationDashboard from "./OrganizationDashboard";
 import Changelog from "./Changelog";
-import MyDocuments from "./MyDocuments";
-import MyCalendar from "./MyCalendar";
+import Index from "./Index";
+import Contacts from "./Contacts";
+import Notes from "./Notes";
+import GovZA from "./GovZA";
+import Desk from "./Desk";
 
-// Add OrganizationDashboard alias
-const OrganizationDashboard = OrganizationManagementPage;
-
-// These components need to be properly referenced from their actual locations
-// For now, we'll create temporary exports that reference existing components
-const Settings = Desk; // Temporary alias for Settings page
-const Documents = Desk; // Temporary alias for Documents page
-const Calendar = Desk; // Temporary alias for Calendar page
-const LeaveManager = Desk; // Temporary alias for LeaveManager page
-const Policies = Desk; // Temporary alias for Policies page
-// Using existing Contacts component instead of ContactsList
-const ContactsList = Contacts; // This fixes the error in App.tsx
+// Import components rather than pages for these since we don't have the page files
+import { Settings } from "@/components/settings/Settings";
+import { ContactsList } from "@/components/desk/contacts/ContactsList";
+import { Calendar } from "@/components/desk/Calendar";
+import { Documents } from "@/components/desk/Documents";
+import { LeaveManager } from "@/components/desk/LeaveManager";
+import { Policies } from "@/components/desk/Policies";
+import { MyDesk } from "@/components/desk/MyDesk";
 
 export {
-  AdminPortal,
-  Auth,
-  Chat,
-  Contacts,
-  Dashboard,
-  Desk,
-  GovZA,
   Index,
-  LogoutPage,
+  Auth,
+  Dashboard,
   NotFound,
-  Notes,
-  OrganizationManagementPage,
-  Changelog,
-  MyDocuments,
-  MyCalendar,
-  // Add missing exports
+  Chat,
+  AdminPortal,
   OrganizationDashboard,
+  Changelog,
   Settings,
-  Documents,
+  Contacts,
+  ContactsList,
+  Notes,
+  GovZA,
   Calendar,
+  Documents,
   LeaveManager,
   Policies,
-  ContactsList
+  Desk,
+  MyDesk
 };

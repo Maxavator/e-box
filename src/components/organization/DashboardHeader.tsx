@@ -53,11 +53,7 @@ export const DashboardHeader = ({
     `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
     '';
 
-  // Special case for Thabo Nkosi - set job title to "Chief Information Officer"
-  let jobTitle = profile?.job_title || '';
-  if (profile?.first_name === 'Thabo' && profile?.last_name === 'Nkosi') {
-    jobTitle = 'Chief Information Officer';
-  }
+  const jobTitle = profile?.job_title || '';
 
   // For debugging
   console.log('DashboardHeader - Profile data:', {

@@ -1,14 +1,11 @@
 
 import { Button } from "@/components/ui/button";
-import { UserPlus, Users, RefreshCcw, Search, Building, Filter } from "lucide-react";
+import { UserPlus, Users, RefreshCcw } from "lucide-react";
 import { UserTable } from "./UserTable";
 import { UserDialog } from "./UserDialog";
 import { useUserManagement } from "./useUserManagement";
 import type { UserWithRole } from "./types";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const UserManagement = () => {
   const {
@@ -29,11 +26,11 @@ export const UserManagement = () => {
     createUserMutation,
     updateUserMutation,
     refreshUsersList,
+    showingGolderUsers,
+    toggleGolderUsers,
+    golderOrgId,
     userProfile,
   } = useUserManagement();
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const [organizationFilter, setOrganizationFilter] = useState<string>("all");
 
   const handleEditUser = (user: UserWithRole) => {
     setSelectedUser(user);
@@ -50,33 +47,6 @@ export const UserManagement = () => {
   const handleFormChange = (field: keyof typeof formData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
-
-  // First filter by organization if filter is set
-  const orgFilteredUsers = users ? 
-    (organizationFilter === "all" ? 
-      users : 
-      users.filter(user => user.organization_id === organizationFilter)
-    ) : 
-    [];
-
-  // Then filter by search query if present
-  const filteredUsers = searchQuery ? 
-    orgFilteredUsers.filter(user => 
-      `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (user.organizations[0]?.name || "").toLowerCase().includes(searchQuery.toLowerCase())
-    ) : 
-    orgFilteredUsers;
-
-  // Get a list of organization IDs that have Golder in their name
-  const golderOrgIds = organizations
-    ?.filter(org => org.name.toLowerCase().includes('golder'))
-    .map(org => org.id) || [];
-
-  // Count how many users are from Golder organizations
-  const golderUsersCount = users?.filter(user => 
-    user.organization_id && golderOrgIds.includes(user.organization_id)
-  ).length || 0;
 
   if (!isAdmin && userRole !== 'org_admin') {
     return (
@@ -103,16 +73,28 @@ export const UserManagement = () => {
           )}
           {isAdmin && (
             <p className="text-sm text-muted-foreground">
-              Managing all users across organizations
-              {golderUsersCount > 0 && (
-                <span className="ml-1">
-                  (including {golderUsersCount} Golder {golderUsersCount === 1 ? 'user' : 'users'})
-                </span>
-              )}
+              {showingGolderUsers 
+                ? "Showing all Golder (Pty) Ltd. users only" 
+                : "Managing all users across organizations"}
             </p>
           )}
         </div>
         <div className="flex gap-2">
+          {isAdmin && golderOrgId && (
+            <Button 
+              variant={showingGolderUsers ? "default" : "outline"} 
+              onClick={toggleGolderUsers}
+              className={showingGolderUsers ? "bg-amber-600 hover:bg-amber-700" : ""}
+            >
+              <Users className="w-4 h-4 mr-2" />
+              {showingGolderUsers ? "Show All Organizations" : "Show Golder Users"}
+              {showingGolderUsers && (
+                <Badge variant="outline" className="ml-2 bg-white text-amber-600">
+                  Filtered
+                </Badge>
+              )}
+            </Button>
+          )}
           <Button variant="outline" onClick={refreshUsersList} title="Refresh user list">
             <RefreshCcw className="w-4 h-4" />
           </Button>
@@ -121,39 +103,6 @@ export const UserManagement = () => {
             Add User
           </Button>
         </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search users by name, email or organization..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        
-        {isAdmin && organizations && organizations.length > 0 && (
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <Select value={organizationFilter} onValueChange={setOrganizationFilter}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Filter by organization" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Organizations</SelectItem>
-                {organizations.map((org) => (
-                  <SelectItem key={org.id} value={org.id}>
-                    {org.name}
-                    {org.name.toLowerCase().includes('golder') && " (Golder)"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
       </div>
 
       <UserDialog
@@ -182,26 +131,14 @@ export const UserManagement = () => {
       />
 
       <UserTable
-        users={filteredUsers}
+        users={users}
         isLoading={isLoading}
         onEditUser={handleEditUser}
         isAdmin={!!isAdmin}
         userRole={userRole}
-        showingGolderUsers={organizationFilter === "all" ? false : golderOrgIds.includes(organizationFilter)}
+        showingGolderUsers={showingGolderUsers}
         userOrganizationId={userProfile?.organization_id}
       />
-      
-      <div className="text-sm text-muted-foreground mt-2">
-        {filteredUsers.length > 0 ? (
-          <p>Showing {filteredUsers.length} {filteredUsers.length === 1 ? 'user' : 'users'} 
-            {organizationFilter !== "all" && organizations && (
-              <span> from {organizations.find(org => org.id === organizationFilter)?.name || 'selected organization'}</span>
-            )}
-          </p>
-        ) : (
-          <p>No users found with the current filters.</p>
-        )}
-      </div>
     </div>
   );
 };

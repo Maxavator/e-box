@@ -4,7 +4,7 @@ import { Book, FileText } from 'lucide-react';
 
 interface EmptyNoteStateProps {
   handleNewNote: () => void;
-  handleNewJournal?: () => void; // Made optional with the ? operator
+  handleNewJournal: () => void;
 }
 
 export function EmptyNoteState({ handleNewNote, handleNewJournal }: EmptyNoteStateProps) {
@@ -23,16 +23,14 @@ export function EmptyNoteState({ handleNewNote, handleNewJournal }: EmptyNoteSta
           <FileText className="h-4 w-4 mr-2" />
           Create a new note
         </Button>
-        {handleNewJournal && (
-          <Button
-            onClick={handleNewJournal}
-            variant="outline"
-            className="px-4 py-2 rounded-md"
-          >
-            <Book className="h-4 w-4 mr-2" />
-            New journal entry
-          </Button>
-        )}
+        <Button
+          onClick={handleNewJournal}
+          variant="outline"
+          className="px-4 py-2 rounded-md"
+        >
+          <Book className="h-4 w-4 mr-2" />
+          New journal entry
+        </Button>
       </div>
     </div>
   );

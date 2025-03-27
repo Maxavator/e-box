@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -97,7 +96,7 @@ export const MainNavigationGroup = ({
         icon={ClipboardList}
         label="Surveys"
         path="/surveys"
-        isActive={location.pathname.startsWith("/surveys")}
+        isActive={location.pathname === "/surveys"}
         onClick={() => handleNavigation("/surveys")}
       />
       

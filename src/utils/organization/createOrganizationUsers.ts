@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { UserToCreate } from "./afrovationUserDefinitions";
+import type { UserToCreate } from "./golderUserDefinitions";
 
 /**
  * Creates multiple users for an organization
@@ -24,7 +24,7 @@ export const createOrganizationUsers = async (users: UserToCreate[], orgId: stri
       // Create auth user with email_confirm set to true to ensure activation
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: user.email,
-        password: 'Monday@1', // Set password to Monday@1 as requested
+        password: 'StaffPass123!',
         options: {
           data: {
             first_name: user.firstName,
@@ -78,7 +78,7 @@ export const createOrganizationUsers = async (users: UserToCreate[], orgId: stri
         // Create an additional user with SA ID format for login
         const { data: saAuthData, error: saAuthError } = await supabase.auth.signUp({
           email: saIdEmail,
-          password: 'Monday@1', // Set password to Monday@1 as requested
+          password: 'StaffPass123!',
           options: {
             data: {
               first_name: user.firstName,

@@ -39,8 +39,7 @@ export function AdminStatusIndicator() {
   const isModerator = 
     userRole === 'hr_moderator' as UserRoleType || 
     userRole === 'comm_moderator' as UserRoleType || 
-    userRole === 'stakeholder_moderator' as UserRoleType ||
-    userRole === 'survey_moderator' as UserRoleType;
+    userRole === 'stakeholder_moderator' as UserRoleType;
   
   if (isLoading) {
     return (
@@ -82,7 +81,6 @@ export function AdminStatusIndicator() {
       <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
         {userRole === 'hr_moderator' as UserRoleType ? 'HR Moderator' : 
          userRole === 'comm_moderator' as UserRoleType ? 'Comm Moderator' : 
-         userRole === 'survey_moderator' as UserRoleType ? 'Survey Moderator' :
          'Stakeholder Moderator'}
       </Badge>
     );

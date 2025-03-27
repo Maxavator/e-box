@@ -5,7 +5,6 @@ import { OrganizationTable } from "./organization/OrganizationTable";
 import { OrganizationDialogs } from "./organization/OrganizationDialogs";
 import { useOrganizations } from "./organization/useOrganizations";
 import { QuickStatsCard } from "../organization/cards/QuickStatsCard";
-import { AfrovationUsers } from "./AfrovationUsers";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "./hooks/useUserRole";
@@ -134,8 +133,6 @@ const OrganizationManagement = () => {
           />
         )}
       </div>
-
-      {isAdmin && <AfrovationUsers />}
 
       <QuickStatsCard />
 
