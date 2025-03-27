@@ -19,23 +19,23 @@ export function OrganizationInfo({ organizationId, organizationName, logo }: Org
   }
 
   const { data: organization, isLoading } = useQuery({
-    queryKey: ['organization', organizationId],
+    queryKey: ['sidebar-organization-info', organizationId],
     enabled: !!organizationId && !organizationName,
     queryFn: async () => {
-      console.log('Fetching organization data for ID:', organizationId);
+      console.log('Fetching organization info for ID:', organizationId);
       
       const { data, error } = await supabase
         .from('organizations')
         .select('name')
         .eq('id', organizationId!)
-        .single();
+        .maybeSingle();
       
       if (error) {
-        console.error('Error fetching organization:', error);
+        console.error('Error fetching organization info:', error);
         return null;
       }
       
-      console.log('Organization data fetched:', data);
+      console.log('Organization info data fetched:', data);
       return data;
     },
   });
@@ -50,7 +50,6 @@ export function OrganizationInfo({ organizationId, organizationName, logo }: Org
   }
 
   if (!organization?.name && !organizationName) {
-    console.log('No organization name found for ID:', organizationId);
     return null;
   }
 

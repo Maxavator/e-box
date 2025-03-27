@@ -4,22 +4,26 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { OnlineStatus } from "./OnlineStatus";
 import { UserRoleBadge } from "@/components/shared/profile-sidebar/UserRoleBadge";
+import { toast } from "sonner";
 
 interface UserInfoProps {
   className?: string;
 }
 
 export function UserInfo({ className }: UserInfoProps) {
-  const { data: session } = useQuery({
+  const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching session:', error);
+        throw error;
+      }
       return session;
     },
   });
 
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['profile', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
@@ -31,6 +35,7 @@ export function UserInfo({ className }: UserInfoProps) {
       
       if (error) {
         console.error('Error fetching profile:', error);
+        toast.error("Failed to load user profile");
         return null;
       }
       
@@ -39,7 +44,7 @@ export function UserInfo({ className }: UserInfoProps) {
   });
 
   // Get organization name if organization_id exists
-  const { data: organization } = useQuery({
+  const { data: organization, isLoading: isOrgLoading } = useQuery({
     queryKey: ['organization', profile?.organization_id],
     enabled: !!profile?.organization_id,
     queryFn: async () => {
@@ -58,6 +63,11 @@ export function UserInfo({ className }: UserInfoProps) {
     },
   });
 
+  // Debug logging
+  console.log('Session:', session);
+  console.log('Profile:', profile);
+  console.log('Organization:', organization);
+
   // Create the display name in the format "First Last"
   const displayName = profile ? 
     `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
@@ -65,6 +75,20 @@ export function UserInfo({ className }: UserInfoProps) {
   const avatarUrl = profile?.avatar_url || '';
   const jobTitle = profile?.job_title || '';
   const orgName = organization?.name || '';
+  
+  const isLoading = isSessionLoading || isProfileLoading;
+
+  if (isLoading) {
+    return (
+      <div className={`flex items-center gap-2 animate-pulse ${className}`}>
+        <div className="h-8 w-8 rounded-full bg-muted"></div>
+        <div className="flex flex-col gap-1">
+          <div className="h-4 w-24 bg-muted rounded"></div>
+          <div className="h-3 w-16 bg-muted rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
