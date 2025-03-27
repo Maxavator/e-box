@@ -436,6 +436,7 @@ export type Database = {
           created_at: string
           first_name: string | null
           id: string
+          is_private: boolean | null
           job_title: string | null
           journal_reminder_day: number | null
           journal_reminder_enabled: boolean | null
@@ -446,6 +447,8 @@ export type Database = {
           office_phone_number: string | null
           organization_id: string | null
           phone_extension: string | null
+          province: string | null
+          sa_id: string | null
           updated_at: string
         }
         Insert: {
@@ -454,6 +457,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id: string
+          is_private?: boolean | null
           job_title?: string | null
           journal_reminder_day?: number | null
           journal_reminder_enabled?: boolean | null
@@ -464,6 +468,8 @@ export type Database = {
           office_phone_number?: string | null
           organization_id?: string | null
           phone_extension?: string | null
+          province?: string | null
+          sa_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -472,6 +478,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id?: string
+          is_private?: boolean | null
           job_title?: string | null
           journal_reminder_day?: number | null
           journal_reminder_enabled?: boolean | null
@@ -482,6 +489,8 @@ export type Database = {
           office_phone_number?: string | null
           organization_id?: string | null
           phone_extension?: string | null
+          province?: string | null
+          sa_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -721,6 +730,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      extract_province_from_said: {
+        Args: {
+          said: string
+        }
+        Returns: string
+      }
       is_survey_moderator_or_admin: {
         Args: {
           uid: string

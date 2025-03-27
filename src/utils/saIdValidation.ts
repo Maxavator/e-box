@@ -1,3 +1,4 @@
+
 // Regular expression for SA ID validation - 13 digits
 export const isSaId = (input: string): boolean => {
   const saIdRegex = /^\d{13}$/;
@@ -68,24 +69,20 @@ export const getProvinceFromSAID = (saId: string): string | null => {
   }
   
   try {
-    // Extract citizenship/province digit (7th digit)
+    // Extract citizenship/province digit (11th digit)
     const provinceDigit = parseInt(saId.substring(10, 11));
     
     // Map province codes to province names
     const provinces: Record<number, string> = {
-      0: 'Cape of Good Hope',
-      1: 'Transvaal',
-      2: 'Natal',
-      3: 'Orange Free State',
-      4: 'Eastern Cape',
-      5: 'Mpumalanga',
-      6: 'Northern Cape',
-      7: 'Limpopo',
-      8: 'North West',
-      9: 'Western Cape',
-      // Modern codes
-      10: 'Gauteng',
-      11: 'KwaZulu-Natal'
+      0: 'Gauteng',
+      1: 'Free State',
+      2: 'KwaZulu Natal',
+      3: 'Eastern Cape',
+      4: 'Mpumalanga',
+      5: 'Northern Cape',
+      6: 'Limpopo',
+      7: 'North West',
+      8: 'Western Cape'
     };
     
     return provinces[provinceDigit] || 'South Africa';

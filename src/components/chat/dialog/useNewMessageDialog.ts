@@ -10,6 +10,9 @@ interface Profile {
   last_name: string | null;
   avatar_url?: string;
   organization_id: string | null;
+  job_title?: string;
+  sa_id?: string;
+  province?: string;
 }
 
 interface Group {
@@ -43,8 +46,9 @@ export function useNewMessageDialog(onSelectConversation?: (conversationId: stri
 
       const { data: orgContacts, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, avatar_url, organization_id')
+        .select('id, first_name, last_name, avatar_url, organization_id, job_title, sa_id, province')
         .eq('organization_id', profile.organization_id)
+        .eq('is_private', false)
         .neq('id', currentUser.id);
 
       if (error) throw error;
@@ -70,8 +74,9 @@ export function useNewMessageDialog(onSelectConversation?: (conversationId: stri
 
       const { data: orgColleagues, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, avatar_url, organization_id, job_title')
+        .select('id, first_name, last_name, avatar_url, organization_id, job_title, sa_id, province')
         .eq('organization_id', profile.organization_id)
+        .eq('is_private', false)
         .neq('id', currentUser.id);
 
       if (error) throw error;

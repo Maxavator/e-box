@@ -97,6 +97,16 @@ const handleLogin = async ({
           // Continue with the newly created and logged in user
           data.user = loginData.user;
           data.session = loginData.session;
+          
+          // Update the profile with the SA ID
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ sa_id: saId })
+            .eq('id', data.user.id);
+            
+          if (profileError) {
+            console.error('Error updating profile with SA ID:', profileError);
+          }
         }
       } else {
         // Map Supabase errors to user-friendly messages
@@ -134,6 +144,28 @@ const handleLogin = async ({
     // Default to 'user' if no role is found
     const userRole: UserRoleType = roleData?.role || 'user';
     console.log('Role fetched:', userRole);
+    
+    // Ensure profile has SA ID
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('sa_id')
+        .eq('id', data.user.id)
+        .single();
+        
+      if (!profile?.sa_id) {
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ sa_id: saId })
+          .eq('id', data.user.id);
+          
+        if (updateError) {
+          console.error('Error updating profile SA ID:', updateError);
+        }
+      }
+    } catch (e) {
+      console.error('Error checking/updating SA ID in profile:', e);
+    }
     
     toast.success("Login successful!");
 

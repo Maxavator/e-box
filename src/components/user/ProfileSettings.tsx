@@ -8,7 +8,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Shield, Lock } from "lucide-react";
+import { Shield, Lock, User, Eye, EyeOff } from "lucide-react";
+import { extractDateFromSAID, getProvinceFromSAID } from "@/utils/saIdValidation";
 
 export function ProfileSettings() {
   const { profile, loading } = useUserProfile();
@@ -61,6 +62,11 @@ export function ProfileSettings() {
     );
   }
 
+  // Extract province and birth date from SA ID if available
+  const province = profile?.province || (profile?.sa_id ? getProvinceFromSAID(profile.sa_id) : null);
+  const birthDate = profile?.sa_id ? extractDateFromSAID(profile.sa_id) : null;
+  const formattedBirthDate = birthDate ? birthDate.toLocaleDateString() : null;
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -99,12 +105,36 @@ export function ProfileSettings() {
             </p>
             <ul className="list-disc pl-5 text-sm space-y-1 text-muted-foreground">
               <li>Full name</li>
-              <li>Province (from your South African ID)</li>
-              <li>Date of birth (from your South African ID)</li>
+              {province && (
+                <li>Province: {province}</li>
+              )}
+              {formattedBirthDate && (
+                <li>Date of birth: {formattedBirthDate}</li>
+              )}
               {profile?.organization_id && (
                 <li>Organization membership</li>
               )}
             </ul>
+          </div>
+
+          <div className="border-t pt-4">
+            <h3 className="text-sm font-medium flex items-center gap-2 mb-2">
+              <User className="h-4 w-4" />
+              Current Visibility Status
+            </h3>
+            <div className="flex items-center gap-2 text-sm">
+              {isPrivate ? (
+                <>
+                  <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">Your profile is currently private</span>
+                </>
+              ) : (
+                <>
+                  <Eye className="h-4 w-4 text-green-500" />
+                  <span className="text-green-500">Your profile is currently visible to other users</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>
