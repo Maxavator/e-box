@@ -4,6 +4,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
+interface Profile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  avatar_url?: string | null;
+  organization_id: string | null;
+  job_title?: string | null;
+  sa_id?: string | null;
+  province?: string | null;
+  is_private?: boolean;
+}
+
 interface UserProfileData {
   organizationName: string | null;
   organizationId: string | null;
@@ -12,6 +24,7 @@ interface UserProfileData {
   userDisplayName: string | null;
   userJobTitle: string | null;
   refreshProfile: () => Promise<void>;
+  profile: Profile | null; // Adding profile to the return type
 }
 
 export function useUserProfile(): UserProfileData {
@@ -19,6 +32,7 @@ export function useUserProfile(): UserProfileData {
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [userDisplayName, setUserDisplayName] = useState<string | null>(null);
   const [userJobTitle, setUserJobTitle] = useState<string | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null); // Store the full profile
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const queryClient = useQueryClient();
@@ -48,7 +62,7 @@ export function useUserProfile(): UserProfileData {
       // Get user profile data including organization_id and name
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('organization_id, first_name, last_name, job_title')
+        .select('organization_id, first_name, last_name, job_title, sa_id, province, is_private, avatar_url, id')
         .eq('id', session!.user.id)
         .maybeSingle();
         
@@ -103,6 +117,9 @@ export function useUserProfile(): UserProfileData {
     }
     
     if (profileData) {
+      // Set the complete profile data
+      setProfile(profileData.profileData as Profile);
+      
       if (profileData.profileData?.first_name && profileData.profileData?.last_name) {
         setUserDisplayName(`${profileData.profileData.first_name} ${profileData.profileData.last_name}`);
       } else if (profileData.profileData?.first_name) {
@@ -157,6 +174,7 @@ export function useUserProfile(): UserProfileData {
     userJobTitle,
     loading, 
     error,
-    refreshProfile
+    refreshProfile,
+    profile // Return the profile in the hook result
   };
 }

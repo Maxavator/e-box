@@ -70,7 +70,7 @@ export const SystemSettings = () => {
         </TabsList>
 
         <TabsContent value="account">
-          <AccountSettings
+          <AccountSettings 
             name={name}
             setName={setName}
             email={email}
