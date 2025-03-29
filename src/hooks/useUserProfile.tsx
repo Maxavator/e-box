@@ -126,13 +126,24 @@ export function useUserProfile(): UserProfileData {
       // Set the complete profile data
       setProfile(profileData.profileData);
       
-      if (profileData.profileData?.first_name && profileData.profileData?.last_name) {
-        setUserDisplayName(`${profileData.profileData.first_name} ${profileData.profileData.last_name}`);
-      } else if (profileData.profileData?.first_name) {
-        setUserDisplayName(profileData.profileData.first_name);
-      } else if (profileData.profileData?.last_name) {
-        setUserDisplayName(profileData.profileData.last_name);
+      // Constructing display name with extra debugging to trace issues
+      const firstName = profileData.profileData?.first_name || '';
+      const lastName = profileData.profileData?.last_name || '';
+      console.log(`DEBUG: firstName="${firstName}", lastName="${lastName}"`);
+      
+      // Create user display name, ensuring we handle all cases properly
+      if (firstName && lastName) {
+        const fullName = `${firstName} ${lastName}`;
+        console.log(`DEBUG: Setting fullName="${fullName}"`);
+        setUserDisplayName(fullName);
+      } else if (firstName) {
+        console.log(`DEBUG: Setting firstName only="${firstName}"`);
+        setUserDisplayName(firstName);
+      } else if (lastName) {
+        console.log(`DEBUG: Setting lastName only="${lastName}"`);
+        setUserDisplayName(lastName);
       } else {
+        console.log(`DEBUG: No name found, using default="User"`);
         setUserDisplayName("User");
       }
       

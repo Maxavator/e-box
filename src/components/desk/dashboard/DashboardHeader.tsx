@@ -20,6 +20,9 @@ export const DashboardHeader = ({ currentView, onBackClick, onAdminClick }: Dash
   const isAdminPage = location.pathname.includes('/admin') || 
                       location.pathname.includes('/organization');
 
+  console.log("DashboardHeader - userDisplayName:", userDisplayName);
+  console.log("DashboardHeader - userJobTitle:", userJobTitle);
+
   return (
     <header className="h-16 bg-card border-b px-4 md:px-6 flex items-center justify-between">
       <div>
