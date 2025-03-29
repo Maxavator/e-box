@@ -70,21 +70,7 @@ export const SystemSettings = () => {
         </TabsList>
 
         <TabsContent value="account">
-          <AccountSettings 
-            name={name}
-            setName={setName}
-            email={email}
-            setEmail={setEmail}
-            phone={phone}
-            setPhone={setPhone}
-            bio={bio}
-            setBio={setBio}
-            timezone={timezone}
-            setTimezone={setTimezone}
-            language={language}
-            setLanguage={setLanguage}
-            onSave={() => handleSave('Account')}
-          />
+          <AccountSettings />
         </TabsContent>
 
         <TabsContent value="appearance">

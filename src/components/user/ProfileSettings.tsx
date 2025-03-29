@@ -1,141 +1,156 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
-import { Shield, Lock, User, Eye, EyeOff } from "lucide-react";
-import { extractDateFromSAID, getProvinceFromSAID } from "@/utils/saIdValidation";
 
 export function ProfileSettings() {
-  const { profile, loading } = useUserProfile();
-  const [isPrivate, setIsPrivate] = useState(profile?.is_private || false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const { profile, loading, refreshProfile } = useUserProfile();
+  
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [jobTitle, setJobTitle] = useState<string>("");
+  const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const [saId, setSaId] = useState<string>("");
+  const [province, setProvince] = useState<string>("");
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const handlePrivacyToggle = async () => {
-    setIsUpdating(true);
+  // Initialize form with profile data when available
+  useEffect(() => {
+    if (profile) {
+      setFirstName(profile.first_name || "");
+      setLastName(profile.last_name || "");
+      setJobTitle(profile.job_title || "");
+      setIsPrivate(profile.is_private || false);
+      setSaId(profile.sa_id || "");
+      setProvince(profile.province || "");
+    }
+  }, [profile]);
+
+  const handleSaveProfile = async () => {
+    if (!profile) return;
+    
+    setIsSaving(true);
+    
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ is_private: !isPrivate })
-        .eq('id', profile?.id);
+        .update({
+          first_name: firstName,
+          last_name: lastName,
+          job_title: jobTitle,
+          is_private: isPrivate,
+          sa_id: saId
+          // Note: province is calculated automatically by a database trigger based on SA ID
+        })
+        .eq('id', profile.id);
       
       if (error) throw error;
       
-      setIsPrivate(!isPrivate);
-      toast({
-        title: "Privacy settings updated",
-        description: isPrivate 
-          ? "Your profile is now visible to other users." 
-          : "Your profile is now private and won't appear in user searches.",
-      });
-      
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['sidebar-profile'] });
-      
-    } catch (error) {
-      console.error('Error updating privacy settings:', error);
-      toast({
-        title: "Error updating privacy settings",
-        description: "Please try again later.",
-        variant: "destructive",
+      toast.success("Profile updated successfully");
+      refreshProfile();
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      toast.error("Failed to update profile", {
+        description: error.message || "An unexpected error occurred"
       });
     } finally {
-      setIsUpdating(false);
+      setIsSaving(false);
     }
   };
 
-  if (loading) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Privacy Settings</CardTitle>
-          <CardDescription>Loading your privacy settings...</CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
-
-  // Extract province and birth date from SA ID if available
-  const province = profile?.province || (profile?.sa_id ? getProvinceFromSAID(profile.sa_id) : null);
-  const birthDate = profile?.sa_id ? extractDateFromSAID(profile.sa_id) : null;
-  const formattedBirthDate = birthDate ? birthDate.toLocaleDateString() : null;
-
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Lock className="h-5 w-5" />
-          Privacy Settings
-        </CardTitle>
+        <CardTitle>Profile Information</CardTitle>
         <CardDescription>
-          Control how your profile appears to other users on the platform
+          Manage your personal information and privacy settings
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between space-x-2">
-            <div className="space-y-0.5">
-              <Label htmlFor="private-profile" className="text-base">Private Profile</Label>
-              <p className="text-sm text-muted-foreground">
-                When enabled, your profile won't appear in user searches and you can't receive new connection requests.
-              </p>
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input 
+                id="firstName" 
+                placeholder="Enter your first name" 
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
             </div>
-            <Switch
-              id="private-profile"
-              checked={isPrivate}
-              onCheckedChange={handlePrivacyToggle}
-              disabled={isUpdating}
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input 
+                id="lastName" 
+                placeholder="Enter your last name" 
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="jobTitle">Job Title</Label>
+            <Input 
+              id="jobTitle" 
+              placeholder="Enter your job title" 
+              value={jobTitle}
+              onChange={(e) => setJobTitle(e.target.value)}
             />
           </div>
           
-          <div className="border-t pt-4">
-            <h3 className="text-sm font-medium flex items-center gap-2 mb-2">
-              <Shield className="h-4 w-4" />
-              Profile Information Visibility
-            </h3>
-            <p className="text-sm text-muted-foreground mb-2">
-              The following information is visible to other users when they find your profile:
-            </p>
-            <ul className="list-disc pl-5 text-sm space-y-1 text-muted-foreground">
-              <li>Full name</li>
-              {province && (
-                <li>Province: {province}</li>
-              )}
-              {formattedBirthDate && (
-                <li>Date of birth: {formattedBirthDate}</li>
-              )}
-              {profile?.organization_id && (
-                <li>Organization membership</li>
-              )}
-            </ul>
+          <div className="space-y-2">
+            <Label htmlFor="saId">SA ID Number</Label>
+            <Input 
+              id="saId" 
+              placeholder="Enter your South African ID number" 
+              value={saId}
+              onChange={(e) => setSaId(e.target.value)}
+            />
+            {province && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Province: {province} (automatically determined from ID)
+              </p>
+            )}
           </div>
-
-          <div className="border-t pt-4">
-            <h3 className="text-sm font-medium flex items-center gap-2 mb-2">
-              <User className="h-4 w-4" />
-              Current Visibility Status
-            </h3>
-            <div className="flex items-center gap-2 text-sm">
-              {isPrivate ? (
-                <>
-                  <EyeOff className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Your profile is currently private</span>
-                </>
-              ) : (
-                <>
-                  <Eye className="h-4 w-4 text-green-500" />
-                  <span className="text-green-500">Your profile is currently visible to other users</span>
-                </>
-              )}
+        </div>
+        
+        <Separator />
+        
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-base">Privacy Settings</Label>
+              <p className="text-sm text-muted-foreground">
+                Control the visibility of your profile information
+              </p>
             </div>
+            <Switch
+              checked={isPrivate}
+              onCheckedChange={setIsPrivate}
+            />
           </div>
+          <p className="text-sm text-muted-foreground">
+            {isPrivate 
+              ? "Your profile is currently private. Only organization admins can see your details." 
+              : "Your profile is currently visible to other users in your organization."}
+          </p>
+        </div>
+        
+        <div className="flex justify-end">
+          <Button 
+            onClick={handleSaveProfile} 
+            disabled={isSaving || loading}
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
+          </Button>
         </div>
       </CardContent>
     </Card>
