@@ -58,7 +58,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       
-      <SidebarFooter className="border-t border-border/30 bg-sidebar">
+      <SidebarFooter className="border-t border-border/30 bg-sidebar p-0">
         <UserProfileSidebarFooter />
       </SidebarFooter>
     </Sidebar>
