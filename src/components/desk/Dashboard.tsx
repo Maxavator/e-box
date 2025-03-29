@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
@@ -9,39 +10,17 @@ import { QuickActions } from "./dashboard/QuickActions";
 import { Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const { userRole, isLoading: isRoleLoading, error: roleError } = useUserRole();
-
-  // Fetch the user profile data including job title
-  const { data: profile, isLoading: isProfileLoading } = useQuery({
-    queryKey: ['dashboardProfileData'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) return null;
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, job_title, organization_id')
-        .eq('id', user.id)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching profile data:', error);
-        return null;
-      }
-      
-      console.log('Dashboard profile data fetched:', data);
-      return data;
-    },
-  });
+  const { profile, userDisplayName, userJobTitle, loading: profileLoading } = useUserProfile();
 
   useEffect(() => {
     console.log('Dashboard mounted, userRole:', userRole, 'isLoading:', isRoleLoading);
-    console.log('Profile data:', profile);
-  }, [userRole, isRoleLoading, profile]);
+    console.log('Profile data:', profile, 'userDisplayName:', userDisplayName);
+  }, [userRole, isRoleLoading, profile, userDisplayName]);
 
   const handleCardClick = (feature: string) => {
     console.log('Card clicked:', feature);
@@ -78,7 +57,7 @@ export const Dashboard = () => {
     }
   };
 
-  const isLoading = isRoleLoading || isProfileLoading;
+  const isLoading = isRoleLoading || profileLoading;
 
   if (isLoading) {
     return (
@@ -108,14 +87,6 @@ export const Dashboard = () => {
     );
   }
 
-  // Format user name
-  const userName = profile ? 
-    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'User' : 
-    'User';
-  
-  // Get job title
-  const jobTitle = profile?.job_title || '';
-
   return (
     <div className="p-0 max-w-full">
       <DashboardHeader 
@@ -127,8 +98,8 @@ export const Dashboard = () => {
       <div className="p-4 md:p-6 space-y-6">
         {/* Display welcome message with user's name and job title */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold">Welcome, {userName}</h1>
-          {jobTitle && <p className="text-muted-foreground">{jobTitle}</p>}
+          <h1 className="text-2xl font-bold">Welcome, {userDisplayName || 'User'}</h1>
+          {userJobTitle && <p className="text-muted-foreground">{userJobTitle}</p>}
         </div>
 
         <StatsCards onCardClick={handleCardClick} />
