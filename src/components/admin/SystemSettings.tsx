@@ -10,14 +10,6 @@ import { NotificationSettings } from "@/components/settings/NotificationSettings
 import { SecuritySettings } from "@/components/settings/SecuritySettings";
 
 export const SystemSettings = () => {
-  // User Information
-  const [name, setName] = useState("Admin User");
-  const [email, setEmail] = useState("admin@example.com");
-  const [phone, setPhone] = useState("+1 234 567 8900");
-  const [bio, setBio] = useState("System Administrator");
-  const [timezone, setTimezone] = useState("utc");
-  const [language, setLanguage] = useState("en");
-
   // Appearance Settings
   const [darkMode, setDarkMode] = useState(true);
   const [compactMode, setCompactMode] = useState(false);

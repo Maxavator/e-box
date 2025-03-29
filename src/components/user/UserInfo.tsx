@@ -5,80 +5,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { OnlineStatus } from "./OnlineStatus";
 import { UserRoleBadge } from "@/components/shared/profile-sidebar/UserRoleBadge";
 import { toast } from "sonner";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 interface UserInfoProps {
   className?: string;
 }
 
 export function UserInfo({ className }: UserInfoProps) {
-  const { data: session, isLoading: isSessionLoading } = useQuery({
-    queryKey: ['session'],
-    queryFn: async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error('Error fetching session:', error);
-        throw error;
-      }
-      return session;
-    },
-  });
-
-  const { data: profile, isLoading: isProfileLoading } = useQuery({
-    queryKey: ['profile', session?.user?.id],
-    enabled: !!session?.user?.id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, avatar_url, job_title, organization_id')
-        .eq('id', session!.user.id)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching profile:', error);
-        toast.error("Failed to load user profile");
-        return null;
-      }
-      
-      return data;
-    },
-  });
-
-  // Get organization name if organization_id exists
-  const { data: organization, isLoading: isOrgLoading } = useQuery({
-    queryKey: ['organization', profile?.organization_id],
-    enabled: !!profile?.organization_id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('organizations')
-        .select('name')
-        .eq('id', profile!.organization_id)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching organization:', error);
-        return null;
-      }
-      
-      return data;
-    },
-  });
-
+  const { profile, userDisplayName, userJobTitle, organizationName, loading: profileLoading } = useUserProfile();
+  
   // Debug logging
-  console.log('Session:', session);
-  console.log('Profile:', profile);
-  console.log('Organization:', organization);
+  console.log('UserInfo - Profile:', profile);
+  console.log('UserInfo - DisplayName:', userDisplayName);
+  console.log('UserInfo - JobTitle:', userJobTitle);
+  console.log('UserInfo - OrgName:', organizationName);
 
   // Create the display name in the format "First Last"
-  const displayName = profile ? 
-    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
-    'User';
+  const displayName = userDisplayName || 'User';
   const avatarUrl = profile?.avatar_url || '';
-  const jobTitle = profile?.job_title || '';
-  const orgName = organization?.name || '';
+  const jobTitle = userJobTitle || '';
+  const orgName = organizationName || '';
   
-  const isLoading = isSessionLoading || isProfileLoading;
-
-  if (isLoading) {
+  if (profileLoading) {
     return (
       <div className={`flex items-center gap-2 animate-pulse ${className}`}>
         <div className="h-8 w-8 rounded-full bg-muted"></div>

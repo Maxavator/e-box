@@ -1,5 +1,5 @@
 
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSession } from "@supabase/auth-helpers-react";
 import { useState, useEffect, ReactNode } from "react";
 import { AuthenticationDialog } from "./AuthenticationDialog";
@@ -14,6 +14,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const [loading, setLoading] = useState(true);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   
   useEffect(() => {
     // Check for existing session
@@ -27,6 +28,11 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         }
         
         setSession(session);
+        
+        // If we're at the root path and authenticated, redirect to dashboard
+        if (session && location.pathname === '/') {
+          navigate('/dashboard');
+        }
       } catch (error) {
         console.error('Unexpected error getting session:', error);
       } finally {
@@ -37,6 +43,11 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       setSession(session);
+      
+      // On login, redirect to dashboard if at root
+      if (session && location.pathname === '/') {
+        navigate('/dashboard');
+      }
     });
 
     getSession();
@@ -45,7 +56,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [location.pathname, navigate]);
   
   useEffect(() => {
     // Show auth dialog if no session

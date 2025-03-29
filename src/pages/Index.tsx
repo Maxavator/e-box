@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -20,13 +19,8 @@ const Index = () => {
         setStatus("Checking your access level...");
         
         if (!isLoading) {
-          if (isAdmin || userRole === 'org_admin') {
-            setStatus("Welcome back! Redirecting you to admin portal...");
-            setTimeout(() => navigate('/admin'), 1000);
-          } else {
-            setStatus("Welcome back! Taking you to your messages...");
-            setTimeout(() => navigate('/chat'), 1000);
-          }
+          setStatus("Welcome back! Taking you to your dashboard...");
+          setTimeout(() => navigate('/dashboard'), 1000);
         }
       } else if (!isLoading) {
         setStatus(""); // Clear status for non-authenticated users

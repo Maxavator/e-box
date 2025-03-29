@@ -24,7 +24,7 @@ interface UserProfileData {
   userDisplayName: string | null;
   userJobTitle: string | null;
   refreshProfile: () => Promise<void>;
-  profile: Profile | null; // Adding profile to the return type
+  profile: Profile | null; // This is the main profile data
 }
 
 export function useUserProfile(): UserProfileData {
@@ -32,7 +32,7 @@ export function useUserProfile(): UserProfileData {
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [userDisplayName, setUserDisplayName] = useState<string | null>(null);
   const [userJobTitle, setUserJobTitle] = useState<string | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null); // Store the full profile
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const queryClient = useQueryClient();
@@ -50,6 +50,8 @@ export function useUserProfile(): UserProfileData {
       console.log('useUserProfile: Session data:', session);
       return session;
     },
+    retry: 1,
+    staleTime: 30000, // Reduce stale time to refresh more often
   });
 
   // Fetch user profile data only when session is available
@@ -96,6 +98,8 @@ export function useUserProfile(): UserProfileData {
         jobTitle: profileData?.job_title || null
       };
     },
+    retry: 2,
+    staleTime: 60000,
   });
 
   // Update state based on query results
@@ -117,8 +121,10 @@ export function useUserProfile(): UserProfileData {
     }
     
     if (profileData) {
+      console.log("Setting profile data:", profileData.profileData);
+      
       // Set the complete profile data
-      setProfile(profileData.profileData as Profile);
+      setProfile(profileData.profileData);
       
       if (profileData.profileData?.first_name && profileData.profileData?.last_name) {
         setUserDisplayName(`${profileData.profileData.first_name} ${profileData.profileData.last_name}`);
@@ -126,6 +132,8 @@ export function useUserProfile(): UserProfileData {
         setUserDisplayName(profileData.profileData.first_name);
       } else if (profileData.profileData?.last_name) {
         setUserDisplayName(profileData.profileData.last_name);
+      } else {
+        setUserDisplayName("User");
       }
       
       setUserJobTitle(profileData.jobTitle);

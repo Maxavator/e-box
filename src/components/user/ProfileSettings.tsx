@@ -24,21 +24,38 @@ export function ProfileSettings() {
   // Initialize form with profile data when available
   useEffect(() => {
     if (profile) {
+      console.log("ProfileSettings - setting form data from profile:", profile);
       setFirstName(profile.first_name || "");
       setLastName(profile.last_name || "");
       setJobTitle(profile.job_title || "");
       setIsPrivate(profile.is_private || false);
       setSaId(profile.sa_id || "");
       setProvince(profile.province || "");
+    } else {
+      console.log("ProfileSettings - profile is null or undefined");
     }
   }, [profile]);
 
   const handleSaveProfile = async () => {
-    if (!profile) return;
+    if (!profile) {
+      console.error("Cannot save profile: profile is null");
+      toast.error("Cannot save profile data", {
+        description: "Your profile information could not be loaded. Please refresh and try again."
+      });
+      return;
+    }
     
     setIsSaving(true);
     
     try {
+      console.log("Saving profile with data:", {
+        first_name: firstName,
+        last_name: lastName,
+        job_title: jobTitle,
+        is_private: isPrivate,
+        sa_id: saId
+      });
+      
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -74,84 +91,94 @@ export function ProfileSettings() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input 
-                id="firstName" 
-                placeholder="Enter your first name" 
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
+        {loading ? (
+          <div className="space-y-4 animate-pulse">
+            <div className="h-10 bg-muted rounded"></div>
+            <div className="h-10 bg-muted rounded"></div>
+            <div className="h-10 bg-muted rounded"></div>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input 
+                    id="firstName" 
+                    placeholder="Enter your first name" 
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input 
+                    id="lastName" 
+                    placeholder="Enter your last name" 
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle">Job Title</Label>
+                <Input 
+                  id="jobTitle" 
+                  placeholder="Enter your job title" 
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="saId">SA ID Number</Label>
+                <Input 
+                  id="saId" 
+                  placeholder="Enter your South African ID number" 
+                  value={saId}
+                  onChange={(e) => setSaId(e.target.value)}
+                />
+                {province && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Province: {province} (automatically determined from ID)
+                  </p>
+                )}
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input 
-                id="lastName" 
-                placeholder="Enter your last name" 
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="jobTitle">Job Title</Label>
-            <Input 
-              id="jobTitle" 
-              placeholder="Enter your job title" 
-              value={jobTitle}
-              onChange={(e) => setJobTitle(e.target.value)}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="saId">SA ID Number</Label>
-            <Input 
-              id="saId" 
-              placeholder="Enter your South African ID number" 
-              value={saId}
-              onChange={(e) => setSaId(e.target.value)}
-            />
-            {province && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Province: {province} (automatically determined from ID)
-              </p>
-            )}
-          </div>
-        </div>
-        
-        <Separator />
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label className="text-base">Privacy Settings</Label>
+            
+            <Separator />
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Privacy Settings</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Control the visibility of your profile information
+                  </p>
+                </div>
+                <Switch
+                  checked={isPrivate}
+                  onCheckedChange={setIsPrivate}
+                />
+              </div>
               <p className="text-sm text-muted-foreground">
-                Control the visibility of your profile information
+                {isPrivate 
+                  ? "Your profile is currently private. Only organization admins can see your details." 
+                  : "Your profile is currently visible to other users in your organization."}
               </p>
             </div>
-            <Switch
-              checked={isPrivate}
-              onCheckedChange={setIsPrivate}
-            />
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {isPrivate 
-              ? "Your profile is currently private. Only organization admins can see your details." 
-              : "Your profile is currently visible to other users in your organization."}
-          </p>
-        </div>
-        
-        <div className="flex justify-end">
-          <Button 
-            onClick={handleSaveProfile} 
-            disabled={isSaving || loading}
-          >
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
+            
+            <div className="flex justify-end">
+              <Button 
+                onClick={handleSaveProfile} 
+                disabled={isSaving || loading}
+              >
+                {isSaving ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );
