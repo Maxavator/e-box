@@ -41,13 +41,11 @@ export function useUserProfile(): UserProfileData {
   const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['profile-auth-session'],
     queryFn: async () => {
-      console.log('useUserProfile: Fetching auth session');
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
         console.error('useUserProfile: Session error:', error);
         throw error;
       }
-      console.log('useUserProfile: Session data:', session);
       return session;
     },
     retry: 1,
@@ -59,8 +57,6 @@ export function useUserProfile(): UserProfileData {
     queryKey: ['profile-user-profile-data', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
-      console.log('useUserProfile: Fetching profile data for user:', session?.user?.id);
-      
       // Get user profile data including organization_id and name
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -73,7 +69,7 @@ export function useUserProfile(): UserProfileData {
         throw profileError;
       }
       
-      console.log('useUserProfile: Profile data:', profileData);
+      console.log('useUserProfile: Raw profile data:', profileData);
       
       let orgName = null;
       // Get organization name if user has an organization
@@ -87,7 +83,6 @@ export function useUserProfile(): UserProfileData {
         if (orgError) {
           console.error('useUserProfile: Organization error:', orgError);
         } else {
-          console.log('useUserProfile: Organization data:', orgData);
           orgName = orgData?.name || null;
         }
       }
@@ -114,39 +109,38 @@ export function useUserProfile(): UserProfileData {
     
     if (profileError) {
       setError(profileError instanceof Error ? profileError : new Error(String(profileError)));
-      // Show toast notification for error
       toast.error("Failed to load profile information", {
         description: "Please try refreshing the page or contact support."
       });
     }
     
     if (profileData) {
-      console.log("Setting profile data:", profileData.profileData);
-      
       // Set the complete profile data
       setProfile(profileData.profileData);
       
-      // Constructing display name with extra debugging to trace issues
+      // Handle name construction for display
       const firstName = profileData.profileData?.first_name || '';
       const lastName = profileData.profileData?.last_name || '';
-      console.log(`DEBUG: firstName="${firstName}", lastName="${lastName}"`);
+      
+      // Log full details for debugging
+      console.log('useUserProfile: Name fields -', {
+        firstName,
+        lastName,
+        profile: profileData.profileData
+      });
       
       // Create user display name, ensuring we handle all cases properly
       if (firstName && lastName) {
-        const fullName = `${firstName} ${lastName}`;
-        console.log(`DEBUG: Setting fullName="${fullName}"`);
-        setUserDisplayName(fullName);
+        setUserDisplayName(`${firstName} ${lastName}`);
       } else if (firstName) {
-        console.log(`DEBUG: Setting firstName only="${firstName}"`);
         setUserDisplayName(firstName);
       } else if (lastName) {
-        console.log(`DEBUG: Setting lastName only="${lastName}"`);
         setUserDisplayName(lastName);
       } else {
-        console.log(`DEBUG: No name found, using default="User"`);
         setUserDisplayName("User");
       }
       
+      // Set job title and organization information
       setUserJobTitle(profileData.jobTitle);
       
       if (profileData.profileData?.organization_id) {
@@ -160,6 +154,7 @@ export function useUserProfile(): UserProfileData {
     }
   }, [isSessionLoading, isProfileLoading, session, profileData, profileError]);
 
+  // Function to manually refresh profile data
   const refreshProfile = async () => {
     try {
       setLoading(true);
@@ -177,7 +172,6 @@ export function useUserProfile(): UserProfileData {
       console.error('Error refreshing user profile:', err);
       setError(err instanceof Error ? err : new Error(String(err)));
       
-      // Show toast notification for error
       toast.error("Failed to refresh profile information", {
         description: "Please try again or contact support."
       });
@@ -194,6 +188,6 @@ export function useUserProfile(): UserProfileData {
     loading, 
     error,
     refreshProfile,
-    profile // Return the profile in the hook result
+    profile
   };
 }

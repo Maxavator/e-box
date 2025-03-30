@@ -8,19 +8,17 @@ import { ActivitySection } from "./dashboard/ActivitySection";
 import { AnnouncementsSection } from "./dashboard/AnnouncementsSection";
 import { QuickActions } from "./dashboard/QuickActions";
 import { Loader2 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const { userRole, isLoading: isRoleLoading, error: roleError } = useUserRole();
-  const { profile, userDisplayName, userJobTitle, loading: profileLoading } = useUserProfile();
+  const { userDisplayName, userJobTitle, loading: profileLoading } = useUserProfile();
 
   useEffect(() => {
-    console.log('Dashboard mounted, userRole:', userRole, 'isLoading:', isRoleLoading);
-    console.log('Profile data:', profile, 'userDisplayName:', userDisplayName);
-  }, [userRole, isRoleLoading, profile, userDisplayName]);
+    console.log('Dashboard mounted, userRole:', userRole, 'isRoleLoading:', isRoleLoading);
+    console.log('Dashboard - userDisplayName:', userDisplayName, 'userJobTitle:', userJobTitle);
+  }, [userRole, isRoleLoading, userDisplayName, userJobTitle]);
 
   const handleCardClick = (feature: string) => {
     console.log('Card clicked:', feature);

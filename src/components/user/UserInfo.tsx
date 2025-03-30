@@ -21,8 +21,7 @@ export function UserInfo({ className, compact = false }: UserInfoProps) {
   console.log('UserInfo - DisplayName:', userDisplayName);
   console.log('UserInfo - JobTitle:', userJobTitle);
   console.log('UserInfo - OrgName:', organizationName);
-  console.log('UserInfo - ProfileData:', profile?.first_name, profile?.last_name);
-
+  
   // Create the display name in the format "First Last"
   const displayName = userDisplayName || 'User';
   const avatarUrl = profile?.avatar_url || '';
@@ -42,13 +41,18 @@ export function UserInfo({ className, compact = false }: UserInfoProps) {
     );
   }
 
+  // Generate initials for avatar fallback
+  const initials = displayName
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase() || 'U';
+
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <Avatar className={compact ? "h-6 w-6" : "h-8 w-8"}>
         <AvatarImage src={avatarUrl} alt={displayName} />
-        <AvatarFallback>
-          {displayName?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
-        </AvatarFallback>
+        <AvatarFallback>{initials}</AvatarFallback>
       </Avatar>
       <div className="flex flex-col">
         <span className={`${compact ? "text-xs" : "text-sm"} font-medium line-clamp-1`}>
