@@ -41,12 +41,17 @@ export function useUserProfile(): UserProfileData {
   const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['profile-auth-session'],
     queryFn: async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error('useUserProfile: Session error:', error);
-        throw error;
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('useUserProfile: Session error:', error);
+          throw error;
+        }
+        return session;
+      } catch (err) {
+        console.error('useUserProfile: Failed to get session:', err);
+        return null;
       }
-      return session;
     },
     retry: 1,
     staleTime: 30000, // Reduce stale time to refresh more often
@@ -57,41 +62,47 @@ export function useUserProfile(): UserProfileData {
     queryKey: ['profile-user-profile-data', session?.user?.id],
     enabled: !!session?.user?.id,
     queryFn: async () => {
-      // Get user profile data including organization_id and name
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('organization_id, first_name, last_name, job_title, sa_id, province, is_private, avatar_url, id')
-        .eq('id', session!.user.id)
-        .maybeSingle();
-        
-      if (profileError) {
-        console.error('useUserProfile: Profile error:', profileError);
-        throw profileError;
-      }
-      
-      console.log('useUserProfile: Raw profile data:', profileData);
-      
-      let orgName = null;
-      // Get organization name if user has an organization
-      if (profileData?.organization_id) {
-        const { data: orgData, error: orgError } = await supabase
-          .from('organizations')
-          .select('name')
-          .eq('id', profileData.organization_id)
+      try {
+        console.log('useUserProfile: Fetching profile for user:', session!.user.id);
+        // Get user profile data including organization_id and name
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('organization_id, first_name, last_name, job_title, sa_id, province, is_private, avatar_url, id')
+          .eq('id', session!.user.id)
           .maybeSingle();
           
-        if (orgError) {
-          console.error('useUserProfile: Organization error:', orgError);
-        } else {
-          orgName = orgData?.name || null;
+        if (profileError) {
+          console.error('useUserProfile: Profile error:', profileError);
+          throw profileError;
         }
+        
+        console.log('useUserProfile: Raw profile data:', profileData);
+        
+        let orgName = null;
+        // Get organization name if user has an organization
+        if (profileData?.organization_id) {
+          const { data: orgData, error: orgError } = await supabase
+            .from('organizations')
+            .select('name')
+            .eq('id', profileData.organization_id)
+            .maybeSingle();
+            
+          if (orgError) {
+            console.error('useUserProfile: Organization error:', orgError);
+          } else {
+            orgName = orgData?.name || null;
+          }
+        }
+        
+        return {
+          profileData,
+          orgName,
+          jobTitle: profileData?.job_title || null
+        };
+      } catch (err) {
+        console.error('useUserProfile: Failed to fetch profile data:', err);
+        throw err;
       }
-      
-      return {
-        profileData,
-        orgName,
-        jobTitle: profileData?.job_title || null
-      };
     },
     retry: 2,
     staleTime: 60000,
@@ -151,6 +162,11 @@ export function useUserProfile(): UserProfileData {
         setOrganizationId(null);
         setOrganizationName(null);
       }
+    } else if (!isProfileLoading && !profileError) {
+      // Handle case where query completed but no data was returned
+      console.log('useUserProfile: No profile data found');
+      setUserDisplayName("User");
+      setUserJobTitle(null);
     }
   }, [isSessionLoading, isProfileLoading, session, profileData, profileError]);
 

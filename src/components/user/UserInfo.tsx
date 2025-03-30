@@ -59,9 +59,11 @@ export function UserInfo({ className, compact = false }: UserInfoProps) {
           {displayName}
         </span>
         <div className="flex items-center flex-wrap">
-          <span className={`${compact ? "text-[10px]" : "text-xs"} text-muted-foreground line-clamp-1 mr-2`}>
-            {jobTitle}
-          </span>
+          {jobTitle && (
+            <span className={`${compact ? "text-[10px]" : "text-xs"} text-muted-foreground line-clamp-1 mr-2`}>
+              {jobTitle}
+            </span>
+          )}
           
           {!compact && orgName && (
             <span className="text-xs text-muted-foreground flex items-center">

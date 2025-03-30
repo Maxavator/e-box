@@ -27,7 +27,7 @@ export const DashboardHeader = ({
       <div>
         <h1 className="text-xl font-bold">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          Welcome back, {formattedName}
+          Welcome back, {formattedName || 'User'}
           {isAdmin && " (Admin)"}
           {jobTitle && <span className="ml-1 text-xs opacity-80">• {jobTitle}</span>}
           {organizationName && <span className="ml-1 text-xs opacity-80">• {organizationName}</span>}
