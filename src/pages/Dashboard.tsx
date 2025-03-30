@@ -35,9 +35,33 @@ const Dashboard = () => {
       userDisplayName, 
       userJobTitle, 
       organizationName,
-      profileLoading
+      profileLoading,
+      firstName: profile?.first_name,
+      lastName: profile?.last_name
     });
   }, [profile, userDisplayName, userJobTitle, organizationName, profileLoading]);
+
+  // Additional check to try to get profile using direct Supabase call
+  useEffect(() => {
+    const checkProfileDirectly = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.id) {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', session.user.id)
+            .single();
+            
+          console.log("Direct profile check:", { data, error });
+        }
+      } catch (err) {
+        console.error("Error in direct profile check:", err);
+      }
+    };
+    
+    checkProfileDirectly();
+  }, []);
 
   const handleQuickAction = (action: string) => {
     console.log(`Quick action clicked: ${action}`);

@@ -23,6 +23,9 @@ export const useProfileState = () => {
 
   // Update state based on query results
   useEffect(() => {
+    console.log('useProfileState effect running with profileData:', profileData);
+    console.log('useProfileState effect - isProfileLoading:', isProfileLoading);
+    
     setLoading(isSessionLoading || isProfileLoading);
     
     if (!isSessionLoading && !session) {

@@ -20,6 +20,7 @@ export const useProfileQueries = () => {
           console.error('useProfileQueries: Session error:', error);
           throw error;
         }
+        console.log('useProfileQueries: Session found:', session ? 'yes' : 'no');
         return session;
       } catch (err) {
         console.error('useProfileQueries: Failed to get session:', err);
