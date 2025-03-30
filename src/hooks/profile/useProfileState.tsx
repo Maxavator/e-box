@@ -45,11 +45,13 @@ export const useProfileState = () => {
       // Handle name construction for display
       const firstName = profileData.profileData?.first_name || '';
       const lastName = profileData.profileData?.last_name || '';
+      const email = session?.user?.email || '';
       
       // Log full details for debugging
       console.log('useProfileState: Name fields -', {
         firstName,
         lastName,
+        email,
         profile: profileData.profileData
       });
       
@@ -60,8 +62,12 @@ export const useProfileState = () => {
         setUserDisplayName(firstName);
       } else if (lastName) {
         setUserDisplayName(lastName);
+      } else if (email) {
+        // If no name is available, use email without the domain part
+        const emailUsername = email.split('@')[0];
+        setUserDisplayName(emailUsername);
       } else {
-        setUserDisplayName(null);
+        setUserDisplayName("User");
       }
       
       // Set job title and organization information
@@ -78,7 +84,15 @@ export const useProfileState = () => {
     } else if (!isProfileLoading && !profileError) {
       // Handle case where query completed but no data was returned
       console.log('useProfileState: No profile data found');
-      setUserDisplayName(null);
+      
+      // Use email as fallback if available
+      if (session?.user?.email) {
+        const emailUsername = session.user.email.split('@')[0];
+        setUserDisplayName(emailUsername);
+      } else {
+        setUserDisplayName("User");
+      }
+      
       setUserJobTitle(null);
     }
   }, [isSessionLoading, isProfileLoading, session, profileData, profileError]);
