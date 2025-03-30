@@ -20,7 +20,24 @@ const Dashboard = () => {
   const [lastUpdate, setLastUpdate] = useState("Just now");
   const [isDataLoading, setIsDataLoading] = useState(false);
   const { checkAuth, AuthDialog } = useAuthDialog();
-  const { userDisplayName, userJobTitle, organizationName, loading: profileLoading } = useUserProfile();
+  const { 
+    profile, 
+    userDisplayName, 
+    userJobTitle, 
+    organizationName, 
+    loading: profileLoading 
+  } = useUserProfile();
+
+  // For debugging purposes
+  useEffect(() => {
+    console.log("Dashboard - Profile data:", { 
+      profile,
+      userDisplayName, 
+      userJobTitle, 
+      organizationName,
+      profileLoading
+    });
+  }, [profile, userDisplayName, userJobTitle, organizationName, profileLoading]);
 
   const handleQuickAction = (action: string) => {
     console.log(`Quick action clicked: ${action}`);
@@ -53,14 +70,6 @@ const Dashboard = () => {
     }, 800);
   };
 
-  useEffect(() => {
-    console.log("Dashboard - Current user data:", {
-      userDisplayName, 
-      userJobTitle, 
-      organizationName
-    });
-  }, [userDisplayName, userJobTitle, organizationName]);
-
   if (roleLoading || profileLoading) {
     return <LoadingState />;
   }
@@ -71,14 +80,11 @@ const Dashboard = () => {
     return null;
   }
 
-  // Format name for display
-  const formattedName = userDisplayName || 'User';
-
   return (
     <div className="flex-1 min-h-screen bg-background">
       <AuthDialog />
       <DashboardHeader 
-        formattedName={formattedName}
+        formattedName={userDisplayName}
         isAdmin={isAdmin}
         jobTitle={userJobTitle || undefined}
         organizationName={organizationName || undefined}

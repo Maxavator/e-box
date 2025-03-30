@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Clock, Loader2 } from "lucide-react";
 
 interface DashboardHeaderProps {
-  formattedName: string;
+  formattedName: string | null;
   isAdmin: boolean;
   jobTitle?: string;
   organizationName?: string;
@@ -22,6 +22,14 @@ export const DashboardHeader = ({
   isDataLoading,
   refreshData
 }: DashboardHeaderProps) => {
+  // For debugging
+  console.log("DashboardHeader rendering with:", {
+    formattedName,
+    isAdmin,
+    jobTitle,
+    organizationName
+  });
+  
   return (
     <header className="h-16 bg-card border-b px-8 flex items-center justify-between">
       <div>

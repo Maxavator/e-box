@@ -148,7 +148,7 @@ export function useUserProfile(): UserProfileData {
       } else if (lastName) {
         setUserDisplayName(lastName);
       } else {
-        setUserDisplayName("User");
+        setUserDisplayName(null);
       }
       
       // Set job title and organization information
@@ -165,7 +165,7 @@ export function useUserProfile(): UserProfileData {
     } else if (!isProfileLoading && !profileError) {
       // Handle case where query completed but no data was returned
       console.log('useUserProfile: No profile data found');
-      setUserDisplayName("User");
+      setUserDisplayName(null);
       setUserJobTitle(null);
     }
   }, [isSessionLoading, isProfileLoading, session, profileData, profileError]);
