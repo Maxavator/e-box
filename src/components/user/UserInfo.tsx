@@ -28,7 +28,7 @@ export function UserInfo({ className, compact = false }: UserInfoProps) {
   const jobTitle = userJobTitle || '';
   const orgName = organizationName || '';
   const province = profile?.province || '';
-  const email = profile?.id ? profile.id : '';
+  const email = profile?.id || '';
   
   if (profileLoading) {
     return (

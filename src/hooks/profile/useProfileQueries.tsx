@@ -43,7 +43,7 @@ export const useProfileQueries = () => {
       try {
         console.log('useProfileQueries: Fetching profile for user:', session!.user.id);
         
-        // Get user profile data
+        // Get user profile data - ensure we select all needed fields
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('organization_id, first_name, last_name, job_title, sa_id, province, is_private, avatar_url, id')

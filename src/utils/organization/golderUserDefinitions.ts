@@ -31,7 +31,7 @@ export const golderUsers: UserToCreate[] = [
     email: 'lesego.motaung@golder.co.za',
     role: 'user',
     title: 'Staff Member',
-    jobTitle: 'Metoerologist'
+    jobTitle: 'Meteorologist'
   },
   {
     firstName: 'Lindiwe',
