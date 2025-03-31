@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -81,7 +82,7 @@ const Index = () => {
       </div>
       
       <footer className="fixed bottom-4 text-center text-sm text-muted-foreground animate-fadeIn delay-300">
-        <p>Version {APP_VERSION.replace('v', '')} | © 2025 Afrovation Technology Solutions (Pty) Ltd. All rights reserved.</p>
+        <p>Version {APP_VERSION.replace('v', '')} | © 2025 Afrovation (Pty) Ltd. All rights reserved.</p>
       </footer>
     </div>
   );

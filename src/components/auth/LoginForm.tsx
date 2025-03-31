@@ -90,7 +90,7 @@ const LoginForm = () => {
               e-Box Enterprise Platform {APP_VERSION}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              © 2025 Afrovation Technology Solutions (Pty) Ltd. All rights reserved.
+              © 2025 Afrovation (Pty) Ltd. All rights reserved.
             </p>
           </div>
         </form>
