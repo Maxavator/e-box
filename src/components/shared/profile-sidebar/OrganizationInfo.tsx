@@ -1,11 +1,10 @@
-
 import { Building2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 interface OrganizationInfoProps {
-  organizationId?: string;
-  organizationName?: string;
+  organizationId?: string | null;
+  organizationName?: string | null;
   logo?: string;
 }
 
@@ -14,9 +13,14 @@ export function OrganizationInfo({ organizationId, organizationName, logo }: Org
   if (organizationName) {
     console.log('Rendering OrganizationInfo with provided name:', organizationName);
     return (
-      <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2">
-        <Building2 className="h-3.5 w-3.5 text-primary" />
-        <span className="text-sm font-medium">{organizationName}</span>
+      <div className="flex items-center gap-2 px-1 py-1.5">
+        <div className="bg-primary/10 p-1.5 rounded-md">
+          <Building2 className="h-4 w-4 text-primary" />
+        </div>
+        <div className="flex flex-col">
+          <span className="text-xs text-muted-foreground">Organization</span>
+          <span className="text-sm font-medium">{organizationName}</span>
+        </div>
       </div>
     );
   }
@@ -46,9 +50,14 @@ export function OrganizationInfo({ organizationId, organizationName, logo }: Org
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2">
-        <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-        <span className="text-xs text-muted-foreground">Loading organization...</span>
+      <div className="flex items-center gap-2 px-1 py-1.5 animate-pulse">
+        <div className="bg-muted p-1.5 rounded-md">
+          <Building2 className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <div className="flex flex-col">
+          <div className="h-3 w-16 bg-muted rounded"></div>
+          <div className="h-4 w-24 bg-muted rounded mt-1"></div>
+        </div>
       </div>
     );
   }
@@ -58,9 +67,14 @@ export function OrganizationInfo({ organizationId, organizationName, logo }: Org
   }
 
   return (
-    <div className="flex items-center gap-1.5 px-1 py-1.5 mb-2">
-      <Building2 className="h-3.5 w-3.5 text-primary" />
-      <span className="text-sm font-medium">{organization?.name}</span>
+    <div className="flex items-center gap-2 px-1 py-1.5">
+      <div className="bg-primary/10 p-1.5 rounded-md">
+        <Building2 className="h-4 w-4 text-primary" />
+      </div>
+      <div className="flex flex-col">
+        <span className="text-xs text-muted-foreground">Organization</span>
+        <span className="text-sm font-medium">{organization?.name}</span>
+      </div>
     </div>
   );
 }

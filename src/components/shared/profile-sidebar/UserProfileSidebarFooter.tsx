@@ -3,9 +3,10 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { UserInfo } from "@/components/user/UserInfo";
 import { AdminButton } from "./AdminButton";
 import { VersionInfo } from "./VersionInfo";
+import { OrganizationInfo } from "./OrganizationInfo";
 
 export function UserProfileSidebarFooter() {
-  const { loading } = useUserProfile();
+  const { loading, organizationName, organizationId } = useUserProfile();
   
   // Show simple loading state
   if (loading) {
@@ -25,7 +26,17 @@ export function UserProfileSidebarFooter() {
   
   return (
     <div className="flex flex-col p-3 w-full border-t border-border/30">
-      {/* User info at the footer */}
+      {/* Organization info at the top of the footer */}
+      {organizationName && (
+        <div className="mb-2 pb-2 border-b border-border/20">
+          <OrganizationInfo 
+            organizationName={organizationName} 
+            organizationId={organizationId}
+          />
+        </div>
+      )}
+      
+      {/* User info */}
       <UserInfo className="mb-2" />
       
       <div className="flex items-center gap-2 mt-1">
