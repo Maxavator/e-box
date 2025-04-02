@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Loader2, UserPlus, Settings, Shield } from "lucide-react";
 import { SetGlobalAdminForm } from "./SetGlobalAdminForm";
 import { Separator } from "@/components/ui/separator";
+import { GlobalAdminsList } from "./GlobalAdminsList";
 
 export function SystemSettings() {
   const [isCreating, setIsCreating] = useState(false);
@@ -65,6 +66,10 @@ export function SystemSettings() {
         
         <SetGlobalAdminForm />
       </div>
+      
+      <Separator className="my-6" />
+      
+      <GlobalAdminsList />
       
       <Separator className="my-6" />
       
