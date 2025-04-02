@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { PaperclipIcon, SendIcon, SmileIcon } from "lucide-react";
+import { PaperclipIcon, SendIcon, X } from "lucide-react";
+import { Attachment } from "@/types/chat";
 
 interface ChatInputProps {
   value: string;
@@ -10,6 +11,8 @@ interface ChatInputProps {
   onSendMessage: () => void;
   onAttach?: () => void;
   isDisabled?: boolean;
+  attachments?: Attachment[];
+  onRemoveAttachment?: (id: string) => void;
 }
 
 export function ChatInput({ 
@@ -17,14 +20,16 @@ export function ChatInput({
   onChange, 
   onSendMessage, 
   onAttach,
-  isDisabled = false 
+  isDisabled = false,
+  attachments = [],
+  onRemoveAttachment
 }: ChatInputProps) {
   const [isFocused, setIsFocused] = useState(false);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if (value.trim() && !isDisabled) {
+      if ((value.trim() || attachments.length > 0) && !isDisabled) {
         onSendMessage();
       }
     }
@@ -32,6 +37,27 @@ export function ChatInput({
 
   return (
     <div className={`bg-background p-3 border-t transition-shadow ${isFocused ? 'shadow-md' : ''}`}>
+      {attachments.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-2">
+          {attachments.map(attachment => (
+            <div key={attachment.id} className="flex items-center bg-muted rounded-md p-1 pr-2">
+              <span className="text-xs truncate max-w-[150px]">{attachment.name}</span>
+              {onRemoveAttachment && (
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-5 w-5 ml-1 rounded-full p-0" 
+                  onClick={() => onRemoveAttachment(attachment.id)}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      
       <div className={`flex gap-2 rounded-lg border ${isFocused ? 'border-primary/50 ring-1 ring-primary/20' : 'border-input'} bg-background overflow-hidden`}>
         <Textarea
           placeholder="Type a message"
@@ -60,8 +86,8 @@ export function ChatInput({
             type="submit" 
             size="icon" 
             onClick={onSendMessage} 
-            disabled={!value.trim() || isDisabled}
-            className={`h-8 w-8 rounded-full ${value.trim() && !isDisabled ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-muted/50'} transition-colors`}
+            disabled={(!value.trim() && attachments.length === 0) || isDisabled}
+            className={`h-8 w-8 rounded-full ${(value.trim() || attachments.length > 0) && !isDisabled ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-muted/50'} transition-colors`}
           >
             <SendIcon className="h-4 w-4" />
             <span className="sr-only">Send</span>
