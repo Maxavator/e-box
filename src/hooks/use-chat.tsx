@@ -57,7 +57,7 @@ export const useChat = () => {
   const {
     newMessage,
     setNewMessage,
-    handleSendMessage,
+    handleSendMessage: baseSendMessage,
     handleEditMessage,
     handleDeleteMessage,
     handleReaction
@@ -98,11 +98,16 @@ export const useChat = () => {
     setAttachments(attachments.filter(a => a.id !== attachmentId));
   };
 
+  const handleSendMessage = () => {
+    baseSendMessage(attachments);
+    setAttachments([]);
+  };
+
   const handleStartConversationWithColleague = async (colleagueId: string) => {
     try {
       const { data } = await supabase.auth.getSession();
       if (!data?.session?.user) {
-        toast("You must be logged in to start conversations");
+        toast.error("You must be logged in to start conversations");
         return null;
       }
       

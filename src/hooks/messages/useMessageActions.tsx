@@ -1,5 +1,5 @@
+
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { Message, Conversation, Attachment } from "@/types/chat";
 import { formatMessageTimestamp } from "./utils";
@@ -9,7 +9,6 @@ export const useMessageActions = (
   selectedConversation: Conversation | null,
   setSelectedConversation: React.Dispatch<React.SetStateAction<Conversation | null>>
 ) => {
-  const { toast: uiToast } = useToast();
   const [newMessage, setNewMessage] = useState("");
 
   const handleSendMessage = async (attachments: Attachment[] = []) => {
@@ -74,11 +73,7 @@ export const useMessageActions = (
                            userRole?.role === 'comm_moderator';
                            
         if (!canBroadcast) {
-          toast({
-            title: "Permission Denied",
-            description: "Only admins and communication moderators can send broadcast messages",
-            variant: "destructive"
-          });
+          toast.error("Permission Denied - Only admins and communication moderators can send broadcast messages");
           
           // Remove temporary message
           if (selectedConversation.messages) {
@@ -104,11 +99,7 @@ export const useMessageActions = (
           
         if (broadcastError) {
           console.error('Error sending broadcast message:', broadcastError);
-          toast({
-            title: "Error",
-            description: "Failed to send broadcast message",
-            variant: "destructive"
-          });
+          toast.error("Failed to send broadcast message");
           return;
         }
         
@@ -138,10 +129,7 @@ export const useMessageActions = (
           });
         }
         
-        toast({
-          title: "Success",
-          description: "Broadcast message sent successfully"
-        });
+        toast.success("Broadcast message sent successfully");
         return;
       }
 

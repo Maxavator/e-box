@@ -36,6 +36,9 @@ export function Chat() {
     handleSelectConversation,
     handleStartConversationWithColleague,
     isNewConversation,
+    attachments,
+    handleAttachFiles,
+    handleRemoveAttachment
   } = useChat();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -109,7 +112,7 @@ export function Chat() {
 
   // Handle sending a message
   const onSendMessage = () => {
-    if (selectedConversation && newMessage.trim()) {
+    if (selectedConversation) {
       handleSendMessage();
     }
   };
@@ -178,6 +181,9 @@ export function Chat() {
                       newMessage={newMessage}
                       onNewMessageChange={setNewMessage}
                       onSendMessage={onSendMessage}
+                      attachments={attachments}
+                      onAttachFiles={handleAttachFiles}
+                      onRemoveAttachment={handleRemoveAttachment}
                     />
                   )}
                 </div>
@@ -231,6 +237,9 @@ export function Chat() {
                   newMessage={newMessage}
                   onNewMessageChange={setNewMessage}
                   onSendMessage={onSendMessage}
+                  attachments={attachments}
+                  onAttachFiles={handleAttachFiles}
+                  onRemoveAttachment={handleRemoveAttachment}
                 />
               )}
             </ResizablePanel>

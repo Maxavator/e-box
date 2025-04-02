@@ -2,7 +2,7 @@
 import { useRef, useEffect } from "react";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
-import type { Conversation, Message } from "@/types/chat";
+import type { Conversation, Message, Attachment } from "@/types/chat";
 
 interface ChatContentProps {
   conversation: Conversation | null;
@@ -14,6 +14,9 @@ interface ChatContentProps {
   newMessage: string;
   onNewMessageChange: (value: string) => void;
   onSendMessage: () => void;
+  attachments?: Attachment[];
+  onAttachFiles?: () => void;
+  onRemoveAttachment?: (id: string) => void;
 }
 
 export function ChatContent({
@@ -25,7 +28,10 @@ export function ChatContent({
   isNewConversation,
   newMessage,
   onNewMessageChange,
-  onSendMessage
+  onSendMessage,
+  attachments = [],
+  onAttachFiles,
+  onRemoveAttachment
 }: ChatContentProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +67,9 @@ export function ChatContent({
             value={newMessage}
             onChange={onNewMessageChange}
             onSendMessage={onSendMessage}
-            onAttach={() => {}}
+            onAttach={onAttachFiles}
+            attachments={attachments}
+            onRemoveAttachment={onRemoveAttachment}
           />
         </>
       ) : (
