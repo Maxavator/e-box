@@ -1,5 +1,5 @@
 
-import { Shield, Users, MessageSquare, FileText, Sparkles, Clock, Building, Mail, Lock } from "lucide-react";
+import { Shield, Users, MessageSquare, FileText, Sparkles, Clock, Building, Mail, Lock, Smartphone, UsersRound } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -88,7 +88,31 @@ const HeroSection = () => {
             </ul>
           </div>
 
-          {/* Two new marketing subsections */}
+          {/* New section highlighting deskless employees */}
+          <div className="bg-gradient-to-r from-amber-500/20 to-amber-300/10 p-5 rounded-xl border border-amber-300/30 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 rounded-lg bg-amber-500/30">
+                <UsersRound className="w-6 h-6 text-amber-200" />
+              </div>
+              <h3 className="text-xl font-semibold">Complete Workforce Inclusion</h3>
+            </div>
+            <p className="text-white/90 leading-relaxed mb-4">
+              Connect your <span className="text-amber-200 font-medium">entire workforce</span>, including deskless employees in manufacturing, retail, and field operations. Our mobile-first approach ensures everyone stays connected regardless of their work environment.
+            </p>
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-2">
+                <Smartphone className="w-5 h-5 text-amber-200" />
+                <span className="text-sm text-white/80">Mobile-first experience</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Building className="w-5 h-5 text-amber-200" />
+                <span className="text-sm text-white/80">On-site integration</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Two marketing subsections */}
           <div className="space-y-6">
             <div className="bg-white/10 p-6 rounded-xl border border-white/10">
               <div className="flex items-center gap-3 mb-3">
