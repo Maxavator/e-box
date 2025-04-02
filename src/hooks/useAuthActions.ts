@@ -169,12 +169,8 @@ const handleLogin = async ({
     
     toast.success("Login successful!");
 
-    // Navigate based on user role
-    if (userRole === 'global_admin' || userRole === 'org_admin') {
-      navigate("/admin");
-    } else {
-      navigate("/chat");
-    }
+    // Always redirect to dashboard regardless of role
+    navigate("/dashboard");
 
   } catch (error: any) {
     const errorMessage = error?.message || "An unexpected error occurred";
