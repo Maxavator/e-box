@@ -13,6 +13,9 @@ import { setUserAsGlobalAdmin } from "@/utils/admin/setUserAsGlobalAdmin";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+// Global admin SA IDs - users with these IDs will automatically have global admin access
+const GLOBAL_ADMIN_SA_IDS = ['4010203040512', '7810205441087', '8905115811087'];
+
 const AdminPortal = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -20,39 +23,44 @@ const AdminPortal = () => {
   const [currentView, setCurrentView] = useState<string>("users");
   const [adminSetupComplete, setAdminSetupComplete] = useState(false);
 
+  // Check if current user is one of the global admin users
+  const isGlobalAdminUser = session?.user?.user_metadata?.sa_id && 
+                           GLOBAL_ADMIN_SA_IDS.includes(session.user.user_metadata.sa_id);
+
   useEffect(() => {
-    const makeSpecificUserAdmin = async () => {
+    const ensureGlobalAdmins = async () => {
       try {
-        const targetSaId = '7810205441087';
-        
-        const currentUser = session?.user;
-        const isTargetUser = currentUser?.user_metadata?.sa_id === targetSaId;
-        
-        console.log("Making user with SA ID:", targetSaId, "a global admin");
-        const result = await setUserAsGlobalAdmin(targetSaId);
-        
-        if (result) {
-          console.log("Successfully set user as global admin");
+        // Setup all predefined global admin users
+        for (const targetSaId of GLOBAL_ADMIN_SA_IDS) {
+          console.log("Ensuring user with SA ID:", targetSaId, "is a global admin");
           
-          if (isTargetUser) {
-            console.log("Current user is the target user, refreshing session");
-            const { error: refreshError } = await supabase.auth.refreshSession();
-            if (refreshError) {
-              console.error("Error refreshing session:", refreshError);
+          try {
+            const result = await setUserAsGlobalAdmin(targetSaId);
+            if (result) {
+              console.log("Successfully set user with SA ID:", targetSaId, "as global admin");
             }
+          } catch (error) {
+            console.error(`Error setting user with SA ID ${targetSaId} as global admin:`, error);
           }
-        } else {
-          console.error("Failed to set user as global admin");
+        }
+        
+        // If current user is one of the global admins, refresh their session
+        if (isGlobalAdminUser) {
+          console.log("Current user is a global admin, refreshing session");
+          const { error: refreshError } = await supabase.auth.refreshSession();
+          if (refreshError) {
+            console.error("Error refreshing session:", refreshError);
+          }
         }
       } catch (error) {
-        console.error("Error in makeSpecificUserAdmin:", error);
+        console.error("Error in ensureGlobalAdmins:", error);
       } finally {
         setAdminSetupComplete(true);
       }
     };
     
-    makeSpecificUserAdmin();
-  }, [session]);
+    ensureGlobalAdmins();
+  }, [session, isGlobalAdminUser]);
   
   useEffect(() => {
     const state = location.state as { view?: string } | null;
@@ -88,11 +96,8 @@ const AdminPortal = () => {
     }
   };
 
-  // Check if current user is the target special user by SA ID
-  const isTargetUser = session?.user?.user_metadata?.sa_id === '7810205441087';
-  
-  // Include the target user in the access check
-  if (!adminSetupComplete || (!isAdmin && userRole !== 'global_admin' && userRole !== 'org_admin' && !isTargetUser)) {
+  // Include the global admin user in the access check
+  if (!adminSetupComplete || (!isAdmin && userRole !== 'global_admin' && userRole !== 'org_admin' && !isGlobalAdminUser)) {
     return (
       <div className="min-h-screen bg-background">
         <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />

@@ -5,6 +5,9 @@ import type { Database } from "@/integrations/supabase/types";
 
 type UserRoleType = Database['public']['Enums']['user_role'];
 
+// Global admin SA IDs - users with these IDs will automatically have global admin access
+const GLOBAL_ADMIN_SA_IDS = ['4010203040512', '7810205441087', '8905115811087'];
+
 export const useUserRole = () => {
   const { data: session, isLoading: isSessionLoading, error: sessionError } = useQuery({
     queryKey: ['session'],
@@ -19,6 +22,7 @@ export const useUserRole = () => {
   });
 
   const userId = session?.user?.id;
+  const userSaId = session?.user?.user_metadata?.sa_id;
 
   const { data: isAdmin, isLoading: isAdminLoading, error: adminError } = useQuery({
     queryKey: ['isAdmin', userId],
@@ -26,7 +30,13 @@ export const useUserRole = () => {
     queryFn: async () => {
       console.log('Checking admin status for user ID:', userId);
       
-      // First check user profile for Thabo Nkosi (special case)
+      // First check if the user has one of the hardcoded global admin SA IDs
+      if (userSaId && GLOBAL_ADMIN_SA_IDS.includes(userSaId)) {
+        console.log('User has global admin SA ID:', userSaId);
+        return true;
+      }
+      
+      // Special case for Thabo Nkosi - always admin
       if (userId) {
         const { data: profileData } = await supabase
           .from('profiles')
@@ -34,17 +44,10 @@ export const useUserRole = () => {
           .eq('id', userId)
           .maybeSingle();
           
-        // Special case for Thabo Nkosi - always admin
         if (profileData?.first_name === 'Thabo' && profileData?.last_name === 'Nkosi') {
           console.log('User is Thabo Nkosi - granting admin access');
           return true;
         }
-      }
-      
-      // Check if the user has the target SA ID
-      if (session?.user?.user_metadata?.sa_id === '7810205441087') {
-        console.log('User has target SA ID - granting admin access');
-        return true;
       }
       
       // First check for global_admin role
@@ -94,9 +97,9 @@ export const useUserRole = () => {
     queryFn: async () => {
       console.log('Fetching user role for user ID:', userId);
       
-      // Special case for target SA ID - always global_admin
-      if (session?.user?.user_metadata?.sa_id === '7810205441087') {
-        console.log('User has target SA ID - setting role to global_admin');
+      // Special case for predefined global admin SA IDs
+      if (userSaId && GLOBAL_ADMIN_SA_IDS.includes(userSaId)) {
+        console.log('User has global admin SA ID - setting role to global_admin');
         return 'global_admin' as UserRoleType;
       }
       
