@@ -42,8 +42,8 @@ export const setUserAsGlobalAdmin = async (saId: string): Promise<boolean> => {
       const userWithSaId = users.find(user => {
         // Safely access potentially undefined properties
         const metaSaId = user.user_metadata?.sa_id;
-        const rawMetaSaId = user.raw_user_meta_data?.sa_id;
-        return metaSaId === saId || rawMetaSaId === saId;
+        // Use the correct property name user_metadata instead of raw_user_meta_data
+        return metaSaId === saId;
       });
       
       if (!userWithSaId) {
