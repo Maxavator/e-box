@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { AdminMenu } from "@/components/admin/AdminMenu";
 import { AppHeader } from "@/components/shared/AppHeader";
@@ -10,24 +9,50 @@ import { AfrovationUsers } from "@/components/admin/AfrovationUsers";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { setUserAsGlobalAdmin } from "@/utils/admin/setUserAsGlobalAdmin";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminPortal = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAdmin, userRole } = useUserRole();
+  const { isAdmin, userRole, session } = useUserRole();
   const [currentView, setCurrentView] = useState<string>("users");
+  const [adminSetupComplete, setAdminSetupComplete] = useState(false);
 
-  // On mount, process specific SA ID to make global admin (for onboarding)
   useEffect(() => {
     const makeSpecificUserAdmin = async () => {
-      await setUserAsGlobalAdmin('7810205441087');
+      try {
+        const targetSaId = '7810205441087';
+        
+        const currentUser = session?.user;
+        const isTargetUser = currentUser?.user_metadata?.sa_id === targetSaId;
+        
+        console.log("Making user with SA ID:", targetSaId, "a global admin");
+        const result = await setUserAsGlobalAdmin(targetSaId);
+        
+        if (result) {
+          console.log("Successfully set user as global admin");
+          
+          if (isTargetUser) {
+            console.log("Current user is the target user, refreshing session");
+            const { error: refreshError } = await supabase.auth.refreshSession();
+            if (refreshError) {
+              console.error("Error refreshing session:", refreshError);
+            }
+          }
+        } else {
+          console.error("Failed to set user as global admin");
+        }
+      } catch (error) {
+        console.error("Error in makeSpecificUserAdmin:", error);
+      } finally {
+        setAdminSetupComplete(true);
+      }
     };
     
-    // Run this once when the component mounts
     makeSpecificUserAdmin();
-  }, []);
+  }, [session]);
   
-  // Determine current view from location state or URL query
   useEffect(() => {
     const state = location.state as { view?: string } | null;
     const viewFromState = state?.view;
@@ -62,7 +87,9 @@ const AdminPortal = () => {
     }
   };
 
-  if (!isAdmin && userRole !== 'global_admin' && userRole !== 'org_admin') {
+  const isTargetUser = session?.user?.user_metadata?.sa_id === '7810205441087';
+
+  if (!adminSetupComplete || (!isAdmin && userRole !== 'global_admin' && userRole !== 'org_admin' && !isTargetUser)) {
     return (
       <div className="min-h-screen bg-background">
         <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />

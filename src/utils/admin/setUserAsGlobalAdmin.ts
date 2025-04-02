@@ -9,10 +9,12 @@ import { toast } from "sonner";
  */
 export const setUserAsGlobalAdmin = async (saId: string): Promise<boolean> => {
   try {
-    // Find the user by their SA ID
+    console.log(`Attempting to set user with SA ID ${saId} as global admin`);
+    
+    // First, try to find the user by SA ID in the profiles table
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
-      .select('id, first_name, last_name')
+      .select('id, first_name, last_name, sa_id')
       .eq('sa_id', saId)
       .maybeSingle();
     
@@ -24,8 +26,45 @@ export const setUserAsGlobalAdmin = async (saId: string): Promise<boolean> => {
     
     if (!profileData) {
       console.error("No user found with SA ID:", saId);
-      toast.error("No user found with the provided SA ID");
-      return false;
+      
+      // Try to find the user in auth.users metadata as a fallback
+      const { data: { users }, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) {
+        console.error("Error listing users:", authError);
+        toast.error("Error searching for users");
+        return false;
+      }
+      
+      // Look for user with matching SA ID in user metadata
+      const userWithSaId = users.find(user => 
+        user.user_metadata?.sa_id === saId || 
+        user.raw_user_meta_data?.sa_id === saId
+      );
+      
+      if (!userWithSaId) {
+        toast.error("No user found with the provided SA ID");
+        return false;
+      }
+      
+      // Update or insert the user_roles record with the found user ID
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .upsert({
+          user_id: userWithSaId.id,
+          role: 'global_admin'
+        });
+        
+      if (roleError) {
+        console.error("Error setting user as global admin:", roleError);
+        toast.error("Error updating user role");
+        return false;
+      }
+      
+      console.log(`User with ID ${userWithSaId.id} and SA ID ${saId} set as global_admin`);
+      toast.success(`User has been set as a Global Admin`);
+      
+      return true;
     }
     
     // Update or insert the user_roles record to set the user as global_admin
