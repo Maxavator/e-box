@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Radio, RadioGroup, RadioIndicator, RadioItem } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Megaphone, Users, Globe } from "lucide-react";
@@ -134,18 +134,14 @@ export function BroadcastComposer() {
             className="flex flex-col space-y-1"
           >
             <div className="flex items-center space-x-2">
-              <RadioItem value="organization" id="organization">
-                <RadioIndicator />
-              </RadioItem>
+              <RadioGroupItem value="organization" id="organization" />
               <Label htmlFor="organization" className="flex items-center cursor-pointer">
                 <Users className="h-4 w-4 mr-2" />
                 Specific Organization
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioItem value="global" id="global">
-                <RadioIndicator />
-              </RadioItem>
+              <RadioGroupItem value="global" id="global" />
               <Label htmlFor="global" className="flex items-center cursor-pointer">
                 <Globe className="h-4 w-4 mr-2" />
                 All Users (Global)
