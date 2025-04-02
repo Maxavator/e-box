@@ -58,6 +58,8 @@ export const useProfileQueries = () => {
         console.log('useProfileQueries: Raw profile data:', profileData);
         
         let orgName = null;
+        let jobTitle = null;
+        
         // Get organization name if user has an organization
         if (profileData?.organization_id) {
           const { data: orgData, error: orgError } = await supabase
@@ -73,10 +75,19 @@ export const useProfileQueries = () => {
           }
         }
         
+        // Set job title
+        jobTitle = profileData?.job_title || null;
+        
+        console.log('useProfileQueries: Processed data:', {
+          profileData, 
+          orgName,
+          jobTitle
+        });
+        
         return {
           profileData,
           orgName,
-          jobTitle: profileData?.job_title || null
+          jobTitle
         } as ProfileQueryResult;
       } catch (err) {
         console.error('useProfileQueries: Failed to fetch profile data:', err);

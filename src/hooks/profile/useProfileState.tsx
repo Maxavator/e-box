@@ -21,6 +21,16 @@ export const useProfileState = () => {
     profileError,
   } = useProfileQueries();
 
+  // Debug log
+  useEffect(() => {
+    console.log('useProfileState - dependencies changed:', {
+      isSessionLoading,
+      isProfileLoading,
+      session: session?.user?.id,
+      profileData: !!profileData,
+    });
+  }, [isSessionLoading, isProfileLoading, session, profileData]);
+
   // Update state based on query results
   useEffect(() => {
     console.log('useProfileState effect running with profileData:', profileData);

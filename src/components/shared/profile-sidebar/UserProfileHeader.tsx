@@ -39,6 +39,9 @@ export function UserProfileHeader({
   // Display the job title if available, otherwise show appropriate fallback
   const displayedRole = jobTitle || (hasOrganization ? "Employee" : "User");
 
+  // Debug logging
+  console.log('UserProfileHeader rendering with:', { firstName, lastName, displayName, jobTitle, avatarUrl });
+
   // Handle click on user name to navigate to settings
   const handleNameClick = () => {
     navigate('/profile');

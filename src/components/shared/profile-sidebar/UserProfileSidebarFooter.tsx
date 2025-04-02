@@ -5,6 +5,7 @@ import { AdminButton } from "./AdminButton";
 import { VersionInfo } from "./VersionInfo";
 import { OrganizationInfo } from "./OrganizationInfo";
 import { UserProfileHeader } from "./UserProfileHeader";
+import { Building2 } from "lucide-react";
 
 export function UserProfileSidebarFooter() {
   const { loading, organizationName, organizationId, userDisplayName, profile } = useUserProfile();
@@ -29,6 +30,15 @@ export function UserProfileSidebarFooter() {
   const firstName = profile?.first_name || '';
   const lastName = profile?.last_name || '';
   const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  
+  // Debug message to help troubleshoot
+  console.log('UserProfileSidebarFooter rendered with:', { 
+    userDisplayName, 
+    profile, 
+    organizationName,
+    firstName,
+    lastName 
+  });
   
   return (
     <div className="flex flex-col p-3 w-full border-t border-border/30">
