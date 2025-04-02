@@ -67,25 +67,25 @@ const HeroSection = () => {
             </ul>
           </div>
 
-          {/* Multi-channel communication section */}
+          {/* Secure communication section - revised without email, SMS, voice */}
           <div className="bg-gradient-to-r from-blue-500/20 to-blue-300/10 p-3 rounded-xl border border-blue-300/30 relative overflow-hidden">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-1.5 rounded-lg bg-blue-500/30">
                 <MessageSquare className="w-4 h-4 text-blue-200" />
               </div>
-              <h3 className="text-base font-semibold">Multi-Channel Communication</h3>
+              <h3 className="text-base font-semibold">Secure Communication</h3>
             </div>
             <p className="text-white/90 text-xs leading-relaxed mb-2">
-              Connect via <span className="text-blue-200 font-medium">SMS, chat, voice,</span> and <span className="text-blue-200 font-medium">email</span> in a single secure platform with guaranteed message delivery.
+              Connect through our <span className="text-blue-200 font-medium">secure messaging platform</span> with guaranteed delivery and compliance with South African regulations.
             </p>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
-                <Mail className="w-3 h-3 text-blue-200" />
-                <span className="text-xs text-white/80">Email support</span>
+                <Lock className="w-3 h-3 text-blue-200" />
+                <span className="text-xs text-white/80">End-to-end encrypted</span>
               </div>
               <div className="flex items-center gap-1">
                 <Smartphone className="w-3 h-3 text-blue-200" />
-                <span className="text-xs text-white/80">24/7 availability</span>
+                <span className="text-xs text-white/80">Mobile accessible</span>
               </div>
             </div>
           </div>
