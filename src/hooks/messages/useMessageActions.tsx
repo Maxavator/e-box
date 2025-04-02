@@ -1,15 +1,15 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { Message, Conversation, Attachment } from "@/types/chat";
 import { formatMessageTimestamp } from "./utils";
+import { toast } from "sonner";
 
 export const useMessageActions = (
   selectedConversation: Conversation | null,
   setSelectedConversation: React.Dispatch<React.SetStateAction<Conversation | null>>
 ) => {
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const [newMessage, setNewMessage] = useState("");
 
   const handleSendMessage = async (attachments: Attachment[] = []) => {
@@ -22,11 +22,7 @@ export const useMessageActions = (
       // Validate that we have a proper UUID for conversation_id
       if (!selectedConversation.id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(selectedConversation.id)) {
         console.error('Invalid conversation ID format:', selectedConversation.id);
-        toast({
-          title: "Error",
-          description: "Invalid conversation format. Please try again or create a new conversation.",
-          variant: "destructive"
-        });
+        toast.error("Invalid conversation format. Please try again or create a new conversation.");
         return;
       }
 
@@ -174,11 +170,7 @@ export const useMessageActions = (
           });
         }
         
-        toast({
-          title: "Error",
-          description: "Failed to send message",
-          variant: "destructive"
-        });
+        toast.error("Failed to send message");
         return;
       }
 
@@ -245,6 +237,7 @@ export const useMessageActions = (
       }, 3000);
     } catch (error) {
       console.error('Error in handleSendMessage:', error);
+      toast.error("An error occurred while sending your message");
     }
   };
 

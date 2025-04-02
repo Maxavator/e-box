@@ -106,11 +106,18 @@ export const useChat = () => {
         return null;
       }
       
-      const { data: existingConvs } = await supabase
+      // Check if conversation already exists
+      const { data: existingConvs, error: searchError } = await supabase
         .from('conversations')
         .select('id')
         .or(`and(user1_id.eq.${data.session.user.id},user2_id.eq.${colleagueId}),and(user1_id.eq.${colleagueId},user2_id.eq.${data.session.user.id})`)
         .maybeSingle();
+      
+      if (searchError) {
+        console.error("Error searching for existing conversation:", searchError);
+        toast.error("Failed to check for existing conversation");
+        return null;
+      }
       
       if (existingConvs) {
         handleSelectConversation(existingConvs.id);
@@ -118,6 +125,7 @@ export const useChat = () => {
         return existingConvs.id;
       }
       
+      // Create new conversation with RLS handling
       const { data: newConv, error } = await supabase
         .from('conversations')
         .insert({

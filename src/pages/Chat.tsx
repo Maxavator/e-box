@@ -107,6 +107,13 @@ export function Chat() {
     }
   };
 
+  // Handle sending a message
+  const onSendMessage = () => {
+    if (selectedConversation && newMessage.trim()) {
+      handleSendMessage();
+    }
+  };
+
   return (
     <div className="h-[calc(100vh-64px)] overflow-hidden flex flex-col">
       <div className="flex-1 overflow-hidden">
@@ -168,6 +175,9 @@ export function Chat() {
                       onReactToMessage={handleReaction}
                       messages={selectedConversation?.messages || []}
                       isNewConversation={isNewConversation}
+                      newMessage={newMessage}
+                      onNewMessageChange={setNewMessage}
+                      onSendMessage={onSendMessage}
                     />
                   )}
                 </div>
@@ -218,6 +228,9 @@ export function Chat() {
                   onReactToMessage={handleReaction}
                   messages={selectedConversation?.messages || []}
                   isNewConversation={isNewConversation}
+                  newMessage={newMessage}
+                  onNewMessageChange={setNewMessage}
+                  onSendMessage={onSendMessage}
                 />
               )}
             </ResizablePanel>
