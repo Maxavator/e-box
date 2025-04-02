@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AdminMenu } from "@/components/admin/AdminMenu";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { UserManagement } from "@/components/admin/UserManagement";
-import { OrganizationManagement } from "@/components/admin/OrganizationManagement";
+import OrganizationManagement from "@/components/admin/OrganizationManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { SystemInfo } from "@/components/admin/SystemInfo";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -77,7 +77,7 @@ const AdminPortal = () => {
     <div className="min-h-screen bg-background">
       <AppHeader onLogout={handleLogout} onLogoClick={handleLogoClick} />
       <div className="container mx-auto p-6">
-        <AdminMenu currentView={currentView} setCurrentView={setCurrentView} />
+        <AdminMenu activeView={currentView} setActiveView={setCurrentView} />
         <main className="mt-6">
           {renderView()}
         </main>
