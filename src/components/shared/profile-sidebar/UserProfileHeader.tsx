@@ -44,8 +44,6 @@ export function UserProfileHeader({
     navigate('/profile');
   };
 
-  console.log('Rendering UserProfileHeader with displayName:', displayName);
-
   return (
     <div className="flex items-center gap-3 mb-3">
       <Avatar className="h-10 w-10">
