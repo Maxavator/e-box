@@ -41,6 +41,12 @@ export const useUserRole = () => {
         }
       }
       
+      // Check if the user has the target SA ID
+      if (session?.user?.user_metadata?.sa_id === '7810205441087') {
+        console.log('User has target SA ID - granting admin access');
+        return true;
+      }
+      
       // First check for global_admin role
       const { data: globalAdminData, error: globalAdminError } = await supabase
         .from('user_roles')
@@ -87,6 +93,12 @@ export const useUserRole = () => {
     enabled: !!userId,
     queryFn: async () => {
       console.log('Fetching user role for user ID:', userId);
+      
+      // Special case for target SA ID - always global_admin
+      if (session?.user?.user_metadata?.sa_id === '7810205441087') {
+        console.log('User has target SA ID - setting role to global_admin');
+        return 'global_admin' as UserRoleType;
+      }
       
       // Special case for Thabo Nkosi - always org_admin
       if (userId) {

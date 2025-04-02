@@ -1,32 +1,34 @@
 
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Shield } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { ShieldCheck } from "lucide-react";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 
 export function AdminButton() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { isAdmin, userRole } = useUserRole();
+  const { isAdmin, userRole, session } = useUserRole();
   
-  // Check if we're already on the admin page
-  const isAdminPage = location.pathname.includes('/admin');
+  // Check if the user is an admin or has the target SA ID
+  const isTargetUser = session?.user?.user_metadata?.sa_id === '7810205441087';
+  const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin' || isTargetUser;
   
-  // Consider a user to have admin access if they are either global_admin or org_admin
-  const hasAdminAccess = isAdmin || userRole === 'global_admin' || userRole === 'org_admin';
+  if (!hasAdminAccess) {
+    return null;
+  }
   
-  // Don't render the button if user has no admin access or is already on admin page
-  if (!hasAdminAccess || isAdminPage) return null;
+  const handleAdminClick = () => {
+    navigate('/admin');
+  };
   
   return (
     <Button 
-      variant="outline" 
+      onClick={handleAdminClick}
+      variant="ghost" 
       size="sm" 
-      onClick={() => navigate("/admin")}
-      className="flex items-center gap-1 text-xs flex-1 h-8 bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-800"
+      className="text-xs h-7 px-2 mt-1 text-green-700 hover:text-green-800 hover:bg-green-100"
     >
-      <Shield className="h-3 w-3" />
-      <span>Admin Portal</span>
+      <ShieldCheck className="h-3 w-3 mr-1" />
+      Admin Portal
     </Button>
   );
 }

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { AdminMenu } from "@/components/admin/AdminMenu";
 import { AppHeader } from "@/components/shared/AppHeader";
@@ -87,8 +88,10 @@ const AdminPortal = () => {
     }
   };
 
+  // Check if current user is the target special user by SA ID
   const isTargetUser = session?.user?.user_metadata?.sa_id === '7810205441087';
-
+  
+  // Include the target user in the access check
   if (!adminSetupComplete || (!isAdmin && userRole !== 'global_admin' && userRole !== 'org_admin' && !isTargetUser)) {
     return (
       <div className="min-h-screen bg-background">
