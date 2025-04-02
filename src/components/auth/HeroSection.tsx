@@ -1,5 +1,5 @@
 
-import { Shield, Users, MessageSquare, FileText, Sparkles, Clock, Building, Mail, Lock, Smartphone, UsersRound } from "lucide-react";
+import { Shield, Users, MessageSquare, Sparkles, Clock, Building, Mail, Lock, Smartphone, UsersRound } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -14,141 +14,93 @@ const HeroSection = () => {
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20"></div>
       
-      {/* Content with glass effect */}
-      <div className="max-w-xl relative z-10 p-12 text-white backdrop-blur-sm bg-white/5 rounded-2xl border border-white/10 shadow-xl">
-        <div className="space-y-6">
-          <div className="flex justify-center mb-8">
+      {/* Content with glass effect - more compact version */}
+      <div className="max-w-lg relative z-10 p-8 text-white backdrop-blur-sm bg-white/5 rounded-2xl border border-white/10 shadow-xl">
+        <div className="space-y-4">
+          <div className="flex justify-center mb-4">
             <img 
               src="/lovable-uploads/dbb30299-d801-4939-9dd4-ef26c4cc55cd.png" 
               alt="e-Box Logo" 
-              className="h-16"
+              className="h-12"
             />
           </div>
           <div className="space-y-3">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-5 h-5 text-amber-300" />
-              <span className="text-sm font-medium text-amber-300">Trusted by 500+ South African Enterprises</span>
+            <div className="flex items-center gap-2 mb-1">
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span className="text-xs font-medium text-amber-300">Trusted by 500+ South African Enterprises</span>
             </div>
-            <h1 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+            <h1 className="text-2xl lg:text-3xl font-bold leading-tight tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
               The All-In-One Enterprise Communication Hub
             </h1>
-            <p className="text-lg lg:text-xl opacity-90 leading-relaxed">
-              e-Box unifies your business communications, document delivery, and HR processes in a secure, compliant platform designed specifically for South African enterprises.
+            <p className="text-base opacity-90 leading-relaxed">
+              e-Box unifies business communications, document delivery, and HR processes in a secure platform for South African enterprises.
             </p>
           </div>
         </div>
 
-        <div className="space-y-8 mt-10">
-          <div className="space-y-6">
-            <ul className="grid grid-cols-2 gap-6">
-              <li className="flex items-start gap-4 group transition-all duration-300 hover:translate-y-[-2px]">
-                <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                  <Shield className="w-6 h-6 text-amber-200" />
+        <div className="space-y-4 mt-6">
+          {/* Features list - reduced to two key items per row */}
+          <div className="space-y-4">
+            <ul className="grid grid-cols-2 gap-4">
+              <li className="flex items-start gap-3 group">
+                <div className="mt-1 p-1.5 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
+                  <Shield className="w-4 h-4 text-amber-200" />
                 </div>
-                <div className="space-y-1">
-                  <h4 className="font-medium text-lg">POPIA Compliant</h4>
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    End-to-end encryption with full South African regulatory compliance
+                <div>
+                  <h4 className="font-medium text-sm">POPIA Compliant</h4>
+                  <p className="text-white/80 text-xs leading-relaxed">
+                    End-to-end encryption with full compliance
                   </p>
                 </div>
               </li>
-              <li className="flex items-start gap-4 group transition-all duration-300 hover:translate-y-[-2px]">
-                <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                  <Users className="w-6 h-6 text-amber-200" />
+              <li className="flex items-start gap-3 group">
+                <div className="mt-1 p-1.5 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
+                  <Users className="w-4 h-4 text-amber-200" />
                 </div>
-                <div className="space-y-1">
-                  <h4 className="font-medium text-lg">Multilingual Support</h4>
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    Full support for all 11 official South African languages
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start gap-4 group transition-all duration-300 hover:translate-y-[-2px]">
-                <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                  <Clock className="w-6 h-6 text-amber-200" />
-                </div>
-                <div className="space-y-1">
-                  <h4 className="font-medium text-lg">99.9% Uptime</h4>
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    Enterprise-grade reliability with local data centers and 24/7 support
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start gap-4 group transition-all duration-300 hover:translate-y-[-2px]">
-                <div className="mt-1 p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                  <Building className="w-6 h-6 text-amber-200" />
-                </div>
-                <div className="space-y-1">
-                  <h4 className="font-medium text-lg">B-BBEE Level 1</h4>
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    Proudly South African with highest B-BBEE contributor status
+                <div>
+                  <h4 className="font-medium text-sm">Multilingual</h4>
+                  <p className="text-white/80 text-xs leading-relaxed">
+                    All 11 official SA languages
                   </p>
                 </div>
               </li>
             </ul>
           </div>
 
-          {/* New section highlighting deskless employees */}
-          <div className="bg-gradient-to-r from-amber-500/20 to-amber-300/10 p-5 rounded-xl border border-amber-300/30 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-amber-500/30">
-                <UsersRound className="w-6 h-6 text-amber-200" />
+          {/* Workforce inclusion section - more compact */}
+          <div className="bg-gradient-to-r from-amber-500/20 to-amber-300/10 p-3 rounded-xl border border-amber-300/30 relative overflow-hidden">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-1.5 rounded-lg bg-amber-500/30">
+                <UsersRound className="w-4 h-4 text-amber-200" />
               </div>
-              <h3 className="text-xl font-semibold">Complete Workforce Inclusion</h3>
+              <h3 className="text-base font-semibold">Complete Workforce Inclusion</h3>
             </div>
-            <p className="text-white/90 leading-relaxed mb-4">
-              Connect your <span className="text-amber-200 font-medium">entire workforce</span>, including deskless employees in manufacturing, retail, and field operations. Our mobile-first approach ensures everyone stays connected regardless of their work environment.
+            <p className="text-white/90 text-xs leading-relaxed mb-2">
+              Connect your <span className="text-amber-200 font-medium">entire workforce</span>, including deskless employees in manufacturing, retail, and field operations.
             </p>
-            <div className="flex items-center justify-between px-2">
-              <div className="flex items-center gap-2">
-                <Smartphone className="w-5 h-5 text-amber-200" />
-                <span className="text-sm text-white/80">Mobile-first experience</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <Smartphone className="w-3 h-3 text-amber-200" />
+                <span className="text-xs text-white/80">Mobile-first</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Building className="w-5 h-5 text-amber-200" />
-                <span className="text-sm text-white/80">On-site integration</span>
+              <div className="flex items-center gap-1">
+                <Building className="w-3 h-3 text-amber-200" />
+                <span className="text-xs text-white/80">On-site integration</span>
               </div>
             </div>
           </div>
 
-          {/* Two marketing subsections */}
-          <div className="space-y-6">
-            <div className="bg-white/10 p-6 rounded-xl border border-white/10">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-lg bg-amber-500/20">
-                  <Mail className="w-6 h-6 text-amber-200" />
-                </div>
-                <h3 className="text-xl font-semibold">Unified Communications</h3>
-              </div>
-              <p className="text-white/90 leading-relaxed">
-                Streamline all your business communications in one secure platform. Integrate email, messaging, and document delivery with automated workflows that save time and reduce errors.
-              </p>
-            </div>
-
-            <div className="bg-white/10 p-6 rounded-xl border border-white/10">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-lg bg-amber-500/20">
-                  <Lock className="w-6 h-6 text-amber-200" />
-                </div>
-                <h3 className="text-xl font-semibold">Enterprise Security</h3>
-              </div>
-              <p className="text-white/90 leading-relaxed">
-                Bank-grade encryption and South African data sovereignty ensure your sensitive information never leaves the country. Multi-factor authentication and detailed audit trails keep your data protected.
-              </p>
-            </div>
-          </div>
-
-          <div className="pt-6 border-t border-white/20 text-center">
+          {/* Footer */}
+          <div className="pt-4 border-t border-white/20 text-center">
             <p className="text-xs text-white/70">
               powered by
             </p>
             <img 
               src="/lovable-uploads/7366015f-cd77-4ca3-94bb-3848e07b8868.png" 
               alt="Afrovation" 
-              className="h-5 mt-1 mx-auto"
+              className="h-4 mt-1 mx-auto"
             />
-            <p className="text-xs mt-2 text-white/70">
+            <p className="text-xs mt-1 text-white/70">
               © 2025 Afrovation. All rights reserved.
             </p>
           </div>
