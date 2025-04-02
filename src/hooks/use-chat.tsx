@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useConversations } from "./useConversations";
 import { useMessages } from "./messages";
@@ -6,6 +7,7 @@ import { Attachment } from "@/types/chat";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useGolderColleagues } from "@/components/contacts/hooks/useGolderColleagues";
+import { toast } from "sonner";
 
 export const useChat = () => {
   const [activeTab, setActiveTab] = useState("chats");
@@ -97,38 +99,49 @@ export const useChat = () => {
   };
 
   const handleStartConversationWithColleague = async (colleagueId: string) => {
-    const { data } = await supabase.auth.getSession();
-    if (!data?.session?.user) return;
-    
-    const { data: existingConvs } = await supabase
-      .from('conversations')
-      .select('id')
-      .or(`and(user1_id.eq.${data.session.user.id},user2_id.eq.${colleagueId}),and(user1_id.eq.${colleagueId},user2_id.eq.${data.session.user.id})`)
-      .maybeSingle();
-    
-    if (existingConvs) {
-      handleSelectConversation(existingConvs.id);
+    try {
+      const { data } = await supabase.auth.getSession();
+      if (!data?.session?.user) {
+        toast("You must be logged in to start conversations");
+        return null;
+      }
+      
+      const { data: existingConvs } = await supabase
+        .from('conversations')
+        .select('id')
+        .or(`and(user1_id.eq.${data.session.user.id},user2_id.eq.${colleagueId}),and(user1_id.eq.${colleagueId},user2_id.eq.${data.session.user.id})`)
+        .maybeSingle();
+      
+      if (existingConvs) {
+        handleSelectConversation(existingConvs.id);
+        setActiveTab("chats");
+        return existingConvs.id;
+      }
+      
+      const { data: newConv, error } = await supabase
+        .from('conversations')
+        .insert({
+          user1_id: data.session.user.id,
+          user2_id: colleagueId
+        })
+        .select('id')
+        .single();
+      
+      if (error) {
+        console.error("Error creating conversation:", error);
+        toast.error("Failed to create conversation");
+        return null;
+      }
+      
+      toast.success("New conversation started");
+      handleSelectConversation(newConv.id);
       setActiveTab("chats");
-      return existingConvs.id;
-    }
-    
-    const { data: newConv, error } = await supabase
-      .from('conversations')
-      .insert({
-        user1_id: data.session.user.id,
-        user2_id: colleagueId
-      })
-      .select('id')
-      .single();
-    
-    if (error) {
-      console.error("Error creating conversation:", error);
+      return newConv.id;
+    } catch (err) {
+      console.error("Error in handleStartConversationWithColleague:", err);
+      toast.error("Couldn't start conversation");
       return null;
     }
-    
-    handleSelectConversation(newConv.id);
-    setActiveTab("chats");
-    return newConv.id;
   };
 
   return {

@@ -1,7 +1,8 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarDays, Inbox, MessageSquare, Search, Users, Building } from "lucide-react";
+import { CalendarDays, Inbox, MessageSquare, Search, Users, Building, Megaphone } from "lucide-react";
 import { ConversationList } from "./ConversationList";
 import { NewMessageDialog } from "./NewMessageDialog";
 import { type Conversation } from "@/types/chat";
@@ -17,7 +18,7 @@ interface ChatSidebarProps {
   conversations: Conversation[];
   selectedConversation: Conversation | null;
   onSelectConversation: (id: string) => void;
-  onCalendarActionClick: (view: "calendar" | "inbox") => void;
+  onCalendarActionClick: (view: "calendar" | "inbox" | "proposed") => void;
   colleagues?: Array<{
     id: string;
     first_name: string | null;
@@ -35,6 +36,8 @@ interface ChatSidebarProps {
   isLoadingColleagues?: boolean;
   isLoadingGolderColleagues?: boolean;
   onStartConversation?: (colleagueId: string) => void;
+  canBroadcast?: boolean;
+  onBroadcastClick?: () => void;
 }
 
 export function ChatSidebar({
@@ -51,7 +54,15 @@ export function ChatSidebar({
   isLoadingColleagues = false,
   isLoadingGolderColleagues = false,
   onStartConversation,
+  canBroadcast = false,
+  onBroadcastClick,
 }: ChatSidebarProps) {
+  // Calculate the value for tabs including broadcast if the user has permission
+  const getTabsValue = () => {
+    if (activeTab === "broadcast" && canBroadcast) return "broadcast";
+    return activeTab;
+  };
+
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <div className="px-4 py-2 border-b">
@@ -67,12 +78,11 @@ export function ChatSidebar({
         </div>
       </div>
       <Tabs
-        defaultValue="chats"
-        value={activeTab}
+        value={getTabsValue()}
         onValueChange={onTabChange}
         className="flex-1 flex flex-col overflow-hidden"
       >
-        <TabsList className="grid grid-cols-3 px-4 py-2">
+        <TabsList className="grid grid-cols-3">
           <TabsTrigger value="chats">
             <MessageSquare className="h-4 w-4 mr-2" />
             <span>Chats</span>
@@ -85,11 +95,17 @@ export function ChatSidebar({
             <Users className="h-4 w-4 mr-2" />
             <span>Colleagues</span>
           </TabsTrigger>
+          {canBroadcast && (
+            <TabsTrigger value="broadcast" onClick={onBroadcastClick}>
+              <Megaphone className="h-4 w-4 mr-2" />
+              <span>Broadcast</span>
+            </TabsTrigger>
+          )}
         </TabsList>
         <div className="p-4 flex-1 overflow-hidden">
           <TabsContent value="chats" className="h-full flex flex-col">
             <div className="mb-4">
-              <NewMessageDialog />
+              <NewMessageDialog onSelectConversation={onSelectConversation} />
             </div>
             <ConversationList
               conversations={conversations}
@@ -227,6 +243,21 @@ export function ChatSidebar({
               )}
             </ScrollArea>
           </TabsContent>
+          {canBroadcast && (
+            <TabsContent value="broadcast">
+              <div className="text-center py-4">
+                <Megaphone className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                <h3 className="text-lg font-medium">Broadcast Messages</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Send important announcements to all users or specific organizations
+                </p>
+                <Button onClick={onBroadcastClick}>
+                  <Megaphone className="h-4 w-4 mr-2" />
+                  Compose Broadcast
+                </Button>
+              </div>
+            </TabsContent>
+          )}
         </div>
       </Tabs>
     </div>

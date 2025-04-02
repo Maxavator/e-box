@@ -56,6 +56,7 @@ export const useMessageActions = (
       } else {
         setSelectedConversation({
           ...selectedConversation,
+          messages: [tempMessage],
           lastMessage: tempMessage
         });
       }
@@ -63,7 +64,92 @@ export const useMessageActions = (
       // Clear message input
       setNewMessage("");
 
-      // Actually send message to database
+      // Check if this is a broadcast message (only for admins/mods)
+      if (selectedConversation.isBroadcast) {
+        // Check if user has permission to send broadcast
+        const { data: userRole } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .maybeSingle();
+          
+        const canBroadcast = userRole?.role === 'global_admin' || 
+                           userRole?.role === 'org_admin' || 
+                           userRole?.role === 'comm_moderator';
+                           
+        if (!canBroadcast) {
+          toast({
+            title: "Permission Denied",
+            description: "Only admins and communication moderators can send broadcast messages",
+            variant: "destructive"
+          });
+          
+          // Remove temporary message
+          if (selectedConversation.messages) {
+            setSelectedConversation({
+              ...selectedConversation,
+              messages: selectedConversation.messages.filter(m => m.id !== tempMessageId)
+            });
+          }
+          return;
+        }
+        
+        // Send broadcast message
+        const { data: broadcastData, error: broadcastError } = await supabase
+          .from('broadcast_messages')
+          .insert({
+            sender_id: user.id,
+            content: newMessage,
+            organization_id: selectedConversation.organizationId || null,
+            is_global: selectedConversation.isGlobal || false
+          })
+          .select()
+          .single();
+          
+        if (broadcastError) {
+          console.error('Error sending broadcast message:', broadcastError);
+          toast({
+            title: "Error",
+            description: "Failed to send broadcast message",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        // Update temporary message with real message data
+        const broadcastMsgObj: Message = {
+          id: broadcastData.id,
+          conversationId: selectedConversation.id,
+          senderId: user.id,
+          senderName: 'You (Broadcast)',
+          content: broadcastData.content,
+          text: broadcastData.content,
+          timestamp: formatMessageTimestamp(broadcastData.created_at),
+          status: 'sent',
+          reactions: {},
+          sender: 'me',
+          isBroadcast: true,
+          attachments: attachments
+        };
+        
+        if (selectedConversation.messages) {
+          setSelectedConversation({
+            ...selectedConversation,
+            messages: selectedConversation.messages.map(m => 
+              m.id === tempMessageId ? broadcastMsgObj : m
+            ),
+            lastMessage: broadcastMsgObj
+          });
+        }
+        
+        toast({
+          title: "Success",
+          description: "Broadcast message sent successfully"
+        });
+        return;
+      }
+
+      // Send regular message to database
       const { data: messageData, error } = await supabase
         .from('messages')
         .insert({
@@ -123,6 +209,7 @@ export const useMessageActions = (
       } else {
         setSelectedConversation({
           ...selectedConversation,
+          messages: [newMessageObj],
           lastMessage: newMessageObj
         });
       }

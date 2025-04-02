@@ -23,6 +23,7 @@ export interface Message {
   sender?: 'me' | 'them' | 'system';
   edited?: boolean;
   isEdited?: boolean;
+  isBroadcast?: boolean;
   attachments?: Attachment[];
 }
 
@@ -49,6 +50,9 @@ export interface Conversation {
   draft?: boolean;
   unread?: boolean;
   labels?: string[];
+  isBroadcast?: boolean;
+  isGlobal?: boolean;
+  organizationId?: string;
 }
 
 export interface Group {
