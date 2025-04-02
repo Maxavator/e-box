@@ -125,7 +125,7 @@ const HeroSection = () => {
               className="h-5 mt-1 mx-auto"
             />
             <p className="text-xs mt-2 text-white/70">
-              © 2025 Afrovation Technology Solutions (Pty) Ltd. All rights reserved.
+              © 2025 Afrovation. All rights reserved.
             </p>
           </div>
         </div>
