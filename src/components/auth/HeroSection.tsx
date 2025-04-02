@@ -1,5 +1,5 @@
 
-import { Shield, Users, MessageSquare, Sparkles, Clock, Building, Mail, Lock, Smartphone, UsersRound } from "lucide-react";
+import { Shield, Users, MessageSquare, Sparkles, Clock, Building, Mail, Lock, Smartphone, UsersRound, FileText } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -55,12 +55,12 @@ const HeroSection = () => {
               </li>
               <li className="flex items-start gap-3 group">
                 <div className="mt-1 p-1.5 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                  <Users className="w-4 h-4 text-amber-200" />
+                  <FileText className="w-4 h-4 text-amber-200" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-sm">Multilingual</h4>
+                  <h4 className="font-medium text-sm">Paperless HR</h4>
                   <p className="text-white/80 text-xs leading-relaxed">
-                    All 11 official SA languages
+                    Digital payslips and document delivery
                   </p>
                 </div>
               </li>
