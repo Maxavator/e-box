@@ -6,6 +6,7 @@ import { UserManagement } from "@/components/admin/UserManagement";
 import OrganizationManagement from "@/components/admin/OrganizationManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { SystemInfo } from "@/components/admin/SystemInfo";
+import { AfrovationUsers } from "@/components/admin/AfrovationUsers";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUserRole } from "@/components/admin/hooks/useUserRole";
 import { setUserAsGlobalAdmin } from "@/utils/admin/setUserAsGlobalAdmin";
@@ -54,6 +55,8 @@ const AdminPortal = () => {
         return <SystemSettings />;
       case "system":
         return <SystemInfo />;
+      case "afrovation":
+        return <AfrovationUsers />;
       default:
         return <UserManagement />;
     }
