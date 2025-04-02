@@ -28,7 +28,7 @@ export const setUserAsGlobalAdmin = async (saId: string): Promise<boolean> => {
       console.error("No user found with SA ID:", saId);
       
       // Try to find the user in auth.users metadata as a fallback
-      const { data: { users }, error: authError } = await supabase.auth.admin.listUsers();
+      const { data, error: authError } = await supabase.auth.admin.listUsers();
       
       if (authError) {
         console.error("Error listing users:", authError);
@@ -37,10 +37,14 @@ export const setUserAsGlobalAdmin = async (saId: string): Promise<boolean> => {
       }
       
       // Look for user with matching SA ID in user metadata
-      const userWithSaId = users.find(user => 
-        user.user_metadata?.sa_id === saId || 
-        user.raw_user_meta_data?.sa_id === saId
-      );
+      // Fix TypeScript error by properly typing the users array
+      const users = data?.users || [];
+      const userWithSaId = users.find(user => {
+        // Safely access potentially undefined properties
+        const metaSaId = user.user_metadata?.sa_id;
+        const rawMetaSaId = user.raw_user_meta_data?.sa_id;
+        return metaSaId === saId || rawMetaSaId === saId;
+      });
       
       if (!userWithSaId) {
         toast.error("No user found with the provided SA ID");
