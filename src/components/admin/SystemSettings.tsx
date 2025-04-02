@@ -1,112 +1,90 @@
 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { createGlobalAdmin } from "@/utils/admin/createGlobalAdmin";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Lock, Moon, User } from "lucide-react";
-import { toast } from "sonner";
-import { AccountSettings } from "@/components/settings/AccountSettings";
-import { AppearanceSettings } from "@/components/settings/AppearanceSettings";
-import { NotificationSettings } from "@/components/settings/NotificationSettings";
-import { SecuritySettings } from "@/components/settings/SecuritySettings";
+import { Loader2, UserPlus, Settings, Shield } from "lucide-react";
+import { SetGlobalAdminForm } from "./SetGlobalAdminForm";
+import { Separator } from "@/components/ui/separator";
 
-export const SystemSettings = () => {
-  // Appearance Settings
-  const [darkMode, setDarkMode] = useState(true);
-  const [compactMode, setCompactMode] = useState(false);
-  const [fontSize, setFontSize] = useState("medium");
-  const [highContrast, setHighContrast] = useState(false);
+export function SystemSettings() {
+  const [isCreating, setIsCreating] = useState(false);
 
-  // Notification Settings
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [emailUpdates, setEmailUpdates] = useState(true);
-  const [weeklyDigest, setWeeklyDigest] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [desktopAlerts, setDesktopAlerts] = useState(true);
-
-  // Security Settings
-  const [twoFactorAuth, setTwoFactorAuth] = useState(false);
-  const [sessionTimeout, setSessionTimeout] = useState(false);
-  const [loginAlerts, setLoginAlerts] = useState(true);
-
-  const handleSave = (section: string) => {
-    toast.success(`${section} settings saved successfully`);
+  const handleCreateGlobalAdmin = async () => {
+    setIsCreating(true);
+    try {
+      await createGlobalAdmin();
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">System Settings</h2>
+      <div className="flex flex-col gap-2">
+        <h2 className="text-2xl font-bold">System Settings</h2>
         <p className="text-muted-foreground">
-          Configure system-wide settings and preferences
+          Configure system-wide settings and manage global administrators
         </p>
       </div>
-
-      <Tabs defaultValue="account" className="w-full">
-        <TabsList className="w-full justify-start">
-          <TabsTrigger value="account" className="flex items-center gap-2">
-            <User className="w-4 h-4" />
-            Account
-          </TabsTrigger>
-          <TabsTrigger value="appearance" className="flex items-center gap-2">
-            <Moon className="w-4 h-4" />
-            Appearance
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
-            <Bell className="w-4 h-4" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Lock className="w-4 h-4" />
-            Security
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="account">
-          <AccountSettings />
-        </TabsContent>
-
-        <TabsContent value="appearance">
-          <AppearanceSettings
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-            compactMode={compactMode}
-            setCompactMode={setCompactMode}
-            fontSize={fontSize}
-            setFontSize={setFontSize}
-            highContrast={highContrast}
-            setHighContrast={setHighContrast}
-            onSave={() => handleSave('Appearance')}
-          />
-        </TabsContent>
-
-        <TabsContent value="notifications">
-          <NotificationSettings
-            pushNotifications={pushNotifications}
-            setPushNotifications={setPushNotifications}
-            emailUpdates={emailUpdates}
-            setEmailUpdates={setEmailUpdates}
-            weeklyDigest={weeklyDigest}
-            setWeeklyDigest={setWeeklyDigest}
-            soundEnabled={soundEnabled}
-            setSoundEnabled={setSoundEnabled}
-            desktopAlerts={desktopAlerts}
-            setDesktopAlerts={setDesktopAlerts}
-            onSave={() => handleSave('Notification')}
-          />
-        </TabsContent>
-
-        <TabsContent value="security">
-          <SecuritySettings
-            twoFactorAuth={twoFactorAuth}
-            setTwoFactorAuth={setTwoFactorAuth}
-            sessionTimeout={sessionTimeout}
-            setSessionTimeout={setSessionTimeout}
-            loginAlerts={loginAlerts}
-            setLoginAlerts={setLoginAlerts}
-            onSave={() => handleSave('Security')}
-          />
-        </TabsContent>
-      </Tabs>
+      
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <UserPlus className="h-5 w-5 text-blue-600" />
+              Create Test Global Admin
+            </CardTitle>
+            <CardDescription>
+              Create a test global admin user with pre-configured credentials
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent>
+            <p className="text-sm mb-4">
+              This will create a standard test user with global administrator privileges that
+              you can use for testing the system.
+            </p>
+            
+            <Button 
+              onClick={handleCreateGlobalAdmin} 
+              disabled={isCreating}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {isCreating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating Admin...
+                </>
+              ) : (
+                "Create Global Admin"
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <SetGlobalAdminForm />
+      </div>
+      
+      <Separator className="my-6" />
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            <Settings className="h-5 w-5 text-purple-600" />
+            Advanced Settings
+          </CardTitle>
+          <CardDescription>
+            Additional system configuration options
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Advanced settings will be available in a future update.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
-};
+}
