@@ -11,7 +11,8 @@ import {
   MoreVertical, 
   Pen, 
   Trash2, 
-  X 
+  X,
+  Smile
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,6 +25,7 @@ import type { Message, Attachment } from "@/types/chat";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { BroadcastMessageItem } from "./broadcast/BroadcastMessageItem";
 
 interface MessageItemProps {
   message: Message;
@@ -42,6 +44,11 @@ export function MessageItem({
 }: MessageItemProps) {
   const [editMode, setEditMode] = useState(false);
   const [editText, setEditText] = useState(message.text || message.content);
+  
+  // If this is a broadcast message, use the BroadcastMessageItem component
+  if (message.isBroadcast) {
+    return <BroadcastMessageItem message={message} />;
+  }
   
   // If this is admin chat, get the sender's profile
   const { data: senderProfile } = useQuery({
@@ -104,14 +111,30 @@ export function MessageItem({
           <div 
             key={attachment.id}
             className={`flex items-center p-2 rounded-md ${
-              isSentByMe ? 'bg-primary/10' : 'bg-muted/80'
-            }`}
+              isSentByMe ? 'bg-primary/10 hover:bg-primary/20' : 'bg-muted/80 hover:bg-muted'
+            } transition-colors duration-200 cursor-pointer`}
           >
-            {attachment.type.startsWith('image/')
-              ? <Image className="h-4 w-4 mr-2" />
-              : <File className="h-4 w-4 mr-2" />
-            }
+            {attachment.type === 'image' ? (
+              <div className="relative">
+                <Image className="h-4 w-4 mr-2" />
+                <div className="absolute inset-0 bg-black/5 rounded-md"></div>
+                {attachment.preview && (
+                  <img 
+                    src={attachment.preview} 
+                    alt={attachment.name} 
+                    className="max-h-32 rounded-md mt-1" 
+                  />
+                )}
+              </div>
+            ) : (
+              <File className="h-4 w-4 mr-2" />
+            )}
             <span className="text-xs truncate max-w-[120px]">{attachment.name}</span>
+            {attachment.size && (
+              <span className="text-xs text-muted-foreground ml-2">
+                {formatFileSize(attachment.size)}
+              </span>
+            )}
           </div>
         ))}
       </div>
@@ -122,10 +145,10 @@ export function MessageItem({
     <div
       className={`flex flex-col ${
         isSentByMe ? 'items-end' : isSystemMessage ? 'items-center' : 'items-start'
-      }`}
+      } mb-4`}
     >
       {isAdminChat && !isSentByMe && !isSystemMessage && (
-        <div className="text-xs text-muted-foreground mb-1">
+        <div className="text-xs text-muted-foreground mb-1 ml-10">
           {senderProfile ? `${senderProfile.first_name} ${senderProfile.last_name}` : 'Admin'}
         </div>
       )}
@@ -136,7 +159,7 @@ export function MessageItem({
         </div>
       )}
       
-      <div className="flex items-start gap-2 group">
+      <div className="flex items-start gap-2 group max-w-[80%]">
         {!isSentByMe && !isSystemMessage && (
           <Avatar className="h-8 w-8">
             {isAdminChat && senderProfile ? (
@@ -144,7 +167,7 @@ export function MessageItem({
             ) : (
               <AvatarImage src={''} />
             )}
-            <AvatarFallback>
+            <AvatarFallback className={`${isAdminChat ? 'bg-purple-100 text-purple-700' : ''}`}>
               {isAdminChat && senderProfile 
                 ? `${senderProfile.first_name?.[0] || ''}${senderProfile.last_name?.[0] || ''}` 
                 : 'UN'}
@@ -162,11 +185,11 @@ export function MessageItem({
           <div
             className={`px-4 py-2 rounded-lg text-sm ${
               isSentByMe
-                ? 'bg-primary text-primary-foreground'
+                ? 'bg-primary text-primary-foreground rounded-br-none'
                 : isSystemMessage
                 ? 'bg-primary/10 text-primary border border-primary/20'
-                : 'bg-muted'
-            }`}
+                : 'bg-muted rounded-bl-none'
+            } shadow-sm`}
           >
             {editMode ? (
               <div className="flex">
@@ -174,6 +197,7 @@ export function MessageItem({
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
                   className="min-w-[200px] bg-background h-8"
+                  autoFocus
                 />
                 <Button
                   size="icon"
@@ -196,20 +220,59 @@ export function MessageItem({
                 </Button>
               </div>
             ) : (
-              <div>{message.text || message.content}</div>
+              <div className="break-words">{message.text || message.content}</div>
             )}
           </div>
           
           {renderAttachments()}
           
+          {!editMode && (
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 rounded-full"
+                onClick={() => onReactToMessage(message.id, '👍')}
+              >
+                <Smile className="h-3 w-3" />
+                <span className="sr-only">React</span>
+              </Button>
+              {isSentByMe && !isSystemMessage && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 rounded-full"
+                    onClick={() => {
+                      setEditText(message.text || message.content);
+                      setEditMode(true);
+                    }}
+                  >
+                    <Pen className="h-3 w-3" />
+                    <span className="sr-only">Edit</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 rounded-full text-destructive hover:text-destructive"
+                    onClick={() => onDeleteMessage(message.id)}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    <span className="sr-only">Delete</span>
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
+          
           {reactionArray.length > 0 && !isSystemMessage && (
-            <div className="flex gap-1">
+            <div className="flex gap-1 flex-wrap">
               {reactionArray.map((reaction) => (
                 <Button
                   key={reaction.emoji}
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6"
+                  className="h-6 rounded-full bg-muted/50 px-1.5 hover:bg-muted"
                   onClick={() => onReactToMessage(message.id, reaction.emoji)}
                 >
                   <span className="text-xs">
@@ -284,4 +347,11 @@ function formatMessageTimestamp(timestamp: string): string {
     console.error('Error formatting timestamp:', error);
     return timestamp; // Return original if there's an error
   }
+}
+
+// Helper function to format file size
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B';
+  else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  else return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }

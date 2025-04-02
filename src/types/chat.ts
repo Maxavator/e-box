@@ -24,6 +24,8 @@ export interface Message {
   edited?: boolean;
   isEdited?: boolean;
   isBroadcast?: boolean;
+  isGlobal?: boolean;
+  organizationId?: string;
   attachments?: Attachment[];
 }
 
