@@ -8,7 +8,7 @@ export const useMessages = (
   selectedConversation: Conversation | null,
   setSelectedConversation: React.Dispatch<React.SetStateAction<Conversation | null>>
 ) => {
-  const { newMessage, setNewMessage, handleSendMessage } = useMessageActions(
+  const { newMessage, setNewMessage, handleSendMessage, isSending } = useMessageActions(
     selectedConversation,
     setSelectedConversation
   );
@@ -29,7 +29,8 @@ export const useMessages = (
     handleSendMessage,
     handleEditMessage,
     handleDeleteMessage,
-    handleReaction
+    handleReaction,
+    isSending
   };
 };
 

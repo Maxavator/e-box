@@ -1,10 +1,11 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserPlus, Building, Users } from "lucide-react";
+import { UserPlus, Building, Users, Clock } from "lucide-react";
 import { UserSearch } from "../UserSearch";
 import { ColleaguesTab } from "./ColleaguesTab";
 import { GroupsTab } from "./GroupsTab";
+import { RecentContactsTab } from "./RecentContactsTab";
 
 interface NewMessageTabsProps {
   activeTab: string;
@@ -14,10 +15,13 @@ interface NewMessageTabsProps {
   onSelectUser: (user: any) => void;
   onSelectColleague: (colleague: any) => void;
   onSelectGroup: (group: any) => void;
+  onSelectRecent: (contact: any) => void;
   colleagues: any[];
   groups: any[];
+  recentContacts: any[];
   isLoadingColleagues: boolean;
   isLoadingGroups: boolean;
+  isLoadingRecents: boolean;
 }
 
 export function NewMessageTabs({
@@ -28,10 +32,13 @@ export function NewMessageTabs({
   onSelectUser,
   onSelectColleague,
   onSelectGroup,
+  onSelectRecent,
   colleagues,
   groups,
+  recentContacts = [],
   isLoadingColleagues,
-  isLoadingGroups
+  isLoadingGroups,
+  isLoadingRecents = false
 }: NewMessageTabsProps) {
   return (
     <Tabs defaultValue="all-users" value={activeTab} onValueChange={setActiveTab}>
@@ -47,6 +54,10 @@ export function NewMessageTabs({
         <TabsTrigger value="groups" className="flex-1">
           <Users className="h-4 w-4 mr-2" />
           Groups
+        </TabsTrigger>
+        <TabsTrigger value="recent" className="flex-1">
+          <Clock className="h-4 w-4 mr-2" />
+          Recent
         </TabsTrigger>
       </TabsList>
       
@@ -71,6 +82,16 @@ export function NewMessageTabs({
           setSearchQuery={setSearchQuery}
           isLoadingGroups={isLoadingGroups}
           onSelectGroup={onSelectGroup}
+        />
+      </TabsContent>
+
+      <TabsContent value="recent">
+        <RecentContactsTab
+          recentContacts={recentContacts}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          isLoadingRecents={isLoadingRecents}
+          onSelectRecent={onSelectRecent}
         />
       </TabsContent>
     </Tabs>

@@ -17,6 +17,7 @@ interface ChatContentProps {
   attachments?: Attachment[];
   onAttachFiles?: () => void;
   onRemoveAttachment?: (id: string) => void;
+  isSending?: boolean;
 }
 
 export function ChatContent({
@@ -31,7 +32,8 @@ export function ChatContent({
   onSendMessage,
   attachments = [],
   onAttachFiles,
-  onRemoveAttachment
+  onRemoveAttachment,
+  isSending = false
 }: ChatContentProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -70,6 +72,8 @@ export function ChatContent({
             onAttach={onAttachFiles}
             attachments={attachments}
             onRemoveAttachment={onRemoveAttachment}
+            isLoading={isSending}
+            placeholder={conversation.isGroup ? "Send a message to the group..." : "Type a message..."}
           />
         </>
       ) : (

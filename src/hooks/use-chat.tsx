@@ -60,7 +60,8 @@ export const useChat = () => {
     handleSendMessage: baseSendMessage,
     handleEditMessage,
     handleDeleteMessage,
-    handleReaction
+    handleReaction,
+    isSending
   } = useMessages(selectedConversation, setSelectedConversation);
 
   useRealtime(selectedConversation, setSelectedConversation);
@@ -186,5 +187,6 @@ export const useChat = () => {
     handleRemoveAttachment,
     handleStartConversationWithColleague,
     isNewConversation,
+    isSending
   };
 };

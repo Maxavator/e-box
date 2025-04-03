@@ -25,11 +25,14 @@ export function NewMessageDialog({
     setActiveTab,
     colleagues,
     groups,
+    recentContacts,
     isLoadingColleagues,
     isLoadingGroups,
+    isLoadingRecents,
     handleSelectUser,
     handleSelectColleague,
-    handleSelectGroup
+    handleSelectGroup,
+    handleSelectRecent
   } = useNewMessageDialog(onSelectConversation);
 
   const isOpen = open !== undefined ? open : dialogOpen;
@@ -56,10 +59,13 @@ export function NewMessageDialog({
             onSelectUser={handleSelectUser}
             onSelectColleague={handleSelectColleague}
             onSelectGroup={handleSelectGroup}
+            onSelectRecent={handleSelectRecent}
             colleagues={colleagues}
             groups={groups}
+            recentContacts={recentContacts}
             isLoadingColleagues={isLoadingColleagues}
             isLoadingGroups={isLoadingGroups}
+            isLoadingRecents={isLoadingRecents}
           />
         </div>
       </DialogContent>

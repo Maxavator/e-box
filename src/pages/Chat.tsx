@@ -38,7 +38,8 @@ export function Chat() {
     isNewConversation,
     attachments,
     handleAttachFiles,
-    handleRemoveAttachment
+    handleRemoveAttachment,
+    isSending
   } = useChat();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -184,6 +185,7 @@ export function Chat() {
                       attachments={attachments}
                       onAttachFiles={handleAttachFiles}
                       onRemoveAttachment={handleRemoveAttachment}
+                      isSending={isSending}
                     />
                   )}
                 </div>
@@ -240,6 +242,7 @@ export function Chat() {
                   attachments={attachments}
                   onAttachFiles={handleAttachFiles}
                   onRemoveAttachment={handleRemoveAttachment}
+                  isSending={isSending}
                 />
               )}
             </ResizablePanel>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +19,10 @@ interface Group {
   name: string;
   is_public: boolean;
   avatar_url?: string;
+}
+
+interface RecentContact extends Profile {
+  last_contact: string;
 }
 
 export function useNewMessageDialog(onSelectConversation?: (conversationId: string) => void) {
@@ -111,6 +114,50 @@ export function useNewMessageDialog(onSelectConversation?: (conversationId: stri
     }
   });
 
+  const { data: recentContacts = [], isLoading: isLoadingRecents } = useQuery({
+    queryKey: ['recent-contacts'],
+    queryFn: async () => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session?.session?.user) throw new Error('Not authenticated');
+      
+      const userId = session.session.user.id;
+      
+      const { data: recentConversations, error: convError } = await supabase
+        .from('conversations')
+        .select('id, user1_id, user2_id, updated_at')
+        .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+        .order('updated_at', { ascending: false })
+        .limit(10);
+      
+      if (convError) throw convError;
+      if (!recentConversations || recentConversations.length === 0) return [];
+      
+      const otherUserIds = recentConversations.map(conv => 
+        conv.user1_id === userId ? conv.user2_id : conv.user1_id
+      );
+      
+      const { data: recentProfiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, avatar_url, job_title')
+        .in('id', otherUserIds);
+      
+      if (profilesError) throw profilesError;
+      if (!recentProfiles) return [];
+      
+      return recentProfiles.map(profile => {
+        const conversation = recentConversations.find(conv => 
+          conv.user1_id === profile.id || conv.user2_id === profile.id
+        );
+        
+        return {
+          ...profile,
+          last_contact: conversation?.updated_at || new Date().toISOString()
+        };
+      });
+    },
+    enabled: activeTab === "recent" || dialogOpen
+  });
+
   const handleSelectContact = async (contact: Profile) => {
     try {
       const currentUser = (await supabase.auth.getUser()).data.user;
@@ -177,6 +224,10 @@ export function useNewMessageDialog(onSelectConversation?: (conversationId: stri
     handleSelectContact(colleague);
   };
 
+  const handleSelectRecent = async (contact: RecentContact) => {
+    handleSelectContact(contact);
+  };
+
   const handleSelectGroup = async (group: Group) => {
     try {
       toast({
@@ -209,11 +260,14 @@ export function useNewMessageDialog(onSelectConversation?: (conversationId: stri
     contacts,
     colleagues,
     groups,
+    recentContacts,
     isLoadingContacts,
     isLoadingColleagues,
     isLoadingGroups,
+    isLoadingRecents,
     handleSelectUser,
     handleSelectColleague,
-    handleSelectGroup
+    handleSelectGroup,
+    handleSelectRecent
   };
 }
