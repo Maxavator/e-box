@@ -2,14 +2,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { createGlobalAdmin } from "@/utils/admin/createGlobalAdmin";
+import { createDemoEnvironment } from "@/utils/admin/createDemoEnvironment";
 import { useState } from "react";
-import { Loader2, UserPlus, Settings, Shield } from "lucide-react";
+import { Loader2, UserPlus, Settings, Shield, Building } from "lucide-react";
 import { SetGlobalAdminForm } from "./SetGlobalAdminForm";
 import { Separator } from "@/components/ui/separator";
 import { GlobalAdminsList } from "./GlobalAdminsList";
 
 export function SystemSettings() {
   const [isCreating, setIsCreating] = useState(false);
+  const [isCreatingDemo, setIsCreatingDemo] = useState(false);
 
   const handleCreateGlobalAdmin = async () => {
     setIsCreating(true);
@@ -17,6 +19,15 @@ export function SystemSettings() {
       await createGlobalAdmin();
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleCreateDemoEnvironment = async () => {
+    setIsCreatingDemo(true);
+    try {
+      await createDemoEnvironment();
+    } finally {
+      setIsCreatingDemo(false);
     }
   };
 
@@ -59,6 +70,40 @@ export function SystemSettings() {
                 </>
               ) : (
                 "Create Global Admin"
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Building className="h-5 w-5 text-purple-600" />
+              Create Demo Environment
+            </CardTitle>
+            <CardDescription>
+              Set up a demo company with users and admin roles
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent>
+            <p className="text-sm mb-4">
+              This will create a demo company with 10 staff users, a company admin, and a global admin,
+              all with realistic South African details.
+            </p>
+            
+            <Button 
+              onClick={handleCreateDemoEnvironment} 
+              disabled={isCreatingDemo}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              {isCreatingDemo ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating Demo Environment...
+                </>
+              ) : (
+                "Create Demo Environment"
               )}
             </Button>
           </CardContent>
