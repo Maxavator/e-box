@@ -37,8 +37,8 @@ export function SystemSettings() {
   const handleCreateGolderOrg = async () => {
     setIsCreatingGolder(true);
     try {
-      const result = await createGolderOrg();
-      if (result) {
+      const success = await createGolderOrg();
+      if (success) {
         toast.success("Golder (Pty) Ltd organization created successfully");
       }
     } catch (error) {

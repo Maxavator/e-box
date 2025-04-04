@@ -7,8 +7,9 @@ import { golderUsers } from "./organization/golderUserDefinitions";
 
 /**
  * Creates the Golder organization with all users and the global admin
+ * @returns A boolean indicating whether the organization was successfully created
  */
-export const createGolderOrg = async () => {
+export const createGolderOrg = async (): Promise<boolean> => {
   try {
     // First create the global admin
     console.log("Creating global admin...");
@@ -16,13 +17,13 @@ export const createGolderOrg = async () => {
     
     if (!globalAdmin) {
       toast.error("Failed to create global admin");
-      return;
+      return false;
     }
 
     // Step 1: Create the organization
     const orgData = await createOrganization('Golder (Pty) Ltd.', 'golder.co.za');
     if (!orgData) {
-      return;
+      return false;
     }
 
     const orgId = orgData.id;
@@ -46,9 +47,12 @@ export const createGolderOrg = async () => {
     toast.info("You can now login with either email addresses or SA ID numbers", {
       duration: 8000
     });
+    
+    return true;  // Return true to indicate successful creation
 
   } catch (error) {
     console.error("Error in creating organization:", error);
     toast.error("Failed to create organization. Check console for details.");
+    return false;  // Return false if an error occurred
   }
 };
