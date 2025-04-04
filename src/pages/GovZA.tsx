@@ -56,7 +56,9 @@ export default function GovZA() {
                 className="justify-start"
                 onClick={() => {
                   handleTabChange(tab.value);
-                  document.querySelector('[data-radix-collection-item]')?.click(); // Close sheet
+                  // Use optional chaining and type assertion to safely call click
+                  const closeButton = document.querySelector('[data-radix-collection-item]') as HTMLElement | null;
+                  closeButton?.click();
                 }}
               >
                 <tab.icon className="h-4 w-4 mr-2" />
