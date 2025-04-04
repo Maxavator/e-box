@@ -29,8 +29,7 @@ import {
   DialogHeader, 
   DialogTitle, 
   DialogDescription,
-  DialogFooter,
-  DialogClose
+  DialogFooter
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { 
