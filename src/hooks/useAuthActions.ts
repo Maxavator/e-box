@@ -98,7 +98,7 @@ const handleLogin = async ({
           data.user = loginData.user;
           data.session = loginData.session;
           
-          // Update the profile with the SA ID
+          // Update the profile with the SA ID - we KNOW the profile is new here
           const { error: profileError } = await supabase
             .from('profiles')
             .update({ sa_id: saId })
@@ -145,7 +145,7 @@ const handleLogin = async ({
     const userRole: UserRoleType = roleData?.role || 'user';
     console.log('Role fetched:', userRole);
     
-    // Ensure profile has SA ID
+    // Check if profile already has SA ID before updating
     try {
       const { data: profile } = await supabase
         .from('profiles')
@@ -153,7 +153,9 @@ const handleLogin = async ({
         .eq('id', data.user.id)
         .single();
         
+      // Only update profile if SA ID is not set yet
       if (!profile?.sa_id) {
+        console.log('Profile has no SA ID, updating with:', saId);
         const { error: updateError } = await supabase
           .from('profiles')
           .update({ sa_id: saId })
@@ -162,6 +164,8 @@ const handleLogin = async ({
         if (updateError) {
           console.error('Error updating profile SA ID:', updateError);
         }
+      } else {
+        console.log('Profile already has SA ID:', profile.sa_id, 'skipping update');
       }
     } catch (e) {
       console.error('Error checking/updating SA ID in profile:', e);
