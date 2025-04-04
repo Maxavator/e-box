@@ -4,14 +4,17 @@ import { Button } from "@/components/ui/button";
 import { createGlobalAdmin } from "@/utils/admin/createGlobalAdmin";
 import { createDemoEnvironment } from "@/utils/admin/createDemoEnvironment";
 import { useState } from "react";
-import { Loader2, UserPlus, Settings, Shield, Building } from "lucide-react";
+import { Loader2, UserPlus, Settings, Shield, Building, BookOpen } from "lucide-react";
 import { SetGlobalAdminForm } from "./SetGlobalAdminForm";
 import { Separator } from "@/components/ui/separator";
 import { GlobalAdminsList } from "./GlobalAdminsList";
+import { createGolderOrg } from "@/utils/createGolderOrg";
+import { toast } from "sonner";
 
 export function SystemSettings() {
   const [isCreating, setIsCreating] = useState(false);
   const [isCreatingDemo, setIsCreatingDemo] = useState(false);
+  const [isCreatingGolder, setIsCreatingGolder] = useState(false);
 
   const handleCreateGlobalAdmin = async () => {
     setIsCreating(true);
@@ -28,6 +31,21 @@ export function SystemSettings() {
       await createDemoEnvironment();
     } finally {
       setIsCreatingDemo(false);
+    }
+  };
+
+  const handleCreateGolderOrg = async () => {
+    setIsCreatingGolder(true);
+    try {
+      const result = await createGolderOrg();
+      if (result) {
+        toast.success("Golder (Pty) Ltd organization created successfully");
+      }
+    } catch (error) {
+      console.error("Error creating Golder org:", error);
+      toast.error("Failed to create Golder organization");
+    } finally {
+      setIsCreatingGolder(false);
     }
   };
 
@@ -104,6 +122,40 @@ export function SystemSettings() {
                 </>
               ) : (
                 "Create Demo Environment"
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-amber-600" />
+              Create Golder Organization
+            </CardTitle>
+            <CardDescription>
+              Set up the Golder (Pty) Ltd. organization for partner messaging
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent>
+            <p className="text-sm mb-4">
+              This will create the Golder (Pty) Ltd. organization that can be used for cross-organization
+              messaging and collaboration features.
+            </p>
+            
+            <Button 
+              onClick={handleCreateGolderOrg} 
+              disabled={isCreatingGolder}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              {isCreatingGolder ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating Golder Organization...
+                </>
+              ) : (
+                "Create Golder Organization"
               )}
             </Button>
           </CardContent>

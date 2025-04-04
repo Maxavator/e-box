@@ -39,16 +39,16 @@ export const useUsers = (
         const { data: profiles, error: profilesError } = await profilesQuery;
         if (profilesError) throw profilesError;
 
-        console.log(`Found ${profiles.length} profiles`);
+        console.log(`Found ${profiles?.length || 0} profiles`);
 
         // Get organization details for all profiles in a single query to improve performance
         const organizationIds = profiles
-          .filter(profile => profile.organization_id)
-          .map(profile => profile.organization_id);
+          ?.filter(profile => profile.organization_id)
+          .map(profile => profile.organization_id) || [];
         
         const uniqueOrgIds = [...new Set(organizationIds)];
         
-        let organizationsMap = {};
+        let organizationsMap: Record<string, string> = {};
         if (uniqueOrgIds.length > 0) {
           const { data: organizations, error: orgsError } = await supabase
             .from('organizations')
@@ -59,7 +59,7 @@ export const useUsers = (
             organizationsMap = organizations.reduce((acc, org) => {
               acc[org.id] = org.name;
               return acc;
-            }, {});
+            }, {} as Record<string, string>);
           }
         }
 
@@ -67,7 +67,7 @@ export const useUsers = (
         const { data: allUserRoles, error: rolesError } = await supabase
           .from('user_roles')
           .select('*')
-          .in('user_id', profiles.map(profile => profile.id));
+          .in('user_id', profiles?.map(profile => profile.id) || []);
         
         if (rolesError) throw rolesError;
 
@@ -78,26 +78,12 @@ export const useUsers = (
           }
           acc[role.user_id].push(role);
           return acc;
-        }, {});
+        }, {} as Record<string, any[]>);
 
-        // Get auth status for all users in a single query
-        const { data: authStatuses, error: authError } = await supabase
-          .from('auth_status')
-          .select('user_id, is_confirmed')
-          .in('user_id', profiles.map(profile => profile.id));
-        
-        if (authError) {
-          console.error('Error fetching auth status:', authError);
-          // Continue without auth status rather than failing completely
-        }
+        // Skip auth status check since the table doesn't exist
+        const authStatusMap: Record<string, boolean> = {};
 
-        // Create a map of user_id to auth status
-        const authStatusMap = (authStatuses || []).reduce((acc, status) => {
-          acc[status.user_id] = status.is_confirmed;
-          return acc;
-        }, {});
-
-        const usersWithDetails = profiles.map(profile => {
+        const usersWithDetails = (profiles || []).map(profile => {
           const orgName = profile.organization_id && organizationsMap[profile.organization_id];
           
           return {

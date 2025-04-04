@@ -6,6 +6,7 @@ import { useUsers } from "./hooks/useUsers";
 import { useUserMutations } from "./hooks/useUserMutations";
 import type { UserWithRole, UserFormData } from "./types";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useUserManagement = () => {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -38,14 +39,33 @@ export const useUserManagement = () => {
 
   // Find the Golder organization ID when organizations are loaded
   useEffect(() => {
-    if (organizations?.length) {
-      const golderOrg = organizations.find(
-        org => org.name.toLowerCase().includes('golder')
-      );
-      if (golderOrg) {
-        setGolderOrgId(golderOrg.id);
+    const findGolderOrg = async () => {
+      if (organizations?.length) {
+        const golderOrg = organizations.find(
+          org => org.name.toLowerCase().includes('golder')
+        );
+        
+        if (golderOrg) {
+          setGolderOrgId(golderOrg.id);
+        } else {
+          // If not found in organizations list, try direct DB query
+          const { data, error } = await supabase
+            .from('organizations')
+            .select('id')
+            .ilike('name', '%golder%')
+            .maybeSingle();
+            
+          if (!error && data?.id) {
+            setGolderOrgId(data.id);
+            console.log("Found Golder organization via direct query:", data.id);
+          } else {
+            console.log("Golder organization not found in DB");
+          }
+        }
       }
-    }
+    };
+    
+    findGolderOrg();
   }, [organizations]);
 
   // Set up a polling interval to refresh the users list every 10 seconds
