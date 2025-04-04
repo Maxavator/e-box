@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 
 export function useMediaQuery() {
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
   useEffect(() => {
     const checkScreenSize = () => {
