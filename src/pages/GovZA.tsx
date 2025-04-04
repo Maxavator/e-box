@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Flag, Info, Globe, Shield, Clock, Building2 } from "lucide-react";
+import { Search, Flag, Info, Globe, Shield, Clock, Building2, Inbox } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GovServicesSection } from "@/components/govza/GovServicesSection";
 import { HomeAffairsSection } from "@/components/govza/departments/HomeAffairsSection";
@@ -13,6 +13,7 @@ import { SarsSection } from "@/components/govza/departments/SarsSection";
 import { SassaSection } from "@/components/govza/departments/SassaSection";
 import { NsfasSection } from "@/components/govza/departments/NsfasSection";
 import { MunicipalServicesSection } from "@/components/govza/departments/MunicipalServicesSection";
+import { GovInbox } from "@/components/govza/GovInbox";
 
 export default function GovZA() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,6 +52,10 @@ export default function GovZA() {
       <Tabs defaultValue="overview" className="mb-8">
         <TabsList className="w-full justify-start overflow-x-auto mb-4">
           <TabsTrigger value="overview" className="px-4">Overview</TabsTrigger>
+          <TabsTrigger value="inbox" className="px-4 flex items-center gap-2">
+            <Inbox className="h-4 w-4" />
+            Inbox
+          </TabsTrigger>
           <TabsTrigger value="home-affairs" className="px-4">Home Affairs</TabsTrigger>
           <TabsTrigger value="sars" className="px-4">SARS</TabsTrigger>
           <TabsTrigger value="transport" className="px-4">Transport</TabsTrigger>
@@ -61,6 +66,10 @@ export default function GovZA() {
         
         <TabsContent value="overview">
           <GovServicesSection searchQuery={searchQuery} />
+        </TabsContent>
+        
+        <TabsContent value="inbox">
+          <GovInbox />
         </TabsContent>
         
         <TabsContent value="home-affairs">
